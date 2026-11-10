@@ -1,7 +1,7 @@
 import '../styles/package.css';
 import '../styles/publish.css';
 import { buildsApi, type BuildSummary } from '../api-builds';
-import { publishApi, type PreparedCommand, type PreparedTarget, type TargetInfo } from '../api-publish';
+import { publishApi, type NginxCheck, type PreparedCommand, type PreparedTarget, type TargetInfo } from '../api-publish';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
 import { copyText, fmtCount, fmtDate } from './builds';
@@ -13,7 +13,15 @@ import { toast } from './toast';
 
 type Tone = '' | 'ok' | 'error';
 
-interface Verdict { text: string; tone: Tone; problems: string[] }
+interface Verdict { text: string; tone: Tone; problems: string[]; nginx?: { text: string; tone: Tone } }
+
+function nginxLine(n: NginxCheck | null): { text: string; tone: Tone } | undefined {
+  if (!n) return undefined;
+  if (!n.ran) return { text: 'nginx is not installed here, so nginx -t did not run.', tone: '' };
+  if (n.ok) return { text: n.version ? `nginx -t passed with nginx ${n.version}.` : 'nginx -t passed.', tone: 'ok' };
+  const first = n.output.split('\n').find((l) => l.includes('[emerg]') || l.includes('[alert]')) ?? n.output.split('\n')[0] ?? '';
+  return { text: `nginx -t failed: ${first.replace(/^nginx:\s*/, '')}`, tone: 'error' };
+}
 
 interface Memo {
   picked: Set<string>;
@@ -287,6 +295,7 @@ class PublishSheet extends Dialog {
 <div class="fp-pub-sub" data-f="warnh">Warnings</div>
 <ul class="fp-pub-list" data-f="warns"></ul>
 <div class="fp-pkg-res" data-f="verdict" role="status"></div>
+<div class="fp-pkg-res fp-pub-nginx" data-f="nginx" role="status"></div>
 <ul class="fp-pub-list" data-f="probs"></ul>
 </article>`);
     this.fillResult(node, r);
@@ -326,6 +335,8 @@ class PublishSheet extends Dialog {
     });
     const v = this.memo()?.verdicts.get(r.target);
     say(field(node, 'verdict'), v?.text ?? '', v?.tone ?? '');
+    setHidden(field(node, 'nginx'), r.target !== 'nginx');
+    say(field(node, 'nginx'), v?.nginx?.text ?? '', v?.nginx?.tone ?? '');
     const probs = field(node, 'probs');
     setHidden(probs, !v || v.problems.length === 0);
     patchList(probs, (v?.problems ?? []).map((text, i) => ({ text, i })), {
@@ -419,7 +430,7 @@ class PublishSheet extends Dialog {
         say(this.f.prep, `Prepared ${names}`, 'ok');
       } catch (e) {
         say(this.f.prep, message(e), 'error');
-        refuseStep(e, build);
+        refuseStep(e, build, () => { void this.runPrepare(); });
       }
     });
   }
@@ -433,7 +444,7 @@ class PublishSheet extends Dialog {
       this.paintResults();
       try {
         const r = await publishApi.verify(build, target);
-        memo.verdicts.set(target, r.ok ? { text: 'Verified. Every file matches.', tone: 'ok', problems: [] } : { text: 'Verification failed.', tone: 'error', problems: r.problems });
+        memo.verdicts.set(target, r.ok ? { text: 'Verified. Every file matches.', tone: 'ok', problems: [], nginx: nginxLine(r.nginx) } : { text: 'Verification failed.', tone: 'error', problems: r.problems, nginx: nginxLine(r.nginx) });
       } catch (e) {
         memo.verdicts.set(target, { text: message(e), tone: 'error', problems: [] });
       }

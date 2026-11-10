@@ -17,7 +17,9 @@ export interface PreparedTarget {
   leftOut: string[];
 }
 
-export interface VerifyReport { ok: boolean; checked: number; problems: string[]; leftOut: string[] }
+export interface NginxCheck { ran: boolean; ok: boolean; version: string; output: string }
+
+export interface VerifyReport { ok: boolean; checked: number; problems: string[]; leftOut: string[]; nginx: NginxCheck | null }
 
 export interface RevealResult { path: string; opened: boolean }
 
@@ -143,7 +145,9 @@ export const publishApi = {
       : [];
     const checked = num(o.checked) || num(o.files) || (Array.isArray(o.files) ? o.files.length : 0);
     const ok = typeof o.ok === 'boolean' ? o.ok : typeof o.valid === 'boolean' ? o.valid : problems.length === 0;
-    return { ok, checked, problems, leftOut: lines(o.leftOut) };
+    const n = isObj(o.nginx) ? o.nginx : null;
+    const nginx = n ? { ran: n.ran === true, ok: n.ok === true, version: str(n.version), output: str(n.output) } : null;
+    return { ok, checked, problems, leftOut: lines(o.leftOut), nginx };
   },
   async remove(build: string, target: string): Promise<void> {
     await request<unknown>(`/api/publish/${enc(build)}/${enc(target)}`, { method: 'DELETE' });

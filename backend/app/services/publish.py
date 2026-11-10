@@ -136,6 +136,9 @@ def prepare(build_id: str, target_ids: list[str] | None, include_model: bool = F
                 if folder.exists():
                     shutil.rmtree(folder)
                 os.replace(staged, folder)
+                annotate = getattr(module, "annotate", None)
+                if annotate is not None:
+                    annotate(result, folder)
                 meta = {
                     "target": module.ID,
                     "name": getattr(module, "NAME", module.ID),
@@ -220,8 +223,10 @@ def verify(build_id: str, target_id: str) -> dict:
                 if got != expected_zip:
                     problems.append({"path": "site.zip", "problem": "hash differs from publish.json", "source": "publish.json"})
             else:
+                rewritten = getattr(module, "rewritten", None)
+                changed = rewritten(inp) if rewritten else set()
                 for row in inp.publish.get("files") or []:
-                    if row.get("path") in inp.excluded:
+                    if row.get("path") in inp.excluded or row.get("path") in changed:
                         continue
                     path = f"site/{row.get('path')}"
                     found = current.get(path)
@@ -234,6 +239,14 @@ def verify(build_id: str, target_id: str) -> dict:
             fresh = {row["path"]: row for row in _walk(staged)}
         finally:
             shutil.rmtree(work, ignore_errors=True)
+    nginx_report = None
+    checker = getattr(module, "check", None)
+    if checker is not None:
+        nginx_report = checker(folder)
+        if nginx_report["ran"] and nginx_report["ok"] is False:
+            from app.targets import nginx as nginx_target
+
+            problems.append({"path": "formpublisher.conf", "problem": f"nginx -t: {nginx_target.message_of(nginx_report)}", "source": "nginx -t"})
     for path in sorted(set(fresh) | set(current)):
         if path not in current:
             problems.append({"path": path, "problem": "missing", "source": "prepare"})
@@ -249,7 +262,10 @@ def verify(build_id: str, target_id: str) -> dict:
             seen.add(key)
             unique.append(p)
     left_out = [] if target_id == "static-zip" else list(inp.excluded)
-    return {"build": build_id, "target": target_id, "folder": str(folder), "ok": not unique, "checked": len(current), "problems": unique, "includeModel": include_model, "leftOut": left_out}
+    answer = {"build": build_id, "target": target_id, "folder": str(folder), "ok": not unique, "checked": len(current), "problems": unique, "includeModel": include_model, "leftOut": left_out}
+    if nginx_report is not None:
+        answer["nginx"] = nginx_report
+    return answer
 
 
 def remove(build_id: str, target_id: str) -> dict:
