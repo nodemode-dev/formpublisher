@@ -30,7 +30,8 @@ FormPublisher only reads FormWeb. It never calls FormWeb's `/api/load`, which wo
 ./formpublisher run status
 ./formpublisher run sites
 ./formpublisher run import ~/Downloads/site-export.zip
-./formpublisher run routes [site-id]
+./formpublisher run import-formweb
+./formpublisher run routes SITE-ID
 ./formpublisher run --help
 ```
 

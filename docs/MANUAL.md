@@ -50,7 +50,8 @@ A site's routes come from its `routes.json`. Each has a path, a page, a locale, 
 ./formpublisher run status
 ./formpublisher run sites
 ./formpublisher run import site-export.zip
-./formpublisher run routes [site-id]
+./formpublisher run import-formweb
+./formpublisher run routes SITE-ID
 ./formpublisher run --help
 ```
 

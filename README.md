@@ -104,7 +104,8 @@ The window, the command line and the MCP server call one engine, so an agent and
 ./formpublisher run status                     # the engine, the data folder, whether FormWeb is reachable
 ./formpublisher run sites                      # the sites already imported
 ./formpublisher run import site-export.zip     # import a FormWeb export (or a publication folder)
-./formpublisher run routes [site-id]           # the routes of one site
+./formpublisher run import-formweb             # import the site open in a running FormWeb, read-only
+./formpublisher run routes SITE-ID             # the routes of one site
 ./formpublisher mcp                            # MCP server on stdio
 ```
 

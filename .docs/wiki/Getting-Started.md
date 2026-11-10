@@ -20,7 +20,7 @@ Node 22.12 or newer and Python 3.12. The desktop app also needs Rust and the Tau
 1. In FormWeb, export the site to get a `site-export.zip`.
 2. In FormPublisher, drop the zip on Home, or run `./formpublisher run import site-export.zip`.
 3. The site opens in a tab. Its routes are listed in the routes strip, with the count in the status bar.
-4. `./formpublisher run routes [site-id]` prints the same list.
+4. `./formpublisher run routes SITE-ID` prints the same list; `./formpublisher run sites` shows each site's id.
 
 ## Where things are kept
 

@@ -4,7 +4,7 @@ FormPublisher's engine does every step a person does, so agents drive it the sam
 
 ## The command line
 
-`./formpublisher run` covers the path: `status`, `sites` (what is imported), `import` (a `site-export.zip`, a publication folder, or the site open in FormWeb) and `routes` (the routes of one site). `./formpublisher run --help` lists every command and its options. Answers are short text, or JSON with `--json`; failures exit non-zero with the reason in plain words. It uses a running engine with the same data folder, or runs in-process. The desktop app's frozen engine takes the same commands (`formpublisher-engine cli ...`).
+`./formpublisher run` covers the path: `status`, `sites` (what is imported), `import` (a `site-export.zip` or a publication folder), `import-formweb` (the site open in a running FormWeb, read through its export) and `routes SITE-ID` (the routes of one site). `./formpublisher run --help` lists every command and its options. Answers are short text, or JSON with `--json`; failures exit non-zero with the reason in plain words. It uses a running engine with the same data folder, or runs in-process. The desktop app's frozen engine takes the same commands (`formpublisher-engine cli ...`).
 
 ## The MCP server
 
