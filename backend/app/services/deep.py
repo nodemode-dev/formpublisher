@@ -130,7 +130,7 @@ class Collector:
         self.keys.add(marker)
         short = self.route.lstrip("/") or "/"
         item = {
-            "id": f"deep:{code}:{short}:{self.width}:{checks.route_hash(key)[:8]}",
+            "id": f"deep:{code}:{short}:{self.width}:{checks.route_hash(key.replace(self.host, 'host'))[:8]}",
             "tier": "deep",
             "severity": severity,
             "code": code,
