@@ -2,11 +2,12 @@
 
 FormPublisher is the Form family's site publisher. It opens what FormWeb makes, lists the site's routes and shows them in a FormDeck-style window. People and agents use the same steps: each one is also a command line command and an MCP tool.
 
-It imports FormWeb sites, previews them on device sizes, checks them, builds signed packages, and prepares a folder with the exact commands for each of six hosts. It never uploads anything. In development: the desktop build.
+It imports FormWeb sites, previews them on device sizes, checks them, builds signed packages, and prepares a folder with the exact commands for each of six hosts. It never uploads anything. It runs in a browser tab or as a desktop app.
 
 ## Contents
 
 - [Getting started](#getting-started)
+- [The desktop app](#the-desktop-app)
 - [Home](#home)
 - [Importing a site](#importing-a-site)
 - [Routes](#routes)
@@ -16,6 +17,7 @@ It imports FormWeb sites, previews them on device sizes, checks them, builds sig
 - [Packages and signatures](#packages-and-signatures)
 - [Publish](#publish)
 - [Receive from FormWeb](#receive-from-formweb)
+- [Revisions and diffs](#revisions-and-diffs)
 - [The demo](#the-demo)
 - [Agents](#agents)
 - [The command line](#the-command-line)
@@ -33,6 +35,14 @@ From the repository:
 ```
 
 Open http://localhost:5280. `./formpublisher build` then `./formpublisher serve` runs the built interface from the engine alone on http://127.0.0.1:8280. `./formpublisher doctor` checks the toolchain, the installs and the ports. Windows has `formpublisher.bat` and `formpublisher_oc_install.bat`.
+
+## The desktop app
+
+`./build_app` (`build_app.bat` on Windows) builds the desktop app from this folder, start to finish, and logs to `build_app.log`. It freezes the engine with PyInstaller into one `formpublisher-engine` program (the built interface, the demo site and the `formweb-core` compiler go inside it), then builds the Tauri 2 shell around it. `formpublisher-engine --selfcheck` proves a frozen engine starts, and it takes the same commands as the command line (`formpublisher-engine cli ...`).
+
+When the app starts it shows a small splash with a gradient bar, starts the engine, and reveals the main window only once the interface has drawn its first frame, so there is no white flash. A second launch focuses the running window instead of opening another. Closing the last window ends the app and the engine it started; a terminate or interrupt signal does the same, engine and anything the engine started included.
+
+The port rule: the app uses `FORMPUBLISHER_PORT` when that is set, else 8280 when it is free, else any free port the system hands out. If something already answers the health route on the chosen port, the app uses that engine and does not start another. FormWeb's Send to FormPublisher looks at 8280 first, so when the engine had to take another port FormWeb finds nothing there and leaves the site in the inbox, where the engine imports it on its next scan (see [Receive from FormWeb](#receive-from-formweb)). Running from source, `./formpublisher desktop dev` opens the window over the source tree instead of the frozen engine.
 
 ## Home
 
@@ -213,6 +223,7 @@ The sheet has three parts:
 
 - **Build.** A picker lists the builds of the open site, the latest selected. With no build yet, Build now makes one first.
 - **Hosts.** One card per host with a check box: Static zip, Netlify, Cloudflare Pages, Vercel, GitHub Pages and nginx. Select all and Select none tick them together. Prepare writes a folder for each ticked host.
+- **Keep FormWeb's model files.** A check box under the hosts, off by default. See below.
 - **Prepared folders.** One panel per prepared host with the folder path (Reveal opens it in the system file manager, Copy path copies it), the commands (each has a copy button), notes and warnings, Verify, and Remove.
 
 What each host gets. Every folder is written from the build's own `site.zip`, never from the live site folder, and the same build always gives the same bytes.
@@ -228,6 +239,8 @@ What each host gets. Every folder is written from the build's own `site.zip`, ne
 
 A FormWeb 404 page exported as `404/index.html` counts as the site's 404, and is also written as `404.html` for the hosts that look for that name. A host that cannot represent something says so under Warnings and never drops it silently: GitHub Pages has no server redirects and ignores custom headers, so each redirect becomes a meta-refresh page and each ignored header is named.
 
+Left-out model files. A FormWeb site carries its editing model, `site.formweb.json`, and `asset-access.json`. A host does not need them, and they can reveal more of the site than its visitors see, so the `site/` folder of each host is written without them. The Publish sheet's Keep FormWeb's model files box, `--include-model` on the command line and `includeModel: true` in the MCP tool put them back for one prepare. Each prepared panel says "Left out: ..." and the result lists them under `leftOut`; Verify knows which files were left out and does not report them missing. The package is unchanged: `site.zip` is the build's own bytes and still holds both files, and the Static zip host writes that zip as it is, so the option affects the `site/` folders of the other five hosts only.
+
 Verify re-reads the folder and checks every file against the hashes in `publish.json`, and the host's own files against a fresh prepare. Remove moves the folder to `trash/`. Preparing again replaces the folder. Prepared folders live at `prepared/[site]/[build]/[host]/` in the data folder, and the sheet remembers what is prepared for each build when you close and reopen it.
 
 ## Receive from FormWeb
@@ -237,7 +250,17 @@ FormWeb's Send to FormPublisher hands a site over without a file dialog. There a
 - **The endpoint.** `POST /api/receive/formweb` takes the bytes of a FormWeb `site-export.zip` as `application/zip` (up to 512 MiB), with the header `X-FormWeb-Version` and optionally `X-FormWeb-Site-Name` and `X-FormWeb-Project`. It answers `{site, revision, opened}`, where `opened` is true when a window is listening. Only this computer may send: a request from another address is refused with 403, and so is one with a foreign `Origin`. A running window shows a toast, "Received [name] from FormWeb", with Open; on Home the new site appears in Recent with no reload.
 - **The inbox.** When FormPublisher is closed, FormWeb writes the file into `inbox/` in the data folder instead. Every `*.zip` or `*.fweb` there that has not changed for 2 seconds is imported when the engine starts and every 5 seconds while it runs. A file that imports moves to `inbox/imported/` with a timestamp in front of its name; one that does not moves to `inbox/failed/` with a `.txt` file giving the reason.
 
+Inbox metadata. FormWeb writes a small `NAME.zip.json` beside the zip it leaves in the inbox, with `siteName`, `project` and `version` (the same three things the endpoint takes as headers). The import reads it, so a site that arrives through the inbox gets its name and its project, and a later arrival of the same project adds a revision to the same site instead of making a new one. The file moves with the zip to `imported/` or `failed/`. Without it the site arrives with no name and no project.
+
+Auto-check and auto-build. Two switches in Preferences, FormWeb section, both off by default: Check a site when it arrives, and Build a site when it arrives (settings `receive.autoCheck` and `receive.autoBuild`). When on, each site that arrives from FormWeb, by the endpoint or the inbox, gets the static checks run and then the package built, in that order, on a background thread so the receive answer never waits. They emit the same events as the manual actions (`checks.done`, then the build's own) and a `receive.pipeline` event with the outcome, so a window that is open updates by itself and the problems are ready when you open the site. A failure is reported in that event and never breaks the import.
+
 `GET /api/receive/status` (and `./formpublisher run receive-status`) reports the endpoint, the inbox path, whether the watcher is running, how many files are waiting, and the last five receipts.
+
+## Revisions and diffs
+
+A site that arrives more than once, by the same project, gains a revision each time. Home's site card shows "N revisions" when there are several; pressing it opens the Revisions dialog, and the site's own panel has a Revisions tab. The list shows each revision's time, its file count and, from the second on, how many files were added, removed and changed from the one before. Pick any two with From and To to see the files that were added, removed and changed (path, size before and after, short hash) and the routes added and removed. With one revision the dialog says there is nothing to compare yet.
+
+The same lists come from `GET /api/sites/{id}/revisions` and `GET /api/sites/{id}/diff?from=&to=` (without `from` and `to` the latest revision is compared with the one before it), from `./formpublisher run revisions SITE-ID` and `./formpublisher run diff SITE-ID [--from R] [--to R]`, and from the MCP tools `list_revisions` and `diff_revisions`. All of them only read.
 
 ## The demo
 
@@ -249,7 +272,7 @@ Home has a Demos row with a FormPublisher demo card. It imports the bundled samp
 
 An agent does every step a person does. The command line and the MCP server are thin layers over the same engine routes as the window, so what an agent does appears in the open window at once. They use a running engine that has the same data folder, or run the routes in-process when none runs.
 
-The loop is: import a site, list its routes, run the checks, build, sign, verify, list the targets, prepare, read what is prepared. Asking the person comes first for anything that reads from a running FormWeb, for creating or choosing a signing key and for any passphrase. Preparing writes only inside the data folder.
+The loop is: import a site, list its routes (and, for a site that arrived again, its revisions and what changed), run the checks, build, sign, verify, list the targets, prepare, read what is prepared. Asking the person comes first for anything that reads from a running FormWeb, for creating or choosing a signing key and for any passphrase. Preparing writes only inside the data folder.
 
 `./formpublisher agents sync` mirrors `.claude/skills` to `.agents/skills` and checks the skill files; `--check` exits 1 on drift. `./formpublisher agents install` registers the MCP servers and copies the skills for your account in Claude Code, Codex and Cursor. The repository's kits (`.claude/skills/formpublisher-harness`, `.claude/skills/formpublisher-skillset`, `AGENTS.md`, `CLAUDE.md`) name the tools and commands below.
 
@@ -271,7 +294,9 @@ The loop is: import a site, list its routes, run the checks, build, sign, verify
 | `verify BUILD` | verifies a signature; exits 1 when it is not valid |
 | `keys [--create NAME] [--passphrase P]` | lists signing keys, or creates one |
 | `targets` | lists the six host targets |
-| `prepare BUILD --target T [--target T]` | prepares a folder per target, with the commands to run |
+| `revisions ID` | lists a site's revisions, newest first, with what changed from the one before |
+| `diff ID [--from R] [--to R]` | the files and routes added, removed and changed between two revisions |
+| `prepare BUILD --target T [--target T] [--include-model]` | prepares a folder per target, with the commands to run; FormWeb's model files are left out unless `--include-model` |
 | `prepared BUILD` | lists what is prepared for a build |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
 
@@ -287,7 +312,7 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 
 ## The MCP server
 
-`./formpublisher mcp` serves MCP on stdio with 14 tools over the same routes. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor. `./formpublisher agents install` sets Claude Code, Codex and Cursor up for your account.
+`./formpublisher mcp` serves MCP on stdio with 16 tools over the same routes. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor. `./formpublisher agents install` sets Claude Code, Codex and Cursor up for your account.
 
 | Tool | Does |
 | --- | --- |
@@ -296,6 +321,8 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 | `import_site` | imports a FormWeb export or publication folder from an absolute path |
 | `import_formweb_current` | imports the site open in a running FormWeb |
 | `site_routes` | the routes of a site (read only) |
+| `list_revisions` | the revisions of a site, newest first, with what changed from the one before (read only) |
+| `diff_revisions` | the files and routes added, removed and changed between two revisions (read only) |
 | `run_checks` | runs the static tier, or the deep tier too, and stores the result |
 | `get_checks` | the stored check results (read only) |
 | `build_package` | builds `site.zip` and `publish.json` |
@@ -303,18 +330,19 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 | `sign_build` | signs a build with a named key |
 | `verify_build` | verifies a build's signature (read only) |
 | `list_targets` | the six hosts a build can be prepared for (read only) |
-| `prepare_publish` | prepares a folder per host for a build, with commands, notes and warnings |
+| `prepare_publish` | prepares a folder per host for a build, with commands, notes and warnings; `includeModel: true` keeps FormWeb's model files, and `leftOut` lists what was left out |
 | `get_prepared` | what is prepared for a build (read only) |
 
 ## Settings and the data folder
 
-Everything is kept in `~/FormPublisher`, or in the folder named by `FORMPUBLISHER_HOME`: `sites/` (imports), `checks/` (results and thumbnails), `builds/` (packages), `prepared/` (the folders Publish writes), `inbox/` (files FormWeb leaves for FormPublisher), `keys/` (signing keys), `trash/` and `settings.json`. The engine port is `FORMPUBLISHER_PORT` (8280 by default) and the site host port is `FORMPUBLISHER_HOST_PORT` (8281). The interface is in 26 languages.
+Everything is kept in `~/FormPublisher`, or in the folder named by `FORMPUBLISHER_HOME`: `sites/` (imports), `checks/` (results and thumbnails), `builds/` (packages), `prepared/` (the folders Publish writes), `inbox/` (files FormWeb leaves for FormPublisher, each with its `.json` metadata), `keys/` (signing keys), `trash/` and `settings.json`. The engine port is `FORMPUBLISHER_PORT` (8280 by default) and the site host port is `FORMPUBLISHER_HOST_PORT` (8281). The interface is in 26 languages.
 
 ## When something goes wrong
 
 - The window cannot reach the engine: run `./formpublisher doctor` and check that 8280 is listening.
 - An import is refused: the message names the reason (not a zip, no `routes.json`, or no FormWeb on loopback).
-- A port is taken: stop what uses 8280, 8281, 5280 or 5281, or set `FORMPUBLISHER_PORT` or `FORMPUBLISHER_HOST_PORT`.
+- A port is taken: stop what uses 8280, 8281, 5280 or 5281, or set `FORMPUBLISHER_PORT` or `FORMPUBLISHER_HOST_PORT`. The desktop app picks another free port by itself when 8280 is taken, and FormWeb then falls back to the inbox.
+- A prepared folder has no `site.formweb.json`: that is the default. Prepare again with Keep FormWeb's model files (`--include-model`) to include it.
 - The preview shows a short text page: nothing is mounted (503). Open a site again.
 - A `.fweb` import answers 422: run `./setup/install_compiler`.
 - The deep check reports `deep.unavailable`: run `./formpublisher_oc_install` and make sure Chrome is installed, or set `checks.chromePath`.

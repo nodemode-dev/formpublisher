@@ -118,13 +118,33 @@
     </td>
     <td width="50%" valign="top">
       <h3>Agent tools</h3>
-      15 command line commands and 14 MCP tools cover the whole path from import to a prepared folder, so Claude Code, Codex and Cursor do what a person does in the window.
+      17 command line commands and 16 MCP tools cover the whole path from import to a prepared folder, so Claude Code, Codex and Cursor do what a person does in the window.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Model files left out</h3>
+      FormWeb's <code>site.formweb.json</code> and <code>asset-access.json</code> stay out of the prepared host folders unless you tick Keep FormWeb's model files (<code>--include-model</code>, <code>includeModel</code>). The package is unchanged, and each prepared folder says what was left out.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Check and build on arrival</h3>
+      Two switches in Preferences, off by default, run the static checks and then a build on every site FormWeb sends, so the problems and the package are ready when you open it. FormWeb also leaves the site's name and project beside the file in the inbox.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Revisions and diffs</h3>
+      A site that arrives again gains a revision. Home's site card and the site's panel list the revisions and show the files and routes added, removed and changed between any two. <code>revisions</code> and <code>diff</code> do the same for agents.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Desktop app</h3>
+      <code>./build_app</code> freezes the engine and builds a Tauri 2 shell around it: a splash, one window with no white flash, a single instance, and the engine stopped with the app, even on a terminate signal. It prefers port 8280, where FormWeb looks first.
     </td>
   </tr>
 </table>
 
 > [!NOTE]
-> The desktop build is in development. This version imports, previews, checks, packages, signs and prepares a folder per host; it does not upload anywhere.
+> This version imports, previews, checks, packages, signs and prepares a folder per host; it does not upload anywhere. The desktop app is built from this folder with `./build_app`.
 
 ## Screenshots
 
@@ -142,6 +162,14 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
   <tr>
     <td width="50%" valign="top"><b>Publish</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/publish-dark.webp"><img alt="The Publish sheet with all six hosts ticked and prepared" src="docs/images/publish-light.webp"></picture></td>
     <td width="50%" valign="top"><b>Prepared folders</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/publish-results-dark.webp"><img alt="Prepared folders for Static zip and Netlify with their commands" src="docs/images/publish-results-light.webp"></picture></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><b>Publish, model files</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/publish-model-dark.webp"><img alt="The Publish sheet with the Keep FormWeb's model files check box under the six hosts" src="docs/images/publish-model-light.webp"></picture></td>
+    <td width="50%" valign="top"><b>Revisions</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/revisions-dark.webp"><img alt="The Revisions dialog listing two revisions and the seven files changed between them" src="docs/images/revisions-light.webp"></picture></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><b>Preferences</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/preferences-dark.webp"><img alt="Preferences, FormWeb section, with the Check a site when it arrives and Build a site when it arrives switches" src="docs/images/preferences-light.webp"></picture></td>
+    <td width="50%" valign="top"><b>Desktop splash</b><br><img alt="The 360 by 200 splash of the desktop app with the gradient progress bar" src="docs/images/splash.webp"></td>
   </tr>
 </table>
 
@@ -165,6 +193,7 @@ The window, the command line and the MCP server call one engine, so an agent and
 ./formpublisher run import site-export.zip     # import a FormWeb export (or a publication folder)
 ./formpublisher run import-formweb             # import the site open in a running FormWeb, read-only
 ./formpublisher run routes SITE-ID             # the routes of one site
+./formpublisher run revisions SITE-ID          # its revisions; diff SITE-ID shows what changed between two
 ./formpublisher run check SITE-ID              # the static checks (--deep for the browser run, --last for the stored result)
 ./formpublisher run build SITE-ID              # the deterministic site.zip and publish.json
 ./formpublisher run sign BUILD-ID --key NAME   # an Ed25519 signature; verify BUILD-ID checks it
@@ -176,22 +205,24 @@ The window, the command line and the MCP server call one engine, so an agent and
 | Command | Does |
 | --- | --- |
 | `status`, `sites`, `routes ID` | the engine, the imported sites, one site's routes |
+| `revisions ID`, `diff ID [--from R] [--to R]` | a site's revisions, and the files and routes that changed between two |
 | `import PATH`, `import-formweb` | import an export, a folder or the site open in FormWeb |
 | `check ID`, `build ID`, `builds` | run the checks, build the package, list builds |
 | `sign BUILD`, `verify BUILD`, `keys` | sign, verify (exits 1 when invalid), list or create (`--create NAME`) keys |
-| `targets`, `prepare BUILD --target T`, `prepared BUILD` | list hosts, prepare a folder per host, list what is prepared |
+| `targets`, `prepare BUILD --target T [--include-model]`, `prepared BUILD` | list hosts, prepare a folder per host (FormWeb's model files left out unless `--include-model`), list what is prepared |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
 
-Every command takes `--json`. The MCP server has 14 tools over the same routes:
+Every command takes `--json`. The MCP server has 16 tools over the same routes:
 
 | MCP tool | Does |
 | --- | --- |
 | `formpublisher_status`, `list_sites`, `site_routes` | read the engine, the sites and the routes |
+| `list_revisions`, `diff_revisions` | read a site's revisions and what changed between two |
 | `import_site`, `import_formweb_current` | import an export or folder, or the site open in FormWeb |
 | `run_checks`, `get_checks` | run the checks, read the stored result |
 | `build_package`, `list_builds` | build the package, list builds |
 | `sign_build`, `verify_build` | sign with a named key, verify a signature |
-| `list_targets`, `prepare_publish`, `get_prepared` | list the six hosts, prepare folders with their commands, read what is prepared |
+| `list_targets`, `prepare_publish`, `get_prepared` | list the six hosts, prepare folders with their commands (`includeModel` keeps FormWeb's model files), read what is prepared |
 
 `.mcp.json`, `.codex/config.toml` and `.cursor/mcp.json` are already wired in this repo, with the `formpublisher-harness` skill for driving the app and `formpublisher-skillset` for changing it. See [`AGENTS.md`](AGENTS.md).
 
@@ -254,7 +285,7 @@ Ports and folders:
 `./formpublisher serve` serves a production build from the engine alone, `./formpublisher desktop dev` opens the desktop window, and `./formpublisher doctor` checks the toolchain. `FORMPUBLISHER_HOME` moves the data folder (`~/FormPublisher` by default).
 
 > [!IMPORTANT]
-> **Status:** in development. Importing from the site open in FormWeb needs FormWeb running on the same computer. The desktop build is not finished, and Publish prepares folders but never uploads. The deep check needs Chrome and the optional `requirements-deep.txt`; `.fweb` projects need `formweb-core`.
+> **Status:** in development. Importing from the site open in FormWeb needs FormWeb running on the same computer. Publish prepares folders but never uploads. The deep check needs Chrome and the optional `requirements-deep.txt`; `.fweb` projects need `formweb-core`.
 
 **Contributing:** changes to FormPublisher come here as pull requests into `main`; changes to how a site is made or exported belong in FormWeb. See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) and [`AGENTS.md`](AGENTS.md). Report security issues privately as [`SECURITY.md`](SECURITY.md) describes.
 
