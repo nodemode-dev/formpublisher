@@ -30,7 +30,7 @@ The port rule: `FORMPUBLISHER_PORT` when set, else 8280 when free, else any free
 
 ## Where things are kept
 
-Imported sites and settings live in FormPublisher's data folder: `~/FormPublisher`, or the folder named by `FORMPUBLISHER_HOME`. Removed sites, builds, keys and prepared folders go to `trash/` there; Home's Trash page restores them or deletes them for good. Keyboard Shortcuts (`Mod+/`) lets you rebind any command with Change and Reset.
+Imported sites and settings live in FormPublisher's data folder: `~/FormPublisher`, or the folder named by `FORMPUBLISHER_HOME`. Removed sites, builds, keys and prepared folders go to `trash/` there; Home's Trash page restores them (entries from before 0.1.4 too, and one whose place is unknown asks where it goes) or deletes them for good. Home sits under the title bar, so the menubar and Preferences work over it, and Recent sites stay still when a site arrives: a row says how many arrived and Show re-sorts. Keyboard Shortcuts (`Mod+/`) lets you rebind any command with Change and Reset.
 
 ## Ports
 

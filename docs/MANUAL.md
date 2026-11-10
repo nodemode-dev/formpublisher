@@ -50,7 +50,13 @@ In the desktop app, Open Folder uses the system folder panel. Cancelling the pan
 
 ## Home
 
-Home is the start page. It offers a drop zone for a FormWeb export, the list of recent sites, and your open sites. Opening a site puts it in a tab.
+Home is the start page. It offers a drop zone for a FormWeb export, the list of recent sites, and your open sites. Opening a site puts it in a tab. Home starts under the title bar, so the brand, the menubar, the theme button and Preferences stay usable while Home is open; only the content below the title bar is locked.
+
+![Home with the Northwind Notes site in Recent and the demo card](images/home-light.webp)
+
+Recent sites keep still while they are on screen. When a site arrives (for example from FormWeb's Send to FormPublisher) while Start or Recent sites is showing, the cards do not move. A row above each list says how many new sites arrived, and Show re-sorts the list with the new sites in place. The row is always there, empty when nothing arrived, so the cards never shift. When Recent is not on screen the lists update as before.
+
+![The Recent sites list with a notice that 1 new site arrived and the Show button](images/recent-notice-light.webp)
 
 ## Importing a site
 
@@ -68,9 +74,13 @@ A site's routes come from its `routes.json`. Each has a path, a page, a locale, 
 
 Removing a site, a build, a signing key or a prepared folder moves it to `trash/` in the data folder; nothing is deleted at once. Each entry gets a `.trash.json` record beside it with its kind, label, origin, time and size. Home's Trash page lists the entries newest first with a kind icon, the label, the kind, the time and the size. Restore moves an entry back to where it came from. Delete for good and Empty Trash remove entries for good, and both ask first. The page refreshes by itself when something is removed or restored, and restoring a site refreshes Recent.
 
-A restore only goes ahead when the place is free: if something already sits at the origin (or a key with the same id exists) it answers 409 with the reason, and the window shows it as a notice. Entries moved to the trash before 0.1.4 have no record; they are listed with a kind taken from their name but cannot be restored.
+A restore only goes ahead when the place is free: if something already sits at the origin (or a key with the same id exists) it answers 409 with the reason, and the window shows it as a notice. Entries moved to the trash before 0.1.4 have no record. Their kind and origin are inferred from the name: a site from its `site.json` id, a key from its `entry.json`, a build from `build-[site]-[12 hex]-[stamp]`, and a prepared folder from `prepared-[site]-[build]-[target]-[stamp]`, matched against the known targets and the build id. A stamp may end in a `-N` counter. The list marks such rows as inferred, and they restore like any other. A prepared folder from before 0.1.4 lost its hidden record, so restoring it prepares the same target again from its build, which gives the same folder; if the build is gone or is itself in the trash, the restore answers 409 naming it.
 
-The routes are `GET /api/trash`, `POST /api/trash/{entry}/restore`, `DELETE /api/trash/{entry}` and `DELETE /api/trash` (empty). An entry name is only accepted when it appears in the folder listing. See [The command line](#the-command-line) and [The MCP server](#the-mcp-server) for the agent side: an agent can list the trash and restore from it, but deleting for good stays with a person.
+An entry whose origin cannot be recorded or inferred answers 409 with the code `origin-unknown`. Restore it to a named place: the window opens a "Where does it go" dialog that shows the kind's own folder as a fixed prefix and asks for the name, a key getting `.pem` added. The engine's refusal shows inside the dialog, which stays open until the name is accepted. The same restore is `POST /api/trash/{entry}/restore` with the body `{"origin": "..."}` and `trash restore ENTRY --to PATH` on the command line. The origin is used only when none is recorded or inferred, it must be free, and it must resolve inside the kind's own folder (a key directly in `keys/`); a path that leaves it, an absolute path, one of another kind or a taken place is refused.
+
+![The Trash page with a removed site, key and build](images/trash-light.webp)
+
+The routes are `GET /api/trash`, `POST /api/trash/{entry}/restore`, `DELETE /api/trash/{entry}` and `DELETE /api/trash` (empty). An entry name is only accepted when it appears in the folder listing. See [The command line](#the-command-line) and [The MCP server](#the-mcp-server) for the agent side: an agent can list the trash and restore from it to a recorded or inferred origin, but restoring to a named place and deleting for good stay with a person.
 
 ## Keyboard shortcuts
 
@@ -120,7 +130,7 @@ The routes strip shows a thumbnail box and a status dot per route: none when not
 
 ## Checks
 
-Checks produce problems. Each problem has an id (stable for the same finding), a tier (`static`, `live` or `deep`), a severity (`error`, `warning`, `info`), a code, the route, a message and a fix, and optionally the file, line, selector and URL. The Problems tab lists them with filters by severity and tier, and clicking a row selects its route. Counts show in the tab and the status bar. Run checks starts the static tier; Deep check starts the deep tier.
+Checks produce problems. Each problem has an id (stable for the same finding, and for a deep problem the same on every run: the id hashes the failing URL with the site host's port left out, so a new run on a new port gives the same ids; messages and the url field still show the real address), a tier (`static`, `live` or `deep`), a severity (`error`, `warning`, `info`), a code, the route, a message and a fix, and optionally the file, line, selector and URL. The Problems tab lists them with filters by severity and tier, and clicking a row selects its route. Counts show in the tab and the status bar. Run checks starts the static tier; Deep check starts the deep tier.
 
 ### Static tier
 
@@ -319,7 +329,7 @@ The loop is: import a site, list its routes (and, for a site that arrived again,
 | `prepare BUILD --target T [--target T] [--include-model]` | prepares a folder per target, with the commands to run; FormWeb's model files are left out unless `--include-model` |
 | `prepared BUILD` | lists what is prepared for a build |
 | `trash` | lists the trash, newest first, with each entry's kind, label, time and size |
-| `trash restore ENTRY` | moves an entry back to where it came from; fails with the reason when the place is taken |
+| `trash restore ENTRY [--to PATH]` | moves an entry back to where it came from; fails with the reason when the place is taken. `--to` names the place for an entry whose origin is unknown, inside the kind's own folder |
 | `trash delete ENTRY` | deletes one entry for good |
 | `trash empty --yes` | deletes every entry for good; refuses to run without `--yes` |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
@@ -357,7 +367,7 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 | `prepare_publish` | prepares a folder per host for a build, with commands, notes and warnings; `includeModel: true` keeps FormWeb's model files, and `leftOut` lists what was left out |
 | `get_prepared` | what is prepared for a build (read only) |
 | `list_trash` | the trash entries, newest first (read only) |
-| `restore_from_trash` | moves an entry back to where it came from |
+| `restore_from_trash` | moves an entry back to where it came from; only a recorded or inferred origin, with no way to name a place |
 
 There is no tool that deletes. Deleting an entry for good or emptying the trash is for a person, in the window or with `trash delete` and `trash empty --yes`.
 

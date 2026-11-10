@@ -42,9 +42,9 @@ These are the exact MCP tool names, with the command that does the same thing. I
 | `prepare_publish` (build, targets, includeModel) | `prepare BUILD --target T [--target T] [--include-model]` | a folder per target with the commands to run | no |
 | `get_prepared` (build) | `prepared BUILD` | what is already prepared | yes |
 | `list_trash` | `trash` | trash entries newest first, with kind, label, origin, time and size | yes |
-| `restore_from_trash` (entry) | `trash restore ENTRY` | move an entry back to where it came from; 409 with the reason when the place is taken or the entry predates 0.1.4 | no |
+| `restore_from_trash` (entry) | `trash restore ENTRY` | move an entry back to its recorded or inferred origin (entries from before 0.1.4 have an inferred one); 409 with the reason when the place is taken, and 409 `origin-unknown` when there is none | no |
 
-Not tools: `trash delete ENTRY` deletes one trash entry for good and `trash empty --yes` deletes them all. There is no tool for either, and deleting stays a person's action: do it only when the person asks for that entry. `keys` lists the signing keys and `keys --create NAME [--passphrase P]` makes one, and `receive-status` shows the endpoint, inbox folder and last receipts for FormWeb's Send to FormPublisher. `agents sync` is `./formpublisher agents sync`.
+Not tools: `trash delete ENTRY` deletes one trash entry for good and `trash empty --yes` deletes them all. There is no tool for either, and deleting stays a person's action: do it only when the person asks for that entry. `trash restore ENTRY --to PATH` (the HTTP body `{origin}`, or the Trash page's "Where does it go" dialog) restores to a named place for an entry whose origin is unknown; it stays a person's or the command line's action, and the MCP tool only restores recorded or inferred origins, so when it answers `origin-unknown` tell the person rather than inventing a path. `keys` lists the signing keys and `keys --create NAME [--passphrase P]` makes one, and `receive-status` shows the endpoint, inbox folder and last receipts for FormWeb's Send to FormPublisher. `agents sync` is `./formpublisher agents sync`.
 
 ## The loop
 
@@ -90,7 +90,7 @@ FormPublisher prepares; it never uploads. Publishing is a chain, and each link n
 
 A site sent from FormWeb's Send to FormPublisher arrives on its own: it is imported by the running window's engine, or dropped in the data folder's `inbox/` while FormPublisher is closed. Either way, a site sent again becomes a new revision of the same site, so `list_revisions` and `diff_revisions` show what changed between sends. It then shows in `list_sites` like any import. Two Preferences settings, off by default, run the static checks and a build on every arrival; when they are on, call `get_checks` and `list_builds` instead of running them again.
 
-Removing a site, build, key or prepared folder moves it to the trash, so `list_trash` shows it and `restore_from_trash` brings it back when the person asks. Use the entry name `list_trash` returned.
+Removing a site, build, key or prepared folder moves it to the trash, so `list_trash` shows it and `restore_from_trash` brings it back when the person asks, entries from before 0.1.4 included. Use the entry name `list_trash` returned.
 
 A `.fweb` project (envelope format `com.nodemode.formweb`, or FormWeb's version 2 zip of up to 512 MiB) imports the same way. It needs `formweb-core`; without it the import fails with 422 and the message says to run `./setup/install_compiler`. Tell the person; do not try to work around it.
 
