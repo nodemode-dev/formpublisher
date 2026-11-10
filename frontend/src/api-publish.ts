@@ -13,9 +13,11 @@ export interface PreparedTarget {
   commands: PreparedCommand[];
   notes: string[];
   warnings: string[];
+  includeModel: boolean;
+  leftOut: string[];
 }
 
-export interface VerifyReport { ok: boolean; checked: number; problems: string[] }
+export interface VerifyReport { ok: boolean; checked: number; problems: string[]; leftOut: string[] }
 
 export interface RevealResult { path: string; opened: boolean }
 
@@ -87,6 +89,8 @@ export function toPrepared(id: string, raw: unknown): PreparedTarget | null {
     commands: Array.isArray(raw.commands) ? raw.commands.map(toCommand).filter((c): c is PreparedCommand => c !== null) : [],
     notes: lines(raw.notes),
     warnings: lines(raw.warnings),
+    includeModel: raw.includeModel === true,
+    leftOut: lines(raw.leftOut),
   };
 }
 
@@ -112,8 +116,8 @@ export const publishApi = {
   async targets(): Promise<TargetInfo[]> {
     return listOf(await request<unknown>('/api/targets'), 'targets').map(toTarget).filter((t): t is TargetInfo => t !== null);
   },
-  async prepare(build: string, targets: string[]): Promise<PreparedTarget[]> {
-    return resultsOf(await request<unknown>('/api/publish/prepare', body('POST', { build, targets })));
+  async prepare(build: string, targets: string[], includeModel = false): Promise<PreparedTarget[]> {
+    return resultsOf(await request<unknown>('/api/publish/prepare', body('POST', { build, targets, includeModel })));
   },
   async prepared(build: string): Promise<PreparedTarget[]> {
     try {
@@ -137,7 +141,7 @@ export const publishApi = {
       : [];
     const checked = num(o.checked) || num(o.files) || (Array.isArray(o.files) ? o.files.length : 0);
     const ok = typeof o.ok === 'boolean' ? o.ok : typeof o.valid === 'boolean' ? o.valid : problems.length === 0;
-    return { ok, checked, problems };
+    return { ok, checked, problems, leftOut: lines(o.leftOut) };
   },
   async remove(build: string, target: string): Promise<void> {
     await request<unknown>(`/api/publish/${enc(build)}/${enc(target)}`, { method: 'DELETE' });

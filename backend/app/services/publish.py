@@ -11,7 +11,7 @@ from pathlib import Path
 from app import targets
 from app.services import intake, package, paths
 from app.services.bus import bus
-from app.targets._common import PreparedInput, PreparedResult
+from app.targets._common import MODEL_FILES, PreparedInput, PreparedResult
 
 _lock = threading.RLock()
 
@@ -66,7 +66,7 @@ def _unpack(archive: Path, dest: Path) -> list[str]:
     return sorted(names, key=lambda n: n.encode("utf-8"))
 
 
-def _load(build_id: str, work: Path) -> PreparedInput:
+def _load(build_id: str, work: Path, include_model: bool = False) -> PreparedInput:
     record = package.get_build(build_id)
     publish = record.get("publish")
     if not isinstance(publish, dict):
@@ -80,8 +80,10 @@ def _load(build_id: str, work: Path) -> PreparedInput:
     root = work / "unpacked"
     root.mkdir()
     names = _unpack(archive, root)
+    left_out = [] if include_model else [n for n in names if n in MODEL_FILES]
+    names = [n for n in names if n not in left_out]
     build = {k: v for k, v in record.items() if k not in ("publish", "signature")}
-    return PreparedInput(build=build, publish=publish, publish_bytes=raw, zip_path=archive, root=root, names=names, slug=record["site"])
+    return PreparedInput(build=build, publish=publish, publish_bytes=raw, zip_path=archive, root=root, names=names, slug=record["site"], excluded=left_out)
 
 
 def _build_folder(module, inp: PreparedInput, out: Path) -> PreparedResult:
@@ -89,6 +91,10 @@ def _build_folder(module, inp: PreparedInput, out: Path) -> PreparedResult:
     result = module.prepare(inp, out)
     if not isinstance(result, PreparedResult):
         raise _error(f"target {module.ID} returned an invalid result", 500)
+    if inp.excluded and module.ID != "static-zip":
+        result.notes.append(f"Left out FormWeb's model files ({', '.join(inp.excluded)}). Prepare again with includeModel to keep them in site/.")
+    elif module.ID == "static-zip" and any(n in MODEL_FILES for n in inp.names + inp.excluded):
+        result.notes.append("site.zip is unchanged, so it still holds FormWeb's model files. The includeModel option only affects the site/ folders of the other hosts.")
     return result
 
 
@@ -104,7 +110,12 @@ def _read_meta(path: Path):
     return package._read_json(path)
 
 
-def prepare(build_id: str, target_ids: list[str] | None) -> dict:
+META_KEYS = ("name", "folder", "files", "commands", "notes", "warnings", "preparedAt", "includeModel", "leftOut")
+
+
+def prepare(build_id: str, target_ids: list[str] | None, include_model: bool = False) -> dict:
+    if not isinstance(include_model, bool):
+        raise _error("includeModel must be true or false")
     ids = list(target_ids) if target_ids else list(targets.registry())
     if not all(isinstance(t, str) for t in ids):
         raise _error("targets must be a list of target ids")
@@ -116,7 +127,7 @@ def prepare(build_id: str, target_ids: list[str] | None) -> dict:
     with _lock:
         work = Path(tempfile.mkdtemp(prefix=".prepare-", dir=paths.prepared_dir()))
         try:
-            inp = _load(build_id, work)
+            inp = _load(build_id, work, include_model)
             for module in modules:
                 staged = work / "out" / module.ID
                 result = _build_folder(module, inp, staged)
@@ -135,9 +146,11 @@ def prepare(build_id: str, target_ids: list[str] | None) -> dict:
                     "notes": result.notes,
                     "warnings": result.warnings,
                     "preparedAt": intake.now_iso(),
+                    "includeModel": include_model,
+                    "leftOut": [] if module.ID == "static-zip" else list(inp.excluded),
                 }
                 package._write_text(_meta_file(site, build_id, module.ID), package.dumps(meta))
-                results[module.ID] = {k: meta[k] for k in ("name", "folder", "files", "commands", "notes", "warnings", "preparedAt")}
+                results[module.ID] = {k: meta[k] for k in META_KEYS}
         finally:
             shutil.rmtree(work, ignore_errors=True)
     for target_id, row in results.items():
@@ -153,7 +166,9 @@ def prepared(build_id: str) -> dict:
     for module_id in targets.registry():
         meta = _read_meta(_meta_file(site, build_id, module_id))
         if isinstance(meta, dict) and (folder / module_id).is_dir():
-            results[module_id] = {k: meta.get(k) for k in ("name", "folder", "files", "commands", "notes", "warnings", "preparedAt")}
+            results[module_id] = {k: meta.get(k) for k in META_KEYS}
+            results[module_id]["includeModel"] = meta.get("includeModel") is True
+            results[module_id]["leftOut"] = meta.get("leftOut") if isinstance(meta.get("leftOut"), list) else []
     return {"build": build_id, "site": site, "results": results}
 
 
@@ -194,10 +209,12 @@ def verify(build_id: str, target_id: str) -> dict:
     site, folder = _prepared_folder(build_id, target_id)
     problems: list[dict] = []
     current = {row["path"]: row for row in _walk(folder)}
+    meta = _read_meta(_meta_file(site, build_id, target_id))
+    include_model = isinstance(meta, dict) and meta.get("includeModel") is True
     with _lock:
         work = Path(tempfile.mkdtemp(prefix=".verify-", dir=paths.prepared_dir()))
         try:
-            inp = _load(build_id, work)
+            inp = _load(build_id, work, include_model)
             expected_zip = (inp.publish.get("package") or {}).get("sha256")
             if target_id == "static-zip":
                 got = current.get("site.zip", {}).get("sha256")
@@ -205,6 +222,8 @@ def verify(build_id: str, target_id: str) -> dict:
                     problems.append({"path": "site.zip", "problem": "hash differs from publish.json", "source": "publish.json"})
             else:
                 for row in inp.publish.get("files") or []:
+                    if row.get("path") in inp.excluded:
+                        continue
                     path = f"site/{row.get('path')}"
                     found = current.get(path)
                     if found is None:
@@ -230,7 +249,8 @@ def verify(build_id: str, target_id: str) -> dict:
         if key not in seen:
             seen.add(key)
             unique.append(p)
-    return {"build": build_id, "target": target_id, "folder": str(folder), "ok": not unique, "checked": len(current), "problems": unique}
+    left_out = [] if target_id == "static-zip" else list(inp.excluded)
+    return {"build": build_id, "target": target_id, "folder": str(folder), "ok": not unique, "checked": len(current), "problems": unique, "includeModel": include_model, "leftOut": left_out}
 
 
 def remove(build_id: str, target_id: str) -> dict:
