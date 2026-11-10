@@ -10,6 +10,7 @@ import { anyDialogOpen } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setHidden, setText } from './dom';
 import { icon } from './icons';
 import { RevisionsDialog, revisionsText } from './revisions';
+import { TrashPage } from './trash';
 
 export type HomeView = 'start' | 'recent' | 'builds' | 'trash';
 type View = HomeView;
@@ -64,6 +65,7 @@ export class Home {
   private readonly navItems: HTMLElement[];
   private readonly pages: HTMLElement[];
   private readonly builds: BuildsPage;
+  private readonly trash: TrashPage;
   private revisions: RevisionsDialog | null = null;
 
   constructor(private readonly app: App, private readonly commands: Commands, visible: boolean) {
@@ -104,8 +106,7 @@ export class Home {
 </div>
 <div data-page="recent" hidden><div class="fp-home-head"><div><h1 class="fp-home-title">Recent sites</h1><p class="fp-home-sub">Every site you have imported, newest first.</p></div></div>${CARD_GRID('fp-recent-full', true)}</div>
 <div data-page="builds" hidden></div>
-<div data-page="trash" hidden><div class="fp-home-head"><div><h1 class="fp-home-title">Trash</h1><p class="fp-home-sub">Removed sites are not deleted.</p></div></div>
-<div class="fp-card fp-trash-note"><span class="fp-empty-icon">${icon('trash', 20)}</span><div class="fp-trash-text"><div class="fp-empty-title">Removed sites are kept in the trash folder</div><div class="fp-empty-text">When you remove a site, FormPublisher moves it to the trash/ folder inside its data folder. Open that folder to restore a site or to delete it for good.</div></div></div></div>
+<div data-page="trash" hidden></div>
 </div>
 </section>`);
     this.hero = q(this.root, '.fp-home-hero');
@@ -122,6 +123,7 @@ export class Home {
     this.pages = Array.from(this.root.querySelectorAll<HTMLElement>('[data-page]'));
     setText(this.fwText, 'Checking FormWeb');
     this.builds = new BuildsPage(this.app, q(this.root, '[data-page="builds"]'));
+    this.trash = new TrashPage(this.app, q(this.root, '[data-page="trash"]'));
     document.getElementById('app')?.appendChild(this.root);
     this.restoreNav();
     this.wire();
@@ -167,6 +169,7 @@ export class Home {
     for (const p of this.pages) setHidden(p, p.dataset.page !== view);
     for (const n of this.navItems) setClass(n, 'is-active', n.dataset.v === view);
     if (view === 'builds') void this.builds.refresh();
+    if (view === 'trash') void this.trash.refresh();
   }
 
   async revealBuild(id: string): Promise<void> {
