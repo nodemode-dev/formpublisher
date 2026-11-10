@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.7 · 2026-11-10
+
+- A signing key in the trash whose record was lost or damaged can be restored again: FormPublisher rebuilds it from the key file, with the same id and fingerprint, and asks for the passphrase when the key is locked. The command line reads that passphrase from standard input with `--passphrase-stdin`.
+- Some refusals now come with the next step beside them: Open the trash, Try again, Show the running check, Open the manual or Enter the passphrase.
+- FormWeb's folder redirects (`/blog/*` to `/docs/:splat`) and its 404 page reach every publish target without hand edits; GitHub Pages, which has no server redirects, says it skipped them.
+- Older FormWeb exports that keep their 404 page only at `404/index.html` now show it correctly at any missing address, in every target and in the preview site host.
+- The FormWeb engine crates are vendored at 0.19.7.
+- Every new string is in all 26 languages.
+
 ## 0.1.6 · 2026-11-10
 
 - Every refusal from the engine now carries a stable code beside its message, such as `site-missing`, `passphrase-wrong` or `place-taken`, so scripts and agents can act on it without reading the text. The command line prints `error [code]: message`, agent tools say the same, and the manual lists every code.
