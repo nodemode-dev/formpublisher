@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import shutil
 import threading
 from datetime import datetime, timezone
@@ -12,6 +13,9 @@ SUFFIX = ".trash.json"
 KINDS = ("site", "build", "key", "prepared")
 ROOTS = {"site": "sites", "build": "builds", "key": "keys", "prepared": "prepared"}
 PREFIXES = (("build-", "build"), ("key-", "key"), ("prepared-", "prepared"))
+STAMP_RE = re.compile(r"-\d{8}T\d{6}Z(?:-\d+)?$")
+BUILD_ID_RE = re.compile(r"^[0-9a-f]{12}$")
+SITE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,100}$")
 _lock = threading.RLock()
 
 
@@ -19,6 +23,18 @@ def _error(message: str, status: int = 400):
     from app.services.intake import IntakeError
 
     return IntakeError(message, status)
+
+
+def _origin_unknown():
+    from app.services.intake import IntakeError
+
+    class OriginUnknown(IntakeError):
+        code = "origin-unknown"
+
+    return OriginUnknown(
+        "This entry was moved before the trash kept its origin and its name cannot be read, so say where it goes (a place inside its own folder) to restore it.",
+        409,
+    )
 
 
 def _iso(moment: datetime) -> str:
@@ -116,18 +132,71 @@ def _row(entry: Path) -> dict:
             "kind": meta["kind"],
             "label": meta.get("label") if isinstance(meta.get("label"), str) else entry.name,
             "origin": meta.get("origin") if isinstance(meta.get("origin"), str) else None,
+            "originInferred": False,
             "moved": meta.get("moved") if isinstance(meta.get("moved"), str) else _iso(datetime.fromtimestamp(entry.stat().st_mtime, timezone.utc)),
             "size": meta.get("size") if isinstance(meta.get("size"), int) else _size(entry),
         }
-    kind = next((k for prefix, k in PREFIXES if entry.name.startswith(prefix)), "site")
+    kind = _legacy_kind(entry)
+    origin = _infer_origin(entry, kind)
     return {
         "entry": entry.name,
         "kind": kind,
         "label": entry.name,
-        "origin": None,
+        "origin": origin,
+        "originInferred": origin is not None,
         "moved": _iso(datetime.fromtimestamp(entry.stat().st_mtime, timezone.utc)),
         "size": _size(entry),
     }
+
+
+def _read_json(path: Path) -> dict | None:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _legacy_kind(entry: Path) -> str:
+    if entry.is_dir() and (entry / "site.json").is_file():
+        return "site"
+    return next((k for prefix, k in PREFIXES if entry.name.startswith(prefix)), "site")
+
+
+def _infer_origin(entry: Path, kind: str) -> str | None:
+    """Work out where a trash entry made before 0.1.4 came from, from its contents and its name, or return None."""
+    if kind == "site":
+        record = _read_json(entry / "site.json") if entry.is_dir() else None
+        site_id = record.get("id") if record else None
+        if isinstance(site_id, str) and SITE_ID_RE.match(site_id):
+            return f"sites/{site_id}"
+        return None
+    if kind == "key":
+        record = _read_json(entry / "entry.json") if entry.is_dir() else None
+        key_id = record.get("id") if record else None
+        if isinstance(key_id, str) and re.match(r"^[0-9a-f]{16}$", key_id):
+            return f"keys/{key_id}.pem"
+        return None
+    stem = STAMP_RE.sub("", entry.name, count=1)
+    if stem == entry.name:
+        return None
+    if kind == "build":
+        match = re.match(r"^build-(.+)-([0-9a-f]{12})$", stem)
+        if match and SITE_ID_RE.match(match.group(1)):
+            return f"builds/{match.group(1)}/{match.group(2)}"
+        return None
+    if not stem.startswith("prepared-"):
+        return None
+    body = stem[len("prepared-"):]
+    from app import targets
+
+    for target_id in sorted(targets.registry(), key=len, reverse=True):
+        if not body.endswith("-" + target_id):
+            continue
+        match = re.match(r"^(.+)-([0-9a-f]{12})$", body[: -len(target_id) - 1])
+        if match and SITE_ID_RE.match(match.group(1)):
+            return f"prepared/{match.group(1)}/{match.group(2)}/{target_id}"
+    return None
 
 
 def list_entries() -> dict:
@@ -145,17 +214,27 @@ def _find(entry: str) -> Path:
     return found
 
 
-def _free_destination(row: dict) -> Path:
-    if not row["origin"]:
-        raise _error("This entry was moved before the trash kept its origin, so it cannot be restored automatically.", 409)
+def _free_destination(row: dict, origin: str | None = None) -> tuple[Path, str]:
+    chosen = row["origin"]
+    given = False
+    if not chosen:
+        if origin is None:
+            raise _origin_unknown()
+        if not isinstance(origin, str) or not origin.strip() or "\x00" in origin:
+            raise _error("origin must be a path inside the data folder, such as sites/my-site")
+        chosen = origin.strip()
+        given = True
     base = Path(os.path.abspath(paths.home()))
-    dest = Path(os.path.abspath(base / row["origin"]))
+    dest = Path(os.path.abspath(base / chosen))
     root = base / ROOTS[row["kind"]]
     if dest == root or root not in dest.parents:
-        raise _error("The recorded origin is not a valid place for this kind of entry.", 409)
+        what = "The origin you gave" if given else "The recorded origin"
+        raise _error(f"{what} is not a valid place for this kind of entry; it has to sit inside {ROOTS[row['kind']]}/.", 409)
+    if row["kind"] == "key" and dest.parent != root:
+        raise _error(f"A key goes straight inside {ROOTS['key']}/, as <key id>.pem.", 409)
     if dest.exists() or dest.is_symlink():
-        raise _error(f"Something already exists at {row['origin']}; remove or rename it first.", 409)
-    return dest
+        raise _error(f"Something already exists at {dest.relative_to(base).as_posix()}; remove or rename it first.", 409)
+    return dest, dest.relative_to(base).as_posix()
 
 
 def _restore_key(entry: Path, row: dict, dest: Path) -> dict:
@@ -180,13 +259,56 @@ def _restore_key(entry: Path, row: dict, dest: Path) -> dict:
     return {"id": key_row["id"], "name": key_row.get("name")}
 
 
-def restore(entry_name: str) -> dict:
-    """Move an entry back to where it came from, or raise 409 saying why it cannot go."""
+def _reprepare(entry_name: str, row: dict, dest: Path, origin: str) -> dict:
+    from app.services import package, publish
+
+    parts = Path(origin).parts
+    if len(parts) != 4 or not BUILD_ID_RE.match(parts[2]) or not SITE_ID_RE.match(parts[1]):
+        raise _error("A prepared folder goes at prepared/<site>/<build id>/<target>.", 409)
+    site, build_id, target_id = parts[1], parts[2], parts[3]
+    try:
+        record = package.get_build(build_id)
+    except Exception as exc:
+        if getattr(exc, "status", None) == 404:
+            raise _error(f"Build {build_id} is no longer here, so {target_id} cannot be prepared again from it. Restore the build from the trash first if it is there.", 409)
+        raise
+    if record.get("site") != site:
+        raise _error(f"Build {build_id} belongs to a different site than {site}, so this entry cannot be prepared again from it.", 409)
+    try:
+        publish.prepare(build_id, [target_id])
+    except Exception as exc:
+        if getattr(exc, "status", None) == 404:
+            raise _error(f"Target {target_id} is not available any more, so it cannot be prepared again.", 409)
+        raise
+    with _lock:
+        entry = _entries().get(entry_name)
+        if entry is not None:
+            _destroy(entry)
+    bus.emit("trash.changed", action="restored", kind="prepared", entry=entry_name)
+    return {"entry": entry_name, "kind": "prepared", "restored": True, "origin": origin, "reprepared": True, "build": build_id, "target": target_id}
+
+
+def restore(entry_name: str, origin: str | None = None) -> dict:
+    """Move an entry back to where it came from, or raise 409 saying why it cannot go.
+
+    An entry whose origin is neither recorded nor inferable from its name and contents needs origin, a path relative
+    to the data folder inside the entry's own kind of folder; without one the answer is 409 with code origin-unknown.
+    A prepared folder moved before 0.1.4 has no hidden record, so it is prepared again from its build.
+    """
     with _lock:
         entry = _find(entry_name)
         row = _row(entry)
-        dest = _free_destination(row)
+        dest, used = _free_destination(row, origin)
+        row["origin"] = used
         kind = row["kind"]
+        if kind == "prepared" and _meta(entry) is None:
+            legacy = True
+        else:
+            legacy = False
+    if legacy:
+        return _reprepare(entry_name, row, dest, used)
+    with _lock:
+        entry = _find(entry_name)
         info: dict = {}
         if kind == "key":
             info = _restore_key(entry, row, dest)
