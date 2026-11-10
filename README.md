@@ -101,18 +101,57 @@
       Import a <code>.fweb</code> project directly. <code>formweb-core</code>, built from the vendored FormWeb crates by <code>./setup/install_compiler</code>, exports it to a site the same way FormWeb does.
     </td>
   </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Publish</h3>
+      Prepare a folder for Static zip, Netlify, Cloudflare Pages, Vercel, GitHub Pages or nginx, with the redirects, headers and 404 rule that host expects and the exact commands to run. Each folder is written from the build's own <code>site.zip</code>, can be verified against <code>publish.json</code>, and nothing is ever uploaded.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Receive from FormWeb</h3>
+      FormWeb's Send to FormPublisher posts a site to <code>/api/receive/formweb</code> on this computer, or leaves it in the <code>inbox/</code> folder when FormPublisher is closed. The window shows a toast and the site appears in Recent.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Demo</h3>
+      Home's Demos row opens a bundled sample site, "Northwind Notes", with a short tour of Preview, Checks, Package and Publish. <a href="demo/index.html">demo/index.html</a> is the same walk-through offline: open it straight from disk, no network and no build.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Agent tools</h3>
+      15 command line commands and 14 MCP tools cover the whole path from import to a prepared folder, so Claude Code, Codex and Cursor do what a person does in the window.
+    </td>
+  </tr>
 </table>
 
 > [!NOTE]
-> Publishing to a host and the desktop build are in development. This version imports, previews, checks, packages and signs; it does not upload anywhere.
+> The desktop build is in development. This version imports, previews, checks, packages, signs and prepares a folder per host; it does not upload anywhere.
+
+## Screenshots
+
+Taken from the running app on the demo site, at 1600 by 1000, in the dark and the light theme.
+
+<table>
+  <tr>
+    <td width="50%" valign="top"><b>Home</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.webp"><img alt="Home with the Northwind Notes site in Recent and the demo card" src="docs/images/home-light.webp"></picture></td>
+    <td width="50%" valign="top"><b>Preview</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/preview-dark.webp"><img alt="The sample site in the preview stage with the routes strip and the inspector" src="docs/images/preview-light.webp"></picture></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><b>Checks</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/checks-dark.webp"><img alt="The Problems panel listing a broken link and two heading warnings" src="docs/images/checks-light.webp"></picture></td>
+    <td width="50%" valign="top"><b>Package</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/package-dark.webp"><img alt="The Package sheet with a built, signed and verified package" src="docs/images/package-light.webp"></picture></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><b>Publish</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/publish-dark.webp"><img alt="The Publish sheet with all six hosts ticked and prepared" src="docs/images/publish-light.webp"></picture></td>
+    <td width="50%" valign="top"><b>Prepared folders</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/publish-results-dark.webp"><img alt="Prepared folders for Static zip and Netlify with their commands" src="docs/images/publish-results-light.webp"></picture></td>
+  </tr>
+</table>
 
 ## Everything in the box
 
 <table>
   <tr>
     <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · site tabs · routes strip · inspector · status bar · Preferences</td>
-    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · list sites · import (zip, folder or the site open in FormWeb) · routes</td>
-    <td width="33%" valign="top"><h4>Three ways in</h4>site-export.zip · publication folder · the running FormWeb's current site</td>
+    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · targets · prepare · prepared · receive-status</td>
+    <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · publication folder · the running FormWeb's current site · sent from FormWeb (endpoint or inbox) · the demo</td>
   </tr>
 </table>
 
@@ -126,10 +165,39 @@ The window, the command line and the MCP server call one engine, so an agent and
 ./formpublisher run import site-export.zip     # import a FormWeb export (or a publication folder)
 ./formpublisher run import-formweb             # import the site open in a running FormWeb, read-only
 ./formpublisher run routes SITE-ID             # the routes of one site
+./formpublisher run check SITE-ID              # the static checks (--deep for the browser run, --last for the stored result)
+./formpublisher run build SITE-ID              # the deterministic site.zip and publish.json
+./formpublisher run sign BUILD-ID --key NAME   # an Ed25519 signature; verify BUILD-ID checks it
+./formpublisher run targets                    # the six hosts
+./formpublisher run prepare BUILD-ID --target netlify --target nginx
 ./formpublisher mcp                            # MCP server on stdio
 ```
 
+| Command | Does |
+| --- | --- |
+| `status`, `sites`, `routes ID` | the engine, the imported sites, one site's routes |
+| `import PATH`, `import-formweb` | import an export, a folder or the site open in FormWeb |
+| `check ID`, `build ID`, `builds` | run the checks, build the package, list builds |
+| `sign BUILD`, `verify BUILD`, `keys` | sign, verify (exits 1 when invalid), list or create (`--create NAME`) keys |
+| `targets`, `prepare BUILD --target T`, `prepared BUILD` | list hosts, prepare a folder per host, list what is prepared |
+| `receive-status` | the receive endpoint, the inbox folder and the last receipts |
+
+Every command takes `--json`. The MCP server has 14 tools over the same routes:
+
+| MCP tool | Does |
+| --- | --- |
+| `formpublisher_status`, `list_sites`, `site_routes` | read the engine, the sites and the routes |
+| `import_site`, `import_formweb_current` | import an export or folder, or the site open in FormWeb |
+| `run_checks`, `get_checks` | run the checks, read the stored result |
+| `build_package`, `list_builds` | build the package, list builds |
+| `sign_build`, `verify_build` | sign with a named key, verify a signature |
+| `list_targets`, `prepare_publish`, `get_prepared` | list the six hosts, prepare folders with their commands, read what is prepared |
+
 `.mcp.json`, `.codex/config.toml` and `.cursor/mcp.json` are already wired in this repo, with the `formpublisher-harness` skill for driving the app and `formpublisher-skillset` for changing it. See [`AGENTS.md`](AGENTS.md).
+
+## Demo
+
+Home's Demos row opens the bundled sample site, "Northwind Notes", and a quick tour walks Preview, Checks, Package and Publish. To see it without installing anything, open [`demo/index.html`](demo/index.html) from disk in a browser: it shows the FormPublisher window in both themes driving the sample site through the device widths, with the checks, the package manifest and the six prepared folders taken from real runs of the engine (`demo/data/`). The sample's pictures are CC0; `demo/MEDIA.md` lists their sources.
 
 ### Agents
 
@@ -178,13 +246,15 @@ Ports and folders:
 | `sites/` | imported sites and their revisions |
 | `checks/` | stored check results and deep-run thumbnails |
 | `builds/` | packages: `site.zip`, `publish.json`, `site.zip.sig` |
+| `prepared/` | the folders Publish writes, one per build and host |
+| `inbox/` | sites FormWeb leaves for FormPublisher (`imported/` and `failed/` below it) |
 | `keys/` | signing keys |
 | `trash/` | deleted items |
 
 `./formpublisher serve` serves a production build from the engine alone, `./formpublisher desktop dev` opens the desktop window, and `./formpublisher doctor` checks the toolchain. `FORMPUBLISHER_HOME` moves the data folder (`~/FormPublisher` by default).
 
 > [!IMPORTANT]
-> **Status:** in development. Importing from the site open in FormWeb needs FormWeb running on the same computer. The desktop build and publishing are not finished. The deep check needs Chrome and the optional `requirements-deep.txt`; `.fweb` projects need `formweb-core`.
+> **Status:** in development. Importing from the site open in FormWeb needs FormWeb running on the same computer. The desktop build is not finished, and Publish prepares folders but never uploads. The deep check needs Chrome and the optional `requirements-deep.txt`; `.fweb` projects need `formweb-core`.
 
 **Contributing:** changes to FormPublisher come here as pull requests into `main`; changes to how a site is made or exported belong in FormWeb. See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) and [`AGENTS.md`](AGENTS.md). Report security issues privately as [`SECURITY.md`](SECURITY.md) describes.
 
@@ -196,7 +266,8 @@ Ports and folders:
 | `backend/` | the FastAPI engine, the command line and the MCP server |
 | `src-tauri/` | the Tauri 2 shell |
 | `setup/` | install, build and agent scripts |
-| `docs/` | the manual |
+| `docs/` | the manual and its screenshots |
+| `demo/` | the sample site and the offline demo (`index.html`) |
 | `.docs/wiki/` | the wiki pages |
 | `assets/` | the app icon used by this README |
 

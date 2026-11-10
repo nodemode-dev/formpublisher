@@ -4,6 +4,7 @@
 - [Preview](Preview)
 - [Checks](Checks)
 - [Packages and Signatures](Packages-and-Signatures)
+- [Publishing](Publishing)
 - [Agents](Agents)
 - [Architecture](Architecture)
 - [Releasing](Releasing)
