@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.9
-Last updated: 2026-11-10 · Phase 29: every target's words keyed for the Publish sheet in all 26 languages
+Current build version: v0.2.0
+Last updated: 2026-11-10 · Phase 32: verify rows, refusals and nginx notes keyed in all 26 languages
 
 ---
 
@@ -228,3 +228,11 @@ The executor spec is `TURN_J_SPEC.md` in the 0.1.9 planning sidecar.
 `i18n/keys/part15.json` (new, 65 keys): every description, command label, note and warning that `backend/app/targets/*.py`, `_common.py` (`netlify_style`, the `copy_site` fallback notes) and the nginx check can answer, written for the translator's matching rules in `i18n/index.ts` (exact keys first, then `{n}` patterns anchored at both ends, each placeholder matching any text; a trailing period or colon is retried without it). Paths, file names, counts, rule text, versions and nginx's own messages are `{0}` to `{2}`; the GitHub Pages splat note's `{2}` is filled with one of three keyed phrases (the site's base URL, the canonical link of the 404 page, the default), which the translator translates on their own. No component changed: the target description, the command labels, and the note and warning list items were already plain text outside `translate="no"`, and the command lines themselves sit in `.fp-pub-code` marked `translate="no"`, which the translator skips. The 25 locale folders hold `part15.json`, es-MX and fr-CA as full maps; languages that inflect keep counts and names standing alone.
 
 Checked: three FormWeb exports (a 404 page with exact and splat rules, an older export with only `404/index.html`, no 404 page) prepared on all six targets gave 52 distinct strings and a direct run of the target modules over rare cases 61, each matching exactly one key under the translator's rules (P2); the director's run matched all 45 strings one prepare answered and found all 65 keys in all 25 folders with their placeholders; `npm run build`.
+
+## Phase 32: verify in every language · v0.2.0 (2026-11-10)
+
+The executor spec is `TURN_K_SPEC.md` in the 0.2.0 planning sidecar.
+
+`ui/publish-sheet.ts`: the verify problem `li` loses `translate="no"`, so the row (one text node, `path: problem` as `publishApi.verify` builds it) reaches the translator; the path and nginx's message are placeholders, so they stay as they are. `i18n/keys/part16.json` (12 keys): the five problem rows (`{0}: missing`, `{0}: hash differs from publish.json`, `{0}: extra file`, `{0}: differs from a fresh prepare`, `{0}: nginx -t: {1}`), the three verify refusals the sheet shows as its verdict, and the four nginx prepare notes; the verdicts and the nginx line were already keyed in earlier parts. All 25 locale folders hold `part16.json`.
+
+Checked: every problem kind made for real on a lab engine gave 21 texts, each matching exactly one key; the director's run matched 48 strings (notes, warnings, labels and three real problem rows) to exactly one key each; CLS 0 with the CPU throttled 4x while failed verifies painted; `npm run build`.

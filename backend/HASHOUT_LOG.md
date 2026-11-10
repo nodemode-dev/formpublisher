@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.9
-Last updated: 2026-11-10 · Phases 28 to 30: nginx-check.sh, nginx redirects that keep the query, the GitHub Pages description, external redirect targets and the canonical base path checked
+Current build version: v0.2.0
+Last updated: 2026-11-10 · Phases 31 and 33: GitHub Pages redirect pages that keep the query and hash, an executable nginx-check.sh and the listen pass
 
 ---
 
@@ -364,3 +364,13 @@ The executor spec is `TURN_J_SPEC.md` in the 0.1.9 planning sidecar. The vendore
 - `targets/github_pages.py`: `DESCRIPTION` says its 404 page also follows folder redirects. No other change: P3 found that an export without `site.formweb.json` and `asset-access.json` imports, and GitHub Pages then takes `/repo` from the 404 page's canonical link with the note naming that source; and that external targets (`/ext` to `https://example.org/x`, `/out/*` to `https://example.org/:splat`, added by hand since FormWeb refuses them) come out right everywhere: a stub with meta refresh, a script rule used as written, `_redirects` lines for Netlify and Cloudflare Pages, `:path*` in `vercel.json`, nginx `return`s that pass `nginx -t`, and the site host's 301s, which encode `%0d%0a` in Location so no header is injected. In Chrome under `/repo`, `/out//evil.com` went to `https://example.org/evil.com`, never to `//evil.com`.
 
 Checked: `nginx-check.sh` passed as root and as uid 65534 (`setpriv`), failed with nginx's `[emerg]` line on a broken copy and left nothing in TMPDIR; 24 prepared folders (four exports, six targets) verified clean; on a live nginx serving the prepared config, `/old?q=1` answered 301 to `/docs?q=1` and `/blog/x/y?q=1&r=2` 301 to `/docs/x/y?q=1&r=2`; the selfcheck passes.
+
+## Phases 31 and 33 · v0.2.0 (2026-11-10)
+
+The executor spec is `TURN_K_SPEC.md` in the 0.2.0 planning sidecar (planned as 0.1.10; released as 0.2.0 to keep the family's one-digit patch number, which FormWeb's version test enforces). The vendored FormWeb crates are 0.20.0, which changed only the workspace version.
+
+- `targets/github_pages.py`: `STUB` gains `{script}` right after its meta charset, filled by `_stub_script(to)` from `STUB_SCRIPT`: the target as a JSON literal with `<`, `>` and `&` escaped, split at its own `#`, then `location.replace` with the target, the visitor's `location.search` unless the target has its own `?`, and the target's hash or else the visitor's. The meta refresh and canonical link stay as the fallback; the page bytes depend only on the target, so verify stays clean.
+- `targets/_common.py`: `put(out, rel, data, mode=None)` chmods when a mode is given. `targets/nginx.py`: `CHECK_SCRIPT` starts with `#!/bin/sh` and is written 0755; the mode survives because `publish.prepare` `os.replace`s the whole staged folder. The command still reads `sh nginx-check.sh`, which works when a copy loses the mode.
+- `targets/nginx.py` `check()`: `_run_nginx` holds one `nginx -t` run. After the unix-socket pass passes, `_free_ports(n)` binds n loopback sockets to port 0, reads their ports and closes them, and `_loopback_listens` (with `LISTEN_RX`) points each listen line at `127.0.0.1:port`, keeping its other parameters, for a second run. A failure there fails the check with nginx's message; no free port, a bind race ("Address already in use") or a timeout skips it. The answer gains `listen {ran, ok, output}`. `annotate` writes "The config passed nginx -t with nginx X, and so did its listen lines on a loopback port." or that they were not checked; the director reworded P3's first text, which began "nginx -t passed with nginx X", because the window's translator matched it to part14's verify line `nginx -t passed with nginx {0}.` and would have left the rest in English.
+
+Checked: on a GitHub Pages stand-in under `/repo`, `/repo/old?q=1#h` landed on `/repo/docs?q=1#h` and on `/repo/docs` with scripts off; an external target with its own query, added by hand, went to `https://example.org/x?a=1#h`. `nginx-check.sh` was `-rwxr-xr-x` and `./nginx-check.sh` passed as root and as uid 65534; verify ran both passes; a hand-broken `listen 80 bogusparam;` failed only the listen pass with nginx's `invalid parameter` message; two prepares were byte-identical with the same modes; the selfcheck passes.
