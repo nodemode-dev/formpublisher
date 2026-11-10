@@ -92,6 +92,7 @@ visitor opens a path that is not a page, GitHub Pages answers with the 404 page,
 sends the browser to the new address (keeping the query and the hash) and the longest
 matching prefix wins. The browser follows them, but the status is the 404 page's 404, not
 the 301 or 302 in publish.json. The script assumes the site lives under {base}.
+With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects.
 
 {rows}
 """
@@ -219,6 +220,7 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
         put(out, "site/404.html", _place_script(page_path.read_bytes(), _script_tag(base, rules)))
         shown = base or "/"
         result.notes.append(f"{len(rules)} splat redirect(s) are followed by a script at the top of site/404.html; it assumes the site is served under {shown} (from {base_source}).")
+        result.notes.append("With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects.")
         splats = [f"{row['from']} -> {row['to']} (the 404 page redirects the browser)" for row in ordered_redirects(inp) if is_splat(row) and any(row["from"][:-2].rstrip("/") == rule[0] for rule in rules)]
     for row in ordered_redirects(inp):
         if is_splat(row):
