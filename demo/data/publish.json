@@ -1,9 +1,9 @@
 {
   "created": true,
   "files": 27,
-  "id": "1b6cac412739",
+  "id": "c0fbe406652f",
   "publish": {
-    "builtWith": "FormPublisher 0.1.1",
+    "builtWith": "FormPublisher 0.1.2",
     "checks": {
       "errors": 1,
       "infos": 0,
@@ -213,18 +213,18 @@
       }
     ],
     "site": {
-      "id": "northwind-notes-2f2448",
-      "name": "Northwind Notes",
-      "revision": "20261110T082203Z",
+      "id": "northwind-notes-17959d",
+      "name": "northwind-notes",
+      "revision": "20261110T092325Z",
       "source": {
-        "kind": "folder"
+        "kind": "formweb-export"
       }
     },
     "version": 1
   },
-  "revision": "20261110T082203Z",
+  "revision": "20261110T092325Z",
   "signature": false,
   "signed": false,
-  "site": "northwind-notes-2f2448",
+  "site": "northwind-notes-17959d",
   "size": 377852
 }
