@@ -1,9 +1,9 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "The page talks HTTP to its engine on 127.0.0.1:8280 (a remote origin to Tauri, so the capability lists it). Through Tauri it tells the shell its first paint is ready, opens extra windows, opens links with the system, and uses the system's open and save panels.",
+  "description": "The page talks HTTP to its engine on 127.0.0.1, on 8280 or the free port the shell picked (a remote origin to Tauri, so the capability lists it). Through Tauri it tells the shell its first paint is ready, opens extra windows, opens links with the system, and uses the system's open and save panels.",
   "windows": ["splash", "main", "extra-*"],
-  "remote": { "urls": ["http://127.0.0.1:8280/*"] },
+  "remote": { "urls": ["http://127.0.0.1:*/*"] },
   "permissions": [
     "core:default",
     "core:window:allow-set-title",

@@ -112,7 +112,7 @@ fn set_seen<R: Runtime>(window: &WebviewWindow<R>, seen: bool) {
 fn set_seen<R: Runtime>(window: &WebviewWindow<R>, seen: bool) {
     let target = window.clone();
     let _ = window.run_on_main_thread(move || {
-        use gtk::prelude::{GtkWindowExt, WidgetExt};
+        use gtk::prelude::WidgetExt;
         if let Ok(gtk_window) = target.gtk_window() {
             gtk_window.realize();
             gtk_window.set_opacity(if seen { 1.0 } else { 0.0 });
