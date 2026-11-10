@@ -5,12 +5,12 @@ FormPublisher builds `formweb-core` from these crates to open `.fweb` projects. 
 | Field | Value |
 | --- | --- |
 | Source | `nodemode-dev/formweb`, the `native/` workspace |
-| Version | 0.19.3 |
-| Branch | `feat/mcp-motion-handoff` |
-| Tree of `native/` | `b6af8bddf1a1d2d38c90dbec2cc1dc9f075499d9` |
-| `crates/formweb-model` | `17b814c06c416f61ab6d481d8a8bf2cf850d09e0` |
-| `crates/formweb-engine` | `30db6ad9f7cc222040621909e754f32b6d11ddb3` |
-| `crates/formweb-export` | `a19c6996bb4f2854fcaa87cc8e096c1bce9281d5` |
+| Version | 0.19.4 |
+| Branch | `feat/duplicate-posters-projects` |
+| Tree of `native/` | `bb3b445862e9dd378d62dc7b0a3a22e3886deca2` |
+| `crates/formweb-model` | `272ba3b3a7d2aa19abee23d4dc930281c113ec5e` |
+| `crates/formweb-engine` | `5336f7e97071080f208672a93ed6202f576928bc` |
+| `crates/formweb-export` | `f33bd34dbc902fdd7b8aa9ddcfb92c499d600f11` |
 | `crates/formweb-core` | `915277609ad50b7407636927d589bdd48d9f6504` |
 | Left out | `crates/formweb-render` (its own workspace, a GPU renderer FormPublisher does not use) and `target/` |
 
