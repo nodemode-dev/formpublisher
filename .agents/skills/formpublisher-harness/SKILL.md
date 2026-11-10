@@ -2,7 +2,7 @@
 name: formpublisher-harness
 description: Drives FormPublisher, the Form family's site publisher, through its formpublisher MCP server or the ./formpublisher run command line. Use whenever the person wants a FormWeb site exported as site-export.zip imported, a FormWeb publication folder opened, the site currently open in a running FormWeb brought in, the imported sites listed, or a site's routes listed; or when formpublisher tools such as status, sites, import and routes are available or fail. Not for editing a site (that is FormWeb), not for changing FormPublisher's own source code (use formpublisher-skillset), and not for device preview, checks, packaging, signing or publishing, which are in development.
 metadata:
-  version: "0.0.0"
+  version: "0.1.0"
 ---
 
 # formpublisher harness

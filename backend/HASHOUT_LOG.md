@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.0.0
+Current build version: v0.1.0
 Last updated: 2026-11-10 · Phase 2 engine skeleton and site intake
 
 ---
@@ -78,7 +78,7 @@ backend/
 
 ## app/__init__.py
 
-- `__version__` is `0.0.0`. A later commit sets `0.1.0`; the other version sites are listed in the root log.
+- `__version__` is `0.1.0`; the other version sites are listed in the root log in the planning sidecar.
 
 ## app/main.py
 

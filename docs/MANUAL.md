@@ -2,7 +2,7 @@
 
 FormPublisher is the Form family's site publisher. It opens what FormWeb makes, lists the site's routes and shows them in a FormDeck-style window. People and agents use the same steps: each one is also a command line command and an MCP tool.
 
-Version 0.0.0 is the foundations. In development: device preview, checks, packaging, signing, publishing and the desktop build.
+Version 0.1.0 imports FormWeb sites and shows their routes. In development: device preview, checks, packaging, signing, publishing and the desktop build.
 
 ## Contents
 
