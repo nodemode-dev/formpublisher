@@ -1,3 +1,4 @@
+import '../styles/recent.css';
 import { api, type Site } from '../api';
 import { openSample } from '../api-demo';
 import type { App } from '../app-api';
@@ -7,7 +8,7 @@ import { brandMark } from './brand';
 import { BuildsPage } from './builds';
 import type { Commands } from './commands';
 import { anyDialogOpen } from './dialogs';
-import { el, patchList, q, setAttr, setClass, setHidden, setText } from './dom';
+import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
 import { RevisionsDialog, revisionsText } from './revisions';
 import { TrashPage } from './trash';
@@ -44,7 +45,10 @@ function relative(iso: string): string {
 
 const routeText = (n: number): string => (n === 1 ? '1 route' : `${n} routes`);
 
-const CARD_GRID = (cls: string, withEmpty: boolean): string => `<div class="fp-card-grid ${cls}">
+const arrivedText = (n: number): string => (n === 1 ? '1 new site arrived' : `${n} new sites arrived`);
+
+const CARD_GRID = (cls: string, withEmpty: boolean): string => `<div class="fp-recent-note" data-note="${cls}"><button class="fp-btn fp-btn-sm" type="button" data-show disabled>Show</button><span class="fp-recent-note-text" role="status" aria-live="polite"></span></div>
+<div class="fp-card-grid ${cls}">
 <div class="fp-card is-skeleton" aria-hidden="true"><span class="fp-card-preview"></span><span class="fp-card-body"><span class="fp-card-name">&nbsp;</span><span class="fp-card-meta">&nbsp;</span><span class="fp-card-revs">&nbsp;</span></span></div>
 ${withEmpty ? `<div class="fp-card is-empty" hidden><span class="fp-card-preview is-blank">${icon('globe', 28)}</span><span class="fp-card-body"><span class="fp-card-name">No sites yet</span><span class="fp-card-meta">Open a zip, a folder or a site from FormWeb</span></span></div>` : ''}
 <div class="fp-card-list"></div>
@@ -57,7 +61,8 @@ export class Home {
   private fwTimer = 0;
   private readonly hero: HTMLElement;
   private readonly counts: HTMLElement[];
-  private readonly grids: Array<{ list: HTMLElement; skeleton: HTMLElement; empty: HTMLElement | null; limit: number }>;
+  private readonly grids: Array<{ list: HTMLElement; skeleton: HTMLElement; empty: HTMLElement | null; note: HTMLElement; limit: number }>;
+  private frozen: string[] | null = null;
   private readonly openBox: HTMLElement;
   private readonly openList: HTMLElement;
   private readonly fwDot: HTMLElement;
@@ -112,8 +117,8 @@ export class Home {
     this.hero = q(this.root, '.fp-home-hero');
     this.counts = Array.from(this.root.querySelectorAll<HTMLElement>('[data-count="sites"]'));
     this.grids = [
-      { list: q(this.root, '.fp-recent-grid .fp-card-list'), skeleton: q(this.root, '.fp-recent-grid .is-skeleton'), empty: q(this.root, '.fp-recent-grid .is-empty'), limit: START_CARDS },
-      { list: q(this.root, '.fp-recent-full .fp-card-list'), skeleton: q(this.root, '.fp-recent-full .is-skeleton'), empty: q(this.root, '.fp-recent-full .is-empty'), limit: Infinity },
+      { list: q(this.root, '.fp-recent-grid .fp-card-list'), skeleton: q(this.root, '.fp-recent-grid .is-skeleton'), empty: q(this.root, '.fp-recent-grid .is-empty'), note: q(this.root, '[data-note="fp-recent-grid"]'), limit: START_CARDS },
+      { list: q(this.root, '.fp-recent-full .fp-card-list'), skeleton: q(this.root, '.fp-recent-full .is-skeleton'), empty: q(this.root, '.fp-recent-full .is-empty'), note: q(this.root, '[data-note="fp-recent-full"]'), limit: Infinity },
     ];
     this.openBox = q(this.root, '.fp-home-open');
     this.openList = q(this.root, '.fp-home-open-list');
@@ -130,7 +135,7 @@ export class Home {
     this.sidePanel();
     this.paint();
     if (visible) {
-      this.app.mounts.root.inert = true;
+      this.lock(true);
       this.startPolling();
     }
   }
@@ -141,19 +146,23 @@ export class Home {
     if (view) this.select(view);
     if (!this.isOpen) {
       this.root.hidden = false;
-      this.app.mounts.root.inert = true;
+      this.lock(true);
       this.startPolling();
     }
-    this.paint();
+    this.paint(true);
     this.navItems.find((n) => n.classList.contains('is-active'))?.focus({ preventScroll: true });
   }
 
   hide(): void {
     if (!this.isOpen) return;
     this.root.hidden = true;
-    this.app.mounts.root.inert = false;
+    this.lock(false);
     window.clearInterval(this.fwTimer);
     this.fwTimer = 0;
+  }
+
+  private lock(on: boolean): void {
+    for (const c of Array.from(this.app.mounts.root.children)) (c as HTMLElement).inert = on && !c.classList.contains('fp-titlebar');
   }
 
   setDragOver(over: boolean): void {
@@ -168,6 +177,7 @@ export class Home {
     this.view = view;
     for (const p of this.pages) setHidden(p, p.dataset.page !== view);
     for (const n of this.navItems) setClass(n, 'is-active', n.dataset.v === view);
+    this.paint(true);
     if (view === 'builds') void this.builds.refresh();
     if (view === 'trash') void this.trash.refresh();
   }
@@ -202,11 +212,25 @@ export class Home {
     if (!this.loaded) { this.loaded = true; this.paint(); }
   }
 
-  paint(): void {
+  private recentOnScreen(): boolean {
+    return this.isOpen && this.loaded && (this.view === 'start' || this.view === 'recent');
+  }
+
+  paint(resort = false): void {
     const state = this.app.state();
-    const sites = [...state.sites].sort((a, b) => (Date.parse(b.importedAt) || 0) - (Date.parse(a.importedAt) || 0));
-    for (const c of this.counts) setText(c, String(sites.length));
+    const sorted = [...state.sites].sort((a, b) => (Date.parse(b.importedAt) || 0) - (Date.parse(a.importedAt) || 0));
+    for (const c of this.counts) setText(c, String(sorted.length));
+    const on = this.recentOnScreen();
+    if (!on || resort) this.frozen = null;
+    if (on) this.frozen ??= sorted.map((s) => s.id);
+    const held = this.frozen;
+    const byId = new Map(sorted.map((s) => [s.id, s]));
+    const fresh = held ? sorted.filter((s) => !held.includes(s.id)).length : 0;
+    const sites = held ? held.filter((id) => byId.has(id)).map((id) => byId.get(id) as Site) : sorted;
     for (const g of this.grids) {
+      setText(q(g.note, '.fp-recent-note-text'), fresh > 0 ? arrivedText(fresh) : '');
+      setClass(g.note, 'is-on', fresh > 0);
+      setDisabled(q<HTMLButtonElement>(g.note, '[data-show]'), fresh === 0);
       setHidden(g.skeleton, this.loaded);
       if (g.empty) setHidden(g.empty, !this.loaded || sites.length > 0);
       patchList<Site>(g.list, sites.slice(0, g.limit), {
@@ -314,6 +338,7 @@ export class Home {
       const t = e.target as HTMLElement;
       const v = t.closest<HTMLElement>('[data-v]')?.dataset.v as View | undefined;
       if (v) { this.select(v); return; }
+      if (t.closest('[data-show]')) { this.paint(true); return; }
       if (t.closest('[data-revs]')) {
         const owner = t.closest<HTMLElement>('[data-site]')?.dataset.site;
         if (owner) this.showRevisions(owner);

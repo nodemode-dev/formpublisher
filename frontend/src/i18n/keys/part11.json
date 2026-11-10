@@ -1,0 +1,9 @@
+[
+"1 new site arrived",
+"{0} new sites arrived",
+"Show",
+"Where does it go",
+"{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.",
+"For example a site id or a build path",
+"Type a name."
+]
