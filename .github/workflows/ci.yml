@@ -52,5 +52,10 @@ jobs:
         run: python -m compileall -q backend/app setup
       - name: Agent skills in step
         run: ./formpublisher agents sync --check
+      - name: Build formweb-core
+        working-directory: vendor/formweb-native
+        run: cargo build --release --locked
+      - name: Core self check
+        run: vendor/formweb-native/target/release/formweb-core --selfcheck
       - name: Shell syntax
-        run: bash -n formpublisher && bash -n formpublisher_oc_install && bash -n build_app && bash -n setup/lib.sh && bash -n setup/freeze_backend
+        run: bash -n formpublisher && bash -n formpublisher_oc_install && bash -n build_app && bash -n setup/lib.sh && bash -n setup/freeze_backend && bash -n setup/install_compiler

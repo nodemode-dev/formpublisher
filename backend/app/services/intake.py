@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from app.services import compile as compiler
 from app.services import paths
 from app.services.bus import bus
 
@@ -319,6 +320,26 @@ def import_zip_file(archive: Path, kind: str, source: dict, source_key: str, nam
     return _finish(staging, kind, source, source_key, stem or "site", name)
 
 
+def is_fweb(path: Path, filename: str | None = None) -> bool:
+    if (filename or path.name).lower().endswith(".fweb"):
+        return True
+    return not zipfile.is_zipfile(path) and compiler.looks_like_fweb(path)
+
+
+def import_fweb_file(envelope: Path, source: dict, source_key: str, name: str | None = None, stem: str | None = None) -> dict:
+    staging = _staging()
+    try:
+        try:
+            details = compiler.compile_fweb(envelope, staging)
+        except compiler.CompileError as exc:
+            raise IntakeError(exc.message, exc.status) from exc
+    except BaseException:
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
+    source = {**source, "engine": details.get("engine"), "locale": details.get("locale"), "assets": details.get("assets")}
+    return _finish(staging, "fweb", source, source_key, stem or "site", name or details.get("name"))
+
+
 def import_folder(folder: Path, name: str | None = None) -> dict:
     root = folder.resolve()
     staging = _staging()
@@ -340,12 +361,16 @@ def import_path(raw: str, name: str | None = None) -> dict:
         return import_folder(target, name)
     if target.is_file():
         resolved = target.resolve()
+        if is_fweb(resolved):
+            return import_fweb_file(resolved, {"kind": "fweb", "path": str(resolved)}, f"fweb:{resolved}", name, resolved.stem)
         return import_zip_file(resolved, "zip", {"kind": "zip", "path": str(resolved)}, f"zip:{resolved}", name, resolved.stem)
     raise IntakeError(f"{raw} does not exist", 404)
 
 
 def import_upload(archive: Path, filename: str, name: str | None = None) -> dict:
     label = Path(filename or "upload.zip").name
+    if is_fweb(archive, label):
+        return import_fweb_file(archive, {"kind": "fweb", "path": label, "upload": True}, f"fweb-upload:{label}", name, Path(label).stem)
     return import_zip_file(archive, "zip", {"kind": "zip", "path": label, "upload": True}, f"upload:{label}", name, Path(label).stem)
 
 

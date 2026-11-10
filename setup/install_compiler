@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+source "$(dirname "$0")/lib.sh"
+fp_rust_env
+command -v cargo >/dev/null 2>&1 || fp_die "cargo is missing. Install Rust stable from https://rustup.rs and run ./setup/install_compiler again"
+src="$FORMPUBLISHER_ROOT/vendor/formweb-native"
+[ -f "$src/Cargo.toml" ] || fp_die "vendor/formweb-native is missing"
+ext=""
+[ "$(fp_os)" = windows ] && ext=".exe"
+fp_say "building formweb-core (the first build takes a few minutes)"
+(cd "$src" && cargo build --release --locked -p formweb-core)
+mkdir -p "$FORMPUBLISHER_ROOT/backend/bin"
+cp "$src/target/release/formweb-core$ext" "$FORMPUBLISHER_ROOT/backend/bin/formweb-core$ext"
+chmod +x "$FORMPUBLISHER_ROOT/backend/bin/formweb-core$ext"
+fp_say "formweb-core ready: backend/bin/formweb-core$ext"
