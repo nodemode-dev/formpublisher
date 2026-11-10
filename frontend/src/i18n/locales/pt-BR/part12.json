@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "O nome de um site usa letras minúsculas, dígitos e hifens, e começa com uma letra ou um dígito.",
+  "A key name is 16 characters from 0 to 9 and a to f.": "O nome de uma chave tem 16 caracteres, de 0 a 9 e de a a f.",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "Um build fica em <site>/<build id>, onde o ID do build tem 12 caracteres, de 0 a 9 e de a a f.",
+  "A prepared folder goes at <site>/<build id>/<target>.": "Uma pasta preparada fica em <site>/<build id>/<target>."
+}

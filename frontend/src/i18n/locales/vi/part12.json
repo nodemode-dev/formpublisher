@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "Tên trang web gồm chữ thường, chữ số và dấu gạch nối, và bắt đầu bằng một chữ cái hoặc một chữ số.",
+  "A key name is 16 characters from 0 to 9 and a to f.": "Tên khóa gồm 16 ký tự từ 0 đến 9 và từ a đến f.",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "Một bản dựng nằm ở <site>/<build id>, trong đó ID bản dựng gồm 12 ký tự từ 0 đến 9 và từ a đến f.",
+  "A prepared folder goes at <site>/<build id>/<target>.": "Một thư mục đã chuẩn bị nằm ở <site>/<build id>/<target>."
+}

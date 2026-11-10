@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "站点名称由小写字母、数字和连字符组成，并以字母或数字开头。",
+  "A key name is 16 characters from 0 to 9 and a to f.": "密钥名称是 16 个字符，取自 0 到 9 和 a 到 f。",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "构建放在 <site>/<build id>，其中构建 ID 是 12 个字符，取自 0 到 9 和 a 到 f。",
+  "A prepared folder goes at <site>/<build id>/<target>.": "已准备的文件夹放在 <site>/<build id>/<target>。"
+}

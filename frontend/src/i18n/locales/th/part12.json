@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "ชื่อไซต์ใช้ตัวอักษรพิมพ์เล็ก ตัวเลข และเครื่องหมายยัติภังค์ และขึ้นต้นด้วยตัวอักษรหรือตัวเลข",
+  "A key name is 16 characters from 0 to 9 and a to f.": "ชื่อคีย์มี 16 อักขระ จาก 0 ถึง 9 และ a ถึง f",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "บิลด์จะอยู่ที่ <site>/<build id> โดยรหัสบิลด์มี 12 อักขระ จาก 0 ถึง 9 และ a ถึง f",
+  "A prepared folder goes at <site>/<build id>/<target>.": "โฟลเดอร์ที่เตรียมไว้จะอยู่ที่ <site>/<build id>/<target>"
+}

@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "A webhely neve kisbetűkből, számjegyekből és kötőjelekből áll, és betűvel vagy számjeggyel kezdődik.",
+  "A key name is 16 characters from 0 to 9 and a to f.": "A kulcs neve 16 karakter 0-tól 9-ig és a-tól f-ig.",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "A build helye <site>/<build id>, ahol a build azonosító 12 karakter 0-tól 9-ig és a-tól f-ig.",
+  "A prepared folder goes at <site>/<build id>/<target>.": "Az előkészített mappa helye <site>/<build id>/<target>."
+}

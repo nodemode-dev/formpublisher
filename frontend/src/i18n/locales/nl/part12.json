@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "Een sitenaam bestaat uit kleine letters, cijfers en koppeltekens en begint met een letter of een cijfer.",
+  "A key name is 16 characters from 0 to 9 and a to f.": "Een sleutelnaam bestaat uit 16 tekens van 0 tot 9 en a tot f.",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "Een build komt in <site>/<build id>, waarbij de build-id 12 tekens van 0 tot 9 en a tot f is.",
+  "A prepared folder goes at <site>/<build id>/<target>.": "Een voorbereide map komt in <site>/<build id>/<target>."
+}

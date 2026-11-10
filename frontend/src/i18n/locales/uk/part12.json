@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "Назва сайту складається з малих літер, цифр і дефісів та починається з літери або цифри.",
+  "A key name is 16 characters from 0 to 9 and a to f.": "Назва ключа складається з 16 символів від 0 до 9 і від a до f.",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "Збірка розміщується за шляхом <site>/<build id>, де ID збірки складається з 12 символів від 0 до 9 і від a до f.",
+  "A prepared folder goes at <site>/<build id>/<target>.": "Підготовлена тека розміщується за шляхом <site>/<build id>/<target>."
+}
