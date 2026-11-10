@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "formpublisher": {
+      "command": "${workspaceFolder}/formpublisher",
+      "args": ["mcp"]
+    },
+    "formmcp": {
+      "command": "formmcp",
+      "args": ["mcp"]
+    }
+  }
+}

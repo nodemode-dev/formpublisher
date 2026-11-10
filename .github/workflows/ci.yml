@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install
+        working-directory: frontend
+        run: npm ci --no-fund
+      - name: Audit
+        working-directory: frontend
+        run: npm audit --audit-level=low
+      - name: Type check and build
+        working-directory: frontend
+        run: npm run build
+
+  engine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install
+        run: pip install -r backend/requirements.txt
+      - name: Self check
+        run: python backend/formpublisher_engine.py --selfcheck
+      - name: Compile
+        run: python -m compileall -q backend/app setup
+      - name: Agent skills in step
+        run: ./formpublisher agents sync --check
+      - name: Shell syntax
+        run: bash -n formpublisher && bash -n formpublisher_oc_install && bash -n build_app && bash -n setup/lib.sh && bash -n setup/freeze_backend
