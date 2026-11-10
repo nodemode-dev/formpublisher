@@ -19,6 +19,7 @@ usage: ./formpublisher [command] [options]
   run ...             the formpublisher command line (status, sites, import, routes); run --help
   mcp                 the formpublisher MCP server on stdio, for Claude Code and other MCP clients
   agents install|status|sync  set up Claude Code, Codex and Cursor (install), say what is set up (status), or mirror the skills (sync [--check])
+  vendor --check      check that the vendored FormWeb crates, their table and Cargo.lock agree (for CI and before a compiler build)
   doctor              check the toolchain, installs and ports
   version             the version (also --version)
   desktop dev|build   run or bundle the desktop app (Tauri 2; in development)
@@ -102,6 +103,7 @@ case "$cmd" in
   boot|dev) boot ;;
   install) exec "$root/formpublisher_oc_install" "$@" ;;
   agents) exec "$(py)" "$root/setup/agents.py" "$@" ;;
+  vendor) exec "$(py)" "$root/setup/vendor_check.py" "$@" ;;
   backend) run_backend "$@" ;;
   frontend) run_frontend "$@" ;;
   build) ensure_frontend; cd "$root/frontend"; exec npm run build ;;

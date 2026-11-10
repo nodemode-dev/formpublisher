@@ -19,6 +19,7 @@ if /i "%CMD%"=="run" ( shift & "%PYEXE%" backend\formpublisher_engine.py cli %1 
 if /i "%CMD%"=="cli" ( shift & "%PYEXE%" backend\formpublisher_engine.py cli %1 %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
 if /i "%CMD%"=="mcp" ( shift & "%PYEXE%" backend\formpublisher_engine.py mcp %1 %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
 if /i "%CMD%"=="agents" ( shift & "%PYEXE%" setup\agents.py %1 %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
+if /i "%CMD%"=="vendor" ( shift & "%PYEXE%" setup\vendor_check.py %1 %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
 if /i "%CMD%"=="doctor" goto doctor
 if /i "%CMD%"=="version" ( "%PYEXE%" backend\formpublisher_engine.py --version & goto :eof )
 if /i "%CMD%"=="help" goto usage
@@ -64,5 +65,5 @@ goto :eof
 :usage
 echo formpublisher.bat [command]
 echo   boot ^| install ^| backend ^| frontend ^| build ^| serve ^| desktop dev ^| desktop build
-echo   run ... ^| mcp ... ^| agents install^|status^|sync ^| doctor ^| version ^| help
+echo   run ... ^| mcp ... ^| agents install^|status^|sync ^| vendor --check ^| doctor ^| version ^| help
 exit /b 0
