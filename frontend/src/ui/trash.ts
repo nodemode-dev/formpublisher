@@ -13,6 +13,18 @@ const LIVE = new Set(['site.removed', 'site.imported', 'builds.removed', 'builds
 
 const message = (e: unknown): string => (e instanceof Error && e.message ? e.message : 'Request failed');
 
+const SITE_ID = /^[a-z0-9][a-z0-9-]{0,100}$/;
+const HEX12 = /^[0-9a-f]{12}$/;
+const HEX16 = /^[0-9a-f]{16}$/;
+
+function shapeError(kind: TrashKind, name: string): string {
+  const parts = name.split('/');
+  if (kind === 'site') return parts.length === 1 && SITE_ID.test(name) ? '' : 'A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.';
+  if (kind === 'key') return HEX16.test(name.replace(/\.pem$/, '')) ? '' : 'A key name is 16 characters from 0 to 9 and a to f.';
+  if (kind === 'build') return parts.length === 2 && SITE_ID.test(parts[0]) && HEX12.test(parts[1]) ? '' : 'A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.';
+  return parts.length === 3 && SITE_ID.test(parts[0]) && HEX12.test(parts[1]) && SITE_ID.test(parts[2]) ? '' : 'A prepared folder goes at <site>/<build id>/<target>.';
+}
+
 class OriginDialog extends Dialog {
   private readonly lead = el('<p class="fp-note"></p>');
   private readonly prefix = el('<span class="fp-tr-prefix" translate="no"></span>');
@@ -50,6 +62,8 @@ class OriginDialog extends Dialog {
     const name = this.input.value.trim().replace(/^\/+/, '');
     if (!item || this.busy) return;
     if (!name) { setText(this.error, 'Type a name.'); this.input.focus(); return; }
+    const shape = shapeError(item.kind, name);
+    if (shape) { setText(this.error, shape); this.input.focus(); return; }
     const origin = `${TRASH_ROOT[item.kind]}/${item.kind === 'key' && !name.endsWith('.pem') ? `${name}.pem` : name}`;
     this.busy = true;
     setDisabled(this.ok, true);
