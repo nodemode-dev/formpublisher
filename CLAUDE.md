@@ -1,11 +1,12 @@
 # FormPublisher
 
-FormPublisher is the Form family's site publisher. It opens what FormWeb makes (a `site-export.zip`, a publication folder, or the site currently open in a running FormWeb), lists the routes, and shows them in a FormDeck-style window. Device preview, checks, packaging, signing, publishing and the desktop build are in development. Vanilla TypeScript and Vite interface, Python 3.12 FastAPI engine, Tauri 2 shell, a command line and an MCP server.
+FormPublisher is the Form family's site publisher. It opens what FormWeb makes (a `site-export.zip`, a publication folder, or the site currently open in a running FormWeb), lists the routes, and shows them in a FormDeck-style window. It previews the site on device sizes, runs checks, builds a deterministic signed package and prepares a folder per host with the commands to run (prepare-only, it never uploads). The desktop build is in development. Vanilla TypeScript and Vite interface, Python 3.12 FastAPI engine, Tauri 2 shell, a command line and an MCP server.
 
 ## Layout
 
 - `frontend/src/` is the window: title bar, tabs, routes strip, inspector, status bar, Home, theme boot. Styles are in `frontend/src/styles/` and every `z-index` comes from `tokens.css`.
 - `backend/app/routers/<name>.py` each export `router`; `backend/app/main.py` includes every one it finds. Services live in `backend/app/services/`. The entry is `backend/formpublisher_engine.py` (`--selfcheck`, `cli`, `mcp`).
+- `backend/app/targets/<id>.py` is one host adapter each (discovered like the routers); `backend/app/cli.py` holds the `Client` (HTTP to a running engine, else the same services in-process) and `backend/app/mcp.py` one tool per method. A new route gets a Client method, a command and a tool together; the exact tool names are in `AGENTS.md` and `.claude/skills/formpublisher-harness`.
 - Ports: the interface on http://localhost:5280 (Vite, `server.host` false, preview on 5281), the engine on http://127.0.0.1:8280 (`FORMPUBLISHER_PORT`).
 - Data folder: `~/FormPublisher`, moved with `FORMPUBLISHER_HOME`.
 - Scripts are named as the family's: `formpublisher` (boot), `formpublisher_oc_install`, `build_app`, each with a `.bat` twin; `./formpublisher agents install|status|sync` (`setup/agents.py`) connects Claude Code, Codex and Cursor. `.claude/skills` holds the formpublisher skills; `.agents/skills` is its mirror, kept by `./formpublisher agents sync`.

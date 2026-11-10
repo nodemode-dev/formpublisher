@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -9,7 +10,9 @@ from pathlib import Path
 from typing import Any
 
 from app import __version__
-from app.services import formweb, intake, paths, settings
+from app.services import checks, formweb, intake, keys, package, paths, settings
+
+DEEP_WAIT_SECONDS = 900
 
 
 class OpError(Exception):
@@ -126,6 +129,144 @@ class Client:
             return self.call("GET", f"/api/sites/{urllib.parse.quote(site_id, safe='')}/routes")
         return self._local(intake.site_routes, site_id)
 
+    def _revision(self, site_id: str, revision: str | None) -> str:
+        if revision:
+            return revision
+        record = self.call("GET", f"/api/sites/{_q(site_id)}")
+        return record.get("revision") or (record.get("revisions") or [""])[-1]
+
+    def check(self, site_id: str, deep: bool = False, widths: list[int] | None = None, revision: str | None = None) -> dict:
+        self.connect()
+        if self.url:
+            body: dict[str, Any] = {"site": site_id, "tiers": ["static", "deep"] if deep else ["static"]}
+            if revision:
+                body["revision"] = revision
+            if widths:
+                body["widths"] = widths
+            self.call("POST", "/api/checks/run", body)
+            chosen = self._revision(site_id, revision)
+            deadline = time.monotonic() + DEEP_WAIT_SECONDS
+            while True:
+                report = self.call("GET", f"/api/checks/{_q(site_id)}/{_q(chosen)}")
+                if not report.get("running") or time.monotonic() > deadline:
+                    break
+                time.sleep(1)
+            report.pop("running", None)
+            return {"site": site_id, "revision": chosen, **report}
+        from app.routers import checks as route
+
+        def run_local() -> str:
+            root = intake.revision_root(site_id, revision)
+            route._static(site_id, root.name, root)
+            if deep:
+                route._deep("cli", site_id, root.name, root, route._widths(widths), "auto")
+            return root.name
+
+        chosen = self._local(run_local)
+        return {"site": site_id, "revision": chosen, **checks.report(site_id, chosen)}
+
+    def get_checks(self, site_id: str, revision: str | None = None) -> dict:
+        self.connect()
+        if self.url:
+            chosen = self._revision(site_id, revision)
+            report = self.call("GET", f"/api/checks/{_q(site_id)}/{_q(chosen)}")
+            report.pop("running", None)
+            return {"site": site_id, "revision": chosen, **report}
+        chosen = self._local(lambda: intake.revision_root(site_id, revision).name)
+        return {"site": site_id, "revision": chosen, **checks.report(site_id, chosen)}
+
+    def build(self, site_id: str, revision: str | None = None) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("POST", "/api/builds", {"site": site_id, "revision": revision})
+        return self._local(package.build, site_id, revision)
+
+    def builds(self) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", "/api/builds")
+        rows = package.list_builds()
+        return {"builds": rows, "count": len(rows)}
+
+    def keys(self) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", "/api/keys")
+        rows = keys.list_keys()
+        return {"keys": rows, "count": len(rows)}
+
+    def create_key(self, name: str, passphrase: str | None = None) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("POST", "/api/keys", {"name": name, "passphrase": passphrase})
+        return self._local(keys.create_key, name, passphrase)
+
+    def sign(self, build_id: str, key: str | None = None, passphrase: str | None = None) -> dict:
+        self.connect()
+        if not key:
+            rows = self.keys()["keys"]
+            if not rows:
+                raise OpError("there is no signing key yet; create one with: keys --create NAME")
+            if len(rows) > 1:
+                raise OpError("several keys exist; name one with --key (" + ", ".join(f"{r['id']} {r.get('name', '')}" for r in rows) + ")")
+            key = rows[0]["id"]
+        if self.url:
+            return self.call("POST", f"/api/builds/{_q(build_id)}/sign", {"key": key, "passphrase": passphrase})
+        return self._local(keys.sign_build, build_id, key, passphrase)
+
+    def verify(self, build_id: str) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("POST", f"/api/builds/{_q(build_id)}/verify", {})
+        return self._local(keys.verify_build, build_id)
+
+    def targets(self) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", "/api/targets")
+        from app.services import publish
+
+        return self._local(publish.list_targets)
+
+    def prepare(self, build_id: str, target_ids: list[str]) -> dict:
+        self.connect()
+        if not target_ids:
+            raise OpError("name at least one target (see targets)")
+        if self.url:
+            return self.call("POST", "/api/publish/prepare", {"build": build_id, "targets": target_ids})
+        from app.services import publish
+
+        return self._local(publish.prepare, build_id, target_ids)
+
+    def prepared(self, build_id: str) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", f"/api/publish/{_q(build_id)}")
+        from app.services import publish
+
+        return self._local(publish.prepared, build_id)
+
+    def receive_status(self) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", "/api/receive/status")
+        from app.services import inbox
+
+        return self._local(inbox.status)
+
+
+def _q(value: str) -> str:
+    return urllib.parse.quote(value, safe="")
+
+
+def _widths(raw: str | None) -> list[int] | None:
+    if not raw:
+        return None
+    try:
+        return [int(part) for part in raw.split(",") if part.strip()]
+    except ValueError as exc:
+        raise OpError("--widths takes whole numbers separated by commas, for example 390,1440") from exc
+
 
 def _plural(count: int, word: str) -> str:
     return f"{count} {word}" if count == 1 else f"{count} {word}s"
@@ -168,6 +309,85 @@ def say_routes(data: dict) -> str:
     return "\n".join(lines)
 
 
+def say_check(data: dict) -> str:
+    summary = data["summary"]
+    ran = ", ".join(summary.get("ran", [])) or "nothing yet"
+    lines = [f"{data['site']}  revision {data['revision']}  checked: {ran}  {_plural(summary['errors'], 'error')}, {_plural(summary['warnings'], 'warning')}, {_plural(summary['infos'], 'note')}"]
+    for p in data["problems"]:
+        lines.append(f"{p.get('severity', ''):<8} {p.get('route', ''):<28} {p.get('code', '')}  {p.get('message', '')}")
+        if p.get("fix"):
+            lines.append(f"{'':<8} fix: {p['fix']}")
+    return "\n".join(lines)
+
+
+def say_build(data: dict) -> str:
+    return f"build {data['id']}  site {data['site']}  revision {data['revision']}  {_plural(data['files'], 'file')}  {data['size']} bytes  " + ("signed" if data.get("signed") else "not signed") + ("" if data.get("created", True) else "  (already built, same bytes)")
+
+
+def say_builds(data: dict) -> str:
+    if not data["builds"]:
+        return "no builds yet; make one with: build SITE-ID"
+    return "\n".join(f"{b['id']:<14} {b['site']:<30} {_plural(b.get('files', 0), 'file'):<10} {b.get('size', 0):>9} bytes  {'signed' if b.get('signed') else 'unsigned':<8} {b.get('created', '')}" for b in data["builds"])
+
+
+def say_keys(data: dict) -> str:
+    if not data["keys"]:
+        return "no keys yet; create one with: keys --create NAME"
+    return "\n".join(f"{k['id']:<14} {k.get('name', ''):<24} {k.get('fingerprint', '')}" + ("  passphrase" if k.get("encrypted") else "") for k in data["keys"])
+
+
+def say_key(data: dict) -> str:
+    return f"created key {data['id']}  {data.get('name', '')}  {data.get('fingerprint', '')}"
+
+
+def say_sign(data: dict) -> str:
+    return f"signed build {data['id']} with key {data['keyId']}  {data['key']}"
+
+
+def say_verify(data: dict) -> str:
+    if data.get("valid"):
+        return f"valid  signed by {data.get('key')}"
+    return f"not valid: {data.get('reason', 'unknown')}"
+
+
+def say_targets(data: dict) -> str:
+    return "\n".join(f"{t['id']:<18} {t['name']:<18} {t.get('description', '')}" + (f"  [local: {t['localTool']}]" if t.get("localTool") else "") for t in data["targets"])
+
+
+def say_prepared(data: dict) -> str:
+    results = data["results"]
+    if not results:
+        return f"nothing is prepared for build {data['build']} yet; run: prepare {data['build']} --target T"
+    lines = [f"build {data['build']}  {_plural(len(results), 'target')} prepared"]
+    for target, row in results.items():
+        lines.append("")
+        lines.append(f"{target}  {row.get('folder', '')}  {_plural(len(row.get('files') or []), 'file')}")
+        for cmd in row.get("commands") or []:
+            where = f"  (in {cmd['cwd']})" if cmd.get("cwd") else ""
+            lines.append(f"  {cmd.get('label', '')}: {cmd.get('run', '')}{where}")
+        for note in row.get("notes") or []:
+            lines.append(f"  note: {note}")
+        for warning in row.get("warnings") or []:
+            lines.append(f"  warning: {warning}")
+    return "\n".join(lines)
+
+
+def say_prepare(data: dict) -> str:
+    return say_prepared({"build": data["build"], "results": data["results"]})
+
+
+def say_receive(data: dict) -> str:
+    lines = [
+        f"endpoint  {data.get('endpoint')}",
+        f"inbox     {data.get('inbox')}  " + ("watching" if data.get("watching") else "not watching") + f", {data.get('pending', 0)} waiting",
+    ]
+    rows = data.get("receipts") or []
+    lines.append("no receipts yet" if not rows else "last receipts:")
+    for r in rows:
+        lines.append("  " + "  ".join(f"{k} {v}" for k, v in r.items() if v not in (None, "")))
+    return "\n".join(lines)
+
+
 def build_parser() -> argparse.ArgumentParser:
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--json", action="store_true", help="print the raw JSON result")
@@ -183,6 +403,32 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("import-formweb", parents=[common], help="download the current FormWeb export and import it")
     rt = sub.add_parser("routes", parents=[common], help="list the routes of a site")
     rt.add_argument("id")
+    ck = sub.add_parser("check", parents=[common], help="run the static checks on a site (add --deep for the browser run) and print the problems")
+    ck.add_argument("id")
+    ck.add_argument("--revision", help="revision to check (default: the latest)")
+    ck.add_argument("--deep", action="store_true", help="also run the deep tier in the installed Chrome (needs Playwright)")
+    ck.add_argument("--widths", help="comma separated viewport widths for the deep tier (default 1440,390)")
+    ck.add_argument("--last", action="store_true", help="print the stored results without running anything")
+    bd = sub.add_parser("build", parents=[common], help="build the deterministic site.zip and publish.json for a site")
+    bd.add_argument("id")
+    bd.add_argument("--revision", help="revision to build (default: the latest)")
+    sub.add_parser("builds", parents=[common], help="list builds, newest first")
+    sg = sub.add_parser("sign", parents=[common], help="sign a build with an Ed25519 key")
+    sg.add_argument("build")
+    sg.add_argument("--key", help="key id (default: the only key, when there is exactly one)")
+    sg.add_argument("--passphrase", help="the key's passphrase, when it has one")
+    vf = sub.add_parser("verify", parents=[common], help="verify a build's signature; exits 1 when it is not valid")
+    vf.add_argument("build")
+    ky = sub.add_parser("keys", parents=[common], help="list signing keys; --create NAME makes a new Ed25519 key")
+    ky.add_argument("--create", metavar="NAME", help="create a key with this name")
+    ky.add_argument("--passphrase", help="encrypt the new key with this passphrase")
+    sub.add_parser("targets", parents=[common], help="list the host targets a build can be prepared for")
+    pp = sub.add_parser("prepare", parents=[common], help="prepare a folder per target for a build, with the exact commands to run")
+    pp.add_argument("build")
+    pp.add_argument("--target", action="append", required=True, metavar="T", help="target id; repeat for several (see targets)")
+    pd = sub.add_parser("prepared", parents=[common], help="list what is prepared for a build")
+    pd.add_argument("build")
+    sub.add_parser("receive-status", parents=[common], help="the receive endpoint, the inbox folder and the last receipts")
     return parser
 
 
@@ -198,13 +444,40 @@ def main(argv: list[str] | None = None) -> int:
             data, say = client.import_path(args.path, args.name), say_import
         elif args.command == "import-formweb":
             data, say = client.import_formweb(), say_import
-        else:
+        elif args.command == "routes":
             data, say = client.routes(args.id), say_routes
+        elif args.command == "check":
+            if args.last:
+                data = client.get_checks(args.id, args.revision)
+            else:
+                data = client.check(args.id, args.deep, _widths(args.widths), args.revision)
+            say = say_check
+        elif args.command == "build":
+            data, say = client.build(args.id, args.revision), say_build
+        elif args.command == "builds":
+            data, say = client.builds(), say_builds
+        elif args.command == "sign":
+            data, say = client.sign(args.build, args.key, args.passphrase), say_sign
+        elif args.command == "verify":
+            data, say = client.verify(args.build), say_verify
+        elif args.command == "keys":
+            if args.create:
+                data, say = client.create_key(args.create, args.passphrase), say_key
+            else:
+                data, say = client.keys(), say_keys
+        elif args.command == "targets":
+            data, say = client.targets(), say_targets
+        elif args.command == "prepare":
+            data, say = client.prepare(args.build, args.target), say_prepare
+        elif args.command == "prepared":
+            data, say = client.prepared(args.build), say_prepared
+        else:
+            data, say = client.receive_status(), say_receive
     except OpError as exc:
         print(f"formpublisher: {exc.message}", file=sys.stderr)
         return exc.code
     print(json.dumps(data, indent=2) if args.json else say(data))
-    return 0
+    return 1 if args.command == "verify" and not data.get("valid") else 0
 
 
 if __name__ == "__main__":
