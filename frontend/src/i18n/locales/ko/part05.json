@@ -1,0 +1,21 @@
+{
+  "Demos": "데모",
+  "Demo": "데모",
+  "FormPublisher demo": "FormPublisher 데모",
+  "Try it on a sample site": "샘플 사이트로 체험하기",
+  "Bundled sample site": "기본 포함 샘플 사이트",
+  "The sample site could not be opened": "샘플 사이트를 열 수 없습니다",
+  "The bundled sample site is missing from this install": "이 설치본에 기본 포함 샘플 사이트가 없습니다",
+  "Quick tour": "빠른 둘러보기",
+  "Skip the tour": "둘러보기 건너뛰기",
+  "Back": "이전",
+  "Next": "다음",
+  "Done": "완료",
+  "Step {0} of {1}": "{1}단계 중 {0}단계",
+  "Preview": "미리보기",
+  "Checks": "검사",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "모든 경로가 선택한 기기 너비로 여기에 표시됩니다. 왼쪽의 경로를 클릭해 사이트를 둘러보세요.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "패널을 열어 검사를 실행하세요. 문제 목록에는 깨진 링크와 누락된 항목이 표시되며, 각 항목마다 해결 방법이 안내됩니다.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "패키징은 사이트를 파일별 해시가 담긴 재현 가능한 zip 하나로 만들어 서명할 수 있게 합니다.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "게시는 호스트별로 폴더와 정확한 명령을 만듭니다. FormPublisher는 아무것도 업로드하지 않습니다."
+}

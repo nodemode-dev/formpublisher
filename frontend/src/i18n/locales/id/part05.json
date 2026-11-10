@@ -1,0 +1,21 @@
+{
+  "Demos": "Demo",
+  "Demo": "Demo",
+  "FormPublisher demo": "Demo FormPublisher",
+  "Try it on a sample site": "Coba pada situs contoh",
+  "Bundled sample site": "Situs contoh bawaan",
+  "The sample site could not be opened": "Situs contoh tidak dapat dibuka",
+  "The bundled sample site is missing from this install": "Situs contoh bawaan tidak ada dalam instalasi ini",
+  "Quick tour": "Tur singkat",
+  "Skip the tour": "Lewati tur",
+  "Back": "Kembali",
+  "Next": "Berikutnya",
+  "Done": "Selesai",
+  "Step {0} of {1}": "Langkah {0} dari {1}",
+  "Preview": "Pratinjau",
+  "Checks": "Pemeriksaan",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Setiap rute ditampilkan di sini pada lebar perangkat yang Anda pilih. Klik sebuah rute di kiri untuk berpindah di dalam situs.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Buka panel untuk menjalankan pemeriksaan. Daftar masalah memuat tautan rusak dan detail yang hilang, dan masing-masing menjelaskan cara memperbaikinya.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "Paket mengubah situs menjadi satu zip yang dapat direproduksi dengan hash untuk setiap file, siap ditandatangani.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "Terbitkan menulis sebuah folder dan perintah yang tepat untuk setiap hosting. FormPublisher tidak pernah mengunggah apa pun."
+}

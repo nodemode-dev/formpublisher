@@ -1,0 +1,21 @@
+{
+  "Demos": "Esittelyt",
+  "Demo": "Esittely",
+  "FormPublisher demo": "FormPublisher-esittely",
+  "Try it on a sample site": "Kokeile esimerkkisivustolla",
+  "Bundled sample site": "Mukana tuleva esimerkkisivusto",
+  "The sample site could not be opened": "Esimerkkisivustoa ei voitu avata",
+  "The bundled sample site is missing from this install": "Mukana tuleva esimerkkisivusto puuttuu tästä asennuksesta",
+  "Quick tour": "Pikaesittely",
+  "Skip the tour": "Ohita esittely",
+  "Back": "Takaisin",
+  "Next": "Seuraava",
+  "Done": "Valmis",
+  "Step {0} of {1}": "Vaihe {0} / {1}",
+  "Preview": "Esikatselu",
+  "Checks": "Tarkistukset",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Jokainen reitti näytetään tässä valitsemasi laitteen leveydellä. Napsauta vasemmalla olevaa reittiä liikkuaksesi sivustolla.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Avaa paneeli ajaaksesi tarkistukset. Ongelmat luettelevat rikkinäiset linkit ja puuttuvat tiedot, ja jokainen kertoo, miten se korjataan.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "Paketoi muuttaa sivuston yhdeksi toistettavaksi zip-tiedostoksi, jossa on tiiviste jokaiselle tiedostolle, valmiina allekirjoitettavaksi.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "Julkaise kirjoittaa kansion ja tarkat komennot kullekin palveluntarjoajalle. FormPublisher ei koskaan lähetä mitään verkkoon."
+}

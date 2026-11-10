@@ -1,0 +1,21 @@
+{
+  "Demos": "Bản demo",
+  "Demo": "Demo",
+  "FormPublisher demo": "Demo FormPublisher",
+  "Try it on a sample site": "Thử trên một trang web mẫu",
+  "Bundled sample site": "Trang web mẫu đi kèm",
+  "The sample site could not be opened": "Không thể mở trang web mẫu",
+  "The bundled sample site is missing from this install": "Trang web mẫu đi kèm không có trong bản cài đặt này",
+  "Quick tour": "Tham quan nhanh",
+  "Skip the tour": "Bỏ qua phần tham quan",
+  "Back": "Quay lại",
+  "Next": "Tiếp theo",
+  "Done": "Xong",
+  "Step {0} of {1}": "Bước {0} trên {1}",
+  "Preview": "Xem trước",
+  "Checks": "Kiểm tra",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Mỗi tuyến được hiển thị tại đây theo độ rộng thiết bị bạn chọn. Nhấp vào một tuyến ở bên trái để di chuyển trong trang web.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Mở bảng điều khiển để chạy các kiểm tra. Danh sách vấn đề liệt kê các liên kết hỏng và chi tiết còn thiếu, kèm cách khắc phục từng mục.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "Đóng gói biến trang web thành một tệp zip có thể tái tạo, kèm mã băm cho từng tệp, sẵn sàng để ký.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "Xuất bản ghi ra một thư mục và các lệnh chính xác cho từng máy chủ lưu trữ. FormPublisher không bao giờ tải lên bất cứ thứ gì."
+}

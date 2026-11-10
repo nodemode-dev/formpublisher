@@ -1,0 +1,21 @@
+{
+  "Demos": "Демо",
+  "Demo": "Демо",
+  "FormPublisher demo": "Демо FormPublisher",
+  "Try it on a sample site": "Спробуйте на прикладі сайту",
+  "Bundled sample site": "Вбудований приклад сайту",
+  "The sample site could not be opened": "Не вдалося відкрити приклад сайту",
+  "The bundled sample site is missing from this install": "Вбудований приклад сайту відсутній у цій установці",
+  "Quick tour": "Швидкий тур",
+  "Skip the tour": "Пропустити тур",
+  "Back": "Назад",
+  "Next": "Далі",
+  "Done": "Готово",
+  "Step {0} of {1}": "Крок {0} з {1}",
+  "Preview": "Перегляд",
+  "Checks": "Перевірки",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Кожен маршрут показано тут у вибраній ширині пристрою. Натисніть маршрут ліворуч, щоб переходити сайтом.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Відкрийте панель, щоб запустити перевірки. У списку проблем указано непрацюючі посилання й відсутні дані, і для кожної сказано, як її виправити.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "Пакування перетворює сайт на один відтворюваний zip із хешем кожного файлу, готовий до підпису.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "Публікація записує теку й точні команди для кожного хостингу. FormPublisher нічого не завантажує."
+}

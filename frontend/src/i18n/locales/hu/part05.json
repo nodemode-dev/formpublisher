@@ -1,0 +1,21 @@
+{
+  "Demos": "Demók",
+  "Demo": "Demó",
+  "FormPublisher demo": "FormPublisher demó",
+  "Try it on a sample site": "Próbálja ki egy mintawebhelyen",
+  "Bundled sample site": "Mellékelt mintawebhely",
+  "The sample site could not be opened": "A mintawebhelyet nem sikerült megnyitni",
+  "The bundled sample site is missing from this install": "A mellékelt mintawebhely hiányzik ebből a telepítésből",
+  "Quick tour": "Gyors bemutató",
+  "Skip the tour": "Bemutató kihagyása",
+  "Back": "Vissza",
+  "Next": "Tovább",
+  "Done": "Kész",
+  "Step {0} of {1}": "{0}. lépés, összesen {1}",
+  "Preview": "Előnézet",
+  "Checks": "Ellenőrzések",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Minden útvonal itt jelenik meg a kiválasztott eszközszélességgel. Kattintson egy útvonalra a bal oldalon, hogy a webhelyen mozogjon.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Nyissa meg a panelt az ellenőrzések futtatásához. A problémák felsorolják a hibás hivatkozásokat és a hiányzó adatokat, és mindegyik megmondja, hogyan javítható.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "A Csomagolás a webhelyből egyetlen reprodukálható zipet készít minden fájlhoz hash-sel, aláírásra készen.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "A Közzététel mappát és pontos parancsokat készít minden tárhelyhez. A FormPublisher soha nem tölt fel semmit."
+}

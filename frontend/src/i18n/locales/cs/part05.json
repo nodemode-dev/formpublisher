@@ -1,0 +1,21 @@
+{
+  "Demos": "Ukázky",
+  "Demo": "Ukázka",
+  "FormPublisher demo": "Ukázka FormPublisher",
+  "Try it on a sample site": "Vyzkoušejte na ukázkovém webu",
+  "Bundled sample site": "Přibalený ukázkový web",
+  "The sample site could not be opened": "Ukázkový web se nepodařilo otevřít",
+  "The bundled sample site is missing from this install": "Přibalený ukázkový web v této instalaci chybí",
+  "Quick tour": "Rychlá prohlídka",
+  "Skip the tour": "Přeskočit prohlídku",
+  "Back": "Zpět",
+  "Next": "Další",
+  "Done": "Hotovo",
+  "Step {0} of {1}": "Krok {0} z {1}",
+  "Preview": "Náhled",
+  "Checks": "Kontroly",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Každá trasa se zde zobrazí v šířce zařízení, kterou zvolíte. Kliknutím na trasu vlevo se pohybujete po webu.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Otevřete panel a spusťte kontroly. Problémy uvádějí nefunkční odkazy a chybějící údaje a každý říká, jak ho opravit.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "Balení změní web na jeden reprodukovatelný zip s hashem každého souboru, připravený k podpisu.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "Publikování zapíše složku a přesné příkazy pro každý hosting. FormPublisher nikdy nic nenahrává."
+}
