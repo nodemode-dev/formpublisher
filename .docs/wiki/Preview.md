@@ -6,7 +6,7 @@ Opening a site mounts a revision on the site host, a second listener at 127.0.0.
 
 - Resolves `/a/b` to the file, then `a/b/index.html`, then `a/b.html`; `/` is `index.html`.
 - Applies `redirects.json` when no file matches (301, 302, 307, 308, or a 200 rewrite; a trailing `*` maps to `:splat`).
-- Answers a missing path with the root `404.html`, or with `404/index.html` when there is no `404.html`.
+- Answers a missing path with the root `404.html`, or with `404/index.html` when there is no `404.html`. For that fallback it makes the page's URLs root-absolute, as the publish targets do.
 - Supports single-range requests, sets `Cache-Control: no-store`, and accepts only `GET` and `HEAD` for its own Host.
 
 ## The options toolbar

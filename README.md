@@ -227,7 +227,7 @@ The window, the command line and the MCP server call one engine, so an agent and
 | `check ID`, `build ID`, `builds` | run the checks, build the package, list builds |
 | `sign BUILD`, `verify BUILD`, `keys` | sign, verify (exits 1 when invalid), list or create (`--create NAME`) keys |
 | `targets`, `prepare BUILD --target T [--include-model]`, `prepared BUILD` | list hosts, prepare a folder per host (FormWeb's model files left out unless `--include-model`), list what is prepared |
-| `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back (`--to PATH` names the place when it is unknown), delete one for good, empty it (refuses without `--yes`) |
+| `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back (`--to PATH` names the place when it is unknown; `--passphrase-stdin` reads one line for a locked key rebuilt from its `.pem`), delete one for good, empty it (refuses without `--yes`) |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
 
 Every command takes `--json`. The MCP server has 18 tools over the same routes:

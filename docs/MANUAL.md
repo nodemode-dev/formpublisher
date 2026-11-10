@@ -83,7 +83,9 @@ The dialog checks the shape of the name before it asks, and the engine applies t
 
 <picture><source media="(prefers-color-scheme: dark)" srcset="images/trash-origin-dark.webp"><img alt="The Where does it go dialog with the kind's folder as a prefix and a name field" src="images/trash-origin-light.webp"></picture>
 
-The restore answer also carries `message`, kept for older callers. The same restore is `POST /api/trash/{entry}/restore` with the body `{"origin": "..."}` and `trash restore ENTRY --to PATH` on the command line. The origin is used only when none is recorded or inferred, it must be free, and it must resolve inside the kind's own folder (a key directly in `keys/`); a path that leaves it, an absolute path, one of another kind or a taken place is refused.
+A trashed key whose record (`entry.json`) is missing or damaged is rebuilt from its `.pem` when you restore it. An unencrypted key gets back its id (the first 16 hex characters of the SHA-256 of its public key) and its fingerprint, and the list shows it as "Recovered key [id]". An encrypted key answers 409 `passphrase-required`; a wrong passphrase answers `passphrase-wrong`, and the right one restores the key. In the window, restoring a locked key asks for its passphrase in a dialog. A file that cannot be read, a key that is not Ed25519, or more than one `.pem` stays `entry-damaged`. An id that is already present answers `place-taken`. The passphrase is never logged, stored or echoed.
+
+The restore answer also carries `message`, kept for older callers. The same restore is `POST /api/trash/{entry}/restore` with the body `{"origin": "...", "passphrase": "..."}` and `trash restore ENTRY --to PATH` on the command line. For a locked key the command line has `trash restore ENTRY --passphrase-stdin`, which reads one line from standard input. No flag takes the passphrase itself. The origin is used only when none is recorded or inferred, it must be free, and it must resolve inside the kind's own folder (a key directly in `keys/`); a path that leaves it, an absolute path, one of another kind or a taken place is refused.
 
 ![The Trash page with a removed site, key and build](images/trash-light.webp)
 
@@ -112,7 +114,7 @@ How the host resolves a request:
 - `/a/b` is the file `a/b`, then `a/b/index.html`, then `a/b.html`; `/a/b/` is `a/b/index.html`; `/` is `index.html`. Query strings are ignored.
 - Paths with `..`, a backslash or a NUL byte are refused (400); symlinks that leave the revision are not followed.
 - `redirects.json` applies when no file matches: 301, 302, 307 and 308 answer with `Location`, 200 rewrites to the target, and a trailing `*` in `from` becomes `:splat` in `to`.
-- A missing path answers with the root `404.html` (status 404). When there is no `404.html` it answers with `404/index.html`, where FormWeb puts its 404 page, and otherwise plain text.
+- A missing path answers with the root `404.html` (status 404). When there is no `404.html` it answers with `404/index.html`, where FormWeb puts its 404 page, and otherwise plain text. For that older `404/index.html` fallback the host makes the URLs in the page root-absolute, as the publish targets do.
 - Single-range requests answer 206, or 416 when unsatisfiable. Every response carries `Cache-Control: no-store`, `X-Content-Type-Options: nosniff` and `Referrer-Policy: strict-origin-when-cross-origin`.
 - Only `GET` and `HEAD` are accepted, and only for `127.0.0.1:[port]` or `localhost:[port]` as Host.
 
@@ -276,6 +278,8 @@ What each host gets. Every folder is written from the build's own `site.zip`, ne
 
 A FormWeb 404 page exported as `404/index.html` counts as the site's 404, and is also written as `404.html` for the hosts that look for that name. A host that cannot represent something says so under Warnings and never drops it silently: GitHub Pages has no server redirects and ignores custom headers, so each redirect becomes a meta-refresh page and each ignored header is named.
 
+FormWeb 0.19.7 exports splat redirects (`/blog/*` to `/docs/:splat`) and a root `404.html`. Netlify and Cloudflare Pages write the splat into `_redirects`, Vercel writes it as `:path*` in `vercel.json`, and nginx writes it as a regex `location`. GitHub Pages skips a splat redirect with a warning, because it has no server redirects; its exact redirects become refresh pages. An older export has only `404/index.html`. Every target then writes it as `404.html` with its URLs made root-absolute, and says so in its notes. Static zip stays byte for byte.
+
 Left-out model files. A FormWeb site carries its editing model, `site.formweb.json`, and `asset-access.json`. A host does not need them, and they can reveal more of the site than its visitors see, so the `site/` folder of each host is written without them. The Publish sheet's Keep FormWeb's model files box, `--include-model` on the command line and `includeModel: true` in the MCP tool put them back for one prepare. Each prepared panel says "Left out: ..." and the result lists them under `leftOut`; Verify knows which files were left out and does not report them missing. The package is unchanged: `site.zip` is the build's own bytes and still holds both files, and the Static zip host writes that zip as it is, so the option affects the `site/` folders of the other five hosts only.
 
 Verify re-reads the folder and checks every file against the hashes in `publish.json`, and the host's own files against a fresh prepare. Remove moves the folder to `trash/`. Preparing again replaces the folder. Prepared folders live at `prepared/[site]/[build]/[host]/` in the data folder, and the sheet remembers what is prepared for each build when you close and reopen it.
@@ -336,7 +340,7 @@ The loop is: import a site, list its routes (and, for a site that arrived again,
 | `prepare BUILD --target T [--target T] [--include-model]` | prepares a folder per target, with the commands to run; FormWeb's model files are left out unless `--include-model` |
 | `prepared BUILD` | lists what is prepared for a build |
 | `trash` | lists the trash, newest first, with each entry's kind, label, time and size |
-| `trash restore ENTRY [--to PATH]` | moves an entry back to where it came from; fails with the reason when the place is taken. `--to` names the place for an entry whose origin is unknown, inside the kind's own folder |
+| `trash restore ENTRY [--to PATH] [--passphrase-stdin]` | moves an entry back to where it came from; fails with the reason when the place is taken. `--to` names the place for an entry whose origin is unknown, inside the kind's own folder. `--passphrase-stdin` reads one line from standard input for a locked key that is rebuilt from its `.pem` |
 | `trash delete ENTRY` | deletes one entry for good |
 | `trash empty --yes` | deletes every entry for good; refuses to run without `--yes` |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
@@ -374,7 +378,7 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 | `prepare_publish` | prepares a folder per host for a build, with commands, notes and warnings; `includeModel: true` keeps FormWeb's model files, and `leftOut` lists what was left out |
 | `get_prepared` | what is prepared for a build (read only) |
 | `list_trash` | the trash entries, newest first (read only) |
-| `restore_from_trash` | moves an entry back to where it came from; only a recorded or inferred origin, with no way to name a place |
+| `restore_from_trash` | moves an entry back to where it came from; only a recorded or inferred origin, with no way to name a place. It takes `passphrase` for a locked key rebuilt from its `.pem` |
 
 There is no tool that deletes. Deleting an entry for good or emptying the trash is for a person, in the window or with `trash delete` and `trash empty --yes`.
 
@@ -403,6 +407,10 @@ When no specific code is given, the code follows the status:
 | 503 | `unavailable` |
 | 504 | `timeout` |
 
+The window shows one next step beside some refusals: Open the trash (`build-missing` or `site-missing` when the item is in the trash), Try again (`formweb-unreachable`), Show the running check (`check-running`), Open the manual (`core-missing`, at this section) and Enter the passphrase (`passphrase-required` or `passphrase-wrong` when signing).
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="images/notice-action-dark.webp"><img alt="A notice with a refusal and one action button beside it" src="images/notice-action-light.webp"></picture>
+
 Specific codes:
 
 | Code | Meaning |
@@ -413,13 +421,13 @@ Specific codes:
 | `target-unknown` | no such publish target |
 | `build-damaged` | a build lost its `site.zip` or `publish.json`, or the zip no longer matches |
 | `core-missing` | `formweb-core` is not installed (422) |
-| `passphrase-required`, `passphrase-wrong` | signing with a locked key |
+| `passphrase-required`, `passphrase-wrong` | signing with a locked key, or a trash restore of a locked key whose record is rebuilt from its `.pem` (409) |
 | `check-running` | a check is already running for the site (409) |
 | `formweb-unreachable`, `formweb-refused` | FormWeb did not answer, or answered with an error (502) |
 | `origin-unknown` | a trash restore needs a place (409) |
 | `place-invalid` | the restore place has the wrong shape or folder |
 | `place-taken` | something already sits there, or a key with that id exists |
-| `entry-damaged` | a trashed key's record or file is damaged |
+| `entry-damaged` | a trashed key's record or file is damaged and a trash restore cannot rebuild it: the file is unreadable, not Ed25519, or there is more than one `.pem` |
 | `engine-unreachable` | the engine did not answer (command line only) |
 
 ## When something goes wrong
