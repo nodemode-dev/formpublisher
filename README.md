@@ -98,7 +98,7 @@
     </td>
     <td width="50%" valign="top">
       <h3>Open .fweb projects</h3>
-      Import a <code>.fweb</code> project directly. <code>formweb-core</code>, built from the vendored FormWeb crates by <code>./setup/install_compiler</code>, exports it to a site the same way FormWeb does.
+      Import a <code>.fweb</code> project directly, including FormWeb's version 2 zip projects of up to 512 MiB. <code>formweb-core</code>, built from the vendored FormWeb crates by <code>./setup/install_compiler</code>, exports it to a site the same way FormWeb does.
     </td>
   </tr>
   <tr>
@@ -118,7 +118,17 @@
     </td>
     <td width="50%" valign="top">
       <h3>Agent tools</h3>
-      17 command line commands and 16 MCP tools cover the whole path from import to a prepared folder, so Claude Code, Codex and Cursor do what a person does in the window.
+      21 command line commands and 18 MCP tools cover the whole path from import to a prepared folder, and the trash, so Claude Code, Codex and Cursor do what a person does in the window. Deleting for good stays a person's action.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Trash</h3>
+      Removed sites, builds, keys and prepared folders wait in a Trash on Home with their kind, time and size. Restore puts one back where it came from when the place is free; Delete for good and Empty Trash ask first.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Rebindable shortcuts</h3>
+      Change any command's keys in the Keyboard Shortcuts dialog. A combination another command holds offers Replace or Cancel, risky ones are refused with a reason, and Reset and Reset all restore the defaults.
     </td>
   </tr>
   <tr>
@@ -168,6 +178,10 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
     <td width="50%" valign="top"><b>Revisions</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/revisions-dark.webp"><img alt="The Revisions dialog listing two revisions and the seven files changed between them" src="docs/images/revisions-light.webp"></picture></td>
   </tr>
   <tr>
+    <td width="50%" valign="top"><b>Trash</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/trash-dark.webp"><img alt="Home's Trash page listing a removed site, key and build with Restore and Delete for good" src="docs/images/trash-light.webp"></picture></td>
+    <td width="50%" valign="top"><b>Keyboard shortcuts</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/shortcuts-dark.webp"><img alt="The Keyboard Shortcuts dialog with a key conflict offering Replace or Cancel" src="docs/images/shortcuts-light.webp"></picture></td>
+  </tr>
+  <tr>
     <td width="50%" valign="top"><b>Preferences</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/preferences-dark.webp"><img alt="Preferences, FormWeb section, with the Check a site when it arrives and Build a site when it arrives switches" src="docs/images/preferences-light.webp"></picture></td>
     <td width="50%" valign="top"><b>Desktop splash</b><br><img alt="The 360 by 200 splash of the desktop app with the gradient progress bar" src="docs/images/splash.webp"></td>
   </tr>
@@ -177,8 +191,8 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
 
 <table>
   <tr>
-    <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · site tabs · routes strip · inspector · status bar · Preferences</td>
-    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · targets · prepare · prepared · receive-status</td>
+    <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Trash · site tabs · routes strip · inspector · status bar · Preferences · Keyboard Shortcuts</td>
+    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · targets · prepare · prepared · trash · receive-status</td>
     <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · publication folder · the running FormWeb's current site · sent from FormWeb (endpoint or inbox) · the demo</td>
   </tr>
 </table>
@@ -210,9 +224,10 @@ The window, the command line and the MCP server call one engine, so an agent and
 | `check ID`, `build ID`, `builds` | run the checks, build the package, list builds |
 | `sign BUILD`, `verify BUILD`, `keys` | sign, verify (exits 1 when invalid), list or create (`--create NAME`) keys |
 | `targets`, `prepare BUILD --target T [--include-model]`, `prepared BUILD` | list hosts, prepare a folder per host (FormWeb's model files left out unless `--include-model`), list what is prepared |
+| `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back, delete one for good, empty it (refuses without `--yes`) |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
 
-Every command takes `--json`. The MCP server has 16 tools over the same routes:
+Every command takes `--json`. The MCP server has 18 tools over the same routes:
 
 | MCP tool | Does |
 | --- | --- |
@@ -223,6 +238,7 @@ Every command takes `--json`. The MCP server has 16 tools over the same routes:
 | `build_package`, `list_builds` | build the package, list builds |
 | `sign_build`, `verify_build` | sign with a named key, verify a signature |
 | `list_targets`, `prepare_publish`, `get_prepared` | list the six hosts, prepare folders with their commands (`includeModel` keeps FormWeb's model files), read what is prepared |
+| `list_trash`, `restore_from_trash` | read the trash, move an entry back (no tool deletes) |
 
 `.mcp.json`, `.codex/config.toml` and `.cursor/mcp.json` are already wired in this repo, with the `formpublisher-harness` skill for driving the app and `formpublisher-skillset` for changing it. See [`AGENTS.md`](AGENTS.md).
 
@@ -280,7 +296,8 @@ Ports and folders:
 | `prepared/` | the folders Publish writes, one per build and host |
 | `inbox/` | sites FormWeb leaves for FormPublisher (`imported/` and `failed/` below it) |
 | `keys/` | signing keys |
-| `trash/` | deleted items |
+| `trash/` | removed items, each with a `.trash.json` record, restorable from Home |
+| `engine.json` | the running engine's app, port, pid, version and start time, so FormWeb finds it on any port |
 
 `./formpublisher serve` serves a production build from the engine alone, `./formpublisher desktop dev` opens the desktop window, and `./formpublisher doctor` checks the toolchain. `FORMPUBLISHER_HOME` moves the data folder (`~/FormPublisher` by default).
 

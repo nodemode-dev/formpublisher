@@ -15,11 +15,11 @@ Route every change to FormPublisher's code through this file. It maps where the 
 | --- | --- |
 | Engine entry | `backend/formpublisher_engine.py` (serve, `--selfcheck`, `cli`, `mcp`) |
 | Engine routes | `backend/app/routers/[name].py`, each exporting `router`, auto-included by `backend/app/main.py` |
-| Engine services | `backend/app/services/[name].py`: paths and the data folder, settings, site intake, the FormWeb connection, `compile` (formweb-core for .fweb), `host` (static host on 8281, served by `backend/app/host.py`), `checks` and `deep`, `package` and `keys`, `publish` and `inbox` (prepared folders per host, and FormWeb's Send to FormPublisher), `pipeline` (the optional check and build on arrival) and `revisions` (revision lists and diffs); `backend/app/static/probe.js` is the preview probe |
+| Engine services | `backend/app/services/[name].py`: paths and the data folder, settings, site intake, the FormWeb connection, `compile` (formweb-core for .fweb), `host` (static host on 8281, served by `backend/app/host.py`), `checks` and `deep`, `package` and `keys`, `publish` and `inbox` (prepared folders per host, and FormWeb's Send to FormPublisher), `pipeline` (the optional check and build on arrival) and `revisions` (revision lists and diffs), and `trash` (`backend/app/services/trash.py` is the only way into `trash/`, with restore, delete and empty; its routes are `backend/app/routers/trash.py`); `backend/app/static/probe.js` is the preview probe |
 | Host targets | `backend/app/targets/[id].py`, one adapter per host (`ID`, `NAME`, `DESCRIPTION`, `LOCAL_TOOL`, `prepare`), discovered by `backend/app/targets/__init__.py`; adding a host is adding a module |
 | Command line and MCP | `backend/app/cli.py` (`Client`: HTTP to a running engine, else the same services in-process) and `backend/app/mcp.py` (one tool per `Client` method); a new route gets a `Client` method, a command and a tool together |
 | Interface | `frontend/src/`: the shell, Home, tabs, routes strip, inspector, status bar; styles and tokens in `frontend/src/styles/` |
-| Desktop shell | `src-tauri/` (Tauri 2) and the frozen engine sidecar from `setup/freeze_backend` |
+| Desktop shell | `src-tauri/` (Tauri 2), with app commands such as `reveal_path` in `src-tauri/src/files.rs`, and the frozen engine sidecar from `setup/freeze_backend` |
 | Scripts | `./formpublisher`, `./formpublisher_oc_install`, `./build_app`, each with a `.bat` twin; `setup/agents.py`, `setup/lib.sh` |
 | Agent kit | `.claude/skills` (source), `.agents/skills` (mirror), `.mcp.json`, `.codex/config.toml`, `.cursor/mcp.json` |
 | Docs | `docs/MANUAL.md`, `.docs/wiki/`, `README.md`, `CHANGELOG.md`, `NOTICE.md` |

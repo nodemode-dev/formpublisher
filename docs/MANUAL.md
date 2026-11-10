@@ -9,6 +9,8 @@ It imports FormWeb sites, previews them on device sizes, checks them, builds sig
 - [Getting started](#getting-started)
 - [The desktop app](#the-desktop-app)
 - [Home](#home)
+- [Trash](#trash)
+- [Keyboard shortcuts](#keyboard-shortcuts)
 - [Importing a site](#importing-a-site)
 - [Routes](#routes)
 - [.fweb projects](#fweb-projects)
@@ -42,7 +44,9 @@ Open http://localhost:5280. `./formpublisher build` then `./formpublisher serve`
 
 When the app starts it shows a small splash with a gradient bar, starts the engine, and reveals the main window only once the interface has drawn its first frame, so there is no white flash. A second launch focuses the running window instead of opening another. Closing the last window ends the app and the engine it started; a terminate or interrupt signal does the same, engine and anything the engine started included.
 
-The port rule: the app uses `FORMPUBLISHER_PORT` when that is set, else 8280 when it is free, else any free port the system hands out. If something already answers the health route on the chosen port, the app uses that engine and does not start another. FormWeb's Send to FormPublisher looks at 8280 first, so when the engine had to take another port FormWeb finds nothing there and leaves the site in the inbox, where the engine imports it on its next scan (see [Receive from FormWeb](#receive-from-formweb)). Running from source, `./formpublisher desktop dev` opens the window over the source tree instead of the frozen engine.
+The port rule: the app uses `FORMPUBLISHER_PORT` when that is set, else 8280 when it is free, else any free port the system hands out. If something already answers the health route on the chosen port, the app uses that engine and does not start another. Once the site host and the inbox watcher are up, the engine writes `engine.json` in the data folder with `app`, `port`, `pid`, `version` and `started`, so FormWeb finds the running app on whatever port it took. A stopping engine removes the file only when it still names its own pid, so a second engine on another port and data folder never loses its file. When FormPublisher is closed, FormWeb leaves the site in the inbox, where the engine imports it on its next scan (see [Receive from FormWeb](#receive-from-formweb)). Running from source, `./formpublisher desktop dev` opens the window over the source tree instead of the frozen engine.
+
+In the desktop app, Open Folder uses the system folder panel. Cancelling the panel imports nothing, and if the panel fails the app falls back to the typed path dialog, which is also what the browser always shows. Reveal Site Folder opens the site's folder in the system file manager through the app's `reveal_path` command, which only accepts a path inside the data folder (`FORMPUBLISHER_HOME`, or `~/FormPublisher`); anything outside it, or a path that does not exist, is refused.
 
 ## Home
 
@@ -60,9 +64,25 @@ There are three ways in, and all of them only read:
 
 A site's routes come from its `routes.json`. Each has a path, a page, a locale, an item and a stylesheet. The routes strip lists them, the inspector shows the selected route, and the status bar shows how many there are.
 
+## Trash
+
+Removing a site, a build, a signing key or a prepared folder moves it to `trash/` in the data folder; nothing is deleted at once. Each entry gets a `.trash.json` record beside it with its kind, label, origin, time and size. Home's Trash page lists the entries newest first with a kind icon, the label, the kind, the time and the size. Restore moves an entry back to where it came from. Delete for good and Empty Trash remove entries for good, and both ask first. The page refreshes by itself when something is removed or restored, and restoring a site refreshes Recent.
+
+A restore only goes ahead when the place is free: if something already sits at the origin (or a key with the same id exists) it answers 409 with the reason, and the window shows it as a notice. Entries moved to the trash before 0.1.4 have no record; they are listed with a kind taken from their name but cannot be restored.
+
+The routes are `GET /api/trash`, `POST /api/trash/{entry}/restore`, `DELETE /api/trash/{entry}` and `DELETE /api/trash` (empty). An entry name is only accepted when it appears in the folder listing. See [The command line](#the-command-line) and [The MCP server](#the-mcp-server) for the agent side: an agent can list the trash and restore from it, but deleting for good stays with a person.
+
+## Keyboard shortcuts
+
+Keyboard Shortcuts (`Mod+/`, in the Help menu) lists every command with its keys. Each row has Change and Reset. Change records the next combination you press; no command runs while it records. Escape cancels, and Backspace clears the binding. Reset restores that command's default, and Reset all restores every default.
+
+Some combinations are refused with a reason: ones without a modifier, ones the browser or the system keeps, and the text-editing commands (copy, paste and the like). When another command already holds the combination, the dialog names it and offers Replace or Cancel. Overrides are stored in the browser's local storage under `formpublisher_shortcuts`, and the menus, the command palette, the dialog and the desktop app's native menus pick them up at once.
+
 ## .fweb projects
 
 A `.fweb` file is a FormWeb project: a JSON envelope with the format `com.nodemode.formweb`. Import it like a zip or a folder, from Home or the file dialog. FormPublisher hands it to `formweb-core`, the compiler built from the FormWeb crates vendored in `vendor/formweb-native/`. The compiler loads the project and exports every locale with the site's default locale as the base, and FormPublisher writes the files and the referenced assets (`/api/assets/[sha].[ext]` references become real files, as FormWeb's own bundling does). The import is recorded with source kind `fweb`; importing the same project again adds a revision.
+
+Version 2 projects import too. When a project is too big for the JSON envelope, FormWeb 0.19.4 writes a zip `.fweb` instead: `project.json` first, then each asset stored as `assets/[id]`. FormPublisher applies FormWeb's own checks to it: `project.json` comes first and is at most 64 MiB, the format and version are right, at most 500 assets are listed once each, every member is exactly `assets/[listed id]`, and each asset matches its digest, size limit and mime type. The file is capped at 512 MiB and assets stream from the zip in 1 MiB chunks. A bad file is refused with the reason. A version 2 zip is recognised by its contents, so it imports as a project even without the `.fweb` extension, and ordinary site zips are unaffected. A version 1 project and its version 2 twin build to the same files and hashes.
 
 `formweb-core` is not part of the Python install. Build it once with `./setup/install_compiler` (`setup\install_compiler.bat` on Windows), which runs `cargo build --release --locked` and copies the binary to `backend/bin/formweb-core`. `./formpublisher_oc_install` runs it when Rust is installed and says how to get Rust when it is not. `FORMPUBLISHER_FORMWEB_CORE` points to a binary elsewhere. Without the binary an import answers: "Opening .fweb projects needs formweb-core. Run ./setup/install_compiler."
 
@@ -135,7 +155,7 @@ While you preview, the probe reports what the page does and the window turns it 
 
 ### Deep tier
 
-A deep check drives the Chrome you already have installed through Playwright. It serves the revision from its own temporary host with no probe, and for each route at 1440 by 900 and 390 by 844 (or the widths you pass) it opens a fresh context, applies a 4x CPU slowdown and a slow network (150 ms, 200 KB/s), records layout shifts, loads the page, scrolls to the bottom in 8 steps and back, and reads the results. Problems:
+A deep check drives the Chrome you already have installed through Playwright. It serves the revision through the same site host as the preview (with no probe), so a deep check sees the same host rules, and for each route at 1440 by 900 and 390 by 844 (or the widths you pass) it opens a fresh context, applies a 4x CPU slowdown and a slow network (150 ms, 200 KB/s), records layout shifts, loads the page, scrolls to the bottom in 8 steps and back, and reads the results. Problems:
 
 | Code | Severity | Meaning |
 | --- | --- | --- |
@@ -213,7 +233,7 @@ A wrong passphrase is refused with "The passphrase does not unlock this key." Ve
 
 ### The Builds page
 
-Builds in Home lists builds newest first with site, id, date, size and signed. Inspect shows the file table from `publish.json`. Compare takes two builds and lists the files added, removed and changed by path, with the count that are the same. Delete moves a build to the trash. Download saves the zip.
+Builds in Home lists builds newest first with site, id, date, size and signed. Inspect shows the file table from `publish.json`. Compare takes two builds and lists the files added, removed and changed by path, with the count that are the same. Delete moves a build to the [trash](#trash). Download saves the zip.
 
 ## Publish
 
@@ -298,6 +318,10 @@ The loop is: import a site, list its routes (and, for a site that arrived again,
 | `diff ID [--from R] [--to R]` | the files and routes added, removed and changed between two revisions |
 | `prepare BUILD --target T [--target T] [--include-model]` | prepares a folder per target, with the commands to run; FormWeb's model files are left out unless `--include-model` |
 | `prepared BUILD` | lists what is prepared for a build |
+| `trash` | lists the trash, newest first, with each entry's kind, label, time and size |
+| `trash restore ENTRY` | moves an entry back to where it came from; fails with the reason when the place is taken |
+| `trash delete ENTRY` | deletes one entry for good |
+| `trash empty --yes` | deletes every entry for good; refuses to run without `--yes` |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
 
 ```sh
@@ -312,7 +336,7 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 
 ## The MCP server
 
-`./formpublisher mcp` serves MCP on stdio with 16 tools over the same routes. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor. `./formpublisher agents install` sets Claude Code, Codex and Cursor up for your account.
+`./formpublisher mcp` serves MCP on stdio with 18 tools over the same routes. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor. `./formpublisher agents install` sets Claude Code, Codex and Cursor up for your account.
 
 | Tool | Does |
 | --- | --- |
@@ -332,10 +356,14 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 | `list_targets` | the six hosts a build can be prepared for (read only) |
 | `prepare_publish` | prepares a folder per host for a build, with commands, notes and warnings; `includeModel: true` keeps FormWeb's model files, and `leftOut` lists what was left out |
 | `get_prepared` | what is prepared for a build (read only) |
+| `list_trash` | the trash entries, newest first (read only) |
+| `restore_from_trash` | moves an entry back to where it came from |
+
+There is no tool that deletes. Deleting an entry for good or emptying the trash is for a person, in the window or with `trash delete` and `trash empty --yes`.
 
 ## Settings and the data folder
 
-Everything is kept in `~/FormPublisher`, or in the folder named by `FORMPUBLISHER_HOME`: `sites/` (imports), `checks/` (results and thumbnails), `builds/` (packages), `prepared/` (the folders Publish writes), `inbox/` (files FormWeb leaves for FormPublisher, each with its `.json` metadata), `keys/` (signing keys), `trash/` and `settings.json`. The engine port is `FORMPUBLISHER_PORT` (8280 by default) and the site host port is `FORMPUBLISHER_HOST_PORT` (8281). The interface is in 26 languages.
+Everything is kept in `~/FormPublisher`, or in the folder named by `FORMPUBLISHER_HOME`: `sites/` (imports), `checks/` (results and thumbnails), `builds/` (packages), `prepared/` (the folders Publish writes), `inbox/` (files FormWeb leaves for FormPublisher, each with its `.json` metadata), `keys/` (signing keys), `trash/` (removed items and their `.trash.json` records), `engine.json` (the running engine's app, port, pid, version and start time) and `settings.json`. The engine port is `FORMPUBLISHER_PORT` (8280 by default) and the site host port is `FORMPUBLISHER_HOST_PORT` (8281). The interface is in 26 languages.
 
 ## When something goes wrong
 

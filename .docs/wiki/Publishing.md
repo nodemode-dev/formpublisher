@@ -27,7 +27,7 @@ A FormWeb site carries `site.formweb.json` and `asset-access.json`. Hosts do not
 
 ## Verify and remove
 
-Verify re-reads the folder and checks each file against the hashes in `publish.json`, and the host's own files against a fresh prepare. Remove moves the folder to `trash/`. Preparing again replaces the folder. Folders live at `prepared/[site]/[build]/[host]/` in the data folder.
+Verify re-reads the folder and checks each file against the hashes in `publish.json`, and the host's own files against a fresh prepare. Remove moves the folder to `trash/`, where Home's Trash page can restore it. Preparing again replaces the folder. Folders live at `prepared/[site]/[build]/[host]/` in the data folder.
 
 ## Receive from FormWeb
 

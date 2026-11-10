@@ -19,7 +19,7 @@ Node 22.12 or newer and Python 3.12. The desktop app also needs Rust and the Tau
 
 `./build_app` freezes the engine with PyInstaller into `formpublisher-engine` (the built interface, the demo site and the `formweb-core` compiler go inside; `formpublisher-engine --selfcheck` proves it starts) and builds the Tauri 2 shell around it. The app shows a small splash, starts the engine, and reveals the window when the interface has drawn, with no white flash. A second launch focuses the running window. Closing the last window, or a terminate or interrupt signal, stops the engine and anything it started.
 
-The port rule: `FORMPUBLISHER_PORT` when set, else 8280 when free, else any free port. An engine already answering on that port is reused. FormWeb's Send to FormPublisher looks at 8280 first, so when the app had to take another port FormWeb leaves the site in the inbox and the engine imports it from there. See the manual's "The desktop app".
+The port rule: `FORMPUBLISHER_PORT` when set, else 8280 when free, else any free port. An engine already answering on that port is reused. The engine writes `engine.json` (`app`, `port`, `pid`, `version`, `started`) in the data folder once it is up, so FormWeb's Send to FormPublisher finds the app on any port; when the app is closed FormWeb leaves the site in the inbox and the engine imports it from there. In the desktop app, Open Folder uses the system folder panel and Reveal Site Folder opens only paths inside the data folder. See the manual's "The desktop app".
 
 ## The first import
 
@@ -30,7 +30,7 @@ The port rule: `FORMPUBLISHER_PORT` when set, else 8280 when free, else any free
 
 ## Where things are kept
 
-Imported sites and settings live in FormPublisher's data folder: `~/FormPublisher`, or the folder named by `FORMPUBLISHER_HOME`.
+Imported sites and settings live in FormPublisher's data folder: `~/FormPublisher`, or the folder named by `FORMPUBLISHER_HOME`. Removed sites, builds, keys and prepared folders go to `trash/` there; Home's Trash page restores them or deletes them for good. Keyboard Shortcuts (`Mod+/`) lets you rebind any command with Change and Reset.
 
 ## Ports
 
