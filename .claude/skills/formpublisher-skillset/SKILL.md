@@ -42,7 +42,7 @@ backend/app/services (paths, settings, site intake, the FormWeb reader)
 - **Zero flash.** Every container exists in its final layout before the first paint and is filled in place. Every `z-index` is a layer token from `frontend/src/styles/tokens.css`. Icons are inline `currentColor` SVG; no icon libraries.
 - **Surgical edits.** Hand-made edits, one region at a time; no codemods or scripted text replacement. No emoji, no em dashes in Markdown, no commented-out code, near-zero comments: the reasoning goes in the HASHOUT logs.
 - **Read the logs first.** `backend/HASHOUT_LOG.md`, `frontend/HASHOUT_LOG.md`, `src-tauri/HASHOUT_LOG.md` and each module's own `HASHOUT_LOG.md`. Planning documents are in the sidecar, not in this tree.
-- **Keep the agents in step.** After changing a command, a tool or a skill, run `./formpublisher agents sync` (it mirrors `.claude/skills` to `.agents/skills` and checks the skill files; `--check` fails on drift).
+- **Keep the agents in step.** After changing a command, a tool or a skill, run `./formpublisher agents sync` (it mirrors `.claude/skills` to `.agents/skills` and checks the skill files; `--check` fails on drift). After touching `vendor/formweb-native`, stage it and run `./formpublisher vendor --check`.
 - **Versions** are `X.Y.Z`; `frontend/package.json`, `backend/app/__init__.py`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml` carry the same one.
 - **Dependencies** each get a row in `NOTICE.md`. GPL stays out of the distributed bundle.
 - **Commits** as `nodemode-ai <mackin@nodemode.ai>` only, no trailers of any kind (see `CLAUDE.md`).

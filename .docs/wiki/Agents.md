@@ -12,7 +12,7 @@ FormPublisher's engine does every step a person does, so agents drive it the sam
 
 ## Connect
 
-`./formpublisher agents install` registers the MCP servers and copies the skills for your account in Claude Code, Codex and Cursor (`--dry-run` shows the changes; files are backed up first). `./formpublisher agents status` reports what it found. `./formpublisher agents sync` mirrors `.claude/skills` to `.agents/skills`; `--check` exits 1 on drift.
+`./formpublisher agents install` registers the MCP servers and copies the skills for your account in Claude Code, Codex and Cursor (`--dry-run` shows the changes; files are backed up first). `./formpublisher agents status` reports what it found. `./formpublisher agents sync` mirrors `.claude/skills` to `.agents/skills`; `--check` exits 1 on drift. `./formpublisher vendor --check` exits 1 when the vendored FormWeb crates are out of step.
 
 formMCP (`formmcp mcp`) is the family hub that reaches every installed Form app's tools. It is a separate app; when it is missing its entry shows as unavailable and the formpublisher server still works.
 

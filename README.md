@@ -256,6 +256,7 @@ Home's Demos row opens the bundled sample site, "Northwind Notes", and a quick t
 ./formpublisher agents status        # what is installed, which servers, how many skills, whether formMCP is found
 ./formpublisher agents sync          # mirror .claude/skills to .agents/skills
 ./formpublisher agents sync --check  # exits 1 on any drift, for CI
+./formpublisher vendor --check       # exits 1 when the vendored FormWeb crates are out of step, for CI
 ```
 
 Two MCP servers are registered: `formpublisher` and `formmcp`, the Form family hub that reaches every installed Form app's own tools. formMCP is a separate app: when it is not installed, `formmcp` shows as failed or unavailable in your agent and everything else works.
