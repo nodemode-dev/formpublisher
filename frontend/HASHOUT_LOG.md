@@ -236,3 +236,14 @@ The executor spec is `TURN_K_SPEC.md` in the 0.2.0 planning sidecar.
 `ui/publish-sheet.ts`: the verify problem `li` loses `translate="no"`, so the row (one text node, `path: problem` as `publishApi.verify` builds it) reaches the translator; the path and nginx's message are placeholders, so they stay as they are. `i18n/keys/part16.json` (12 keys): the five problem rows (`{0}: missing`, `{0}: hash differs from publish.json`, `{0}: extra file`, `{0}: differs from a fresh prepare`, `{0}: nginx -t: {1}`), the three verify refusals the sheet shows as its verdict, and the four nginx prepare notes; the verdicts and the nginx line were already keyed in earlier parts. All 25 locale folders hold `part16.json`.
 
 Checked: every problem kind made for real on a lab engine gave 21 texts, each matching exactly one key; the director's run matched 48 strings (notes, warnings, labels and three real problem rows) to exactly one key each; CLS 0 with the CPU throttled 4x while failed verifies painted; `npm run build`.
+
+## Every window word translates · v0.2.2 (2026-11-10)
+
+`i18n/index.ts` is unchanged; the DOM translator already skips the whole subtree under `translate="no"` and an element's own title, placeholder and aria-label, so the audit was of the markers. About 75 were read. Names, paths, hashes, ids, commands, versions and URLs stay marked.
+
+- `ui/package-sheet.ts`: the key select no longer carries the marker; only the options that show a key's name and fingerprint do, so "Choose a key" and "No keys yet" translate. `ui/publish-sheet.ts`: the same for the build select; only options showing a build's id carry it, so "No builds yet" translates.
+- `ui/preferences.ts`: the language select keeps native names untranslated on its options while its label translates.
+- `ui/hint-strip.ts` (the quick-tour step count), `ui/home.ts` (the FormWeb status line), `ui/toolbar.ts` (the width and height inputs), `app.ts` (the route field), `ui/trash.ts` (the place input) lose the marker; `ui/builds.ts` translates the file count in the Size cell.
+- `i18n/keys/part18.json` (3 keys: "Choose a key", "No keys yet", "Signing key"), in all 26 languages.
+
+Checked: no layout shift at window load, measured at 1440x900 and 1100x800, dark and light, English and German, with the CPU throttled 4x, in three data states, three runs each: every run CLS 0 with no entries. Turn L's 0.0007 did not reproduce, so nothing changed for it. `npm run build`.

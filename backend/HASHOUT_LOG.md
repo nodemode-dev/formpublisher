@@ -384,3 +384,14 @@ Three changes, none of which touch the engine's routes.
 - `targets/github_pages.py`: the prepare notes and `redirects/README.txt` add "With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects." Both new notes are translated in all 26 languages (`keys/part17.json`); verify rows were checked in the window in German and Japanese (FormPublisher has no right-to-left language).
 
 Docs: `docs/MANUAL.md`, the README command list, the wiki pages Publishing, Importing-Sites and Agents, and the harness and skillset skills in both trees carry the new behaviour.
+
+## The vendor check on Windows and in doctor · v0.2.2 (2026-11-10)
+
+One change, none of which touches the engine's routes (commit b833812).
+
+- `setup/install_compiler.bat` runs `setup\vendor_check.py --check` before cargo, with Python found as `formpublisher.bat` finds it (the backend venv, else `python`), and refuses with the same sentence as `setup/install_compiler`: "the vendored crates are out of step (see above); nothing was built".
+- `./formpublisher doctor` and `formpublisher.bat doctor` gain a vendor row: "vendor: in step at VERSION", or the first problem with a pointer to `./formpublisher vendor --check` for the rest.
+
+Checked: `./formpublisher doctor` printed "vendor: in step at 0.20.1" on the tree and the Version row problem with the pointer in a /tmp clone with a changed row; `bash -n formpublisher` passes; the `.bat` changes were checked by reading, since Windows is not available here.
+
+Docs: `docs/MANUAL.md` (doctor and the install_compiler passage), the wiki pages Getting-Started and Importing-Sites, and the harness and skillset skills in both trees.

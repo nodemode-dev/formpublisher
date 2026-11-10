@@ -55,6 +55,6 @@ backend/app/services (paths, settings, site intake, the FormWeb reader)
 ./formpublisher serve          # the built interface served by the engine on 8280
 ./formpublisher run status     # the command line
 ./formpublisher mcp            # the MCP server on stdio
-./formpublisher doctor         # toolchain, installs and ports
+./formpublisher doctor         # toolchain, installs, ports and the vendor row
 FORMPUBLISHER_HOME=/tmp/fp ./formpublisher run sites   # a scratch data folder
 ```
