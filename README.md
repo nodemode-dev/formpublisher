@@ -124,7 +124,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>Trash</h3>
-      Removed sites, builds, keys and prepared folders wait in a Trash on Home with their kind, time and size. Restore puts one back where it came from when the place is free, entries from before 0.1.4 included; when the place is unknown a dialog asks where it goes. Delete for good and Empty Trash ask first.
+      Removed sites, builds, keys and prepared folders wait in a Trash on Home with their kind, time and size. Restore puts one back where it came from when the place is free, entries from before 0.1.4 included; one Restore from the trash dialog asks for a place, a passphrase or both when they are needed, and a missing-build or missing-site notice offers Restore. Delete for good and Empty Trash ask first.
     </td>
     <td width="50%" valign="top">
       <h3>Rebindable shortcuts</h3>

@@ -21,7 +21,9 @@ Every folder is written from the build's own `site.zip`, never from the live sit
 
 A FormWeb 404 page exported as `404/index.html` counts as the site's 404 and is also written as `404.html`. A host that cannot represent something says so under Warnings: GitHub Pages has no server redirects and ignores custom headers, so each one is named, never dropped silently.
 
-FormWeb 0.19.7 exports splat redirects (`/blog/*` to `/docs/:splat`) and a root `404.html`. Netlify and Cloudflare Pages write the splat into `_redirects`, Vercel as `:path*` in `vercel.json`, and nginx as a regex `location`. GitHub Pages skips splats with a warning, because it has no server redirects; exact ones become refresh pages. For older exports with only `404/index.html`, every target writes it as `404.html` with its URLs made root-absolute and says so in its notes. Static zip stays byte for byte.
+FormWeb 0.19.7 exports splat redirects (`/blog/*` to `/docs/:splat`) and a root `404.html`. Netlify and Cloudflare Pages write the splat into `_redirects`, Vercel as `:path*` in `vercel.json`, and nginx as a regex `location`. GitHub Pages has no server redirects, so a small script at the top of `404.html` follows splats under the site's base path (the status is the 404 page's); exact ones become refresh pages. For older exports with only `404/index.html`, every target writes it as `404.html` with its URLs made root-absolute and says so in its notes. Static zip stays byte for byte.
+
+Where `nginx` is installed, preparing and verifying the nginx target run `nginx -t` on the prepared config; verify answers `nginx` with `ran`, `ok`, `version` and `output`, and a failure is a problem row. Prepare the nginx folder again after updating from 0.1.7.
 
 ## FormWeb's model files
 
