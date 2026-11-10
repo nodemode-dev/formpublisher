@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.8 · 2026-11-10
+
+- Restoring from the trash uses one dialog, Restore from the trash, which asks for a place, a passphrase or both at once and shows any refusal on the field it concerns.
+- When something you asked for needs a build or site that is in the trash, the notice offers Restore: one click puts it back and tries again. If it cannot go back where it was, the Trash page opens with the reason.
+- Where nginx is installed, preparing and verifying the nginx target run `nginx -t` on the config and show the result; a failing config makes verify fail with nginx's message. Folders prepared for nginx by 0.1.7 need preparing again, because the test wrapper changed.
+- GitHub Pages now follows FormWeb's folder redirects (`/blog/*` to `/docs/:splat`) from its 404 page, and every GitHub Pages redirect respects a site served under a path such as `/repo`.
+- The FormWeb engine crates are vendored at 0.19.8.
+- Every new string is in all 26 languages.
+
 ## 0.1.7 · 2026-11-10
 
 - A signing key in the trash whose record was lost or damaged can be restored again: FormPublisher rebuilds it from the key file, with the same id and fingerprint, and asks for the passphrase when the key is locked. The command line reads that passphrase from standard input with `--passphrase-stdin`.
