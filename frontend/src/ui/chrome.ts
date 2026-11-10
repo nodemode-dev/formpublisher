@@ -231,9 +231,13 @@ export function installChrome(app: App): Chrome {
   on('fp:theme-toggle', (detail, ev) => { ev.preventDefault(); commands.run('view.theme', { to: detail.to }); });
   on('fp:new-tab', (_d, ev) => { ev.preventDefault(); home.show('start'); });
   const stepHost: StepHost = {
-    openTrash: () => home.show('trash'),
+    openTrash: () => {
+      document.querySelectorAll<HTMLElement>('#overlay-root .fp-scrim:not([hidden]) [data-close]').forEach((b) => b.click());
+      home.show('trash');
+    },
     showCheck: () => app.showBottomTab('problems'),
     openManual: () => { void openExternal(`${DOCS_URL}#error-codes`); },
+    refreshSites: () => app.refreshSites(),
   };
   on('fp:notice', ({ kind, text, code, ref, run }) => {
     if (kind !== 'error' || !code) { toast(text, kind); return; }
