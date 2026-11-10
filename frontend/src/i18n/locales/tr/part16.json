@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: eksik",
+  "{0}: hash differs from publish.json": "{0}: özeti publish.json ile eşleşmiyor",
+  "{0}: extra file": "{0}: fazladan dosya",
+  "{0}: differs from a fresh prepare": "{0}: yeni bir hazırlıktan farklı",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "bu derleme ve hedef için hazırlanmış bir şey yok",
+  "the build has no publish.json": "derlemede publish.json yok",
+  "site.zip no longer matches publish.json; build it again": "site.zip artık publish.json ile eşleşmiyor; yeniden derleyin",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "Yapılandırma nginx {0} ile nginx -t denetiminden geçti, listen satırları da bir loopback bağlantı noktasında geçti.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "Yapılandırma nginx {0} ile nginx -t denetiminden geçti; boş bağlantı noktası olmadığı için listen satırları loopback üzerinde denetlenmedi.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "Yapılandırma nginx -t denetiminden geçti, listen satırları da bir loopback bağlantı noktasında geçti.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "Yapılandırma nginx -t denetiminden geçti; boş bağlantı noktası olmadığı için listen satırları loopback üzerinde denetlenmedi."
+}

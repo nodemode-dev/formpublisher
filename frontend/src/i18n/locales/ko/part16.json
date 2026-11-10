@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: 없음",
+  "{0}: hash differs from publish.json": "{0}: 해시가 publish.json과 다릅니다",
+  "{0}: extra file": "{0}: 불필요한 파일입니다",
+  "{0}: differs from a fresh prepare": "{0}: 새로 준비한 결과와 다릅니다",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "해당 빌드와 대상에 대해 준비된 것이 없습니다",
+  "the build has no publish.json": "이 빌드에는 publish.json이 없습니다",
+  "site.zip no longer matches publish.json; build it again": "site.zip이 더 이상 publish.json과 일치하지 않습니다. 다시 빌드하세요",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "설정이 nginx {0}의 nginx -t를 통과했고, listen 줄도 루프백 포트에서 확인했습니다.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "설정이 nginx {0}의 nginx -t를 통과했습니다. 사용 가능한 루프백 포트가 없어서 listen 줄은 루프백 포트에서 확인하지 않았습니다.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "설정이 nginx -t를 통과했고, listen 줄도 루프백 포트에서 확인했습니다.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "설정이 nginx -t를 통과했습니다. 사용 가능한 루프백 포트가 없어서 listen 줄은 루프백 포트에서 확인하지 않았습니다."
+}

@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: bị thiếu",
+  "{0}: hash differs from publish.json": "{0}: mã băm khác với publish.json",
+  "{0}: extra file": "{0}: tệp thừa",
+  "{0}: differs from a fresh prepare": "{0}: khác với bản chuẩn bị mới",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "chưa có gì được chuẩn bị cho bản dựng và đích đó",
+  "the build has no publish.json": "bản dựng không có publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip không còn khớp với publish.json; hãy dựng lại",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "Cấu hình đã qua nginx -t với nginx {0}, và các dòng listen của nó cũng qua khi kiểm tra trên một cổng loopback.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "Cấu hình đã qua nginx -t với nginx {0}; các dòng listen của nó chưa được kiểm tra trên cổng loopback vì không có cổng nào trống.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "Cấu hình đã qua nginx -t, và các dòng listen của nó cũng qua khi kiểm tra trên một cổng loopback.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "Cấu hình đã qua nginx -t; các dòng listen của nó chưa được kiểm tra trên cổng loopback vì không có cổng nào trống."
+}

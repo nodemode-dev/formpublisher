@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: saknas",
+  "{0}: hash differs from publish.json": "{0}: hashen skiljer sig från publish.json",
+  "{0}: extra file": "{0}: extra fil",
+  "{0}: differs from a fresh prepare": "{0}: skiljer sig från en ny förberedelse",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "inget är förberett för det bygget och det målet",
+  "the build has no publish.json": "bygget har ingen publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip stämmer inte längre med publish.json; bygg det igen",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "Konfigurationen klarade nginx -t med nginx {0}, och det gjorde dess listen-rader också på en loopback-port.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "Konfigurationen klarade nginx -t med nginx {0}; dess listen-rader kontrollerades inte på en loopback-port eftersom ingen var ledig.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "Konfigurationen klarade nginx -t, och det gjorde dess listen-rader också på en loopback-port.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "Konfigurationen klarade nginx -t; dess listen-rader kontrollerades inte på en loopback-port eftersom ingen var ledig."
+}

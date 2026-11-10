@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: ありません",
+  "{0}: hash differs from publish.json": "{0}: ハッシュが publish.json と一致しません",
+  "{0}: extra file": "{0}: 余分なファイルです",
+  "{0}: differs from a fresh prepare": "{0}: 新たに準備した内容と異なります",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "そのビルドとターゲットに対して準備されたものはありません",
+  "the build has no publish.json": "このビルドには publish.json がありません",
+  "site.zip no longer matches publish.json; build it again": "site.zip が publish.json と一致しなくなりました。ビルドし直してください",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "設定は nginx {0} の nginx -t に合格し、listen 行もループバックポートで確認済みです。",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "設定は nginx {0} の nginx -t に合格しました。空いているループバックポートがなかったため、listen 行はループバックポートで確認していません。",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "設定は nginx -t に合格し、listen 行もループバックポートで確認済みです。",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "設定は nginx -t に合格しました。空いているループバックポートがなかったため、listen 行はループバックポートで確認していません。"
+}

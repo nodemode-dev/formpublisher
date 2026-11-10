@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: 缺失",
+  "{0}: hash differs from publish.json": "{0}: 哈希与 publish.json 不一致",
+  "{0}: extra file": "{0}: 多余的文件",
+  "{0}: differs from a fresh prepare": "{0}: 与重新准备的结果不同",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "该构建和目标尚未准备任何内容",
+  "the build has no publish.json": "该构建没有 publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip 与 publish.json 已不一致；请重新构建",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "配置已通过 nginx {0} 的 nginx -t，其 listen 行也已在回环端口上检查通过。",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "配置已通过 nginx {0} 的 nginx -t；由于没有空闲的回环端口，其 listen 行未在回环端口上检查。",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "配置已通过 nginx -t，其 listen 行也已在回环端口上检查通过。",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "配置已通过 nginx -t；由于没有空闲的回环端口，其 listen 行未在回环端口上检查。"
+}
