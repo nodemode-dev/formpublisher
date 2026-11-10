@@ -6,7 +6,7 @@ use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
-use std::sync::atomic::{AtomicU16, Ordering};
+use std::sync::atomic::{AtomicI32, AtomicU16, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
@@ -24,6 +24,37 @@ const SCREEN_FRACTION: f64 = 0.9;
 struct Backend(Mutex<Option<Child>>);
 
 static PORT: AtomicU16 = AtomicU16::new(DEFAULT_PORT);
+
+/// The engine's process group id (its pid, since it is started as a group leader); 0 until it is started.
+static ENGINE_GROUP: AtomicI32 = AtomicI32::new(0);
+
+#[cfg(unix)]
+extern "C" {
+    fn signal(signum: i32, handler: usize) -> usize;
+    fn kill(pid: i32, sig: i32) -> i32;
+    fn _exit(code: i32) -> !;
+}
+
+/// A terminate, interrupt or hangup signal skips Tauri's exit event, so stop the engine's process group here.
+#[cfg(unix)]
+extern "C" fn on_signal(_: i32) {
+    let group = ENGINE_GROUP.load(Ordering::SeqCst);
+    unsafe {
+        if group > 0 {
+            kill(-group, 15);
+        }
+        _exit(0)
+    }
+}
+
+#[cfg(unix)]
+fn watch_signals() {
+    for number in [1, 2, 15] {
+        unsafe {
+            signal(number, on_signal as *const () as usize);
+        }
+    }
+}
 
 fn engine_addr() -> String {
     format!("127.0.0.1:{}", PORT.load(Ordering::SeqCst))
@@ -185,6 +216,7 @@ fn start_engine(handle: tauri::AppHandle) {
         if !healthy() {
             match spawn_engine() {
                 Some(child) => {
+                    ENGINE_GROUP.store(child.id() as i32, Ordering::SeqCst);
                     if let Ok(mut slot) = handle.state::<Backend>().0.lock() {
                         *slot = Some(child);
                     }
@@ -235,6 +267,8 @@ fn open_window(app: tauri::AppHandle, path: String, title: Option<String>) -> Re
 
 fn main() {
     reveal::mark_launch();
+    #[cfg(unix)]
+    watch_signals();
     PORT.store(choose_port(), Ordering::SeqCst);
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| focus_main(app)))
