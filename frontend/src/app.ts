@@ -4,6 +4,7 @@ import { emit, type NoticeKind } from './events';
 import { locale } from './i18n';
 import { brandMark } from './ui/brand';
 import { mountOnce, q, setAttr, setClass, setDisabled, setHidden, setText, setTitle, setValue } from './ui/dom';
+import { installHints } from './ui/hint-strip';
 import { icon } from './ui/icons';
 import { openPackageSheet, installPackaging } from './ui/package-sheet';
 import { installPanel } from './ui/panel';
@@ -547,5 +548,6 @@ export async function startApp(): Promise<App> {
   instance = app;
   installPanel(app);
   installPackaging(app);
+  installHints(app);
   return app;
 }

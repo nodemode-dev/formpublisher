@@ -1,6 +1,7 @@
 import { api, type Site } from '../api';
+import { openSample } from '../api-demo';
 import type { App } from '../app-api';
-import { on } from '../events';
+import { emit, on } from '../events';
 import { locale } from '../i18n';
 import { brandMark } from './brand';
 import { BuildsPage } from './builds';
@@ -19,6 +20,7 @@ const FW_POLL_MS = 15000;
 
 function kindOf(source: string): string {
   if (!source) return 'Site';
+  if (source === 'Bundled sample site') return 'Demo';
   if (/^https?:\/\//i.test(source)) return 'FormWeb';
   if (/\.zip$/i.test(source)) return 'Zip';
   return 'Folder';
@@ -96,6 +98,7 @@ export class Home {
 </div>
 </div>
 <section class="fp-home-section"><div class="fp-home-section-head"><h2 class="fp-home-section-title">Recent sites</h2><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-v="recent">See all</button></div>${CARD_GRID('fp-recent-grid', true)}</section>
+<section class="fp-home-section"><div class="fp-home-section-head"><h2 class="fp-home-section-title">Demos</h2></div><div class="fp-card-grid"><button class="fp-card" type="button" data-demo="sample"><span class="fp-card-preview">${icon('publish', 28)}<span class="fp-badge fp-demo-badge">Demo</span></span><span class="fp-card-body"><span class="fp-card-name">FormPublisher demo</span><span class="fp-card-meta">Try it on a sample site</span></span></button></div></section>
 </div>
 <div data-page="recent" hidden><div class="fp-home-head"><div><h1 class="fp-home-title">Recent sites</h1><p class="fp-home-sub">Every site you have imported, newest first.</p></div></div>${CARD_GRID('fp-recent-full', true)}</div>
 <div data-page="builds" hidden></div>
@@ -239,6 +242,20 @@ export class Home {
     setAttr(node, 'title', site.source);
   }
 
+  private async openDemo(card: HTMLElement): Promise<void> {
+    if (card.getAttribute('aria-busy') === 'true') return;
+    setAttr(card, 'aria-busy', 'true');
+    try {
+      const { site } = await openSample();
+      await this.app.refreshSites();
+      await this.app.openSite(site.id);
+    } catch (e) {
+      emit('fp:notice', { kind: 'error', text: e instanceof Error ? e.message : 'The sample site could not be opened' });
+    } finally {
+      setAttr(card, 'aria-busy', 'false');
+    }
+  }
+
   private restoreNav(): void {
     try {
       const w = localStorage.getItem(NAV_W_KEY);
@@ -285,6 +302,8 @@ export class Home {
       const t = e.target as HTMLElement;
       const v = t.closest<HTMLElement>('[data-v]')?.dataset.v as View | undefined;
       if (v) { this.select(v); return; }
+      const demo = t.closest<HTMLElement>('[data-demo]');
+      if (demo) { void this.openDemo(demo); return; }
       const cmd = t.closest<HTMLElement>('[data-cmd]')?.dataset.cmd;
       if (cmd) { this.commands.run(cmd); return; }
       const site = t.closest<HTMLElement>('[data-site]')?.dataset.site;
@@ -304,6 +323,7 @@ export class Home {
     on('fp:settings-changed', () => { if (this.isOpen) void this.refreshFormWeb(); });
     on('fp:site-opened', () => { this.paint(); this.hide(); });
     on('fp:site-loaded', () => this.paint());
+    on('fp:live', (ev) => { if (ev.type === 'sites.received') void this.app.refreshSites(); });
     on('fp:site-closed', () => {
       this.paint();
       queueMicrotask(() => { if (this.app.state().activeId === null) this.show(); });
