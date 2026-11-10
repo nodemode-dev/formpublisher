@@ -209,7 +209,7 @@ Each build lives in `builds/[site]/[id]/`:
 
 ```json
 {
-  "builtWith": "FormPublisher 0.1.5",
+  "builtWith": "FormPublisher 0.1.6",
   "checks": { "errors": 0, "infos": 0, "tiers": ["static"], "warnings": 0 },
   "files": [ { "path": "index.html", "sha256": "...", "size": 1024 } ],
   "format": "formpublisher-site",

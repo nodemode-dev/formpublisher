@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.6 · 2026-11-10
+
+- Every refusal from the engine now carries a stable code beside its message, such as `site-missing`, `passphrase-wrong` or `place-taken`, so scripts and agents can act on it without reading the text. The command line prints `error [code]: message`, agent tools say the same, and the manual lists every code.
+- Trash: the Where does it go dialog checks a name before restoring and says what shape it needs, for builds, prepared folders, sites and keys alike, and the engine refuses the same names. A restored site that had lost its id takes its folder name.
+- The preview site host shows a FormWeb site's own 404 page for a missing address; before, it showed a plain Not found because FormWeb keeps that page at `404/index.html`.
+- Deep checks were compared with 0.1.3 on a site with redirects, clean addresses, a folder index and a custom 404 page: the same problems, summaries and thumbnails, and the site host answered every redirect and address the same.
+- The FormWeb engine crates are vendored at 0.19.6.
+- Every new string is in all 26 languages.
+
 ## 0.1.5 · 2026-11-10
 
 - Trash: items removed by earlier releases can now be restored too. FormPublisher works out where each one came from (a prepared folder is prepared again from its build), and when it cannot tell, the Trash page asks where it goes. The command line takes `trash restore ENTRY --to PATH`; agents still restore only to places FormPublisher knows.

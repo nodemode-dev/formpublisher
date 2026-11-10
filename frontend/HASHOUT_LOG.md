@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.5
-Last updated: 2026-11-10 · Phases 16 and 17: the Trash origin dialog, Recent without layout shift, Home under the title bar
+Current build version: v0.1.6
+Last updated: 2026-11-10 · Phases 19 and 21: ApiError codes, the Trash origin dialog for every kind
 
 ---
 
@@ -190,3 +190,13 @@ Each Recent grid has a 32 px notice row above it, always reserved: `visibility: 
 `.fp-home` was `position: fixed; inset: 0` (z-home 10000) over the whole window while `home.ts` made the whole app root inert, so the in-window menubar under it could not take a click (`elementFromPoint` on File returned the Home brand). Home now starts at `var(--fp-titlebar-h)` and `Home.lock(on)` makes every `.fp-app` child inert except `.fp-titlebar`, so the brand, menubar, theme and Preferences stay live above Home and Home's content sits one title bar lower (38, 44 or 50 px by density). The brand and nav rules are unchanged.
 
 Checked: `npm run build`. In headless Chrome at 1280x800 and 4x CPU, two sites received over `/api/receive/formweb` with Recent visible left every card still, showed "2 new sites arrived" and gave CLS 0; Show re-sorted newest first and cleared the notice; a real mouse click opened the File menu in dark and light; an unparseable trash entry opened the dialog, `../evil` was refused inline and a valid name restored it; no page errors.
+
+## Phases 19 and 21: ApiError codes and the Trash origin dialog for every kind · v0.1.6 (2026-11-10)
+
+The executor spec is `TURN_G_SPEC.md` in the 0.1.6 planning sidecar.
+
+`api.ts`: `ApiError` carries `code`, from the answer's body or, when absent, from the status (the same defaults as the engine's `services/codes.py`, plus `unreachable` for status 0); `failure()` reads it. `api-host.ts`, `api-publish.ts`, `api-builds.ts` and `api-revisions.ts` pass it through the same way. `api-trash.ts` already read `code` (or `detail.code`) and is unchanged. Notice text is the detail as before, so the window reads the same.
+
+`ui/trash.ts`: `shapeError(kind, name)` (with `SITE_ID`, `HEX12`, `HEX16`) checks the typed name in `OriginDialog.submit` before any request, with the four part12 sentences; the engine applies the same rule (`place-invalid`), so the client check only saves a round trip. The error line already reserves its 36 px, so a refusal shifts nothing. Key entries with a readable `entry.json` restore without the dialog; a damaged one answers `entry-damaged`, which the dialog cannot fix, so it stays a notice.
+
+Checked: `npm run build`. Headless Chrome at 1280x800 on a lab data folder with an unparseable build, prepared folder, site and key: wrong names were refused inline for each kind, the right ones restored, the build downloaded (377,852 bytes), the prepared folder verified (4 files), the key signed and verified; CLS 0; only the expected 409 console lines. `docs/images/trash-origin-dark.webp` and `-light.webp` show the dialog with an inline refusal.
