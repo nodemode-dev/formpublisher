@@ -94,10 +94,10 @@ def list_revisions(site_id: str) -> dict:
 def diff(site_id: str, left: str | None = None, right: str | None = None) -> dict:
     names = _revisions_of(site_id)
     if not names:
-        raise intake.IntakeError("this site has no revisions", 404)
+        raise intake.IntakeError("this site has no revisions", 404, "revision-missing")
     to = right or intake.get_site(site_id).get("revision") or names[-1]
     if to not in names:
-        raise intake.IntakeError(f"revision {to} not found", 404)
+        raise intake.IntakeError(f"revision {to} not found", 404, "revision-missing")
     if left:
         frm = left
     else:
@@ -106,7 +106,7 @@ def diff(site_id: str, left: str | None = None, right: str | None = None) -> dic
             raise intake.IntakeError("there is no earlier revision to compare with; this site has one revision", 400)
         frm = names[index - 1]
     if frm not in names:
-        raise intake.IntakeError(f"revision {frm} not found", 404)
+        raise intake.IntakeError(f"revision {frm} not found", 404, "revision-missing")
     root_a = intake.revision_root(site_id, frm)
     root_b = intake.revision_root(site_id, to)
     files = _compare(_table(site_id, root_a), _table(site_id, root_b))

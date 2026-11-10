@@ -19,8 +19,8 @@ WRONG_PASSPHRASE = "The passphrase does not unlock this key."
 _lock = threading.RLock()
 
 
-def _error(message: str, status: int = 400) -> intake.IntakeError:
-    return intake.IntakeError(message, status)
+def _error(message: str, status: int = 400, code: str | None = None) -> intake.IntakeError:
+    return intake.IntakeError(message, status, code)
 
 
 def _index_file() -> Path:
@@ -50,11 +50,11 @@ def _public_view(row: dict) -> dict:
 
 def _row(key_id: str) -> dict:
     if not isinstance(key_id, str) or not KEY_ID_RE.match(key_id):
-        raise _error("key not found", 404)
+        raise _error("key not found", 404, "key-missing")
     for row in _load():
         if row.get("id") == key_id:
             return row
-    raise _error("key not found", 404)
+    raise _error("key not found", 404, "key-missing")
 
 
 def _pem_path(key_id: str) -> Path:
@@ -116,15 +116,15 @@ def remove_key(key_id: str) -> dict:
 def _unlock(row: dict, passphrase: str | None) -> Ed25519PrivateKey:
     pem = _pem_path(row["id"])
     if not pem.is_file():
-        raise _error("the private key file is missing", 404)
+        raise _error("the private key file is missing", 404, "key-missing")
     data = pem.read_bytes()
     if row.get("encrypted") and not passphrase:
-        raise _error("This key needs a passphrase.")
+        raise _error("This key needs a passphrase.", 400, "passphrase-required")
     secret = passphrase.encode("utf-8") if row.get("encrypted") and passphrase else None
     try:
         loaded = serialization.load_pem_private_key(data, password=secret)
     except (ValueError, TypeError) as exc:
-        raise _error(WRONG_PASSPHRASE) from exc
+        raise _error(WRONG_PASSPHRASE, 400, "passphrase-wrong") from exc
     if not isinstance(loaded, Ed25519PrivateKey):
         raise _error("the key is not an Ed25519 key")
     return loaded

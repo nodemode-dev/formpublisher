@@ -15,6 +15,7 @@ from typing import Any
 from app.services import compile as compiler
 from app.services import paths, trash
 from app.services.bus import bus
+from app.services.codes import default_code
 
 MAX_FILES = 20_000
 MAX_ENTRIES = 40_000
@@ -27,10 +28,11 @@ _lock = threading.RLock()
 
 
 class IntakeError(ValueError):
-    def __init__(self, message: str, status: int = 400) -> None:
+    def __init__(self, message: str, status: int = 400, code: str | None = None) -> None:
         super().__init__(message)
         self.message = message
         self.status = status
+        self.code = code or getattr(type(self), "code", None) or default_code(status)
 
 
 def now_iso() -> str:
@@ -265,7 +267,7 @@ def _finish(staging: Path, kind: str, source: dict, source_key: str, stem: str, 
         root = _content_root(staging)
         _, rows = routes_of(root)
         if not rows:
-            raise IntakeError("no site found: the source has no routes.json and no index.html")
+            raise IntakeError("no site found: the source has no routes.json and no index.html", 400, "not-a-site")
         title = (name or "").strip() or site_name_from(root) or stem
         sid = make_id(title, source_key)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -332,7 +334,7 @@ def import_fweb_file(envelope: Path, source: dict, source_key: str, name: str | 
         try:
             details = compiler.compile_fweb(envelope, staging)
         except compiler.CompileError as exc:
-            raise IntakeError(exc.message, exc.status) from exc
+            raise IntakeError(exc.message, exc.status, exc.code) from exc
     except BaseException:
         shutil.rmtree(staging, ignore_errors=True)
         raise
@@ -364,7 +366,7 @@ def import_path(raw: str, name: str | None = None) -> dict:
         if is_fweb(resolved):
             return import_fweb_file(resolved, {"kind": "fweb", "path": str(resolved)}, f"fweb:{resolved}", name, resolved.stem)
         return import_zip_file(resolved, "zip", {"kind": "zip", "path": str(resolved)}, f"zip:{resolved}", name, resolved.stem)
-    raise IntakeError(f"{raw} does not exist", 404)
+    raise IntakeError(f"{raw} does not exist", 404, "path-missing")
 
 
 def import_upload(archive: Path, filename: str, name: str | None = None) -> dict:
@@ -380,14 +382,14 @@ def import_formweb_zip(archive: Path, url: str, name: str | None = None) -> dict
 
 def _valid_id(site_id: str) -> str:
     if not isinstance(site_id, str) or not ID_RE.match(site_id):
-        raise IntakeError("site not found", 404)
+        raise IntakeError("site not found", 404, "site-missing")
     return site_id
 
 
 def _site_folder(site_id: str) -> Path:
     folder = paths.sites_dir() / _valid_id(site_id)
     if not (folder / "site.json").is_file():
-        raise IntakeError("site not found", 404)
+        raise IntakeError("site not found", 404, "site-missing")
     return folder
 
 
@@ -415,7 +417,7 @@ def revision_root(site_id: str, revision: str | None = None) -> Path:
     record = _read_json(folder / "site.json") or {}
     chosen = revision or record.get("revision") or (record.get("revisions") or [""])[-1]
     if chosen not in (record.get("revisions") or []):
-        raise IntakeError("revision not found", 404)
+        raise IntakeError("revision not found", 404, "revision-missing")
     return folder / chosen
 
 

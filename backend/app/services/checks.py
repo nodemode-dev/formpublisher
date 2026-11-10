@@ -39,9 +39,9 @@ def now_iso() -> str:
 
 def checks_dir(site: str, revision: str) -> Path:
     if not isinstance(site, str) or not intake.ID_RE.match(site):
-        raise intake.IntakeError("site not found", 404)
+        raise intake.IntakeError("site not found", 404, "site-missing")
     if not isinstance(revision, str) or not re.match(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$", revision):
-        raise intake.IntakeError("revision not found", 404)
+        raise intake.IntakeError("revision not found", 404, "revision-missing")
     folder = paths.sub("checks") / site / revision
     folder.mkdir(parents=True, exist_ok=True)
     return folder

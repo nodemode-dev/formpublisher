@@ -43,7 +43,7 @@ async def _spool(request: Request) -> Path:
 async def receive_formweb(request: Request):
     client = request.client.host if request.client else ""
     if client not in LOOPBACK:
-        return JSONResponse({"detail": "Only this computer may send a site here."}, status_code=403)
+        return JSONResponse({"detail": "Only this computer may send a site here.", "code": "forbidden"}, status_code=403)
     kind = request.headers.get("content-type", "").split(";")[0].strip().lower()
     if kind not in ZIP_TYPES:
         raise intake.IntakeError("send the site-export.zip as application/zip", 415)

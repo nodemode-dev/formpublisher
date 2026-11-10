@@ -27,7 +27,7 @@ def build(client: Client | None = None) -> MCPServer:
         try:
             return await asyncio.to_thread(fn, *args)
         except OpError as exc:
-            raise ToolError(exc.message) from exc
+            raise ToolError(exc.label()) from exc
 
     @server.tool(
         name="formpublisher_status",

@@ -5,14 +5,20 @@ import pkgutil
 import traceback
 from contextlib import asynccontextmanager
 
+from http import HTTPStatus
+
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app import __version__, routers
 from app import host as site_host
 from app.services import paths
 from app.services.bus import bus
+from app.services.codes import default_code
+from app.services.compile import CompileError
 from app.services.formweb import FormwebError
 from app.services.intake import IntakeError
 
@@ -47,7 +53,7 @@ class LocalAccess:
             if scope["type"] == "websocket":
                 await receive()
                 return await send({"type": "websocket.close", "code": 1008})
-            return await JSONResponse({"detail": problem[1]}, status_code=problem[0])(scope, receive, send)
+            return await JSONResponse({"detail": problem[1], "code": default_code(problem[0])}, status_code=problem[0])(scope, receive, send)
 
         async def guarded_send(message):
             if message["type"] == "http.response.start":
@@ -91,17 +97,43 @@ app.add_middleware(LocalAccess)
 
 @app.exception_handler(IntakeError)
 async def intake_error(_request: Request, exc: IntakeError):
-    return JSONResponse({"detail": exc.message}, status_code=exc.status)
+    return JSONResponse({"detail": exc.message, "code": exc.code}, status_code=exc.status)
 
 
 @app.exception_handler(FormwebError)
 async def formweb_error(_request: Request, exc: FormwebError):
-    return JSONResponse({"detail": exc.message}, status_code=exc.status)
+    return JSONResponse({"detail": exc.message, "code": exc.code}, status_code=exc.status)
+
+
+@app.exception_handler(CompileError)
+async def compile_error(_request: Request, exc: CompileError):
+    return JSONResponse({"detail": exc.message, "code": exc.code}, status_code=exc.status)
 
 
 @app.exception_handler(ValueError)
 async def value_error(_request: Request, exc: ValueError):
-    return JSONResponse({"detail": str(exc)}, status_code=400)
+    return JSONResponse({"detail": str(exc), "code": "invalid"}, status_code=400)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_error(_request: Request, exc: StarletteHTTPException):
+    detail = exc.detail if isinstance(exc.detail, str) and exc.detail else HTTPStatus(exc.status_code).phrase
+    return JSONResponse({"detail": detail, "code": default_code(exc.status_code)}, status_code=exc.status_code, headers=getattr(exc, "headers", None))
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(_request: Request, exc: RequestValidationError):
+    parts = []
+    for item in exc.errors():
+        where = ".".join(str(p) for p in item.get("loc", ()) if p not in ("body", "query", "path"))
+        parts.append(f"{where}: {item.get('msg', 'is invalid')}" if where else str(item.get("msg", "the request is invalid")))
+    return JSONResponse({"detail": "; ".join(parts) or "the request is invalid", "code": "invalid"}, status_code=422)
+
+
+@app.exception_handler(Exception)
+async def internal_error(_request: Request, exc: Exception):
+    log.error("unhandled error\n%s", "".join(traceback.format_exception(exc)))
+    return JSONResponse({"detail": "The engine hit an unexpected problem; see its log.", "code": "internal"}, status_code=500)
 
 
 def include_routers(target: FastAPI) -> None:
@@ -131,10 +163,10 @@ include_routers(app)
 @app.get("/{rel:path}", include_in_schema=False)
 def frontend(rel: str):
     if rel == "api" or rel.startswith("api/"):
-        return JSONResponse({"detail": "Not Found"}, status_code=404)
+        return JSONResponse({"detail": "Not Found", "code": "not-found"}, status_code=404)
     dist = paths.frontend_dist()
     if dist is None:
-        return JSONResponse({"detail": "The frontend is not built. Run npm run build in frontend/, or set FORMPUBLISHER_DIST."}, status_code=503)
+        return JSONResponse({"detail": "The frontend is not built. Run npm run build in frontend/, or set FORMPUBLISHER_DIST.", "code": "unavailable"}, status_code=503)
     root = dist.resolve()
     target = (root / rel).resolve() if rel else root / "index.html"
     if rel and root in target.parents and target.is_file():

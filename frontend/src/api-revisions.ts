@@ -47,13 +47,15 @@ async function request(path: string): Promise<unknown> {
   }
   if (!res.ok) {
     let message = `${res.status} ${res.statusText}`.trim();
+    let code = '';
     try {
       const body = (await res.json()) as unknown;
       if (isObj(body) && typeof body.detail === 'string' && body.detail) message = body.detail;
+      if (isObj(body) && typeof body.code === 'string') code = body.code;
     } catch {
       message = message || 'Request failed';
     }
-    throw new ApiError(message, res.status);
+    throw new ApiError(message, res.status, code);
   }
   return (await res.json()) as unknown;
 }
