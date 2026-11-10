@@ -1,0 +1,19 @@
+{
+  "Change": "Değiştir",
+  "Press keys": "Tuşlara basın",
+  "Replace": "Değiştir",
+  "Reset all": "Tümünü sıfırla",
+  "Choose Change, then press the new keys.": "Değiştir'i seçin, ardından yeni tuşlara basın.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Yeni tuşlara basın. Escape iptal eder, Backspace temizler.",
+  "All shortcuts are back to their defaults.": "Tüm kısayollar varsayılan değerlerine döndü.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Tuşla birlikte Ctrl, Alt veya Cmd kullanın.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Bu birleşimi tarayıcı veya sistem kullanıyor, bu yüzden uygulama kullanamaz.",
+  "Text editing keys cannot be moved.": "Metin düzenleme tuşları taşınamaz.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} zaten {1} tarafından kullanılıyor. {2} olarak taşınsın mı?",
+  "{0} is used by {1}. Move it back to {2}?": "{0}, {1} tarafından kullanılıyor. {2} olarak geri taşınsın mı?",
+  "{0} is now {1}.": "{0} artık {1}.",
+  "{0} has no shortcut.": "{0} için kısayol yok.",
+  "{0} is back to its default.": "{0} varsayılan değerine döndü.",
+  "Change shortcut: {0}": "Kısayolu değiştir: {0}",
+  "Reset shortcut: {0}": "Kısayolu sıfırla: {0}"
+}

@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Les sites, builds, clés et dossiers préparés supprimés restent ici jusqu'à ce que vous les supprimiez définitivement.",
+  "Empty Trash": "Vider la corbeille",
+  "Item": "Élément",
+  "Moved": "Déplacé",
+  "Restore": "Restaurer",
+  "Delete for good": "Supprimer définitivement",
+  "Prepared folder": "Dossier préparé",
+  "Key": "Clé",
+  "Nothing in the trash": "Aucun élément dans la corbeille",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Les sites, builds, clés et dossiers préparés que vous supprimez s'affichent ici.",
+  "Delete {0} for good? This cannot be undone.": "Supprimer {0} définitivement? Cette action est irréversible.",
+  "Delete everything in the trash for good? This cannot be undone.": "Supprimer définitivement tout le contenu de la corbeille? Cette action est irréversible.",
+  "Restored {0}": "{0} restauré",
+  "Deleted {0}": "{0} supprimé",
+  "The trash is empty": "La corbeille est vide"
+}

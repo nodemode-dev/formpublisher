@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Sites, builds, chaves e pastas preparadas removidos ficam aqui até você excluí-los de vez.",
+  "Empty Trash": "Esvaziar lixeira",
+  "Item": "Item",
+  "Moved": "Movido em",
+  "Restore": "Restaurar",
+  "Delete for good": "Excluir de vez",
+  "Prepared folder": "Pasta preparada",
+  "Key": "Chave",
+  "Nothing in the trash": "Nada na lixeira",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Sites, builds, chaves e pastas preparadas que você remover aparecem aqui.",
+  "Delete {0} for good? This cannot be undone.": "Excluir {0} de vez? Esta ação não pode ser desfeita.",
+  "Delete everything in the trash for good? This cannot be undone.": "Excluir tudo na lixeira de vez? Esta ação não pode ser desfeita.",
+  "Restored {0}": "{0} restaurado",
+  "Deleted {0}": "{0} excluído",
+  "The trash is empty": "A lixeira está vazia"
+}

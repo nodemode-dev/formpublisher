@@ -1,0 +1,19 @@
+{
+  "Change": "Wijzigen",
+  "Press keys": "Druk op toetsen",
+  "Replace": "Vervangen",
+  "Reset all": "Alles herstellen",
+  "Choose Change, then press the new keys.": "Kies Wijzigen en druk dan op de nieuwe toetsen.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Druk op de nieuwe toetsen. Escape annuleert, Backspace wist.",
+  "All shortcuts are back to their defaults.": "Alle sneltoetsen zijn teruggezet naar de standaardwaarden.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Gebruik Ctrl, Alt of Cmd samen met de toets.",
+  "The browser or system keeps that combination, so the app cannot use it.": "De browser of het systeem houdt die combinatie voor zichzelf, dus de app kan haar niet gebruiken.",
+  "Text editing keys cannot be moved.": "Toetsen voor tekstbewerking kunnen niet worden verplaatst.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} wordt al gebruikt door {1}. Verplaatsen naar {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} wordt gebruikt door {1}. Terugzetten naar {2}?",
+  "{0} is now {1}.": "{0} is nu {1}.",
+  "{0} has no shortcut.": "{0} heeft geen sneltoets.",
+  "{0} is back to its default.": "{0} is teruggezet naar de standaardwaarde.",
+  "Change shortcut: {0}": "Sneltoets wijzigen: {0}",
+  "Reset shortcut: {0}": "Sneltoets herstellen: {0}"
+}

@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Kaldırılan siteler, derlemeler, anahtarlar ve hazırlanan klasörler, kalıcı olarak silene kadar burada kalır.",
+  "Empty Trash": "Çöp kutusunu boşalt",
+  "Item": "Öğe",
+  "Moved": "Taşınma",
+  "Restore": "Geri yükle",
+  "Delete for good": "Kalıcı olarak sil",
+  "Prepared folder": "Hazırlanan klasör",
+  "Key": "Anahtar",
+  "Nothing in the trash": "Çöp kutusunda hiçbir şey yok",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Kaldırdığınız siteler, derlemeler, anahtarlar ve hazırlanan klasörler burada görünür.",
+  "Delete {0} for good? This cannot be undone.": "{0} kalıcı olarak silinsin mi? Bu işlem geri alınamaz.",
+  "Delete everything in the trash for good? This cannot be undone.": "Çöp kutusundaki her şey kalıcı olarak silinsin mi? Bu işlem geri alınamaz.",
+  "Restored {0}": "{0} geri yüklendi",
+  "Deleted {0}": "{0} silindi",
+  "The trash is empty": "Çöp kutusu boş"
+}

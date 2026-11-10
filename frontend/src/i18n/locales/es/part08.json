@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Los sitios, compilaciones, claves y carpetas preparadas que elimines permanecen aquí hasta que los borres definitivamente.",
+  "Empty Trash": "Vaciar la papelera",
+  "Item": "Elemento",
+  "Moved": "Movido",
+  "Restore": "Restaurar",
+  "Delete for good": "Eliminar definitivamente",
+  "Prepared folder": "Carpeta preparada",
+  "Key": "Clave",
+  "Nothing in the trash": "No hay nada en la papelera",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Aquí aparecen los sitios, compilaciones, claves y carpetas preparadas que eliminas.",
+  "Delete {0} for good? This cannot be undone.": "¿Eliminar {0} definitivamente? Esta acción no se puede deshacer.",
+  "Delete everything in the trash for good? This cannot be undone.": "¿Eliminar definitivamente todo lo que hay en la papelera? Esta acción no se puede deshacer.",
+  "Restored {0}": "{0} restaurado",
+  "Deleted {0}": "{0} eliminado",
+  "The trash is empty": "La papelera está vacía"
+}

@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Entfernte Websites, Builds, Schlüssel und vorbereitete Ordner bleiben hier, bis Sie sie endgültig löschen.",
+  "Empty Trash": "Papierkorb leeren",
+  "Item": "Element",
+  "Moved": "Verschoben",
+  "Restore": "Wiederherstellen",
+  "Delete for good": "Endgültig löschen",
+  "Prepared folder": "Vorbereiteter Ordner",
+  "Key": "Schlüssel",
+  "Nothing in the trash": "Nichts im Papierkorb",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Websites, Builds, Schlüssel und vorbereitete Ordner, die Sie entfernen, erscheinen hier.",
+  "Delete {0} for good? This cannot be undone.": "{0} endgültig löschen? Dies kann nicht rückgängig gemacht werden.",
+  "Delete everything in the trash for good? This cannot be undone.": "Alles im Papierkorb endgültig löschen? Dies kann nicht rückgängig gemacht werden.",
+  "Restored {0}": "{0} wiederhergestellt",
+  "Deleted {0}": "{0} gelöscht",
+  "The trash is empty": "Der Papierkorb ist leer"
+}

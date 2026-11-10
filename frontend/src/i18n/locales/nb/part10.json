@@ -1,0 +1,19 @@
+{
+  "Change": "Endre",
+  "Press keys": "Trykk taster",
+  "Replace": "Erstatt",
+  "Reset all": "Tilbakestill alle",
+  "Choose Change, then press the new keys.": "Velg Endre, og trykk deretter de nye tastene.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Trykk de nye tastene. Escape avbryter, Backspace fjerner.",
+  "All shortcuts are back to their defaults.": "Alle snarveier er tilbake til standard.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Bruk Ctrl, Alt eller Cmd sammen med tasten.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Nettleseren eller systemet bruker den kombinasjonen selv, så appen kan ikke bruke den.",
+  "Text editing keys cannot be moved.": "Taster for tekstredigering kan ikke flyttes.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} brukes allerede av {1}. Flytte den til {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} brukes av {1}. Flytte den tilbake til {2}?",
+  "{0} is now {1}.": "{0} er nå {1}.",
+  "{0} has no shortcut.": "{0} har ingen snarvei.",
+  "{0} is back to its default.": "{0} er tilbake til standard.",
+  "Change shortcut: {0}": "Endre snarvei: {0}",
+  "Reset shortcut: {0}": "Tilbakestill snarvei: {0}"
+}

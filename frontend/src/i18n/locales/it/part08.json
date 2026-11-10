@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "I siti, le build, le chiavi e le cartelle preparate rimossi restano qui finché non li elimini definitivamente.",
+  "Empty Trash": "Svuota il cestino",
+  "Item": "Elemento",
+  "Moved": "Spostato",
+  "Restore": "Ripristina",
+  "Delete for good": "Elimina definitivamente",
+  "Prepared folder": "Cartella preparata",
+  "Key": "Chiave",
+  "Nothing in the trash": "Il cestino non contiene nulla",
+  "Sites, builds, keys and prepared folders you remove show up here.": "I siti, le build, le chiavi e le cartelle preparate che rimuovi compaiono qui.",
+  "Delete {0} for good? This cannot be undone.": "Eliminare {0} definitivamente? L'operazione non può essere annullata.",
+  "Delete everything in the trash for good? This cannot be undone.": "Eliminare definitivamente tutto il contenuto del cestino? L'operazione non può essere annullata.",
+  "Restored {0}": "{0} ripristinato",
+  "Deleted {0}": "{0} eliminato",
+  "The trash is empty": "Il cestino è vuoto"
+}

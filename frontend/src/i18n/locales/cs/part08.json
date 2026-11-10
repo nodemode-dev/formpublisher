@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Odebrané weby, sestavení, klíče a připravené složky zůstanou zde, dokud je trvale nesmažete.",
+  "Empty Trash": "Vysypat koš",
+  "Item": "Položka",
+  "Moved": "Přesunuto",
+  "Restore": "Obnovit",
+  "Delete for good": "Smazat natrvalo",
+  "Prepared folder": "Připravená složka",
+  "Key": "Klíč",
+  "Nothing in the trash": "V koši nic není",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Zde se zobrazí weby, sestavení, klíče a připravené složky, které odeberete.",
+  "Delete {0} for good? This cannot be undone.": "Smazat {0} natrvalo? Tuto akci nelze vrátit zpět.",
+  "Delete everything in the trash for good? This cannot be undone.": "Smazat natrvalo vše v koši? Tuto akci nelze vrátit zpět.",
+  "Restored {0}": "Obnoveno: {0}",
+  "Deleted {0}": "Smazáno: {0}",
+  "The trash is empty": "Koš je prázdný"
+}

@@ -1,0 +1,19 @@
+{
+  "Change": "Módosítás",
+  "Press keys": "Nyomja meg a billentyűket",
+  "Replace": "Csere",
+  "Reset all": "Összes visszaállítása",
+  "Choose Change, then press the new keys.": "Válassza a Módosítás lehetőséget, majd nyomja meg az új billentyűket.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Nyomja meg az új billentyűket. Az Esc megszakítja, a Backspace törli.",
+  "All shortcuts are back to their defaults.": "Az összes billentyűparancs visszaállt az alapértelmezettre.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Használja a Ctrl, Alt vagy Cmd billentyűt a másik billentyűvel együtt.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Ezt a kombinációt a böngésző vagy a rendszer tartja fenn, ezért az alkalmazás nem használhatja.",
+  "Text editing keys cannot be moved.": "A szövegszerkesztő billentyűk nem helyezhetők át.",
+  "{0} is already used by {1}. Move it to {2}?": "A(z) {0} kombinációt már a(z) {1} használja. Áthelyezi ide: {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "A(z) {0} kombinációt a(z) {1} használja. Visszahelyezi ide: {2}?",
+  "{0} is now {1}.": "{0} új billentyűparancsa: {1}.",
+  "{0} has no shortcut.": "{0} nem rendelkezik billentyűparanccsal.",
+  "{0} is back to its default.": "{0} visszaállt az alapértelmezettre.",
+  "Change shortcut: {0}": "Billentyűparancs módosítása: {0}",
+  "Reset shortcut: {0}": "Billentyűparancs visszaállítása: {0}"
+}

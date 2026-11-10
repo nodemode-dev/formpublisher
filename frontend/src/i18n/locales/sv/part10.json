@@ -1,0 +1,19 @@
+{
+  "Change": "Ändra",
+  "Press keys": "Tryck på tangenter",
+  "Replace": "Ersätt",
+  "Reset all": "Återställ alla",
+  "Choose Change, then press the new keys.": "Välj Ändra och tryck sedan på de nya tangenterna.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Tryck på de nya tangenterna. Escape avbryter, Backspace rensar.",
+  "All shortcuts are back to their defaults.": "Alla kortkommandon är återställda till standard.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Använd Ctrl, Alt eller Cmd tillsammans med tangenten.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Webbläsaren eller systemet reserverar den kombinationen, så appen kan inte använda den.",
+  "Text editing keys cannot be moved.": "Tangenter för textredigering kan inte flyttas.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} används redan av {1}. Flytta det till {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} används av {1}. Flytta tillbaka det till {2}?",
+  "{0} is now {1}.": "{0} är nu {1}.",
+  "{0} has no shortcut.": "{0} har inget kortkommando.",
+  "{0} is back to its default.": "{0} är återställt till standard.",
+  "Change shortcut: {0}": "Ändra kortkommando: {0}",
+  "Reset shortcut: {0}": "Återställ kortkommando: {0}"
+}

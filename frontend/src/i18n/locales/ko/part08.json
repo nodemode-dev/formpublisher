@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "삭제한 사이트, 빌드, 키, 준비된 폴더는 완전히 삭제하기 전까지 여기에 보관됩니다.",
+  "Empty Trash": "휴지통 비우기",
+  "Item": "항목",
+  "Moved": "이동한 시간",
+  "Restore": "복원",
+  "Delete for good": "완전히 삭제",
+  "Prepared folder": "준비된 폴더",
+  "Key": "키",
+  "Nothing in the trash": "휴지통에 아무것도 없습니다",
+  "Sites, builds, keys and prepared folders you remove show up here.": "삭제한 사이트, 빌드, 키, 준비된 폴더가 여기에 표시됩니다.",
+  "Delete {0} for good? This cannot be undone.": "{0}을(를) 완전히 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
+  "Delete everything in the trash for good? This cannot be undone.": "휴지통의 모든 항목을 완전히 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
+  "Restored {0}": "{0}을(를) 복원했습니다",
+  "Deleted {0}": "{0}을(를) 삭제했습니다",
+  "The trash is empty": "휴지통이 비어 있습니다"
+}

@@ -1,0 +1,19 @@
+{
+  "Change": "Změnit",
+  "Press keys": "Stiskněte klávesy",
+  "Replace": "Nahradit",
+  "Reset all": "Obnovit vše",
+  "Choose Change, then press the new keys.": "Zvolte Změnit a poté stiskněte nové klávesy.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Stiskněte nové klávesy. Esc akci zruší, Backspace zástupce vymaže.",
+  "All shortcuts are back to their defaults.": "Všechny zkratky byly vráceny na výchozí hodnoty.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Použijte Ctrl, Alt nebo Cmd spolu s klávesou.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Tuto kombinaci si ponechává prohlížeč nebo systém, takže ji aplikace nemůže použít.",
+  "Text editing keys cannot be moved.": "Klávesy pro úpravu textu nelze přesouvat.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} už používá {1}. Přesunout ji na {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} používá {1}. Přesunout ji zpět na {2}?",
+  "{0} is now {1}.": "{0} je nyní {1}.",
+  "{0} has no shortcut.": "{0} nemá žádnou zkratku.",
+  "{0} is back to its default.": "{0} je vráceno na výchozí hodnotu.",
+  "Change shortcut: {0}": "Změnit zkratku: {0}",
+  "Reset shortcut: {0}": "Obnovit zkratku: {0}"
+}

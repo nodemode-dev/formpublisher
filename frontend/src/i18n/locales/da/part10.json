@@ -1,0 +1,19 @@
+{
+  "Change": "Skift",
+  "Press keys": "Tryk på taster",
+  "Replace": "Erstat",
+  "Reset all": "Nulstil alle",
+  "Choose Change, then press the new keys.": "Vælg Skift, og tryk derefter på de nye taster.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Tryk på de nye taster. Escape annullerer, Backspace rydder.",
+  "All shortcuts are back to their defaults.": "Alle genveje er tilbage til standard.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Brug Ctrl, Alt eller Cmd sammen med tasten.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Browseren eller systemet beholder den kombination, så appen kan ikke bruge den.",
+  "Text editing keys cannot be moved.": "Taster til tekstredigering kan ikke flyttes.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} bruges allerede af {1}. Vil du flytte den til {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} bruges af {1}. Vil du flytte den tilbage til {2}?",
+  "{0} is now {1}.": "{0} er nu {1}.",
+  "{0} has no shortcut.": "{0} har ingen genvej.",
+  "{0} is back to its default.": "{0} er tilbage til standard.",
+  "Change shortcut: {0}": "Skift genvej: {0}",
+  "Reset shortcut: {0}": "Nulstil genvej: {0}"
+}

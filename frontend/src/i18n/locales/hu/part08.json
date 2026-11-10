@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Az eltávolított webhelyek, buildek, kulcsok és előkészített mappák itt maradnak, amíg véglegesen nem törli őket.",
+  "Empty Trash": "Kuka ürítése",
+  "Item": "Elem",
+  "Moved": "Áthelyezve",
+  "Restore": "Visszaállítás",
+  "Delete for good": "Végleges törlés",
+  "Prepared folder": "Előkészített mappa",
+  "Key": "Kulcs",
+  "Nothing in the trash": "A kuka üres",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Az eltávolított webhelyek, buildek, kulcsok és előkészített mappák itt jelennek meg.",
+  "Delete {0} for good? This cannot be undone.": "Véglegesen törli ezt: {0}? Ez nem vonható vissza.",
+  "Delete everything in the trash for good? This cannot be undone.": "Véglegesen töröl mindent a kukából? Ez nem vonható vissza.",
+  "Restored {0}": "Visszaállítva: {0}",
+  "Deleted {0}": "Törölve: {0}",
+  "The trash is empty": "A kuka üres"
+}

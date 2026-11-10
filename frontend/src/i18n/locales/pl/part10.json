@@ -1,0 +1,19 @@
+{
+  "Change": "Zmień",
+  "Press keys": "Naciśnij klawisze",
+  "Replace": "Zamień",
+  "Reset all": "Zresetuj wszystkie",
+  "Choose Change, then press the new keys.": "Wybierz Zmień, a następnie naciśnij nowe klawisze.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Naciśnij nowe klawisze. Escape anuluje, Backspace czyści.",
+  "All shortcuts are back to their defaults.": "Wszystkie skróty wróciły do ustawień domyślnych.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Użyj Ctrl, Alt lub Cmd razem z klawiszem.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Tę kombinację zajmuje przeglądarka lub system, więc aplikacja nie może jej użyć.",
+  "Text editing keys cannot be moved.": "Klawiszy edycji tekstu nie można przenosić.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} jest już używany przez: {1}. Przenieść go do: {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} jest używany przez: {1}. Przenieść go z powrotem do: {2}?",
+  "{0} is now {1}.": "{0} to teraz {1}.",
+  "{0} has no shortcut.": "{0} nie ma skrótu.",
+  "{0} is back to its default.": "{0} wrócił do ustawienia domyślnego.",
+  "Change shortcut: {0}": "Zmień skrót: {0}",
+  "Reset shortcut: {0}": "Zresetuj skrót: {0}"
+}

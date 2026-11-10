@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Удалённые сайты, сборки, ключи и подготовленные папки хранятся здесь, пока вы не удалите их навсегда.",
+  "Empty Trash": "Очистить корзину",
+  "Item": "Элемент",
+  "Moved": "Перемещён",
+  "Restore": "Восстановить",
+  "Delete for good": "Удалить навсегда",
+  "Prepared folder": "Подготовленная папка",
+  "Key": "Ключ",
+  "Nothing in the trash": "В корзине ничего нет",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Здесь появятся удалённые вами сайты, сборки, ключи и подготовленные папки.",
+  "Delete {0} for good? This cannot be undone.": "Удалить {0} навсегда? Это действие нельзя отменить.",
+  "Delete everything in the trash for good? This cannot be undone.": "Удалить всё содержимое корзины навсегда? Это действие нельзя отменить.",
+  "Restored {0}": "Восстановлено: {0}",
+  "Deleted {0}": "Удалено: {0}",
+  "The trash is empty": "Корзина пуста"
+}
