@@ -64,14 +64,18 @@ class LocalAccess:
 async def lifespan(app: FastAPI):
     bus.attach(asyncio.get_running_loop())
     paths.ensure_layout()
-    from app.services import inbox
+    from app.services import deep, inbox
 
+    deep.attach(asyncio.get_running_loop())
     host_server, host_task = await site_host.start()
     inbox.start()
+    paths.write_engine_file(__version__)
     try:
         yield
     finally:
+        paths.remove_engine_file()
         inbox.stop()
+        deep.attach(None)
         await site_host.stop(host_server, host_task)
 
 
