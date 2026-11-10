@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.0
-Last updated: 2026-11-10 · Phases 31 and 33: GitHub Pages redirect pages that keep the query and hash, an executable nginx-check.sh and the listen pass
+Current build version: v0.2.1
+Last updated: 2026-11-10 · Phases 34 to 36: the listen pass inside nginx-check.sh, ./formpublisher vendor --check and the GitHub Pages note for visitors without scripts
 
 ---
 

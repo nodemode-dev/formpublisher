@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 · 2026-11-10
+
+- `nginx-check.sh` also checks the `listen` lines: after its first pass it runs `nginx -t` again with each listen line on a loopback port, so your own check is as strict as the app's. `NGINX_CHECK_PORT` sets the first port.
+- `./formpublisher vendor --check` confirms that the bundled FormWeb engine code matches the version and contents recorded in `vendor/formweb-native/VENDOR.md`. The compiler setup and CI run it before building.
+- On GitHub Pages, the folder-redirect note says that visitors with scripts turned off see the 404 page at those addresses.
+- The FormWeb engine crates are vendored at 0.20.1.
+- Every new string is in all 26 languages.
+
 ## 0.2.0 · 2026-11-10
 
 The version moves to 0.2.0 rather than 0.1.10, to keep the Form family's one-digit patch number (FormWeb moves to 0.20.0 the same way).

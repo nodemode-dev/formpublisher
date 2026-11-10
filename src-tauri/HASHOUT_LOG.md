@@ -2,8 +2,8 @@
 
 Living log for the desktop shell (Tauri 2). Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.2.0
-Last updated: 2026-11-10 · v0.2.0 no shell changes; Cargo.toml, Cargo.lock and tauri.conf.json carry 0.2.0.
+Current build version: v0.2.1
+Last updated: 2026-11-10 · v0.2.1 no shell changes; Cargo.toml, Cargo.lock and tauri.conf.json carry 0.2.1.
 
 ---
 
