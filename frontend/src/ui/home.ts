@@ -98,7 +98,7 @@ export class Home {
 <div class="fp-home-hero-text">
 <div class="fp-home-hero-title">Drop a site zip here</div>
 <div class="fp-home-hero-sub">Drop a FormWeb site export (.zip) or project (.fweb) anywhere on this box to import it. FormPublisher reads it and never changes it.</div>
-<div class="fp-home-fw"><span class="fp-st-dot"></span><span class="fp-home-fw-text" translate="no"></span></div>
+<div class="fp-home-fw"><span class="fp-st-dot"></span><span class="fp-home-fw-text"></span></div>
 </div>
 <div class="fp-home-hero-actions">
 <button class="fp-btn fp-btn-primary" type="button" data-cmd="file.open-zip">${icon('archive', 14)}<span>Open zip</span></button>

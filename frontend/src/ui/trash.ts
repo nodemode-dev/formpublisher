@@ -32,7 +32,7 @@ class RestoreDialog extends Dialog {
   private readonly lead = el('<p class="fp-note"></p>');
   private readonly placeBox = el('<div class="fp-tr-field" hidden></div>');
   private readonly prefix = el('<span class="fp-tr-prefix" translate="no"></span>');
-  private readonly placeInput = el<HTMLInputElement>('<input class="fp-input is-mono" type="text" spellcheck="false" autocomplete="off" aria-label="Name" placeholder="For example a site id or a build path" translate="no">');
+  private readonly placeInput = el<HTMLInputElement>('<input class="fp-input is-mono" type="text" spellcheck="false" autocomplete="off" aria-label="Name" placeholder="For example a site id or a build path">');
   private readonly placeError = el('<p class="fp-tr-origin-error" role="alert"></p>');
   private readonly passBox = el('<div class="fp-tr-field" hidden></div>');
   private readonly passInput = el<HTMLInputElement>('<input class="fp-input" type="password" spellcheck="false" autocomplete="off" aria-label="Passphrase of the locked key" placeholder="Passphrase of the locked key">');

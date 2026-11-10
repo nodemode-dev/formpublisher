@@ -4,6 +4,7 @@ import { buildsApi, type BuildSummary } from '../api-builds';
 import { publishApi, type NginxCheck, type PreparedCommand, type PreparedTarget, type TargetInfo } from '../api-publish';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
+import { t } from '../i18n';
 import { copyText, fmtCount, fmtDate } from './builds';
 import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
@@ -95,7 +96,7 @@ class PublishSheet extends Dialog {
 <section class="fp-pkg-sec">
 <div class="fp-pkg-sec-h">Build</div>
 <div class="fp-pkg-info"><span class="fp-pkg-k">Site</span><span class="fp-pkg-v" data-f="site" translate="no"></span></div>
-<div class="fp-pkg-line"><select class="fp-select fp-pkg-grow fp-pub-build-sel" data-f="build" aria-label="Build" translate="no"></select><button class="fp-btn fp-btn-sm" type="button" data-a="build">${icon('package', 14)}<span>Build now</span></button></div>
+<div class="fp-pkg-line"><select class="fp-select fp-pkg-grow fp-pub-build-sel" data-f="build" aria-label="Build"></select><button class="fp-btn fp-btn-sm" type="button" data-a="build">${icon('package', 14)}<span>Build now</span></button></div>
 <div class="fp-pub-note" data-f="buildnote" role="status"></div>
 </section>
 <section class="fp-pkg-sec">
@@ -216,12 +217,13 @@ class PublishSheet extends Dialog {
   }
 
   private paintBuilds(): void {
-    const items = this.builds.length ? this.builds.map((b) => ({ id: b.id, label: `${b.id}   ${fmtDate(b.created)}` })) : [{ id: '', label: 'No builds yet' }];
+    const items = this.builds.length ? this.builds.map((b) => ({ id: b.id, label: `${b.id}   ${fmtDate(b.created)}` })) : [{ id: '', label: t('No builds yet') }];
     patchList(this.buildSel, items, {
       key: (b) => b.id || '-',
       create: (b) => {
         const o = el<HTMLOptionElement>('<option></option>');
         o.value = b.id;
+        if (b.id) o.translate = false;
         o.textContent = b.label;
         return o;
       },

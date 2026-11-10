@@ -66,9 +66,9 @@ const select = (ctl: string, label: string, options: ReadonlyArray<readonly [str
 
 const CONTROLS = `<span class="fp-sep"></span>
 ${select('device', 'Device', [['desktop', 'Desktop 1440 x 900'], ['laptop', 'Laptop 1280 x 800'], ['tablet', 'Tablet 834 x 1112'], ['phone', 'Phone 390 x 844'], ['custom', 'Custom']])}
-<input class="fp-tb-num" data-ctl="width" type="number" inputmode="numeric" min="${MIN_SIZE}" max="${MAX_SIZE}" step="1" aria-label="Width" title="Width" translate="no">
+<input class="fp-tb-num" data-ctl="width" type="number" inputmode="numeric" min="${MIN_SIZE}" max="${MAX_SIZE}" step="1" aria-label="Width" title="Width">
 <span class="fp-tb-x" aria-hidden="true">x</span>
-<input class="fp-tb-num" data-ctl="height" type="number" inputmode="numeric" min="${MIN_SIZE}" max="${MAX_SIZE}" step="1" aria-label="Height" title="Height" translate="no">
+<input class="fp-tb-num" data-ctl="height" type="number" inputmode="numeric" min="${MIN_SIZE}" max="${MAX_SIZE}" step="1" aria-label="Height" title="Height">
 <button class="fp-icon-btn" type="button" data-ctl="rotate" title="Rotate" aria-label="Rotate">${rotateIcon(16)}</button>
 ${select('zoom', 'Zoom', [['fit', 'Fit'], ['50', '50%'], ['75', '75%'], ['100', '100%']])}
 <span class="fp-sep"></span>

@@ -37,7 +37,7 @@ class HintStrip {
 
   constructor(private readonly app: App) {
     this.root = el(`<section class="fp-hint" aria-label="Quick tour" hidden>
-<span class="fp-hint-count" translate="no"></span>
+<span class="fp-hint-count"></span>
 <span class="fp-hint-title"></span>
 <span class="fp-hint-text"></span>
 <span class="fp-hint-actions">
