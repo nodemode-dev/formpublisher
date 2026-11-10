@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.1
-Last updated: 2026-11-10 · Phases 34 to 36: the listen pass inside nginx-check.sh, ./formpublisher vendor --check and the GitHub Pages note for visitors without scripts
+Current build version: v0.2.2
+Last updated: 2026-11-10 · Phase 38: the vendor check in setup/install_compiler.bat and a vendor row in doctor
 
 ---
 

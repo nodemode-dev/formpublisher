@@ -1,7 +1,7 @@
 {
   "name": "formpublisher",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "formpublisher · preview, check, package and publish FormWeb sites",
   "type": "module",
   "engines": {
