@@ -13,7 +13,6 @@ use std::time::{Duration, Instant};
 use tauri::{Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_dialog::DialogExt;
 
-/// The usual engine port. FormWeb's "Send to FormPublisher" looks here first, so the shell prefers it when it is free.
 const DEFAULT_PORT: u16 = 8280;
 const ENGINE_WAIT: Duration = Duration::from_secs(60);
 const ENGINE_NAME: &str = if cfg!(windows) { "formpublisher-engine.exe" } else { "formpublisher-engine" };
@@ -25,7 +24,6 @@ struct Backend(Mutex<Option<Child>>);
 
 static PORT: AtomicU16 = AtomicU16::new(DEFAULT_PORT);
 
-/// The engine's process group id (its pid, since it is started as a group leader); 0 until it is started.
 static ENGINE_GROUP: AtomicI32 = AtomicI32::new(0);
 
 #[cfg(unix)]
@@ -35,7 +33,6 @@ extern "C" {
     fn _exit(code: i32) -> !;
 }
 
-/// A terminate, interrupt or hangup signal skips Tauri's exit event, so stop the engine's process group here.
 #[cfg(unix)]
 extern "C" fn on_signal(_: i32) {
     let group = ENGINE_GROUP.load(Ordering::SeqCst);
@@ -64,7 +61,6 @@ fn engine_url() -> String {
     format!("http://{}", engine_addr())
 }
 
-/// The port the engine will use: FORMPUBLISHER_PORT when set, else 8280 when free, else any free port the system hands out.
 fn choose_port() -> u16 {
     if let Some(port) = std::env::var("FORMPUBLISHER_PORT").ok().and_then(|raw| raw.trim().parse::<u16>().ok()).filter(|p| *p > 0) {
         return port;
@@ -121,7 +117,6 @@ fn spawn_engine() -> Option<Child> {
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null());
-    // Its own process group, so stopping the shell stops the engine and anything the engine started.
     #[cfg(unix)]
     {
         use std::os::unix::process::CommandExt;
@@ -140,7 +135,6 @@ fn kill_backend(handle: &tauri::AppHandle) {
     let Some(mut child) = child else { return };
     #[cfg(unix)]
     {
-        // A negative id signals the engine's whole process group (the one-file bootloader and its Python child).
         let pid = format!("-{}", child.id());
         let signal = |sig: &str| {
             Command::new("kill")
@@ -287,7 +281,6 @@ fn main() {
 
     app.run(|handle, event| {
         match event {
-            // The last window closing ends the app; the engine the shell started goes with it.
             RunEvent::WindowEvent { event: tauri::WindowEvent::Destroyed, .. } if handle.webview_windows().is_empty() => handle.exit(0),
             RunEvent::Exit => kill_backend(handle),
             _ => {}
