@@ -29,6 +29,7 @@ STUB = """<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
+{script}
 <title>Redirecting</title>
 <link rel="canonical" href="{to}">
 <meta http-equiv="refresh" content="0; url={to}">
@@ -100,6 +101,8 @@ if(b){{if(p.indexOf(b+"/")!==0)return;p=p.slice(b.length)}}
 for(i=0;i<r.length;i++){{x=r[i][0];if(p.indexOf(x+"/")===0){{
 t=r[i][1].split(":splat").join(p.slice(x.length+1).replace(/^[\\/\\\\]+/,""));
 if(t!==location.pathname)location.replace(t+location.search+location.hash);return}}}}}})();</script>"""
+
+STUB_SCRIPT = """<script>(function(){{var t={to},s=t.indexOf("#"),f=s<0?"":t.slice(s);if(s>=0)t=t.slice(0,s);location.replace(t+(t.indexOf("?")<0?location.search:"")+(f||location.hash))}})();</script>"""
 
 HEAD_OPEN = re.compile(rb"<head(?:\s[^>]*)?>", re.I)
 HTML_OPEN = re.compile(rb"<html(?:\s[^>]*)?>", re.I)
@@ -175,6 +178,11 @@ def _script_tag(base: str, rules: list[list[str]]) -> bytes:
     return SCRIPT.format(base=literal(base), rules=literal(rules)).encode("ascii")
 
 
+def _stub_script(to: str) -> str:
+    value = json.dumps(to, ensure_ascii=True).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+    return STUB_SCRIPT.format(to=value)
+
+
 def _place_script(page: bytes, tag: bytes) -> bytes:
     """Put the script first in <head>, after a leading meta charset when there is one."""
     head = HEAD_OPEN.search(page)
@@ -223,7 +231,7 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
             result.warnings.append(f"The redirect {row['from']} was skipped because the site already has a page at {rel}.")
             continue
         to = base + row["to"] if row["to"].startswith("/") and not row["to"].startswith("//") else row["to"]
-        put(out, f"site/{rel}", STUB.format(to=html.escape(to, quote=True)))
+        put(out, f"site/{rel}", STUB.format(to=html.escape(to, quote=True), script=_stub_script(to)))
         listed.append(f"{row['from']} -> {to} ({row['status']}) as site/{rel}")
     if listed or splats:
         text = NOTE_HEAD
