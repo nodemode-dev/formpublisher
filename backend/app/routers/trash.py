@@ -24,6 +24,7 @@ def empty_trash():
 async def restore_entry(entry: str, request: Request):
     raw = await request.body()
     origin = None
+    passphrase = None
     if raw.strip():
         try:
             body = json.loads(raw)
@@ -34,8 +35,11 @@ async def restore_entry(entry: str, request: Request):
         origin = body.get("origin")
         if origin is not None and not isinstance(origin, str):
             return JSONResponse({"detail": "origin must be text", "code": "invalid"}, status_code=400)
+        passphrase = body.get("passphrase")
+        if passphrase is not None and not isinstance(passphrase, str):
+            return JSONResponse({"detail": "passphrase must be text", "code": "invalid"}, status_code=400)
     try:
-        return await run_in_threadpool(trash.restore, entry, origin)
+        return await run_in_threadpool(trash.restore, entry, origin, passphrase)
     except IntakeError as exc:
         return JSONResponse({"code": exc.code, "detail": exc.message, "message": exc.message}, status_code=exc.status)
 

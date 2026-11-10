@@ -287,13 +287,14 @@ class Client:
 
         return self._local(trash.list_entries)
 
-    def trash_restore(self, entry: str, origin: str | None = None) -> dict:
+    def trash_restore(self, entry: str, origin: str | None = None, passphrase: str | None = None) -> dict:
         self.connect()
         if self.url:
-            return self.call("POST", f"/api/trash/{_q(entry)}/restore", {"origin": origin} if origin else None)
+            body = {k: v for k, v in (("origin", origin), ("passphrase", passphrase)) if v}
+            return self.call("POST", f"/api/trash/{_q(entry)}/restore", body or None)
         from app.services import trash
 
-        return self._local(trash.restore, entry, origin)
+        return self._local(trash.restore, entry, origin, passphrase)
 
     def trash_delete(self, entry: str) -> dict:
         self.connect()
@@ -554,6 +555,7 @@ def build_parser() -> argparse.ArgumentParser:
     trr = tr_sub.add_parser("restore", parents=[common], help="move an entry back to where it came from")
     trr.add_argument("entry")
     trr.add_argument("--to", metavar="PATH", help="where it goes, relative to the data folder (for example sites/my-site), for an entry whose origin is not known")
+    trr.add_argument("--passphrase-stdin", action="store_true", help="read the passphrase of an encrypted key from standard input (one line), for a key whose record has to be rebuilt")
     trd = tr_sub.add_parser("delete", parents=[common], help="delete one entry for good")
     trd.add_argument("entry")
     tre = tr_sub.add_parser("empty", parents=[common], help="delete every entry for good")
@@ -608,7 +610,8 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "trash":
             action = args.trash_command
             if action == "restore":
-                data, say = client.trash_restore(args.entry, args.to), say_trash_restore
+                secret = sys.stdin.readline().rstrip("\r\n") if args.passphrase_stdin else None
+                data, say = client.trash_restore(args.entry, args.to, secret), say_trash_restore
             elif action == "delete":
                 data, say = client.trash_delete(args.entry), say_trash_delete
             elif action == "empty":
