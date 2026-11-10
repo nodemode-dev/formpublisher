@@ -2,7 +2,7 @@
 
 ## The build
 
-`site.zip` is deterministic: entries sorted by path, forward slashes, timestamps fixed at 1980-01-01, mode 0644, deflate level 9, no directory entries. The same revision gives the same bytes anywhere. The build id is the first 12 hex digits of the zip's SHA-256.
+`site.zip` is deterministic: entries sorted by path, forward slashes, timestamps fixed at 1980-01-01, mode 0644, deflate level 9, no directory entries. The same revision gives the same bytes anywhere. The build id is the first 12 hex digits of the SHA-256 of the site id, a colon and the zip's SHA-256, so the same bytes imported as two sites get two builds.
 
 A build folder, `builds/[site]/[id]/`, holds `site.zip`, `publish.json` (format `formpublisher-site`, version 1: files with SHA-256 and size, routes, redirects, headers, check summary, source kind and FormWeb version), `build.json` (the library record) and, once signed, `site.zip.sig`. `publish.json` is never inside the zip.
 

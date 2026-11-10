@@ -184,7 +184,8 @@ def build(site_id: str, revision: str | None = None) -> dict:
         work = Path(tempfile.mkdtemp(prefix=".build-", dir=paths.builds_dir()))
         try:
             made = _assemble(site_id, revision, work)
-            build_id = made["sha256"][:12]
+            # The same bytes imported as two sites must not share a build id (builds live under builds/<site>/<id>).
+            build_id = hashlib.sha256(f"{site_id}:{made['sha256']}".encode()).hexdigest()[:12]
             folder = paths.builds_dir() / site_id / build_id
             if (folder / "build.json").is_file():
                 existing = get_build(build_id)
