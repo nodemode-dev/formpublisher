@@ -1,0 +1,19 @@
+[
+"Change",
+"Press keys",
+"Replace",
+"Reset all",
+"Choose Change, then press the new keys.",
+"Press the new keys. Escape cancels, Backspace clears.",
+"All shortcuts are back to their defaults.",
+"Use Ctrl, Alt or Cmd together with the key.",
+"The browser or system keeps that combination, so the app cannot use it.",
+"Text editing keys cannot be moved.",
+"{0} is already used by {1}. Move it to {2}?",
+"{0} is used by {1}. Move it back to {2}?",
+"{0} is now {1}.",
+"{0} has no shortcut.",
+"{0} is back to its default.",
+"Change shortcut: {0}",
+"Reset shortcut: {0}"
+]
