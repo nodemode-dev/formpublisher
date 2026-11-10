@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.1
-Last updated: 2026-11-10 · Phases 4 to 6: site host, checks, packages and signatures, .fweb projects
+Current build version: v0.1.2
+Last updated: 2026-11-10 · Phases 7 to 9: host targets and Publish, Receive from FormWeb, CLI and MCP, demos
 
 ---
 
@@ -224,3 +224,32 @@ The executor spec is `TURN_B_SPEC.md` in the 0.1.1 planning sidecar.
 - `compile.py` raises its own `CompileError`, converted by intake, because intake imports it and the reverse import would be circular. Only the envelope's `site` is loaded; the checkpoint is ignored. `baseUrl` is the site's own or `https://example.com`, as the core would pick.
 - The FormWeb `bundle_assets` rules are ported: `/api/assets/<sha>.<ext>` becomes `assets/<file>` with the right `../` depth, `asset-access.json` is rebuilt last, `CREDITS.txt` is written when assets carry licences (without the Lucide text, which is not vendored). An image the project references but the file does not carry fails the import.
 - `.fweb` detection reads the first 4 KB for the `format` field; the extension is the main signal. Upload source keys are `fweb-upload:<label>`, so an upload never shares an id with a zip of the same name.
+
+## Phases 7 to 9 · v0.1.2 (2026-11-10)
+
+The executor spec is `TURN_C_SPEC.md` in the 0.1.2 planning sidecar.
+
+### app/targets/*.py, app/services/publish.py, app/routers/publish.py
+
+- Adapters are discovered from `targets/*.py`; modules starting with `_` are helpers. `_common.py` holds `PreparedInput`, `PreparedResult` and the shared redirect, header and 404 helpers. Adapters write only `commands`, `notes` and `warnings`; the service fills `files` by walking the folder, so a folder is byte-identical across prepares and carries no timestamps.
+- Prepared metadata lives beside the folders as `prepared/<site>/<build>/.<target>.json`; dot names are skipped when listing. Delete moves the folder to `trash/prepared-<site>-<build>-<target>-<stamp>`.
+- A FormWeb page at `/404` exports as `404/index.html`; `has_404` accepts it and `copy_site` also writes it as the root `404.html` every host looks for. Its relative asset paths resolve correctly at `/404.html`; on hosts that serve that file for a deep unknown path, relative paths are the site's own concern.
+- Verify compares every `site/` file with `publish.json` and every file with a fresh prepare in a temporary folder, reporting `missing`, `hash differs from publish.json`, `extra file` or `differs from a fresh prepare`.
+- nginx: `root /usr/share/nginx/html`, `try_files $uri $uri/ $uri.html =404`, a relative `include` in `nginx-test.conf` that resolves against the `-c` file's folder. Not run here (no nginx); read only.
+
+### app/services/inbox.py, app/routers/receive.py, main.py lifespan
+
+- Router `on_startup` hooks do not run under a custom lifespan, so `main.py` starts and stops the inbox watcher inside `lifespan`. It polls every 5 s and imports a file only after it has stayed unchanged for 2 s; results move to `inbox/imported/` or `inbox/failed/` with a `.txt` reason. The last five receipts are kept in memory.
+- `POST /api/receive/formweb` takes the raw zip body; `LocalAccess` refuses foreign origins and the handler refuses non-loopback clients. The site id is hashed from the site name and source key, so FormWeb must send a stable `X-FormWeb-Site-Name` for re-sends to land as revisions of one site.
+
+### app/services/package.py, app/services/paths.py
+
+- Build ids are the first 12 hex digits of SHA-256 over `<site id>:<zip sha256>`, so the same export imported as two sites gets two builds (the old id, the zip hash alone, let `/api/publish/{build}` answer for the wrong site). `publish.json` still records the zip's own hash.
+- `origins()` adds the engine's own origin on whatever port it runs when `FORMPUBLISHER_ORIGINS` is unset, because the engine serves the built window itself.
+
+### app/routers/demo.py, app/cli.py, app/mcp.py
+
+- `POST /api/demo/sample` imports `resource_dir()/demo/sample-site.zip` once under a lock, matched by `source.kind` `demo` and a fixed key, and returns `{site, created}`; the frozen engine carries the zip.
+- CLI and MCP call the same services in-process when no engine answers. `sign` without `--key` uses the only key and refuses when there are none or several. Over HTTP a deep check polls `GET /api/checks/{site}/{revision}` until `running` clears, capped at 15 minutes. Key creation is CLI-only (`keys --create`); MCP has 14 tools with `readOnlyHint` on the eight that only read.
+
+Checked: `formpublisher_engine.py --selfcheck` lists every router with no errors; one build prepared for all six targets twice gave identical folders; receive, inbox, verify, delete, the MCP stdio walk and every CLI command were run as the spec's exits ask.

@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.1
+Current build version: v0.1.2
 Last updated: 2026-11-10 · Phases 4 to 6: preview, checks panel, package sheet and builds
 
 ---
@@ -139,3 +139,11 @@ Each page is filled once; lists sit in an absolutely positioned container under 
 
 ### src/ui/package-sheet.ts, src/ui/builds.ts, src/api-builds.ts, src/styles/package.css, home.ts, chrome.ts
 The sheet, the Builds page and the Inspect and Compare dialogs are each built once and every block reserves its height before data arrives. `el()` returns only the first root element, so each multi-block dialog body is wrapped in one `fp-pkg-wrap`. Compare orders the two chosen builds by list order so the older one is `a`. The sticky file header uses `--z-raised`. Commands: `site.package` (Shift+Mod+B, File), `site.check` and `site.check-deep` (Site), `view.builds` (View, opens Home on Builds). Dropping a `.fweb` file imports it like a zip.
+
+## Phases 7 to 9: Publish sheet, receive toast, demo and tour · v0.1.2 (2026-11-10)
+
+### src/ui/publish-sheet.ts, src/api-publish.ts, src/styles/publish.css, toolbar.ts, chrome.ts, package-sheet.ts, events.ts, toast.ts
+The sheet extends `Dialog` with a fixed height (`min(86vh, 780px)`), `scrollbar-gutter: stable` and skeleton host cards swapped for the real ones in one frame, so opening, building, preparing and rendering results cause no layout shift. Results and ticks are kept per build in memory and the ticks in localStorage. `publish.open` is registered in `chrome.ts`, where the command registry lives (`commands.ts` only holds the class), with no shortcut because Ctrl+Shift+U is taken by Linux input methods. `toast.ts` takes an optional action, used by the receive toast's Open. Server problem text from verify is shown as `path: problem`, not translated.
+
+### src/ui/home.ts, src/app.ts, src/ui/hint-strip.ts, src/api-demo.ts, src/styles/demo.css
+Home refreshes Recent on `sites.received`; a new card pushes older ones down, the one layout shift left, inherent to newest-first order. The Demos row's card calls `POST /api/demo/sample` (idempotent) and opens the site. The tour strip is absolutely positioned at the top of `.fp-main`, walks four steps and stores `formpublisher.hints = done`. Keys for the sheet and toast are in `keys/part04.json`, for the demo and tour in `keys/part05.json`.

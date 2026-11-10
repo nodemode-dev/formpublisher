@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2 · 2026-11-10
+
+- Publish: prepare a folder per host for Static zip, Netlify, Cloudflare Pages, Vercel, GitHub Pages and nginx from a build's own `site.zip`, with the redirects, headers and 404 rule each host expects and the exact commands to run. Verify checks a prepared folder against `publish.json` and a fresh prepare; Remove moves it to the trash. A host that cannot represent something (GitHub Pages redirects and headers) says so. Nothing is uploaded.
+- Receive from FormWeb: `POST /api/receive/formweb` accepts a FormWeb export from this computer only, and an `inbox/` folder takes exports left while FormPublisher is closed. The window shows a toast with Open and the site appears in Recent.
+- Agents: the command line gains `check`, `build`, `builds`, `sign`, `verify`, `keys`, `targets`, `prepare`, `prepared` and `receive-status`, and the MCP server grows to 14 tools covering the same ground, with the agent skills updated.
+- Demo: Home's Demos row opens a bundled sample site with a short tour of Preview, Checks, Package and Publish, and `demo/index.html` runs the same walk-through offline from disk on data from real runs.
+- A FormWeb 404 page exported as `404/index.html` counts as the site's 404 for every host; build ids are unique per site; the engine allows its own origin on any port; `.fweb` projects open through the vendored FormWeb 0.19.2 engine.
+- Every new string is in all 26 languages.
+
 ## 0.1.1 · 2026-11-10
 
 - Preview: the open site runs from its own local host exactly as a static host would serve it, at Desktop, Laptop, Tablet, Phone or a custom size, with zoom, a forced dark or light theme, reduced motion and a slow network, in frames that never blank between pages.
