@@ -7,7 +7,8 @@ from typing import Any
 from app.services import paths
 from app.services.bus import bus
 
-KEYS = ("theme", "language", "density", "formwebUrl", "checks.chromePath")
+KEYS = ("theme", "language", "density", "formwebUrl", "checks.chromePath", "receive.autoCheck", "receive.autoBuild")
+FLAGS = ("receive.autoCheck", "receive.autoBuild")
 LOOPBACK_URL = re.compile(r"^https?://(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?/?$")
 _lock = threading.Lock()
 
@@ -18,6 +19,8 @@ def defaults() -> dict[str, Any]:
         "language": "en",
         "density": "comfortable",
         "formwebUrl": paths.formweb_url_default(),
+        "receive.autoCheck": False,
+        "receive.autoBuild": False,
     }
 
 
@@ -37,6 +40,10 @@ def _write(data: dict) -> None:
 
 
 def _check(key: str, value: Any) -> Any:
+    if key in FLAGS:
+        if not isinstance(value, bool):
+            raise ValueError(f"{key} must be true or false")
+        return value
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{key} must be a non-empty string")
     value = value.strip()

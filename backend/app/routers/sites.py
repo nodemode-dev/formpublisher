@@ -2,11 +2,11 @@ import os
 import tempfile
 from pathlib import Path
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Query, Request
 from starlette.concurrency import run_in_threadpool
 from starlette.datastructures import UploadFile
 
-from app.services import intake
+from app.services import intake, revisions
 
 router = APIRouter(prefix="/api/sites", tags=["sites"])
 
@@ -79,6 +79,16 @@ def get_site(site_id: str):
 @router.get("/{site_id}/routes")
 def site_routes(site_id: str, revision: str | None = None):
     return intake.site_routes(site_id, revision)
+
+
+@router.get("/{site_id}/revisions")
+def site_revisions(site_id: str):
+    return revisions.list_revisions(site_id)
+
+
+@router.get("/{site_id}/diff")
+def site_diff(site_id: str, from_: str | None = Query(default=None, alias="from"), to: str | None = None):
+    return revisions.diff(site_id, from_, to)
 
 
 @router.delete("/{site_id}")

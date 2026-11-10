@@ -72,6 +72,24 @@ def build(client: Client | None = None) -> MCPServer:
         return await run(link.routes, id)
 
     @server.tool(
+        name="list_revisions",
+        description="List the revisions of an imported site, newest first: revision id, time, file count, bytes, route count, and how many files were added, removed and changed from the revision before. A site gains a revision each time the same FormWeb project arrives again. Read only.",
+        annotations=ToolAnnotations(title="List revisions", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def list_revisions(id: str) -> dict:
+        """id: the site id as returned by list_sites."""
+        return await run(link.revisions, id)
+
+    @server.tool(
+        name="diff_revisions",
+        description="Compare two revisions of a site: the added, removed and changed files (path, size, SHA-256) and the added and removed routes. Without from and to it compares the latest revision with the one before it. Read only.",
+        annotations=ToolAnnotations(title="Diff revisions", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def diff_revisions(id: str, from_revision: str | None = None, to_revision: str | None = None) -> dict:
+        """id: site id from list_sites. from_revision: the older revision id from list_revisions. to_revision: the newer one, default the latest."""
+        return await run(link.diff, id, from_revision, to_revision)
+
+    @server.tool(
         name="run_checks",
         description="Run the checks on an imported site's revision and return the problems with route, severity, code, message and fix. The static tier is offline and always runs; set deep to also drive the installed Chrome at the given widths (slow, needs Playwright). Stores the result for get_checks.",
         annotations=ToolAnnotations(title="Run checks", readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False),
@@ -134,12 +152,12 @@ def build(client: Client | None = None) -> MCPServer:
 
     @server.tool(
         name="prepare_publish",
-        description="Prepare a folder per target for a build and return, for each, the folder path, files, the exact commands to run, notes and warnings. Nothing is uploaded; running the commands is up to the person. Preparing again replaces the folder.",
+        description="Prepare a folder per target for a build and return, for each, the folder path, files, the exact commands to run, notes and warnings. Nothing is uploaded; running the commands is up to the person. Preparing again replaces the folder. FormWeb's model files (site.formweb.json, asset-access.json) are left out of the site folders unless includeModel is true; each result's leftOut lists what was left out.",
         annotations=ToolAnnotations(title="Prepare for publishing", readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False),
     )
-    async def prepare_publish(build: str, targets: list[str]) -> dict:
-        """build: build id from list_builds. targets: target ids from list_targets."""
-        return await run(link.prepare, build, targets)
+    async def prepare_publish(build: str, targets: list[str], includeModel: bool = False) -> dict:
+        """build: build id from list_builds. targets: target ids from list_targets. includeModel: keep FormWeb's model files (site.formweb.json, asset-access.json) in the host folders; default false leaves them out and the result lists them under leftOut."""
+        return await run(link.prepare, build, targets, includeModel)
 
     @server.tool(
         name="get_prepared",

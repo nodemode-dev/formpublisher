@@ -40,6 +40,8 @@ export class Preferences extends Dialog {
   private readonly fwTest: HTMLButtonElement;
   private readonly fwResult: HTMLElement;
   private readonly engineValue: HTMLElement;
+  private readonly autoCheck: HTMLInputElement;
+  private readonly autoBuild: HTMLInputElement;
   private saved = '';
   private section: PrefsSection = 'general';
 
@@ -65,6 +67,8 @@ export class Preferences extends Dialog {
 <div class="fp-pref-block"><label class="fp-pref-name" for="fp-fw-url">FormWeb address</label><div class="fp-pref-hint">FormWeb runs on this computer, for example http://127.0.0.1:8240. Test saves a changed address first.</div>
 <div class="fp-fw-row"><input id="fp-fw-url" class="fp-input is-mono" type="text" spellcheck="false" autocomplete="off" translate="no" placeholder="http://127.0.0.1:8240"><button class="fp-btn" type="button" data-act="fw-save">Save</button><button class="fp-btn" type="button" data-act="fw-test">Test</button></div>
 <div class="fp-fw-result" role="status" aria-live="polite"></div></div>
+<div class="fp-pref-row"><div class="fp-pref-text"><label class="fp-pref-name" for="fp-auto-check">Check a site when it arrives</label><div class="fp-pref-hint">Runs the static checks on each site FormWeb sends, so the problems are ready when you open it. Off by default.</div></div><input id="fp-auto-check" class="fp-pref-check" type="checkbox" data-ctl="auto-check"></div>
+<div class="fp-pref-row"><div class="fp-pref-text"><label class="fp-pref-name" for="fp-auto-build">Build a site when it arrives</label><div class="fp-pref-hint">Builds the package as soon as a site arrives, after the checks when both are on. Off by default.</div></div><input id="fp-auto-build" class="fp-pref-check" type="checkbox" data-ctl="auto-build"></div>
 </section>
 <section class="fp-prefs-page" data-sec="about" hidden>
 <h3 class="fp-prefs-h">About</h3>
@@ -94,6 +98,10 @@ export class Preferences extends Dialog {
     this.fwTest = q<HTMLButtonElement>(root, '[data-act="fw-test"]');
     this.fwResult = q(root, '.fp-fw-result');
     this.engineValue = q(root, '[data-field="engine"]');
+    this.autoCheck = q<HTMLInputElement>(root, '[data-ctl="auto-check"]');
+    this.autoBuild = q<HTMLInputElement>(root, '[data-ctl="auto-build"]');
+    this.autoCheck.addEventListener('change', () => { void this.saveFlag('receive.autoCheck', this.autoCheck); });
+    this.autoBuild.addEventListener('change', () => { void this.saveFlag('receive.autoBuild', this.autoBuild); });
     const lang = q<HTMLSelectElement>(root, '[data-ctl="language"]');
     lang.value = storedLanguage();
 
@@ -184,8 +192,22 @@ export class Preferences extends Dialog {
       const url = typeof s.formwebUrl === 'string' ? s.formwebUrl : '';
       this.saved = url;
       setValue(this.fwInput, url);
+      this.autoCheck.checked = s['receive.autoCheck'] === true;
+      this.autoBuild.checked = s['receive.autoBuild'] === true;
     } catch {
       this.result('The engine is not reachable', true);
+    }
+  }
+
+  private async saveFlag(key: 'receive.autoCheck' | 'receive.autoBuild', box: HTMLInputElement): Promise<void> {
+    const wanted = box.checked;
+    try {
+      const s = await api.putSettings({ [key]: wanted });
+      box.checked = s[key] === true;
+      emit('fp:settings-changed', {});
+    } catch (e) {
+      box.checked = !wanted;
+      emit('fp:notice', { kind: 'error', text: e instanceof Error ? e.message : 'Request failed' });
     }
   }
 
