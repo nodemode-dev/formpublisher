@@ -117,12 +117,14 @@ def copy_site(inp: PreparedInput, dest: Path) -> None:
         (dest / "404.html").write_bytes(re.sub(rb'((?:href|src|poster|action)=")\.\./', rb"\1/", page))
 
 
-def put(out: Path, rel: str, data: Any) -> None:
+def put(out: Path, rel: str, data: Any, mode: int | None = None) -> None:
     target = out / rel
     target.parent.mkdir(parents=True, exist_ok=True)
     if isinstance(data, str):
         data = data.replace("\r\n", "\n").encode("utf-8")
     target.write_bytes(data)
+    if mode is not None:
+        target.chmod(mode)
 
 
 def netlify_style(inp: PreparedInput, result: PreparedResult, with_404: bool) -> tuple[str, str]:

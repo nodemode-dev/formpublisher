@@ -1,5 +1,6 @@
 import re
 import shutil
+import socket
 import subprocess
 import tempfile
 from pathlib import Path
@@ -11,7 +12,8 @@ NAME = "nginx"
 DESCRIPTION = "A server block with try_files, redirects, headers and gzip, plus a docker run line."
 LOCAL_TOOL = "sh nginx-check.sh"
 
-CHECK_SCRIPT = """set -u
+CHECK_SCRIPT = """#!/bin/sh
+set -u
 command -v nginx >/dev/null 2>&1 || { echo "nginx-check.sh: nginx was not found on this machine." >&2; exit 127; }
 here=$(cd "$(dirname "$0")" && pwd) || exit 1
 scratch=$(mktemp -d "${TMPDIR:-/tmp}/formpublisher-nginx.XXXXXX") || exit 1
@@ -93,12 +95,61 @@ def _local_listens(text: str, scratch: Path) -> str:
     return re.sub(r"^([ \t]*)listen[ \t][^;\n]*;", swap, text, flags=re.M)
 
 
+LISTEN_RX = re.compile(r"^([ \t]*)listen[ \t]+[^\s;]+([^;\n]*);", re.M)
+
+
+def _free_ports(count: int) -> list[int] | None:
+    held = []
+    ports = []
+    try:
+        for _ in range(count):
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            held.append(sock)
+            sock.bind(("127.0.0.1", 0))
+            ports.append(sock.getsockname()[1])
+    except OSError:
+        return None
+    finally:
+        for sock in held:
+            sock.close()
+    return ports
+
+
+def _loopback_listens(text: str, ports: list[int]) -> str:
+    count = [0]
+
+    def swap(found: re.Match) -> str:
+        port = ports[count[0]]
+        count[0] += 1
+        return f"{found.group(1)}listen 127.0.0.1:{port}{found.group(2)};"
+
+    return LISTEN_RX.sub(swap, text)
+
+
+def _run_nginx(exe: str, scratch: Path, confdir: Path, folder: Path) -> tuple[bool, str]:
+    run = subprocess.run(
+        [exe, "-t", "-p", str(scratch) + "/", "-e", str(scratch / "error.log"), "-c", str(confdir / "nginx-test.conf")],
+        capture_output=True,
+        text=True,
+        errors="replace",
+        timeout=CHECK_SECONDS,
+        stdin=subprocess.DEVNULL,
+        cwd=scratch,
+    )
+    printed = run.stderr + ("\n" + run.stdout if run.stdout.strip() else "")
+    tagged = [line for line in printed.splitlines() if line.startswith("nginx:")]
+    printed = "\n".join(tagged) if tagged else printed
+    return run.returncode == 0, _trim(printed.replace(str(confdir), str(folder)))
+
+
 def check(folder: Path) -> dict:
-    """Run nginx -t on a prepared folder's nginx-test.conf, from a copy in a fresh scratch folder.
+    """Run nginx -t on a prepared folder's nginx-test.conf, from a copy in a fresh scratch folder, in two passes.
 
-    nginx -t opens every listen socket, so the copy swaps each listen for a unix socket inside the scratch folder: no port is bound, no network is used and a normal user can run it. The prefix, pid, temp paths and error log all sit under the scratch folder and there is no user directive.
+    nginx -t opens every listen socket, so the first pass swaps each listen for a unix socket inside the scratch folder: no port is bound, no network is used and a normal user can run it. The prefix, pid, temp paths and error log all sit under the scratch folder and there is no user directive.
 
-    Returns {"ran", "ok", "version", "output"}. When nginx is not on PATH, or the folder has no nginx-test.conf, "ran" is false and "ok" is None.
+    When that passes and free loopback TCP ports can be had, the second pass keeps every listen line's parameters and points its address and port at 127.0.0.1 and a free port, so the listen lines themselves are parsed. A failure there fails the check; a bind trouble or no free port skips the pass.
+
+    Returns {"ran", "ok", "version", "output", "listen"}; "listen" is {"ran", "ok", "output"}. When nginx is not on PATH, or the folder has no nginx-test.conf, "ran" is false and "ok" is None.
     """
     exe = shutil.which("nginx")
     conf = Path(folder) / "nginx-test.conf"
@@ -117,26 +168,32 @@ def check(folder: Path) -> dict:
         confdir.mkdir()
         shutil.copyfile(conf, confdir / "nginx-test.conf")
         site_conf = Path(folder) / "formpublisher.conf"
-        if site_conf.is_file():
-            (confdir / "formpublisher.conf").write_text(_local_listens(site_conf.read_text(encoding="utf-8", errors="replace"), scratch), encoding="utf-8")
+        site_text = site_conf.read_text(encoding="utf-8", errors="replace") if site_conf.is_file() else None
+        if site_text is not None:
+            (confdir / "formpublisher.conf").write_text(_local_listens(site_text, scratch), encoding="utf-8")
+        skipped = {"ran": False, "ok": None, "output": ""}
         try:
-            run = subprocess.run(
-                [exe, "-t", "-p", str(scratch) + "/", "-e", str(scratch / "error.log"), "-c", str(confdir / "nginx-test.conf")],
-                capture_output=True,
-                text=True,
-                errors="replace",
-                timeout=CHECK_SECONDS,
-                stdin=subprocess.DEVNULL,
-                cwd=scratch,
-            )
+            ok, output = _run_nginx(exe, scratch, confdir, Path(folder))
         except subprocess.TimeoutExpired:
-            return {"ran": True, "ok": False, "version": version, "output": f"nginx -t did not finish within {CHECK_SECONDS} seconds."}
+            return {"ran": True, "ok": False, "version": version, "output": f"nginx -t did not finish within {CHECK_SECONDS} seconds.", "listen": skipped}
         except OSError as exc:
-            return {"ran": False, "ok": None, "version": version, "output": _trim(str(exc))}
-        printed = run.stderr + ("\n" + run.stdout if run.stdout.strip() else "")
-        tagged = [line for line in printed.splitlines() if line.startswith("nginx:")]
-        printed = "\n".join(tagged) if tagged else printed
-        return {"ran": True, "ok": run.returncode == 0, "version": version, "output": _trim(printed.replace(str(confdir), str(Path(folder))))}
+            return {"ran": False, "ok": None, "version": version, "output": _trim(str(exc)), "listen": skipped}
+        if not ok or site_text is None:
+            return {"ran": True, "ok": ok, "version": version, "output": output, "listen": skipped}
+        wanted = len(LISTEN_RX.findall(site_text))
+        ports = _free_ports(wanted) if wanted else None
+        if ports is None:
+            return {"ran": True, "ok": True, "version": version, "output": output, "listen": skipped}
+        (confdir / "formpublisher.conf").write_text(_loopback_listens(site_text, ports), encoding="utf-8")
+        try:
+            listen_ok, listen_output = _run_nginx(exe, scratch, confdir, Path(folder))
+        except (subprocess.SubprocessError, OSError):
+            return {"ran": True, "ok": True, "version": version, "output": output, "listen": skipped}
+        if not listen_ok and "Address already in use" in listen_output:
+            return {"ran": True, "ok": True, "version": version, "output": output, "listen": skipped}
+        if not listen_ok:
+            return {"ran": True, "ok": False, "version": version, "output": listen_output, "listen": {"ran": True, "ok": False, "output": listen_output}}
+        return {"ran": True, "ok": True, "version": version, "output": output, "listen": {"ran": True, "ok": True, "output": listen_output}}
     finally:
         shutil.rmtree(scratch, ignore_errors=True)
 
@@ -156,7 +213,9 @@ def annotate(result: PreparedResult, folder: Path) -> None:
     if not report["ran"]:
         result.notes.append("nginx -t runs where nginx is installed; nginx was not found on this machine, so the config was not checked here.")
     elif report["ok"]:
-        result.notes.append(f"nginx -t passed with nginx {report['version']}." if report["version"] else "nginx -t passed.")
+        with_version = f"The config passed nginx -t with nginx {report['version']}" if report["version"] else "The config passed nginx -t"
+        listen = report.get("listen") or {}
+        result.notes.append(with_version + (", and so did its listen lines on a loopback port." if listen.get("ran") else "; its listen lines were not checked on a loopback port because none was free."))
     else:
         result.warnings.append(f"nginx -t failed: {message_of(report)}")
 
@@ -224,7 +283,7 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
     lines += ["    location / {", "        try_files $uri $uri/ $uri.html =404;", "    }", "}"]
     put(out, "formpublisher.conf", "\n".join(lines) + "\n")
     put(out, "nginx-test.conf", TEST_CONF.format(types=TYPES))
-    put(out, "nginx-check.sh", CHECK_SCRIPT)
+    put(out, "nginx-check.sh", CHECK_SCRIPT, 0o755)
     result.command("Check the config", "sh nginx-check.sh")
     result.command(
         "Run it in Docker",
