@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.8
-Last updated: 2026-11-10 · Phases 25 to 27: one restore dialog, Restore from the notice, the nginx -t line
+Current build version: v0.1.9
+Last updated: 2026-11-10 · Phase 29: every target's words keyed for the Publish sheet in all 26 languages
 
 ---
 
@@ -220,3 +220,11 @@ The executor spec is `TURN_I_SPEC.md` in the 0.1.8 planning sidecar.
 `api-publish.ts`: `NginxCheck` and `VerifyReport.nginx`. `ui/publish-sheet.ts`: `nginxLine` turns it into one line (passed with the version, failed with nginx's first `[emerg]` or `[alert]` line, or not installed); the result card has a `data-f="nginx"` row, shown only for the nginx target, so its space exists before verify runs. `styles/publish.css`: `.fp-pub-nginx` is a fixed 18 px single line with an ellipsis. Six keys in `i18n/keys/part14.json` and all 25 locale folders.
 
 Checked: `npm run build`. Headless Chrome against lab engines: a site entry with no origin restored with a typed place after an inline place-taken refusal, and a locked key with a damaged record restored after a wrong passphrase, in one dialog with the panel unchanged; a build removed under an open Publish sheet came back from the notice and the prepare ran again; a removed site came back and listed; a build whose place was taken opened the Trash page with the reason; the nginx line kept its top and height for passed and failed results. CLS 0 throughout, in dark and light. `docs/images/restore-dialog-dark.webp`, `-light.webp`, `notice-restore-dark.webp` and `-light.webp`.
+
+## Phase 29: the Publish sheet in every language · v0.1.9 (2026-11-10)
+
+The executor spec is `TURN_J_SPEC.md` in the 0.1.9 planning sidecar.
+
+`i18n/keys/part15.json` (new, 65 keys): every description, command label, note and warning that `backend/app/targets/*.py`, `_common.py` (`netlify_style`, the `copy_site` fallback notes) and the nginx check can answer, written for the translator's matching rules in `i18n/index.ts` (exact keys first, then `{n}` patterns anchored at both ends, each placeholder matching any text; a trailing period or colon is retried without it). Paths, file names, counts, rule text, versions and nginx's own messages are `{0}` to `{2}`; the GitHub Pages splat note's `{2}` is filled with one of three keyed phrases (the site's base URL, the canonical link of the 404 page, the default), which the translator translates on their own. No component changed: the target description, the command labels, and the note and warning list items were already plain text outside `translate="no"`, and the command lines themselves sit in `.fp-pub-code` marked `translate="no"`, which the translator skips. The 25 locale folders hold `part15.json`, es-MX and fr-CA as full maps; languages that inflect keep counts and names standing alone.
+
+Checked: three FormWeb exports (a 404 page with exact and splat rules, an older export with only `404/index.html`, no 404 page) prepared on all six targets gave 52 distinct strings and a direct run of the target modules over rare cases 61, each matching exactly one key under the translator's rules (P2); the director's run matched all 45 strings one prepare answered and found all 65 keys in all 25 folders with their placeholders; `npm run build`.
