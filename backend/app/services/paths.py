@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 DEFAULT_PORT = 8280
+DEFAULT_HOST_PORT = 8281
 DEFAULT_ORIGINS = (
     "http://localhost:5280",
     "http://127.0.0.1:5280",
@@ -42,6 +43,19 @@ def port() -> int:
     except ValueError:
         return DEFAULT_PORT
     return value if 0 < value < 65536 else DEFAULT_PORT
+
+
+def host_port() -> int:
+    raw = os.environ.get("FORMPUBLISHER_HOST_PORT", "").strip()
+    try:
+        value = int(raw) if raw else DEFAULT_HOST_PORT
+    except ValueError:
+        return DEFAULT_HOST_PORT
+    return value if 0 < value < 65536 else DEFAULT_HOST_PORT
+
+
+def host_origin() -> str:
+    return f"http://127.0.0.1:{host_port()}"
 
 
 def origins() -> list[str]:
