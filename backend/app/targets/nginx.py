@@ -124,5 +124,7 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
     )
     result.notes.append("formpublisher.conf is one server block for conf.d; nginx-test.conf wraps it so nginx -t can parse it alone.")
     result.notes.append("Unknown paths return 404 through try_files" + (" and show the site's 404.html." if inp.has_404 else "; the site has no 404.html, so nginx shows its own page."))
+    if inp.fallback_404:
+        result.notes.append("This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.")
     result.notes.append("absolute_redirect is off so redirects keep working behind a port mapping or a proxy.")
     return result

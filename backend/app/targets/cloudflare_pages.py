@@ -28,6 +28,8 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
     result.command("Run it locally", "npx wrangler pages dev site")
     result.notes.append(f"Cloudflare allows {STATIC_LIMIT} static and {DYNAMIC_LIMIT} dynamic redirect rules in _redirects.")
     result.notes.append("No 404 rule is written: Pages serves 404.html on its own when the file exists.")
+    if inp.fallback_404:
+        result.notes.append("This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.")
     if not inp.has_404:
         result.warnings.append("The site has no 404.html, so Cloudflare Pages treats it as a single-page app and serves index.html with status 200 for unknown paths. Add a 404 page in FormWeb.")
     return result

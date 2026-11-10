@@ -37,4 +37,6 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
     result.command("Serve it locally", "python3 -m http.server -d site 8080")
     result.notes.append("site.zip is the build's own bytes, so its hash matches publish.json and any signature.")
     result.notes.append("This host has no server rules: redirects and headers in publish.json are not applied by a plain file server.")
+    if inp.fallback_404:
+        result.notes.append("This export has 404/index.html and no 404.html; a host that needs a 404.html must be given a copy of it.")
     return result

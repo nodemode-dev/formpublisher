@@ -61,6 +61,8 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
     result.command("Production deploy", "npx vercel deploy site --prod")
     result.command("Run it locally", "npx vercel dev site")
     result.notes.append("vercel.json sits inside site/ so the deploy picks it up; Vercel serves 404.html itself when the file exists.")
+    if inp.fallback_404:
+        result.notes.append("This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.")
     if not inp.has_404:
         result.notes.append("The site has no 404.html, so Vercel shows its own not-found page.")
     return result
