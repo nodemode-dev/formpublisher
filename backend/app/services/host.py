@@ -304,7 +304,7 @@ async def serve_file(send, method: str, request_headers: dict, serving: Serving,
 
 
 async def serve_missing(send, method: str, request_headers: dict, serving: Serving) -> None:
-    page = inside(serving.root, serving.root / "404.html")
+    page = inside(serving.root, serving.root / "404.html") or inside(serving.root, serving.root / "404" / "index.html")
     if page is not None:
         await serve_file(send, method, request_headers, serving, page, 404)
         return
