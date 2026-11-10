@@ -1,0 +1,11 @@
+{
+  "Open the trash": "เปิดถังขยะ",
+  "Try again": "ลองอีกครั้ง",
+  "Show the running check": "แสดงการตรวจสอบที่กำลังทำงาน",
+  "Open the manual": "เปิดคู่มือ",
+  "Enter the passphrase": "ป้อนวลีรหัสผ่าน",
+  "Passphrase needed": "ต้องใช้วลีรหัสผ่าน",
+  "Passphrase": "วลีรหัสผ่าน",
+  "{0} is locked. Type its passphrase to restore it.": "{0} ถูกล็อก พิมพ์วลีรหัสผ่านเพื่อกู้คืน",
+  "Type the passphrase.": "พิมพ์วลีรหัสผ่าน"
+}

@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Otevřít koš",
+  "Try again": "Zkusit znovu",
+  "Show the running check": "Zobrazit probíhající kontrolu",
+  "Open the manual": "Otevřít příručku",
+  "Enter the passphrase": "Zadat heslo",
+  "Passphrase needed": "Je potřeba heslo",
+  "Passphrase": "Heslo klíče",
+  "{0} is locked. Type its passphrase to restore it.": "Klíč {0} je zamčený. Zadejte jeho heslo a obnovte ho.",
+  "Type the passphrase.": "Zadejte heslo."
+}

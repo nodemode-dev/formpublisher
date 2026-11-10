@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Öppna papperskorgen",
+  "Try again": "Försök igen",
+  "Show the running check": "Visa den pågående kontrollen",
+  "Open the manual": "Öppna manualen",
+  "Enter the passphrase": "Ange lösenfrasen",
+  "Passphrase needed": "Lösenfras krävs",
+  "Passphrase": "Lösenfras",
+  "{0} is locked. Type its passphrase to restore it.": "{0} är låst. Skriv lösenfrasen för att återställa den.",
+  "Type the passphrase.": "Skriv lösenfrasen."
+}

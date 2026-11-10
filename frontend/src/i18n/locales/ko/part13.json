@@ -1,0 +1,11 @@
+{
+  "Open the trash": "휴지통 열기",
+  "Try again": "다시 시도",
+  "Show the running check": "실행 중인 검사 보기",
+  "Open the manual": "설명서 열기",
+  "Enter the passphrase": "암호 문구 입력",
+  "Passphrase needed": "암호 문구 필요",
+  "Passphrase": "암호 문구",
+  "{0} is locked. Type its passphrase to restore it.": "{0} 키가 잠겨 있습니다. 복원하려면 암호 문구를 입력하세요.",
+  "Type the passphrase.": "암호 문구를 입력하세요."
+}

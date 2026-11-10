@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Mở thùng rác",
+  "Try again": "Thử lại",
+  "Show the running check": "Hiển thị lần kiểm tra đang chạy",
+  "Open the manual": "Mở hướng dẫn sử dụng",
+  "Enter the passphrase": "Nhập cụm mật khẩu",
+  "Passphrase needed": "Cần cụm mật khẩu",
+  "Passphrase": "Cụm mật khẩu",
+  "{0} is locked. Type its passphrase to restore it.": "Khóa {0} đã bị khóa. Nhập cụm mật khẩu của khóa để khôi phục.",
+  "Type the passphrase.": "Nhập cụm mật khẩu."
+}

@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Открыть корзину",
+  "Try again": "Повторить",
+  "Show the running check": "Показать выполняемую проверку",
+  "Open the manual": "Открыть руководство",
+  "Enter the passphrase": "Ввести парольную фразу",
+  "Passphrase needed": "Нужна парольная фраза",
+  "Passphrase": "Парольная фраза",
+  "{0} is locked. Type its passphrase to restore it.": "Ключ {0} заблокирован. Введите его парольную фразу, чтобы восстановить его.",
+  "Type the passphrase.": "Введите парольную фразу."
+}

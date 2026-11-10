@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Kuka megnyitása",
+  "Try again": "Újrapróbálás",
+  "Show the running check": "A futó ellenőrzés megjelenítése",
+  "Open the manual": "Kézikönyv megnyitása",
+  "Enter the passphrase": "Jelmondat megadása",
+  "Passphrase needed": "Jelmondat szükséges",
+  "Passphrase": "Jelmondat",
+  "{0} is locked. Type its passphrase to restore it.": "A(z) {0} zárolva van. A visszaállításhoz írja be a jelmondatát.",
+  "Type the passphrase.": "Írja be a jelmondatot."
+}

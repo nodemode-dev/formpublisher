@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Ouvrir la corbeille",
+  "Try again": "Réessayer",
+  "Show the running check": "Afficher la vérification en cours",
+  "Open the manual": "Ouvrir le manuel",
+  "Enter the passphrase": "Saisir la phrase secrète",
+  "Passphrase needed": "Phrase secrète requise",
+  "Passphrase": "Phrase secrète",
+  "{0} is locked. Type its passphrase to restore it.": "{0} est verrouillée. Saisissez sa phrase secrète pour la restaurer.",
+  "Type the passphrase.": "Saisissez la phrase secrète."
+}

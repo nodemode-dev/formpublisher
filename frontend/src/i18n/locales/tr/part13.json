@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Çöp kutusunu aç",
+  "Try again": "Tekrar dene",
+  "Show the running check": "Çalışan denetimi göster",
+  "Open the manual": "Kılavuzu aç",
+  "Enter the passphrase": "Parolayı gir",
+  "Passphrase needed": "Parola gerekli",
+  "Passphrase": "Parola",
+  "{0} is locked. Type its passphrase to restore it.": "{0} kilitli. Geri yüklemek için parolasını yazın.",
+  "Type the passphrase.": "Parolayı yazın."
+}

@@ -1,0 +1,11 @@
+{
+  "Open the trash": "開啟垃圾桶",
+  "Try again": "重試",
+  "Show the running check": "顯示執行中的檢查",
+  "Open the manual": "開啟手冊",
+  "Enter the passphrase": "輸入密碼短語",
+  "Passphrase needed": "需要密碼短語",
+  "Passphrase": "密碼短語",
+  "{0} is locked. Type its passphrase to restore it.": "{0} 已鎖定。請輸入其密碼短語以還原。",
+  "Type the passphrase.": "請輸入密碼短語。"
+}

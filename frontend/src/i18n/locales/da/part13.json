@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Åbn papirkurven",
+  "Try again": "Prøv igen",
+  "Show the running check": "Vis den igangværende kontrol",
+  "Open the manual": "Åbn manualen",
+  "Enter the passphrase": "Indtast adgangssætningen",
+  "Passphrase needed": "Adgangssætning påkrævet",
+  "Passphrase": "Adgangssætning",
+  "{0} is locked. Type its passphrase to restore it.": "{0} er låst. Skriv dens adgangssætning for at gendanne den.",
+  "Type the passphrase.": "Skriv adgangssætningen."
+}
