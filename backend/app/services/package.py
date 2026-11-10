@@ -6,12 +6,11 @@ import shutil
 import tempfile
 import threading
 import zipfile
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from app import __version__
-from app.services import intake, paths
+from app.services import intake, paths, trash
 from app.services.bus import bus
 
 ID_RE = re.compile(r"^[0-9a-f]{12}$")
@@ -274,13 +273,7 @@ def compare(a: str, b: str) -> dict:
 def remove_build(build_id: str) -> dict:
     with _lock:
         folder = _find(build_id)
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        target = paths.trash_dir() / f"build-{folder.parent.name}-{build_id}-{stamp}"
-        counter = 2
-        while target.exists():
-            target = paths.trash_dir() / f"build-{folder.parent.name}-{build_id}-{stamp}-{counter}"
-            counter += 1
-        shutil.move(str(folder), str(target))
+        target = trash.move(folder, "build", build_id, trash.rel(folder))
     bus.emit("builds.removed", id=build_id)
     return {"id": build_id, "removed": True, "trash": str(target)}
 
