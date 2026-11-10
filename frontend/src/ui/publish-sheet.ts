@@ -8,6 +8,7 @@ import { copyText, fmtCount, fmtDate } from './builds';
 import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
+import { refuseStep } from './notice-step';
 import { toast } from './toast';
 
 type Tone = '' | 'ok' | 'error';
@@ -389,6 +390,7 @@ class PublishSheet extends Dialog {
         await this.loadPrepared(made.id);
       } catch (e) {
         say(this.f.buildnote, message(e), 'error');
+        refuseStep(e, this.site);
       }
     });
   }
@@ -417,6 +419,7 @@ class PublishSheet extends Dialog {
         say(this.f.prep, `Prepared ${names}`, 'ok');
       } catch (e) {
         say(this.f.prep, message(e), 'error');
+        refuseStep(e, build);
       }
     });
   }

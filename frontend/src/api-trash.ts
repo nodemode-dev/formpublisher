@@ -36,7 +36,7 @@ async function failure(res: Response): Promise<ApiError> {
   } catch {
     message = message || 'Request failed';
   }
-  return res.status === 409 && code === 'origin-unknown' ? new OriginUnknownError(message, res.status) : new ApiError(message, res.status);
+  return res.status === 409 && code === 'origin-unknown' ? new OriginUnknownError(message, res.status, code) : new ApiError(message, res.status, code);
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -76,10 +76,13 @@ export const trashApi = {
     const rows = Array.isArray(raw) ? raw : isObj(raw) && Array.isArray(raw.entries) ? raw.entries : [];
     return rows.map(toEntry).filter((e): e is TrashEntry => e !== null);
   },
-  async restore(entry: string, origin?: string): Promise<void> {
-    const init: RequestInit = origin === undefined
+  async restore(entry: string, origin?: string, passphrase?: string): Promise<void> {
+    const payload: Json = {};
+    if (origin !== undefined) payload.origin = origin;
+    if (passphrase !== undefined) payload.passphrase = passphrase;
+    const init: RequestInit = Object.keys(payload).length === 0
       ? { method: 'POST' }
-      : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ origin }) };
+      : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) };
     await request<unknown>(`/api/trash/${encodeURIComponent(entry)}/restore`, init);
   },
   async remove(entry: string): Promise<void> {
