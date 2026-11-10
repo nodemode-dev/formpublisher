@@ -61,7 +61,9 @@ def host_origin() -> str:
 def origins() -> list[str]:
     raw = os.environ.get("FORMPUBLISHER_ORIGINS", "").strip()
     if not raw:
-        return list(DEFAULT_ORIGINS)
+        # The engine serves the built window itself, so its own origin is allowed on whatever port it runs.
+        own = (f"http://127.0.0.1:{port()}", f"http://localhost:{port()}")
+        return list(dict.fromkeys((*DEFAULT_ORIGINS, *own)))
     return [item.strip().rstrip("/") for item in raw.split(",") if item.strip()]
 
 
@@ -102,12 +104,16 @@ def trash_dir() -> Path:
     return sub("trash")
 
 
+def inbox_dir() -> Path:
+    return sub("inbox")
+
+
 def settings_file() -> Path:
     return home() / "settings.json"
 
 
 def ensure_layout() -> None:
-    for make in (sites_dir, builds_dir, keys_dir, prepared_dir, trash_dir):
+    for make in (sites_dir, builds_dir, keys_dir, prepared_dir, trash_dir, inbox_dir):
         make()
 
 
