@@ -5,11 +5,13 @@ const MAX = 4;
 
 export type ToastKind = 'info' | 'ok' | 'error';
 
-export function toast(text: string, kind: ToastKind = 'info'): void {
+export interface ToastAction { label: string; run: () => void }
+
+export function toast(text: string, kind: ToastKind = 'info', action?: ToastAction): void {
   const root = document.getElementById('toast-root');
   if (!root) return;
-  const ms = kind === 'error' ? 6000 : 3600;
-  const cls = `fp-toast${kind === 'error' ? ' is-error' : ''}`;
+  const ms = action ? 9000 : kind === 'error' ? 6000 : 3600;
+  const cls = `fp-toast${kind === 'error' ? ' is-error' : ''}${action ? ' has-action' : ''}`;
   const same = Array.from(root.children).find((n) => (n as HTMLElement).dataset.text === text && n.className === cls);
   if (same) {
     window.clearTimeout(timers.get(same));
@@ -17,7 +19,16 @@ export function toast(text: string, kind: ToastKind = 'info'): void {
     return;
   }
   const node = el(`<div class="${cls}" role="status"></div>`);
-  node.textContent = text;
+  if (action) {
+    const msg = document.createElement('span');
+    msg.textContent = text;
+    const act = el<HTMLButtonElement>('<button class="fp-btn fp-btn-sm fp-toast-act" type="button"></button>');
+    act.textContent = action.label;
+    act.addEventListener('click', () => { dismissToast(node); action.run(); });
+    node.append(msg, act);
+  } else {
+    node.textContent = text;
+  }
   node.dataset.text = text;
   root.appendChild(node);
   while (root.children.length > MAX) dismissToast(root.firstElementChild as Element);

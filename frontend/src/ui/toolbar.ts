@@ -1,4 +1,5 @@
 import type { PreviewMotion, PreviewTheme, PreviewThrottle } from '../api-host';
+import { emit } from '../events';
 import { q, setDisabled } from './dom';
 import { icon } from './icons';
 
@@ -78,6 +79,7 @@ ${select('throttle', 'Preview network', [['none', 'Network: None'], ['fast', 'Ne
 <button class="fp-icon-btn" type="button" data-ctl="reload" title="Reload" aria-label="Reload">${icon('reload', 16)}</button>
 <button class="fp-icon-btn" type="button" data-ctl="browser" title="Open in browser" aria-label="Open in browser">${icon('globe', 16)}</button>
 <span class="fp-tb-grow"></span>
+<button class="fp-btn" type="button" data-ctl="publish" title="Prepare this site for a host">${icon('publish', 14)}<span>Publish</span></button>
 <button class="fp-btn fp-btn-primary" type="button" data-ctl="package" title="Package this site">${icon('archive', 14)}<span>Package</span></button>`;
 
 export function normalizePath(input: string): string {
@@ -117,7 +119,8 @@ export class Toolbar {
     const reload = ctl<HTMLButtonElement>('reload');
     const browser = ctl<HTMLButtonElement>('browser');
     const pack = ctl<HTMLButtonElement>('package');
-    this.gated = [this.field, reload, browser, pack];
+    const publish = ctl<HTMLButtonElement>('publish');
+    this.gated = [this.field, reload, browser, publish, pack];
     this.paintControls();
     this.setActive(false);
 
@@ -164,6 +167,7 @@ export class Toolbar {
     reload.addEventListener('click', () => hooks.reload());
     browser.addEventListener('click', () => hooks.openBrowser());
     pack.addEventListener('click', () => hooks.packageSite());
+    publish.addEventListener('click', () => emit('fp:publish', { source: 'toolbar' }));
   }
 
   current(): PreviewState {

@@ -24,6 +24,7 @@ export interface FpEventMap {
   'fp:probe': ProbeMessage;
   'fp:checks': { siteId: string; revision: string; status: Record<string, RouteStatus>; thumbs: Record<string, string> };
   'fp:live': { type: string; [key: string]: unknown };
+  'fp:publish': { source: 'toolbar' | 'palette' | 'package'; build?: string };
 }
 
 export type FpEventName = keyof FpEventMap;

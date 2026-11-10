@@ -7,6 +7,7 @@ import { Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
 import { runChecks } from './panel';
+import { installPublish } from './publish-sheet';
 
 type Tone = '' | 'ok' | 'error';
 
@@ -43,6 +44,7 @@ class PackageSheet extends Dialog {
   private readonly buildBtn: HTMLButtonElement;
   private readonly downloadBtn: HTMLButtonElement;
   private readonly libraryBtn: HTMLButtonElement;
+  private readonly publishBtn: HTMLButtonElement;
   private readonly bar: HTMLElement;
   private readonly dot: HTMLElement;
 
@@ -93,6 +95,7 @@ class PackageSheet extends Dialog {
     this.button('Close', 'ghost', () => this.close());
     this.libraryBtn = this.button('Show in library', 'ghost', () => this.toLibrary());
     this.downloadBtn = this.button('Download', 'ghost', () => this.download());
+    this.publishBtn = this.button('Publish', 'ghost', () => this.toPublish());
     this.buildBtn = this.button('Build', 'primary', () => { void this.runBuild(); });
     this.wire();
     this.sync();
@@ -220,6 +223,7 @@ class PackageSheet extends Dialog {
     setDisabled(this.copyBtn, !has);
     setDisabled(this.downloadBtn, this.busy || !has);
     setDisabled(this.libraryBtn, !has);
+    setDisabled(this.publishBtn, this.busy || !has);
     setDisabled(this.newBtn, this.busy);
     setDisabled(this.createBtn, this.busy);
     setDisabled(this.pass, this.busy || !key || !key.encrypted);
@@ -353,6 +357,13 @@ class PackageSheet extends Dialog {
     a.remove();
   }
 
+  private toPublish(): void {
+    const id = this.build?.id;
+    if (!id) return;
+    this.close();
+    emit('fp:publish', { source: 'package', build: id });
+  }
+
   private toLibrary(): void {
     const id = this.build?.id;
     if (!id) return;
@@ -386,6 +397,7 @@ let sheet: PackageSheet | null = null;
 
 export function installPackaging(app: App): void {
   sheet ??= new PackageSheet(app);
+  installPublish(app);
   on('fp:live', (ev) => {
     if (ev.type === 'checks.done' && typeof ev.site === 'string') sheet?.refreshFor(ev.site);
   });
