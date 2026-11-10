@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod files;
 mod reveal;
 
 use std::io::{Read, Write};
@@ -269,7 +270,7 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(Backend(Mutex::new(None)))
-        .invoke_handler(tauri::generate_handler![reveal::app_ready, open_window])
+        .invoke_handler(tauri::generate_handler![reveal::app_ready, open_window, files::reveal_path])
         .setup(|app| {
             let handle = app.handle().clone();
             reveal::round_splash(&handle);

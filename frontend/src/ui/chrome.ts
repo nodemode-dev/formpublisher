@@ -186,7 +186,12 @@ export function installChrome(app: App): Chrome {
         const dir = String((await api.settings()).home ?? '');
         if (!dir) throw new Error('The data folder is not known');
         const sep = dir.includes('\\') ? '\\' : '/';
-        await openExternal([dir.replace(/[\\/]+$/, ''), 'sites', id].join(sep));
+        const { invoke } = await import('@tauri-apps/api/core');
+        try {
+          await invoke('reveal_path', { path: [dir.replace(/[\\/]+$/, ''), 'sites', id].join(sep) });
+        } catch (e) {
+          throw new Error(typeof e === 'string' ? e : e instanceof Error ? e.message : 'The folder could not be shown');
+        }
       },
     },
 

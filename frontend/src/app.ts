@@ -3,7 +3,7 @@ import type { App, AppState, BottomTab, EngineState, Mounts, OpenTab, Pane } fro
 import { emit, type NoticeKind } from './events';
 import { locale } from './i18n';
 import { brandMark } from './ui/brand';
-import { mountOnce, q, setAttr, setClass, setDisabled, setHidden, setText, setTitle, setValue } from './ui/dom';
+import { inTauri, mountOnce, q,setAttr, setClass, setDisabled, setHidden, setText, setTitle, setValue } from './ui/dom';
 import { installHints } from './ui/hint-strip';
 import { icon } from './ui/icons';
 import { openPackageSheet, installPackaging } from './ui/package-sheet';
@@ -439,7 +439,25 @@ export async function startApp(): Promise<App> {
 
   const importFromFormWeb = (): Promise<Site | null> => flow(async () => (await api.formwebImportCurrent()).site, 'FormWeb import finished.');
 
+  const nativeFolder = async (): Promise<string | null | undefined> => {
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      const picked = await invoke<string | string[] | null>('plugin:dialog|open', { options: { directory: true, multiple: false, title: 'Open Folder' } });
+      if (Array.isArray(picked)) return picked[0] ?? null;
+      return picked ?? null;
+    } catch {
+      return undefined;
+    }
+  };
+
   const pickFolder = (): Promise<string | null> => new Promise((resolve) => {
+    if (inTauri()) {
+      void nativeFolder().then((path) => {
+        if (path !== undefined) resolve(path);
+        else void askPath(overlay).then(resolve);
+      });
+      return;
+    }
     const handled = !emit('fp:pick-folder', { resolve }, true);
     if (!handled) void askPath(overlay).then(resolve);
   });

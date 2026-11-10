@@ -16,6 +16,7 @@
     "dialog:allow-message",
     "dialog:allow-ask",
     "allow-app-ready",
-    "allow-open-window"
+    "allow-open-window",
+    "allow-reveal-path"
   ]
 }

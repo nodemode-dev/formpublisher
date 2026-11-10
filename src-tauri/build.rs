@@ -1,4 +1,4 @@
-const APP_COMMANDS: &[&str] = &["app_ready", "open_window"];
+const APP_COMMANDS: &[&str] = &["app_ready", "open_window", "reveal_path"];
 
 fn main() {
     tauri_build::try_build(
