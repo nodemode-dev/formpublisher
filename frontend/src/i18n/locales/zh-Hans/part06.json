@@ -1,0 +1,5 @@
+{
+  "Keep FormWeb's model files": "保留 FormWeb 的模型文件",
+  "Hosts do not need them, so site.formweb.json and asset-access.json are left out unless you tick this.": "托管服务不需要这些文件，因此除非勾选此项，否则会排除 site.formweb.json 和 asset-access.json。",
+  "Left out: {0}": "已排除：{0}"
+}
