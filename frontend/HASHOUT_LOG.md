@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.3
-Last updated: 2026-11-10 · Phases 10 to 12: model files option, revisions, receive settings
+Current build version: v0.1.4
+Last updated: 2026-11-10 · Phases 13 to 15: Trash page, folder panel and reveal, shortcut rebinding
 
 ---
 
@@ -160,3 +160,18 @@ The sheet has a "Keep FormWeb's model files" checkbox, off by default and rememb
 
 ### src/ui/preferences.ts
 Two rows, "Check a site when it arrives" and "Build a site when it arrives", write `receive.autoCheck` and `receive.autoBuild` through the settings route, and a failed save puts the box back. Keys for the revisions and receive strings are in `keys/part07.json`; parts 06 and 07 are translated into all 25 locales, with plural forms for pl, cs, ru and uk.
+
+## Phases 13 to 15: Trash, desktop folder panel and reveal, shortcut rebinding · v0.1.4 (2026-11-10)
+
+The executor spec is `TURN_E_SPEC.md` in the 0.1.4 planning sidecar.
+
+### src/ui/trash.ts, src/api-trash.ts, src/styles/trash.css, src/ui/home.ts
+`TrashPage` follows the BuildsPage pattern and replaces the explanation-only note. Three skeleton rows and the empty state share a 120 px minimum, so the list arriving moves nothing. Rows show a kind icon, label, kind, moved time and size, with Restore and Delete for good; Delete and Empty Trash confirm through `confirmAction`; 409 reasons from the engine show as error notices; a restored site also calls `app.refreshSites()`. It refreshes on `trash.changed` and the remove and create events, only while visible. Keys in `keys/part08.json`. Home's Recent grid still shifts when a new site arrives, as noted in v0.1.2.
+
+### src/app.ts pickFolder, src/ui/chrome.ts site.reveal-folder
+In the desktop app Open Folder calls `invoke('plugin:dialog|open', { options: { directory: true, multiple: false, title } })` from `@tauri-apps/api/core`, because the plugin's npm package is not a dependency; the command and option names come from tauri-plugin-dialog 2.8.4 (`api-iife.js`, `src/commands.rs`). Cancel returns null; a failure falls back to the typed path dialog, which the browser keeps. Reveal Site Folder builds `<home>/sites/<id>` from `GET /api/settings` and calls the shell's `reveal_path`; its refusal string is rethrown so `commands.onError` shows it.
+
+### src/ui/commands.ts, src/ui/shortcuts-dialog.ts, src/styles/shortcuts.css, src/ui/native-menu.ts
+Change records through a capture-phase keydown on the dialog scrim, because the Dialog's own bubbling handler stops propagation and closes on Escape; nothing runs while recording. `rejectCombo` refuses combinations without a modifier (bare F1 to F12 allowed), a static list the browser or system keeps (browsers cannot report them), and the native text commands, whose rows cannot change. A combination held elsewhere names the other command with Replace or Cancel in a fixed 34 px note bar, and Reset keeps its column with `visibility:hidden`, so no state shifts layout. `remember` drops an override equal to the default, so Reset leaves storage clean. `commands.onChange` repaints the dialog and rebuilds the desktop app's native menus so their accelerators follow; the in-window menus and the palette re-read keys when opened. Keys in `keys/part10.json`; parts 08 and 10 are in all 25 locales. `builds.ts` now refreshes on `builds.removed`, the event the engine emits (it listened for `builds.deleted`).
+
+Checked: `npm run build`. In headless Chrome at 4x CPU the Trash page listed a removed site without a click and restored, deleted and emptied with CLS 0; Open Folder was rebound, ran from its new keys, showed in the palette, survived reload, and conflicts and resets behaved as above with CLS 0. Not run: the system folder panel itself (no portal under xvfb) and the native menu rebuild on macOS.
