@@ -1,0 +1,58 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "FormPublisher",
+  "mainBinaryName": "formpublisher",
+  "version": "0.0.0",
+  "identifier": "ai.nodemode.formpublisher",
+  "build": {
+    "frontendDist": "../frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "splash",
+        "title": "FormPublisher",
+        "url": "splash.html",
+        "width": 360,
+        "height": 200,
+        "resizable": false,
+        "decorations": false,
+        "center": true,
+        "transparent": true,
+        "shadow": false,
+        "visible": false
+      }
+    ],
+    "macOSPrivateApi": true,
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Productivity",
+    "shortDescription": "The Form publishing studio",
+    "longDescription": "FormPublisher is the Form family's publishing studio, a desktop app over a local engine.",
+    "publisher": "NodeAgentc, Inc.",
+    "copyright": "Copyright 2026 NodeAgentc, Inc.",
+    "license": "GPL-3.0-only",
+    "licenseFile": "../LICENSE",
+    "resources": {
+      "../LICENSE": "LICENSE",
+      "../NOTICE.md": "NOTICE.md"
+    },
+    "externalBin": ["binaries/formpublisher-engine"],
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "macOS": {
+      "minimumSystemVersion": "13.0",
+      "hardenedRuntime": true,
+      "entitlements": "entitlements.plist"
+    },
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com"
+    },
+    "createUpdaterArtifacts": false
+  }
+}
