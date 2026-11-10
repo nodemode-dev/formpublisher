@@ -13,15 +13,21 @@ export interface TrashEntry {
   size: number;
 }
 
+export const TRASH_ROOT: Record<TrashKind, string> = { site: 'sites', build: 'builds', key: 'keys', prepared: 'prepared' };
+
+export class OriginUnknownError extends ApiError {}
+
 const isObj = (v: unknown): v is Json => typeof v === 'object' && v !== null && !Array.isArray(v);
-const str = (v: unknown): string => (typeof v === 'string' ? v : typeof v === 'number' ? String(v) : '');
+const str =(v: unknown): string => (typeof v === 'string' ? v : typeof v === 'number' ? String(v) : '');
 const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
 
 async function failure(res: Response): Promise<ApiError> {
   let message = `${res.status} ${res.statusText}`.trim();
+  let code = '';
   try {
     const body = (await res.json()) as unknown;
     if (isObj(body)) {
+      code = str(body.code) || (isObj(body.detail) ? str(body.detail.code) : '');
       const d = body.detail ?? body.message ?? body.error;
       if (typeof d === 'string' && d) message = d;
       else if (isObj(d) && typeof d.reason === 'string' && d.reason) message = d.reason;
@@ -30,7 +36,7 @@ async function failure(res: Response): Promise<ApiError> {
   } catch {
     message = message || 'Request failed';
   }
-  return new ApiError(message, res.status);
+  return res.status === 409 && code === 'origin-unknown' ? new OriginUnknownError(message, res.status) : new ApiError(message, res.status);
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -70,8 +76,11 @@ export const trashApi = {
     const rows = Array.isArray(raw) ? raw : isObj(raw) && Array.isArray(raw.entries) ? raw.entries : [];
     return rows.map(toEntry).filter((e): e is TrashEntry => e !== null);
   },
-  async restore(entry: string): Promise<void> {
-    await request<unknown>(`/api/trash/${encodeURIComponent(entry)}/restore`, { method: 'POST' });
+  async restore(entry: string, origin?: string): Promise<void> {
+    const init: RequestInit = origin === undefined
+      ? { method: 'POST' }
+      : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ origin }) };
+    await request<unknown>(`/api/trash/${encodeURIComponent(entry)}/restore`, init);
   },
   async remove(entry: string): Promise<void> {
     await request<unknown>(`/api/trash/${encodeURIComponent(entry)}`, { method: 'DELETE' });
