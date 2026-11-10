@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.4
-Last updated: 2026-11-10 · Phases 13 to 15: Trash page, folder panel and reveal, shortcut rebinding
+Current build version: v0.1.5
+Last updated: 2026-11-10 · Phases 16 and 17: the Trash origin dialog, Recent without layout shift, Home under the title bar
 
 ---
 
@@ -175,3 +175,18 @@ In the desktop app Open Folder calls `invoke('plugin:dialog|open', { options: { 
 Change records through a capture-phase keydown on the dialog scrim, because the Dialog's own bubbling handler stops propagation and closes on Escape; nothing runs while recording. `rejectCombo` refuses combinations without a modifier (bare F1 to F12 allowed), a static list the browser or system keeps (browsers cannot report them), and the native text commands, whose rows cannot change. A combination held elsewhere names the other command with Replace or Cancel in a fixed 34 px note bar, and Reset keeps its column with `visibility:hidden`, so no state shifts layout. `remember` drops an override equal to the default, so Reset leaves storage clean. `commands.onChange` repaints the dialog and rebuilds the desktop app's native menus so their accelerators follow; the in-window menus and the palette re-read keys when opened. Keys in `keys/part10.json`; parts 08 and 10 are in all 25 locales. `builds.ts` now refreshes on `builds.removed`, the event the engine emits (it listened for `builds.deleted`).
 
 Checked: `npm run build`. In headless Chrome at 4x CPU the Trash page listed a removed site without a click and restored, deleted and emptied with CLS 0; Open Folder was rebound, ran from its new keys, showed in the palette, survived reload, and conflicts and resets behaved as above with CLS 0. Not run: the system folder panel itself (no portal under xvfb) and the native menu rebuild on macOS.
+
+## Phases 16 and 17: the Trash origin dialog, Recent sites and Home under the title bar · v0.1.5 (2026-11-10)
+
+The executor spec is `TURN_F_SPEC.md` in the 0.1.5 planning sidecar.
+
+### src/api-trash.ts, src/ui/trash.ts, src/styles/trash.css
+`failure()` turns a 409 whose `code` is `origin-unknown` (top level or inside `detail`) into `OriginUnknownError`, and `restore(entry, origin?)` posts `{origin}`. Only that error opens `OriginDialog` ("Where does it go"): the kind's folder (`TRASH_ROOT`: `sites/`, `builds/`, `keys/`, `prepared/`) is a fixed read-only prefix, the name is typed (a key gets `.pem` if missing), Enter or Restore retries, and the engine's refusal shows inline in a reserved 36 px line with the dialog kept open. Other 409s stay notices.
+
+### src/ui/home.ts, src/styles/recent.css
+Each Recent grid has a 32 px notice row above it, always reserved: `visibility: hidden` when idle with its Show button disabled (so it cannot take focus), visible with `.is-on`. `paint(resort = false)` keeps the displayed order while a Recent list is on screen (`recentOnScreen()`: Home open, loaded, on Start or Recent sites), counting new ids into "N new sites arrived" while existing cards still update in place; Show, `select()` and `show()` call `paint(true)`. The button comes before the text because text-first moved the button (CLS 9e-6). Off screen the lists update as before. This ends the shift noted under Phases 7 to 9. Keys in `keys/part11.json`, in all 25 locales.
+
+### src/styles/overlays.css `.fp-home`, src/ui/home.ts `lock`
+`.fp-home` was `position: fixed; inset: 0` (z-home 10000) over the whole window while `home.ts` made the whole app root inert, so the in-window menubar under it could not take a click (`elementFromPoint` on File returned the Home brand). Home now starts at `var(--fp-titlebar-h)` and `Home.lock(on)` makes every `.fp-app` child inert except `.fp-titlebar`, so the brand, menubar, theme and Preferences stay live above Home and Home's content sits one title bar lower (38, 44 or 50 px by density). The brand and nav rules are unchanged.
+
+Checked: `npm run build`. In headless Chrome at 1280x800 and 4x CPU, two sites received over `/api/receive/formweb` with Recent visible left every card still, showed "2 new sites arrived" and gave CLS 0; Show re-sorted newest first and cleared the notice; a real mouse click opened the File menu in dark and light; an unparseable trash entry opened the dialog, `../evil` was refused inline and a valid name restored it; no page errors.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.5 · 2026-11-10
+
+- Trash: items removed by earlier releases can now be restored too. FormPublisher works out where each one came from (a prepared folder is prepared again from its build), and when it cannot tell, the Trash page asks where it goes. The command line takes `trash restore ENTRY --to PATH`; agents still restore only to places FormPublisher knows.
+- Recent sites no longer jump when a site arrives from FormWeb while you are looking at them: a note says how many arrived, and Show puts them in order.
+- Home now sits under the title bar, so the menus, theme and Preferences work while Home is open.
+- Deep checks give the same problem ids on every run. A comparison with 0.1.3 on a site with real problems (a missing image, an external image, overflow on phones, a failing script and late images) found the same 18 problems.
+- The FormWeb engine crates are vendored at 0.19.5.
+- Every new string is in all 26 languages.
+
 ## 0.1.4 · 2026-11-10
 
 - Trash: removed sites, builds, keys and prepared folders are listed on Home's Trash page and can be restored to where they were, deleted for good, or emptied at once. The command line gains `trash`, `trash restore`, `trash delete` and `trash empty --yes`; MCP gains `list_trash` and `restore_from_trash` (18 tools), and deleting stays a person's action.

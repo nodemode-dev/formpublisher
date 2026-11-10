@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.4
-Last updated: 2026-11-10 · Phases 13 to 15: trash service, engine.json, deep run through the site host, version 2 .fweb projects
+Current build version: v0.1.5
+Last updated: 2026-11-10 · Phases 16 to 18: restoring old trash entries and to named places, stable deep problem ids, deep run parity with 0.1.3
 
 ---
 
@@ -304,3 +304,19 @@ The executor spec is `TURN_E_SPEC.md` in the 0.1.4 planning sidecar. The vendore
 - FormWeb's version 2 `.fweb` is a zip with `project.json` first and `assets/<id>` stored; FormWeb writes it only when version 1 would pass 64 MiB. It is checked up front with FormWeb's own rules (project.json first and at most 64 MiB, format and version 2, a site object, at most 500 assets listed once, every member exactly `assets/<listed id>`, digest, mime, and FormWeb's per-type sizes: 8 MiB images, 64 MiB mp4 and webm, 4 MiB woff2, 2 MiB svg, enforced while streaming), capped at 512 MiB, then each asset is copied from the zip into the build folder in 1 MiB chunks and hashed again on the way, so a large project never sits in memory. `looks_like_fweb` accepts a zip only when its first member is a version 2 `project.json`, so `is_fweb` now asks it for any file and ordinary site zips are unaffected. Version 1 keeps its 128 MiB file cap and no per-type sizes.
 
 Checked: on lab engines a removed site, build, key and prepared folder were listed and restored and worked again; 409, 404, delete and empty answered as above; the CLI matched in-process and over HTTP and the MCP stdio walk listed and restored. Two engines each named their own port and pid in `engine.json` and SIGTERM removed only its own. A static and deep run on the demo gave the same problems, summary and thumbnails before and after the host switch. A version 1 project and its version 2 twin built with identical file lists and hashes, and bad archives were refused with their reasons. With this engine on port 8402, FormWeb 0.19.4 found it through `engine.json` and delivered live.
+
+## Phases 16 to 18 · v0.1.5 (2026-11-10)
+
+The executor spec is `TURN_F_SPEC.md` in the 0.1.5 planning sidecar. The vendored FormWeb crates are 0.19.5.
+
+### app/services/trash.py, app/routers/trash.py, app/cli.py, app/mcp.py
+
+- Entries without a `.trash.json` (moved by 0.1.3 and earlier) get an inferred origin, and listing marks those rows `originInferred`. Kind: a folder holding `site.json` is a site, otherwise the `build-`, `key-` or `prepared-` prefix, else site. The stamp (`-%Y%m%dT%H%M%SZ`, optionally `-N`) is stripped from the end. A site's origin is `sites/<id>` from its `site.json`; a key's is `keys/<id>.pem` from its `entry.json`; a build's is `builds/<site>/<id>` from `build-<site>-<12 hex>`; a prepared folder's is `prepared/<site>/<build>/<target>`, matching the registered target ids longest first as a suffix (they contain hyphens) and anchoring on the 12-hex build id. Anything else has no origin.
+- An old prepared entry lost its hidden `.<target>.json` when 0.1.3 moved it, so restore prepares the same target again from its build with `publish.prepare` (prepared folders are deterministic) and deletes the entry, answering 409 naming the build when it is missing or belongs to another site. It runs outside the trash lock because `publish.remove` takes the publish lock and then the trash lock, and the opposite order would invert them.
+- `POST /api/trash/{entry}/restore` takes an optional `{origin}`, used only when none is recorded or inferred. It must be relative, resolve inside the kind's own folder (a key directly in `keys/`, a prepared origin as `prepared/<site>/<12 hex>/<target>`, which re-prepares) and be free. Without a usable origin the answer is 409 `{code: "origin-unknown"}`; a bad or taken origin is 409; a non-object body or non-text origin is 400. The `code` field exists only on this route, because the shared `IntakeError` handler answers `{detail}`. CLI `trash restore ENTRY [--to PATH]`. MCP `restore_from_trash` takes no origin, so agents can restore only to recorded or inferred places.
+
+### app/services/deep.py
+
+- `Collector.add` hashed the failing URL including the revision host's random port into the problem id, so the same problem got a new id on every run (with the 0.1.3 server too). The hash now covers the URL with the host replaced by `host`; messages and `url` fields keep the real address.
+
+Checked: on a lab data folder, a site, build, key and two prepared folders (one with a `-2` counter) trashed the 0.1.3 way listed with inferred origins and restored (the site's revisions, a 27-file download, a valid signature, verify on both targets; re-prepared folders hashed identically to the originals); a prepared entry whose build was in the trash answered 409 naming it and restored after the build; unparseable entries answered `origin-unknown` and refused `../`, absolute, wrong-kind and taken origins before restoring to a valid one; CLI `--to` in-process and over HTTP. A FormWeb site with a missing image, an external image, overflow at 390, a code section that logs an error and throws, and two late images without dimensions gave the same 18 problems (8 errors, 10 warnings) on FormPublisher 0.1.3 and this branch at 1440 and 390, with the same codes, routes, severities and messages; the only differences were the request ids (the bug above; two more runs after the fix gave identical ids) and the thumbnail of the page whose external image loads with varying timing. Evidence was kept under `/tmp/p3-deep/` during the turn.
