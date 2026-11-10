@@ -31,5 +31,6 @@ Imported sites and settings live in FormPublisher's data folder: `~/FormPublishe
 | Port | What |
 | --- | --- |
 | 8280 | the engine, on 127.0.0.1 (`FORMPUBLISHER_PORT`) |
+| 8281 | the site host for the preview, on 127.0.0.1 (`FORMPUBLISHER_HOST_PORT`) |
 | 5280 | the Vite interface, localhost only |
 | 5281 | the Vite preview of a production build |

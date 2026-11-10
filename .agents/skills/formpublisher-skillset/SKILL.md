@@ -15,7 +15,7 @@ Route every change to FormPublisher's code through this file. It maps where the 
 | --- | --- |
 | Engine entry | `backend/formpublisher_engine.py` (serve, `--selfcheck`, `cli`, `mcp`) |
 | Engine routes | `backend/app/routers/[name].py`, each exporting `router`, auto-included by `backend/app/main.py` |
-| Engine services | `backend/app/services/[name].py`: paths and the data folder, settings, site intake, the FormWeb connection |
+| Engine services | `backend/app/services/[name].py`: paths and the data folder, settings, site intake, the FormWeb connection, `compile` (formweb-core for .fweb), `host` (static host on 8281, served by `backend/app/host.py`), `checks` and `deep`, `package` and `keys`; `backend/app/static/probe.js` is the preview probe |
 | Interface | `frontend/src/`: the shell, Home, tabs, routes strip, inspector, status bar; styles and tokens in `frontend/src/styles/` |
 | Desktop shell | `src-tauri/` (Tauri 2) and the frozen engine sidecar from `setup/freeze_backend` |
 | Scripts | `./formpublisher`, `./formpublisher_oc_install`, `./build_app`, each with a `.bat` twin; `setup/agents.py`, `setup/lib.sh` |

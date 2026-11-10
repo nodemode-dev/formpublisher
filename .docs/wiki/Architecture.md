@@ -9,6 +9,9 @@ engine (Python 3.12, FastAPI, 127.0.0.1:8280)
   services: paths and the data folder, settings, site intake, the read-only FormWeb connection
     -> data folder (FORMPUBLISHER_HOME): sites, settings
     -> a running FormWeb on loopback: GET /api/export only
+site host (ASGI app.host, 127.0.0.1:8281): the mounted revision, probe script, no /api
+  services: host, checks, deep (Chrome via Playwright), package, keys, compile (formweb-core)
+  -> data folder: checks/, builds/, keys/
 command line and MCP server -> the same routes
 desktop shell (Tauri 2) -> frozen engine sidecar formpublisher-engine
 ```

@@ -6,12 +6,15 @@ The Form family's site publisher. FormPublisher opens what FormWeb makes (a `sit
 
 Every step is also a command line command and an MCP tool, so Claude Code and other agents drive it the same way people do.
 
-In development: device preview, checks, packaging, signing, publishing and the desktop build.
+It also previews the site on device sizes from its own static host, runs static, live and deep checks, and builds deterministic, Ed25519-signed packages. In development: publishing to a host and the desktop build.
 
 ## Pages
 
 - [Getting Started](Getting-Started) · install, run, the first import
-- [Importing Sites](Importing-Sites) · the three ways in and what each reads
+- [Importing Sites](Importing-Sites) · the ways in, including .fweb projects, and what each reads
+- [Preview](Preview) · the site host, device sizes, theme, motion and network
+- [Checks](Checks) · static, live and deep problems
+- [Packages and Signatures](Packages-and-Signatures) · site.zip, publish.json, keys and signing
 - [Agents](Agents) · the command line, the MCP server, the skills
 - [Architecture](Architecture) · the engine, the interface, the shell
 - [Releasing](Releasing) · versions and the release commit
