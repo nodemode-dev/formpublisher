@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "1 novo site chegou",
+  "{0} new sites arrived": "{0} novos sites chegaram",
+  "Show": "Mostrar",
+  "Where does it go": "Para onde vai",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "Não foi possível colocar {0} sozinho. A pasta é definida pelo tipo ({1}); digite o nome que ele deve ter lá.",
+  "For example a site id or a build path": "Por exemplo, um ID de site ou um caminho de build",
+  "Type a name.": "Digite um nome."
+}

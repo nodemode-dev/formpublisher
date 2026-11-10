@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "1 nytt nettsted har kommet",
+  "{0} new sites arrived": "{0} nye nettsteder har kommet",
+  "Show": "Vis",
+  "Where does it go": "Hvor skal det hen",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "{0} kunne ikke plasseres av seg selv. Mappen er bestemt av typen ({1}); skriv inn navnet det skal ha der.",
+  "For example a site id or a build path": "For eksempel en nettsted-ID eller en build-sti",
+  "Type a name.": "Skriv inn et navn."
+}

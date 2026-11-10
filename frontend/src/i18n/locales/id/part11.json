@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "1 situs baru telah tiba",
+  "{0} new sites arrived": "{0} situs baru telah tiba",
+  "Show": "Tampilkan",
+  "Where does it go": "Dipulihkan ke mana",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "{0} tidak dapat ditempatkan sendiri. Folder-nya ditentukan oleh jenisnya ({1}); ketik nama yang harus dimilikinya di sana.",
+  "For example a site id or a build path": "Misalnya ID situs atau jalur build",
+  "Type a name.": "Ketik nama."
+}

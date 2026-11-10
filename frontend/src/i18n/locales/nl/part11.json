@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "Er is 1 nieuwe site aangekomen",
+  "{0} new sites arrived": "Er zijn {0} nieuwe sites aangekomen",
+  "Show": "Tonen",
+  "Where does it go": "Waar moet het heen",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "{0} kon niet zelfstandig worden geplaatst. De map staat vast op basis van het type ({1}); typ de naam die het daar moet krijgen.",
+  "For example a site id or a build path": "Bijvoorbeeld een site-id of een buildpad",
+  "Type a name.": "Typ een naam."
+}

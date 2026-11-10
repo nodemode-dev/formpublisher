@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "收到 1 个新站点",
+  "{0} new sites arrived": "收到 {0} 个新站点",
+  "Show": "显示",
+  "Where does it go": "恢复到哪里",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "无法自动放置 {0}。其文件夹由类型({1})决定;请输入它在该文件夹中应使用的名称。",
+  "For example a site id or a build path": "例如站点 ID 或构建路径",
+  "Type a name.": "请输入名称。"
+}

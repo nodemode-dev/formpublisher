@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "Dotarła 1 nowa witryna",
+  "{0} new sites arrived": "Dotarło {0} {0:one=nowa witryna;few=nowe witryny;many=nowych witryn;other=nowej witryny}",
+  "Show": "Pokaż",
+  "Where does it go": "Dokąd to trafi",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "Nie udało się samodzielnie umieścić elementu {0}. Jego folder jest określony przez rodzaj ({1}); wpisz nazwę, jaką ma tam nosić.",
+  "For example a site id or a build path": "Na przykład identyfikator witryny lub ścieżka builda",
+  "Type a name.": "Wpisz nazwę."
+}

@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "1 yeni site geldi",
+  "{0} new sites arrived": "{0} yeni site geldi",
+  "Show": "Göster",
+  "Where does it go": "Nereye gidecek",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "{0} kendi başına yerleştirilemedi. Klasörü türüne ({1}) göre belirlenir; orada alması gereken adı yazın.",
+  "For example a site id or a build path": "Örneğin bir site kimliği veya bir derleme yolu",
+  "Type a name.": "Bir ad yazın."
+}
