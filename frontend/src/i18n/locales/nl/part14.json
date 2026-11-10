@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Terugzetten uit de prullenbak",
+  "Passphrase of the locked key": "Wachtwoordzin van de vergrendelde sleutel",
+  "nginx -t passed with nginx {0}.": "nginx -t is geslaagd met nginx {0}.",
+  "nginx -t passed.": "nginx -t is geslaagd.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx is hier niet geïnstalleerd, dus nginx -t is niet uitgevoerd.",
+  "nginx -t failed: {0}": "nginx -t is mislukt: {0}"
+}

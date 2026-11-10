@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Çöp kutusundan geri yükle",
+  "Passphrase of the locked key": "Kilitli anahtarın parolası",
+  "nginx -t passed with nginx {0}.": "nginx -t, nginx {0} ile başarılı oldu.",
+  "nginx -t passed.": "nginx -t başarılı oldu.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx burada kurulu değil, bu yüzden nginx -t çalıştırılmadı.",
+  "nginx -t failed: {0}": "nginx -t başarısız oldu: {0}"
+}

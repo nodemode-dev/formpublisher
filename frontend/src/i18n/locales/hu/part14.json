@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Visszaállítás a Kukából",
+  "Passphrase of the locked key": "A zárolt kulcs jelmondata",
+  "nginx -t passed with nginx {0}.": "Az nginx -t sikeres volt nginx {0} verzióval.",
+  "nginx -t passed.": "Az nginx -t sikeres volt.",
+  "nginx is not installed here, so nginx -t did not run.": "Az nginx nincs telepítve, ezért az nginx -t nem futott le.",
+  "nginx -t failed: {0}": "Az nginx -t sikertelen: {0}"
+}

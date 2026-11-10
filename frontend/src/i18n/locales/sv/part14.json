@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Återställ från papperskorgen",
+  "Passphrase of the locked key": "Lösenfras för den låsta nyckeln",
+  "nginx -t passed with nginx {0}.": "nginx -t lyckades med nginx {0}.",
+  "nginx -t passed.": "nginx -t lyckades.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx är inte installerat här, så nginx -t kördes inte.",
+  "nginx -t failed: {0}": "nginx -t misslyckades: {0}"
+}

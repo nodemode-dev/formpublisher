@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Восстановить из корзины",
+  "Passphrase of the locked key": "Парольная фраза заблокированного ключа",
+  "nginx -t passed with nginx {0}.": "nginx -t выполнена успешно с nginx {0}.",
+  "nginx -t passed.": "nginx -t выполнена успешно.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx здесь не установлен, поэтому nginx -t не запускалась.",
+  "nginx -t failed: {0}": "nginx -t завершилась ошибкой: {0}"
+}

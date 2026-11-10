@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Przywróć z kosza",
+  "Passphrase of the locked key": "Hasło zablokowanego klucza",
+  "nginx -t passed with nginx {0}.": "nginx -t zakończyło się powodzeniem w nginx {0}.",
+  "nginx -t passed.": "nginx -t zakończyło się powodzeniem.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx nie jest tu zainstalowany, więc nginx -t nie został uruchomiony.",
+  "nginx -t failed: {0}": "nginx -t zakończyło się błędem: {0}"
+}
