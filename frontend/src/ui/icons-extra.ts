@@ -22,4 +22,8 @@ Object.assign(ICONS, {
   book: L('<path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H19v14.5H6.5A1.5 1.5 0 0 0 5 20z"/><path d="M5 20V5.5M9 8.5h6"/>'),
   upload: L('<path d="M12 15.5V4.5M7.5 9L12 4.5 16.5 9M5 19.5h14"/>'),
   density: L('<path d="M4 7h16M4 12h16M4 17h16"/>'),
+  package: L('<path d="M12 3.5l8 4v9l-8 4-8-4v-9z"/><path d="M4 7.5l8 4 8-4M12 11.5v9M8 5.5l8 4"/>'),
+  key: L('<circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5L19 4M15.5 7.5l2.5 2.5M13 10l2 2"/>'),
+  shield: L('<path d="M12 3.5l7 2.5v5.5c0 4.2-2.8 7.4-7 9-4.2-1.6-7-4.8-7-9V6z"/><path d="M8.8 12l2.4 2.4 4-4.8"/>'),
+  compare: L('<path d="M9 4.5v15M15 4.5v15"/><path d="M4.5 8.5L9 4.5l4.5 4M10.5 15.5l4.5 4 4.5-4"/>'),
 });

@@ -1,5 +1,8 @@
 import type { RouteInfo } from '../api';
-import { el, patchList, setAttr, setText } from './dom';
+import { on, type RouteStatus } from '../events';
+import { el, patchList, setAttr, setClass, setText } from './dom';
+
+const STATUS_TEXT: Record<RouteStatus, string> = { ok: 'No problems', warn: 'Warnings', error: 'Errors' };
 
 export interface RouteListHooks {
   select(path: string): void;
@@ -8,6 +11,9 @@ export interface RouteListHooks {
 export class RouteList {
   private selected: string | null = null;
   private items: RouteInfo[] = [];
+  private siteId: string | null = null;
+  private status: Record<string, RouteStatus> = {};
+  private thumbs: Record<string, string> = {};
 
   constructor(private readonly host: HTMLElement, private readonly hooks: RouteListHooks) {
     host.addEventListener('click', (e) => {
@@ -15,6 +21,20 @@ export class RouteList {
       if (row?.dataset.key) hooks.select(row.dataset.key);
     });
     host.addEventListener('keydown', (e) => this.onKey(e));
+    on('fp:checks', (d) => {
+      if (d.siteId !== this.siteId) return;
+      this.status = d.status ?? {};
+      this.thumbs = d.thumbs ?? {};
+      for (const node of Array.from(this.host.querySelectorAll<HTMLElement>('.fp-route'))) this.paintChecks(node, node.dataset.key ?? '');
+    });
+  }
+
+  setSite(siteId: string | null): void {
+    if (siteId === this.siteId) return;
+    this.siteId = siteId;
+    this.status = {};
+    this.thumbs = {};
+    for (const node of Array.from(this.host.querySelectorAll<HTMLElement>('.fp-route'))) this.paintChecks(node, node.dataset.key ?? '');
   }
 
   render(items: readonly RouteInfo[], selected: string | null): void {
@@ -24,7 +44,7 @@ export class RouteList {
     patchList(this.host, this.items, {
       key: (r) => r.path,
       create: (r) => {
-        const node = el(`<button class="fp-route" type="button" role="option" tabindex="-1" aria-selected="false"><span class="fp-route-path" translate="no"></span><span class="fp-route-page" translate="no"></span></button>`);
+        const node = el(`<button class="fp-route" type="button" role="option" tabindex="-1" aria-selected="false"><span class="fp-route-thumb" aria-hidden="true"></span><span class="fp-route-path" translate="no"></span><span class="fp-route-page" translate="no"></span><span class="fp-route-dot"></span></button>`);
         this.paint(node, r, tabStop);
         return node;
       },
@@ -38,6 +58,39 @@ export class RouteList {
     setAttr(node, 'aria-selected', String(r.path === this.selected));
     setAttr(node, 'tabindex', r.path === tabStop ? '0' : '-1');
     setAttr(node, 'title', r.page ? `${r.path} · ${r.page}` : r.path);
+    this.paintChecks(node, r.path);
+  }
+
+  private paintChecks(node: HTMLElement, path: string): void {
+    const state = this.status[path];
+    const dot = node.querySelector<HTMLElement>('.fp-route-dot');
+    if (dot) {
+      setClass(dot, 'is-ok', state === 'ok');
+      setClass(dot, 'is-warn', state === 'warn');
+      setClass(dot, 'is-error', state === 'error');
+      setAttr(dot, 'title', state ? STATUS_TEXT[state] : 'Not checked');
+    }
+    const box = node.querySelector<HTMLElement>('.fp-route-thumb');
+    if (!box) return;
+    const url = this.thumbs[path] ?? '';
+    let img = box.querySelector('img');
+    if (!url) {
+      img?.remove();
+      return;
+    }
+    if (!img) {
+      img = document.createElement('img');
+      img.alt = '';
+      img.decoding = 'async';
+      img.draggable = false;
+      const shown = img;
+      img.addEventListener('load', () => setClass(shown, 'is-loaded', true));
+      box.appendChild(img);
+    }
+    if (img.getAttribute('src') !== url) {
+      setClass(img, 'is-loaded', false);
+      img.src = url;
+    }
   }
 
   private onKey(e: KeyboardEvent): void {

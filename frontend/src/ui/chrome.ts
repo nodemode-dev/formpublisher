@@ -6,10 +6,13 @@ import { CommandPalette } from './command-palette';
 import { Commands, installShortcuts } from './commands';
 import { confirmAction } from './dialogs';
 import { inTauri } from './dom';
+import { setLibraryOpener } from './builds';
 import { Home } from './home';
 import './icons-extra';
 import { MenuBar, type MenuDef } from './menu';
 import { NativeMenus, wantsNativeMenus } from './native-menu';
+import { openPackageSheet } from './package-sheet';
+import { runChecks } from './panel';
 import { Preferences, type PrefsSection } from './preferences';
 import { ShortcutsDialog } from './shortcuts-dialog';
 import { applyDensity, nextToggleTheme, readChoice, readDensity, setTheme, THEMES, type Density } from './themes';
@@ -52,6 +55,7 @@ export function installChrome(app: App): Chrome {
   const siteName = (): string => st().site?.name ?? st().open.find((t) => t.id === st().activeId)?.name ?? '';
 
   const home = new Home(app, commands, app.state().activeId === null);
+  setLibraryOpener((id) => { void home.revealBuild(id); });
   let palette: CommandPalette | null = null;
   let prefs: Preferences | null = null;
   let shortcuts: ShortcutsDialog | null = null;
@@ -91,7 +95,7 @@ export function installChrome(app: App): Chrome {
   });
 
   commands.add(
-    { id: 'file.open-zip', label: 'Open Zip...', keys: ['Mod+O'], icon: 'archive', group: 'File', menu: 'File', description: 'Import a FormWeb site export (.zip)', mutates: true, enabled: engineUp, run: () => app.pickZip() },
+    { id: 'file.open-zip', label: 'Open Zip...', keys: ['Mod+O'], icon: 'archive', group: 'File', menu: 'File', description: 'Import a FormWeb site export (.zip) or project (.fweb)', mutates: true, enabled: engineUp, run: () => app.pickZip() },
     {
       id: 'file.open-folder', label: 'Open Folder...', keys: ['Shift+Mod+O'], icon: 'folder', group: 'File', menu: 'File', description: 'Import a publication folder', mutates: true, enabled: engineUp,
       run: async () => {
@@ -129,6 +133,7 @@ export function installChrome(app: App): Chrome {
     },
 
     { id: 'view.home', label: 'Home', keys: ['Alt+Mod+H'], icon: 'home', group: 'View', menu: 'View', description: 'Show the Home page', run: () => home.show('start') },
+    { id: 'view.builds', label: 'Builds', icon: 'package', group: 'View', menu: 'View', description: 'Show the library of builds on the Home page', run: () => home.show('builds') },
     { id: 'view.palette', label: 'Find a Command...', keys: ['Shift+Mod+P'], icon: 'commandPalette', group: 'View', menu: 'View', description: 'Search every command', run: () => { palette ??= new CommandPalette(commands); palette.show(); } },
     { id: 'view.theme', label: 'Toggle Theme', icon: 'sun', group: 'View', menu: 'View', description: 'Switch between the dark and light theme',
       run: (params) => {
@@ -145,6 +150,9 @@ export function installChrome(app: App): Chrome {
     tab('view.console', 'Console', 'terminal', 'console'),
     tab('view.network', 'Network', 'globe', 'network'),
 
+    { id: 'site.package', label: 'Package Site...', keys: ['Shift+Mod+B'], icon: 'package', group: 'Site', menu: 'File', description: 'Build, sign and verify a package of the open site', enabled: () => hasSite() && engineUp(), run: () => openPackageSheet(app) },
+    { id: 'site.check', label: 'Run Checks', icon: 'check', group: 'Site', menu: 'Site', description: 'Run the static checks on the open site', enabled: () => hasSite() && engineUp(), run: () => runChecks(app, false) },
+    { id: 'site.check-deep', label: 'Run Deep Checks', icon: 'check', group: 'Site', menu: 'Site', description: 'Run the static and deep checks in a headless browser', enabled: () => hasSite() && engineUp(), run: () => runChecks(app, true) },
     {
       id: 'site.reload-routes', label: 'Reload Routes', keys: ['Mod+R'], icon: 'reload', group: 'Site', menu: 'Site', description: 'Read the routes of the open site again', enabled: () => hasSite() && engineUp(),
       run: async () => {
@@ -191,10 +199,10 @@ export function installChrome(app: App): Chrome {
   commands.onError = (_cmd, error) => notice('error', error instanceof Error && error.message ? error.message : 'Request failed');
 
   const menuDefs = (native: boolean): MenuDef[] => [
-    { label: 'File', items: ['file.open-zip', 'file.open-folder', 'file.import-formweb', '-', 'file.new-window', 'file.close-tab', ...(native ? [] : ['-', 'app.preferences'])] },
+    { label: 'File', items: ['file.open-zip', 'file.open-folder', 'file.import-formweb', '-', 'file.new-window', 'file.close-tab', '-', 'site.package', ...(native ? [] : ['-', 'app.preferences'])] },
     { label: 'Edit', items: ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.select-all'] },
-    { label: 'View', items: ['view.home', 'view.palette', '-', 'view.theme', { label: 'Density', items: ['view.density-compact', 'view.density-regular', 'view.density-comfortable'] }, '-', 'view.toggle-routes', 'view.toggle-inspector', 'view.toggle-bottom', '-', 'view.problems', 'view.console', 'view.network'] },
-    { label: 'Site', items: ['site.reload-routes', 'site.reveal-folder', '-', 'site.remove'] },
+    { label: 'View', items: ['view.home', 'view.builds', 'view.palette', '-', 'view.theme', { label: 'Density', items: ['view.density-compact', 'view.density-regular', 'view.density-comfortable'] }, '-', 'view.toggle-routes', 'view.toggle-inspector', 'view.toggle-bottom', '-', 'view.problems', 'view.console', 'view.network'] },
+    { label: 'Site', items: ['site.check', 'site.check-deep', '-', 'site.reload-routes', 'site.reveal-folder', '-', 'site.remove'] },
     { label: 'Help', items: ['help.shortcuts', 'help.docs', '-', 'help.about'] },
   ];
 
@@ -229,8 +237,8 @@ export function installChrome(app: App): Chrome {
     if (!hasFiles(e)) return;
     e.preventDefault();
     home.setDragOver(false);
-    const zips = Array.from(e.dataTransfer?.files ?? []).filter((f) => /\.zip$/i.test(f.name));
-    if (!zips.length) { notice('error', 'Only .zip site exports can be imported by dropping.'); return; }
+    const zips = Array.from(e.dataTransfer?.files ?? []).filter((f) => /\.(zip|fweb)$/i.test(f.name));
+    if (!zips.length) { notice('error', 'Only .zip site exports or .fweb projects can be imported by dropping.'); return; }
     void (async () => {
       for (const file of zips) {
         try { await app.importZip(file); } catch { continue; }

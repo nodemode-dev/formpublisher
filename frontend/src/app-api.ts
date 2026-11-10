@@ -38,6 +38,11 @@ export interface Mounts {
   readonly toast: HTMLElement;
 }
 
+export interface PreviewApi {
+  navigate(path: string): void;
+  reload(): void;
+}
+
 export interface App {
   readonly mounts: Mounts;
   readonly ready: Promise<void>;
@@ -54,4 +59,5 @@ export interface App {
   pickFolder(): Promise<string | null>;
   togglePane(pane: Pane, force?: boolean): void;
   showBottomTab(tab: BottomTab): void;
+  preview(): PreviewApi;
 }

@@ -2,6 +2,9 @@ import type { Disposer } from './ui/dom';
 
 export type NoticeKind = 'info' | 'ok' | 'error';
 
+export interface ProbeMessage { source: 'fp-probe'; gen: number; type: string; siteId: string; [key: string]: unknown }
+export type RouteStatus = 'ok' | 'warn' | 'error';
+
 export interface FpEventMap {
   'fp:home': Record<string, never>;
   'fp:palette': { source: 'titlebar' | 'shortcut' };
@@ -18,6 +21,9 @@ export interface FpEventMap {
   'fp:ui-settings-changed': { key: string };
   'fp:notice': { kind: NoticeKind; text: string };
   'fp:engine-state': { state: 'ok' | 'down' | 'unknown' };
+  'fp:probe': ProbeMessage;
+  'fp:checks': { siteId: string; revision: string; status: Record<string, RouteStatus>; thumbs: Record<string, string> };
+  'fp:live': { type: string; [key: string]: unknown };
 }
 
 export type FpEventName = keyof FpEventMap;

@@ -3,12 +3,14 @@ import type { App } from '../app-api';
 import { on } from '../events';
 import { locale } from '../i18n';
 import { brandMark } from './brand';
+import { BuildsPage } from './builds';
 import type { Commands } from './commands';
 import { anyDialogOpen } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setHidden, setText } from './dom';
 import { icon } from './icons';
 
-type View = 'start' | 'recent' | 'trash';
+export type HomeView = 'start' | 'recent' | 'builds' | 'trash';
+type View = HomeView;
 
 const NAV_W_KEY = 'formpublisher.homeNav';
 const NAV_HIDDEN_KEY = 'formpublisher.homeNavHidden';
@@ -58,6 +60,7 @@ export class Home {
   private readonly fwText: HTMLElement;
   private readonly navItems: HTMLElement[];
   private readonly pages: HTMLElement[];
+  private readonly builds: BuildsPage;
 
   constructor(private readonly app: App, private readonly commands: Commands, visible: boolean) {
     this.root = el(`<section class="fp-home" aria-label="Home"${visible ? '' : ' hidden'}>
@@ -65,6 +68,7 @@ export class Home {
 <div class="fp-home-brand">${brandMark(26)}<span class="fp-home-brand-text"><span class="fp-home-brand-name" translate="no">formpublisher</span><span class="fp-home-brand-by" translate="no">by nodemode.ai</span></span></div>
 <button class="fp-home-nav-item is-active" type="button" data-v="start">${icon('home', 16)}<span>Start</span></button>
 <button class="fp-home-nav-item" type="button" data-v="recent">${icon('globe', 16)}<span>Recent sites</span><span class="fp-badge is-count" data-count="sites">0</span></button>
+<button class="fp-home-nav-item" type="button" data-v="builds">${icon('package', 16)}<span>Builds</span></button>
 <button class="fp-home-nav-item" type="button" data-v="trash">${icon('trash', 16)}<span>Trash</span></button>
 <div class="fp-home-open" hidden><div class="fp-home-nav-sep"></div><div class="fp-home-nav-title">Open sites</div><div class="fp-home-open-list"></div></div>
 <div class="fp-home-nav-foot">
@@ -82,7 +86,7 @@ export class Home {
 <span class="fp-home-hero-icon">${icon('archive', 26)}</span>
 <div class="fp-home-hero-text">
 <div class="fp-home-hero-title">Drop a site zip here</div>
-<div class="fp-home-hero-sub">Drop a FormWeb site export (.zip) anywhere on this box to import it. FormPublisher reads it and never changes it.</div>
+<div class="fp-home-hero-sub">Drop a FormWeb site export (.zip) or project (.fweb) anywhere on this box to import it. FormPublisher reads it and never changes it.</div>
 <div class="fp-home-fw"><span class="fp-st-dot"></span><span class="fp-home-fw-text" translate="no"></span></div>
 </div>
 <div class="fp-home-hero-actions">
@@ -94,6 +98,7 @@ export class Home {
 <section class="fp-home-section"><div class="fp-home-section-head"><h2 class="fp-home-section-title">Recent sites</h2><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-v="recent">See all</button></div>${CARD_GRID('fp-recent-grid', true)}</section>
 </div>
 <div data-page="recent" hidden><div class="fp-home-head"><div><h1 class="fp-home-title">Recent sites</h1><p class="fp-home-sub">Every site you have imported, newest first.</p></div></div>${CARD_GRID('fp-recent-full', true)}</div>
+<div data-page="builds" hidden></div>
 <div data-page="trash" hidden><div class="fp-home-head"><div><h1 class="fp-home-title">Trash</h1><p class="fp-home-sub">Removed sites are not deleted.</p></div></div>
 <div class="fp-card fp-trash-note"><span class="fp-empty-icon">${icon('trash', 20)}</span><div class="fp-trash-text"><div class="fp-empty-title">Removed sites are kept in the trash folder</div><div class="fp-empty-text">When you remove a site, FormPublisher moves it to the trash/ folder inside its data folder. Open that folder to restore a site or to delete it for good.</div></div></div></div>
 </div>
@@ -111,6 +116,7 @@ export class Home {
     this.navItems = Array.from(this.root.querySelectorAll<HTMLElement>('.fp-home-nav-item[data-v]'));
     this.pages = Array.from(this.root.querySelectorAll<HTMLElement>('[data-page]'));
     setText(this.fwText, 'Checking FormWeb');
+    this.builds = new BuildsPage(this.app, q(this.root, '[data-page="builds"]'));
     document.getElementById('app')?.appendChild(this.root);
     this.restoreNav();
     this.wire();
@@ -155,6 +161,12 @@ export class Home {
     this.view = view;
     for (const p of this.pages) setHidden(p, p.dataset.page !== view);
     for (const n of this.navItems) setClass(n, 'is-active', n.dataset.v === view);
+    if (view === 'builds') void this.builds.refresh();
+  }
+
+  async revealBuild(id: string): Promise<void> {
+    this.show('builds');
+    await this.builds.reveal(id);
   }
 
   private startPolling(): void {
