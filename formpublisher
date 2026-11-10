@@ -96,6 +96,11 @@ doctor() {
   ok rust "$(rustc -V 2>/dev/null || echo 'missing (desktop builds only)')"
   ok engine "$(listening "$port" && echo "listening on $port" || echo 'not running')"
   ok interface "$(listening 5280 && echo 'listening on 5280' || echo 'not running')"
+  if out="$("$(py)" "$root/setup/vendor_check.py" --check 2>&1)"; then
+    ok vendor "${out##*$'\n'}"
+  else
+    ok vendor "$(printf '%s\n' "$out" | grep -v 'not a git checkout' | grep -m1 .) (./formpublisher vendor --check lists them all)"
+  fi
 }
 cmd="${1:-boot}"
 [ $# -gt 0 ] && shift
