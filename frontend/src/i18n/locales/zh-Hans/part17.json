@@ -1,0 +1,4 @@
+{
+  "nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, then again with each listen line on a loopback port (NGINX_CHECK_PORT sets the first one), so it needs no root, no IPv6 and no network and changes nothing in this folder.": "nginx-check.sh 先在使用 unix 套接字而非端口的临时副本上运行 nginx -t，再让每个 listen 行使用一个回环端口重新运行一次（第一个端口由 NGINX_CHECK_PORT 设定），因此不需要 root 权限、IPv6 和网络，也不会改动此文件夹中的任何内容。",
+  "With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects.": "关闭脚本后，访问 splat 地址的访客会看到 404 页面，因为只有脚本才会执行这些重定向。"
+}

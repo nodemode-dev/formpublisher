@@ -1,0 +1,4 @@
+{
+  "nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, then again with each listen line on a loopback port (NGINX_CHECK_PORT sets the first one), so it needs no root, no IPv6 and no network and changes nothing in this folder.": "nginx-check.sh는 포트 대신 unix 소켓을 쓰는 임시 사본에서 nginx -t를 실행한 다음, 각 listen 줄을 루프백 포트에 두고 다시 실행합니다(첫 번째 포트는 NGINX_CHECK_PORT로 지정합니다). 따라서 root도 IPv6도 네트워크도 필요 없고 이 폴더의 내용은 전혀 바뀌지 않습니다.",
+  "With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects.": "스크립트를 끄면 스플랫 주소로 접속한 방문자에게 404 페이지가 표시됩니다. 이 리디렉션은 스크립트만 따르기 때문입니다."
+}

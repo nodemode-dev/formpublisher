@@ -1,0 +1,4 @@
+{
+  "nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, then again with each listen line on a loopback port (NGINX_CHECK_PORT sets the first one), so it needs no root, no IPv6 and no network and changes nothing in this folder.": "nginx-check.sh ajaa nginx -t -komennon väliaikaisella kopiolla, jossa on porttien sijaan unix-sokettejä, ja sitten uudelleen niin, että jokainen listen-rivi on loopback-portissa (NGINX_CHECK_PORT asettaa ensimmäisen), joten se ei tarvitse root-oikeuksia, IPv6:ta eikä verkkoa eikä muuta mitään tässä kansiossa.",
+  "With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects.": "Kun komentosarjat on poistettu käytöstä, splat-osoitteeseen saapuva kävijä näkee 404-sivun, koska vain komentosarja seuraa näitä uudelleenohjauksia."
+}
