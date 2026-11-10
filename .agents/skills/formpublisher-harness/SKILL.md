@@ -1,8 +1,8 @@
 ---
 name: formpublisher-harness
-description: Drives FormPublisher, the Form family's site publisher, through its formpublisher MCP server or the ./formpublisher run command line. Use whenever the person wants a FormWeb site exported as site-export.zip imported, a FormWeb publication folder opened, the site currently open in a running FormWeb brought in, the imported sites listed, a site's routes listed, a .fweb project opened, a site mounted for preview, checked (static or deep), built into a deterministic site.zip, or signed and verified with an Ed25519 key, or prepared for a host (Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx or a plain zip); or when formpublisher tools such as list_sites, import_site, run_checks, build_package or prepare_publish are available or fail. Not for editing a site (that is FormWeb), not for changing FormPublisher's own source code (use formpublisher-skillset), and not for uploading to a host, which FormPublisher never does.
+description: Drives FormPublisher, the Form family's site publisher, through its formpublisher MCP server or the ./formpublisher run command line. Use whenever the person wants a FormWeb site exported as site-export.zip imported, a FormWeb publication folder opened, the site currently open in a running FormWeb brought in, the imported sites listed, a site's routes listed, its revisions listed or compared, a .fweb project opened, a site mounted for preview, checked (static or deep), built into a deterministic site.zip, or signed and verified with an Ed25519 key, or prepared for a host (Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx or a plain zip); or when formpublisher tools such as list_sites, import_site, run_checks, build_package or prepare_publish are available or fail. Not for editing a site (that is FormWeb), not for changing FormPublisher's own source code (use formpublisher-skillset), and not for uploading to a host, which FormPublisher never does.
 metadata:
-  version: "0.1.2"
+  version: "0.1.3"
 ---
 
 # formpublisher harness
@@ -30,6 +30,8 @@ These are the exact MCP tool names, with the command that does the same thing. I
 | `import_site` (path) | `import PATH` | import a site export zip or publication folder as a new revision | no |
 | `import_formweb_current` | `import-formweb` | import the site open in a running FormWeb | no |
 | `site_routes` (id) | `routes ID` | routes of the latest revision | yes |
+| `list_revisions` (id) | `revisions ID` | revisions newest first, with files, bytes, routes and what changed from the one before | yes |
+| `diff_revisions` (id, from_revision, to_revision) | `diff ID [--from R] [--to R]` | files added, removed and changed (path, size, SHA-256) and routes added and removed between two revisions; default the latest against the one before | yes |
 | `run_checks` (id, deep, widths, revision) | `check ID [--deep] [--widths 390,1440]` | run the static tier, and the Chrome tier with deep | no |
 | `get_checks` (id, revision) | `check ID --last` | stored results, nothing runs | yes |
 | `build_package` (id, revision) | `build ID [--revision R]` | deterministic site.zip and publish.json | no |
@@ -37,7 +39,7 @@ These are the exact MCP tool names, with the command that does the same thing. I
 | `sign_build` (build, key, passphrase) | `sign BUILD [--key K]` | detached Ed25519 signature | no |
 | `verify_build` (build) | `verify BUILD` | check the signature against the zip | yes |
 | `list_targets` | `targets` | the six hosts | yes |
-| `prepare_publish` (build, targets) | `prepare BUILD --target T [--target T]` | a folder per target with the commands to run | no |
+| `prepare_publish` (build, targets, includeModel) | `prepare BUILD --target T [--target T] [--include-model]` | a folder per target with the commands to run | no |
 | `get_prepared` (build) | `prepared BUILD` | what is already prepared | yes |
 
 Not tools: `keys` lists the signing keys and `keys --create NAME [--passphrase P]` makes one, and `receive-status` shows the endpoint, inbox folder and last receipts for FormWeb's Send to FormPublisher. `agents sync` is `./formpublisher agents sync`.
@@ -69,7 +71,7 @@ FormPublisher prepares; it never uploads. Publishing is a chain, and each link n
 2. `build_package` with the site id. The same site gives the same build id, so a repeated call returns the existing build with `created` false.
 3. `sign_build` with the build id and a key the person named (a key id from `keys`). With one key in the data folder and no `key` argument it uses that one and says which; with none it fails and the person creates one with `./formpublisher run keys --create NAME`. Then `verify_build` and report `valid` as returned.
 4. `list_targets` for the six ids: `static-zip`, `netlify`, `cloudflare-pages`, `vercel`, `github-pages`, `nginx`.
-5. `prepare_publish` with the build id and the target ids the person wants. Each result has the prepared `folder`, its `files`, the `commands` (label, run, cwd) to run, `notes` and `warnings`. Show the commands exactly as returned and the warnings in full (for example GitHub Pages has no server redirects); do not run a deploy command yourself unless the person asks. Preparing again replaces the folder.
+5. `prepare_publish` with the build id and the target ids the person wants. Each result has the prepared `folder`, its `files`, the `commands` (label, run, cwd) to run, `notes` and `warnings`. Show the commands exactly as returned and the warnings in full (for example GitHub Pages has no server redirects); do not run a deploy command yourself unless the person asks. Preparing again replaces the folder. The host folders leave out FormWeb's model files (`site.formweb.json`, `asset-access.json`), which no host needs, and each result lists them under `leftOut`; pass `includeModel` true only when the person wants them kept.
 6. `get_prepared` reads back what exists for a build without preparing anything.
 
 ```sh
@@ -84,7 +86,7 @@ FormPublisher prepares; it never uploads. Publishing is a chain, and each link n
 ./formpublisher run receive-status
 ```
 
-A site sent from FormWeb's Send to FormPublisher arrives on its own: it is imported by the running window's engine, or dropped in the data folder's `inbox/` while FormPublisher is closed. It then shows in `list_sites` like any import.
+A site sent from FormWeb's Send to FormPublisher arrives on its own: it is imported by the running window's engine, or dropped in the data folder's `inbox/` while FormPublisher is closed. Either way, a site sent again becomes a new revision of the same site, so `list_revisions` and `diff_revisions` show what changed between sends. It then shows in `list_sites` like any import. Two Preferences settings, off by default, run the static checks and a build on every arrival; when they are on, call `get_checks` and `list_builds` instead of running them again.
 
 A `.fweb` project (envelope format `com.nodemode.formweb`) imports the same way. It needs `formweb-core`; without it the import fails with 422 and the message says to run `./setup/install_compiler`. Tell the person; do not try to work around it.
 

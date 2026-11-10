@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.3 · 2026-11-10
+
+- Desktop: the app was compiled and run for the first time, on Linux, with its splash and the Start page and no white frame. The frozen engine carries `formweb-core` and the demo sample and checks for both before it is bundled. The shell prefers port 8280 so FormWeb's Send to FormPublisher reaches it (falling back to a free port) and stops its engine on exit and on terminate, interrupt and hangup signals. The macOS and Windows bundles are not yet built.
+- Publish: prepared host folders leave out FormWeb's model files (`site.formweb.json`, `asset-access.json`) by default and each result says what was left out; the Publish sheet has a remembered "Keep FormWeb's model files" option, the command line `--include-model` and MCP `includeModel`. `site.zip` and `publish.json` are unchanged.
+- Receive: two Preferences settings, off by default, run the static checks and a build on every site that arrives from FormWeb, after the receive has answered. An inbox zip that FormWeb wrote with its metadata file becomes a revision of the same site a live send would use.
+- Revisions: Home's site cards and the site panel list each site's revisions and compare any two (files added, removed and changed, routes added and removed); the command line gains `revisions` and `diff`, and MCP `list_revisions` and `diff_revisions` (16 tools).
+- The FormWeb engine crates are vendored at 0.19.3. `demo/tools` holds the scripts that draw the sample's pictures, build it and regenerate the demo data, and the demo data was regenerated with them.
+- Every new string is in all 26 languages.
+
 ## 0.1.2 · 2026-11-10
 
 - Publish: prepare a folder per host for Static zip, Netlify, Cloudflare Pages, Vercel, GitHub Pages and nginx from a build's own `site.zip`, with the redirects, headers and 404 rule each host expects and the exact commands to run. Verify checks a prepared folder against `publish.json` and a fresh prepare; Remove moves it to the trash. A host that cannot represent something (GitHub Pages redirects and headers) says so. Nothing is uploaded.

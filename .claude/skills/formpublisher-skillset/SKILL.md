@@ -2,7 +2,7 @@
 name: formpublisher-skillset
 description: Use for any change to FormPublisher's own code, the Form family's site publisher. Covers the FastAPI engine in backend/app (routers, services, the site intake of FormWeb exports and publication folders, the read-only FormWeb connection, settings and the data folder), the vanilla TypeScript and Vite interface in frontend (the shell, Home, tabs, routes strip, inspector, status bar, tokens and the zero-flash rules), the command line and MCP server behind backend/formpublisher_engine.py, the Tauri 2 shell in src-tauri and its frozen engine sidecar, and the ./formpublisher scripts. Trigger on FormPublisher source files, a new route, a new tool, an engine or interface bug, ports 8280 or 5280, or HASHOUT_LOG. Not for driving FormPublisher to import and list sites (use formpublisher-harness).
 metadata:
-  version: "0.1.2"
+  version: "0.1.3"
 ---
 
 # formpublisher-skillset
@@ -15,7 +15,7 @@ Route every change to FormPublisher's code through this file. It maps where the 
 | --- | --- |
 | Engine entry | `backend/formpublisher_engine.py` (serve, `--selfcheck`, `cli`, `mcp`) |
 | Engine routes | `backend/app/routers/[name].py`, each exporting `router`, auto-included by `backend/app/main.py` |
-| Engine services | `backend/app/services/[name].py`: paths and the data folder, settings, site intake, the FormWeb connection, `compile` (formweb-core for .fweb), `host` (static host on 8281, served by `backend/app/host.py`), `checks` and `deep`, `package` and `keys`, `publish` and `inbox` (prepared folders per host, and FormWeb's Send to FormPublisher); `backend/app/static/probe.js` is the preview probe |
+| Engine services | `backend/app/services/[name].py`: paths and the data folder, settings, site intake, the FormWeb connection, `compile` (formweb-core for .fweb), `host` (static host on 8281, served by `backend/app/host.py`), `checks` and `deep`, `package` and `keys`, `publish` and `inbox` (prepared folders per host, and FormWeb's Send to FormPublisher), `pipeline` (the optional check and build on arrival) and `revisions` (revision lists and diffs); `backend/app/static/probe.js` is the preview probe |
 | Host targets | `backend/app/targets/[id].py`, one adapter per host (`ID`, `NAME`, `DESCRIPTION`, `LOCAL_TOOL`, `prepare`), discovered by `backend/app/targets/__init__.py`; adding a host is adding a module |
 | Command line and MCP | `backend/app/cli.py` (`Client`: HTTP to a running engine, else the same services in-process) and `backend/app/mcp.py` (one tool per `Client` method); a new route gets a `Client` method, a command and a tool together |
 | Interface | `frontend/src/`: the shell, Home, tabs, routes strip, inspector, status bar; styles and tokens in `frontend/src/styles/` |
