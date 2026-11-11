@@ -64,7 +64,7 @@ const rotateIcon = (size: number): string => `<span class="icon" style="width:${
 const select = (ctl: string, label: string, options: ReadonlyArray<readonly [string, string]>): string =>
   `<select class="fp-tb-select" data-ctl="${ctl}" aria-label="${label}" title="${label}">${options.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select>`;
 
-const FIT_BELOW = 1240;
+const FIT_BELOW = 1400;
 
 const shortLabel = (ctl: string, text: string): string => {
   if (ctl === 'device') return text.replace(/\s+\d+\s*x\s*\d+$/, '');
@@ -144,6 +144,7 @@ export class Toolbar {
     this.probe.add(new Option(''));
     host.append(this.probe);
     this.paintControls();
+    this.fit();
     this.setActive(false);
 
     this.field.addEventListener('keydown', (e) => {
@@ -198,7 +199,6 @@ export class Toolbar {
     }).observe(host);
     const refit = new MutationObserver(() => this.fit());
     for (const s of this.selects) {
-      s.addEventListener('change', () => this.fit());
       refit.observe(s, { childList: true, characterData: true, subtree: true });
     }
     document.fonts?.addEventListener('loadingdone', () => this.fit());
@@ -223,9 +223,14 @@ export class Toolbar {
         const short = compact ? shortLabel(ctl, o.text) : '';
         if (short && short !== o.text) { if (o.label !== short) o.label = short; } else if (o.hasAttribute('label')) o.removeAttribute('label');
       }
-      if (sized && s.selectedOptions[0]) {
-        this.probe.options[0].text = s.selectedOptions[0].label;
-        s.style.width = `${Math.ceil(this.probe.getBoundingClientRect().width)}px`;
+      if (sized && s.options.length) {
+        let widest = 0;
+        for (const o of Array.from(s.options)) {
+          this.probe.options[0].text = o.label;
+          widest = Math.max(widest, this.probe.getBoundingClientRect().width);
+        }
+        const px = `${Math.ceil(widest)}px`;
+        if (s.style.width !== px) s.style.width = px;
       } else if (s.style.width) {
         s.style.removeProperty('width');
       }
@@ -260,6 +265,5 @@ export class Toolbar {
     if (this.theme.value !== s.theme) this.theme.value = s.theme;
     if (this.motion.value !== s.motion) this.motion.value = s.motion;
     if (this.throttle.value !== s.throttle) this.throttle.value = s.throttle;
-    this.fit();
   }
 }

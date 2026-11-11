@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.5
+Current build version: v0.2.6
 Last updated: 2026-11-11 · Phases 46 to 48: whole panel tabs and toolbar selects in narrow windows, and Save as .fpub named SITE-BUILD.fpub
 
 ---
@@ -325,3 +325,22 @@ The Phase 43 link set the download name to `ID.fpub` (commit 35f207d).
 - `ui/builds.ts`: the link's `download` is `SITE-BUILD.fpub`, the engine's Content-Disposition name and the CLI default. Chrome already used the server's name, so nothing changed there; a webview that ignores the header would have used the shorter name. Site ids are slugs and build ids hex, so the name needs no cleaning. The site.zip link already matched.
 
 Checked: real Chrome downloads in English and German for builds of sites named Plain, an 80-character name, Café Zürich Über 日本語, my.site.v1.2.final and 日本語, each equal to the engine header and to `formpublisher run fpub` in an empty folder; `npx tsc --noEmit`; `npm run build`.
+
+## Phases 49 and 50: whole toolbar values at every width, and picks that move nothing · v0.2.6 (2026-11-11)
+
+Between 1240 and 1400 px of row Turn O's container rule still let the selects shrink with an ellipsis, and below 1240 px each select was sized to its chosen option, so a pick moved its neighbours (commit 83c2e79).
+
+- `ui/toolbar.ts`: `FIT_BELOW` is 1400. `paint()` sizes each select to its widest option label in the current stage, measured with the hidden probe select (arrow included), and writes the inline width only when it changes. The select `change` listener and the `fit()` call in `paintControls()` are gone: the toolbar fits once at construction and then only on row resize, option or text changes and font loads, never on a pick.
+- `styles/preview.css`: the 1400 px container rule no longer shrinks or clips selects (`min-width: 0; max-width: none; text-overflow: clip`); the `.is-short` rule that let the device select shrink is removed; in `.is-short` the number inputs are 34 px (`padding: 0 1px`) and the icon buttons 22 px, so the row still fits at 760 px in German and Russian. Four-digit sizes still show whole.
+
+Checked: English, German, Finnish and Russian at 1440, 1366, 1280, 1100 and 760 px with CPU 4x, cycling every option of every select: no cut value, no control outside the row, no control moved or resized by a pick (before: up to 13 cut selects per case between 1240 and 1400 px, and 11 or 12 picks moving neighbours below 1400 px); CLS 0 opening a site and resizing; 1440 x 900 unchanged; `npx tsc --noEmit`; `npm run build`.
+
+## Phase 51: the Problems bar keeps one row where a short "All" is enough · v0.2.6 (2026-11-11)
+
+Turn P left the bar 59 px tall at 760 x 640 in every language (commits 96d59ec and e858928).
+
+- `ui/panel.ts`: `watchBar()` and `fitBar()`. When the bar would wrap with the full labels (another control sits on a lower row than the severity select), option 0 of both filters gets `option.label = t('All')` and each select's `title` the full option text; if the bar still wraps, the full labels come back. It runs before first paint from a `ResizeObserver` on the Problems page, and on option edits, picks and font loads. Option text and keys are unchanged.
+- `styles/panel.css`: the narrow column gap is 2 px.
+- `i18n/keys/part21.json`: "All", in all 25 other languages, in a form that stands without a noun.
+
+Checked: English, German, Finnish and Russian at 1440 x 900, 1100 x 800 and 760 x 640 with CPU 4x and every option of both filters: whole values, every control inside the bar, CLS 0 opening a site, resizing and running checks. English at 760 x 640 is one 34 px row again. Known: German, Finnish and Russian still wrap at 760 x 640, and Russian at 1100 x 800, because their widest other options (Warnungen, Varoitukset, Предупреждения; Statisch, Staattinen, Статическая) leave no room with whole values.
