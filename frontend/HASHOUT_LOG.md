@@ -312,6 +312,12 @@ Turn O kept every control in the row but the selects at 760 x 640 showed only "D
 
 Checked: English, German, Finnish and Russian at 1440 x 900, 1100 x 800 and 760 x 640 with CPU 4x and every option of every select: whole values, no control outside the row, no scrolling, CLS 0 opening a site and resizing; 1440 x 900 unchanged; `npx tsc --noEmit`; `npm run build`. Known: picking an option resizes the select, so its neighbours move after the user's own pick; the band between 1240 and 1400 px still uses Turn O's shrinking selects.
 
+The director's exit run then found the Problems bar's two filters ("All severities", "All tiers") squeezed to 40 to 52 px at 760 x 640 in every language and cut at 1100 x 800 in Russian (commit d503e8f).
+
+- `styles/panel.css`: the filters keep their own width (`flex: none`, `max-width: 100%`), which counts the engine's arrow, and `.fp-pn-bar` wraps (`flex-wrap`, `min-height: 34px` in place of a fixed height), so the filters and then the icon buttons drop to their own rows when the width cannot hold them. The rows follow the width and the language, never the results. Run checks keeps the right edge with `margin-left: auto`; the progress text takes the free space and, at 300 px or less, is visually hidden but stays in its live region. `container-type` moves from the bar to its page, so Turn O's 300 px rules, which targeted the bar from its own container, now apply.
+
+Checked: the same four languages and three sizes with every option of both filters: whole values, every control inside the bar, Run checks and Deep check reachable; CLS 0 opening a site, resizing and running checks; 1440 x 900 unchanged. Known: at 760 x 640 the bar is 59 px tall instead of 34 (one filter per row in German, Finnish and Russian), and in Russian at 1100 x 800 Deep check wraps to a second row.
+
 ## Phase 48: Save as .fpub downloads as SITE-BUILD.fpub · v0.2.5 (2026-11-11)
 
 The Phase 43 link set the download name to `ID.fpub` (commit 35f207d).
