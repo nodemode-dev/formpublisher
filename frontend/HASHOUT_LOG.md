@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.7
-Last updated: 2026-11-11 · Phases 52 to 54: a compact Problems filter, a language switch without a reload, and the narrow window in WebKitGTK
+Current build version: v0.2.8
+Last updated: 2026-11-11 · Phases 55 to 57: the first pick after a translated start moves nothing (the steady switch waits for the owner), the Linux desktop shell, and a shorter device select
 
 ---
 

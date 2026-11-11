@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.8 · 2026-11-11
+
+- The toolbar's dropdowns start at their final width in every language, so the first pick after starting in German, for example, no longer moves the toolbar.
+- In the narrowest toolbar the device dropdown is only as wide as its preset names, and Custom shows a short word where its full name is long (German "Andere"). The tooltip names the full device.
+- A second FormPublisher engine, such as the desktop app next to a command-line engine, now serves its previews on a free port of its own instead of reaching the first engine's site. `/api/health` and `engine.json` report the port as `hostPort`.
+- The desktop app was built and run on Linux: the in-window menus, the toolbar and the Problems filter match the browser.
+- The FormWeb engine crates are vendored at 0.20.8.
+- The new label is in all 26 languages.
+
 ## 0.2.7 · 2026-11-11
 
 - Where the Problems filters cannot share one row even with "All", they give way to a single funnel button. A dot shows when a filter is active, the tooltip names both choices, and its menu sets severity and tier by mouse or keyboard. The bar is one row in every language and size.
