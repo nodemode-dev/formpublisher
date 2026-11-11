@@ -1,7 +1,12 @@
+import os
+import tempfile
+from pathlib import Path
+
 from fastapi import APIRouter, Request
 from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 
-from app.services import intake, keys, package
+from app.services import fpub, intake, keys, package
 
 router = APIRouter(prefix="/api/builds", tags=["builds"])
 
@@ -49,6 +54,19 @@ def get_build(build_id: str):
 def download(build_id: str):
     target = package.zip_path(build_id)
     return FileResponse(target, media_type="application/zip", filename="site.zip")
+
+
+@router.get("/{build_id}/fpub")
+def fpub_file(build_id: str):
+    handle, name = tempfile.mkstemp(prefix="formpublisher-fpub-", suffix=".fpub")
+    os.close(handle)
+    target = Path(name)
+    try:
+        made = fpub.write_file(build_id, target)
+    except BaseException:
+        target.unlink(missing_ok=True)
+        raise
+    return FileResponse(target, media_type="application/octet-stream", filename=f"{made['site']}-{build_id}.fpub", background=BackgroundTask(target.unlink, missing_ok=True))
 
 
 @router.post("/{build_id}/reproduce")

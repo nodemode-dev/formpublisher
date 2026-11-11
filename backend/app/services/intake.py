@@ -262,24 +262,25 @@ def _write_json(target: Path, data: dict) -> None:
     os.replace(tmp, target)
 
 
-def _finish(staging: Path, kind: str, source: dict, source_key: str, stem: str, name: str | None, skipped: int = 0) -> dict:
+def _finish(staging: Path, kind: str, source: dict, source_key: str, stem: str, name: str | None, skipped: int = 0, site_id: str | None = None, revision_name: str | None = None) -> dict:
     try:
         root = _content_root(staging)
         _, rows = routes_of(root)
         if not rows:
             raise IntakeError("no site found: the source has no routes.json and no index.html", 400, "not-a-site")
         title = (name or "").strip() or site_name_from(root) or stem
-        sid = make_id(title, source_key)
+        sid = site_id or make_id(title, source_key)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         files, size = _tree_stats(root)
         redirects = redirects_of(root)
         with _lock:
             folder = paths.sites_dir() / sid
             folder.mkdir(parents=True, exist_ok=True)
-            revision = stamp
+            base = revision_name or stamp
+            revision = base
             counter = 2
             while (folder / revision).exists():
-                revision = f"{stamp}-{counter}"
+                revision = f"{base}-{counter}"
                 counter += 1
             os.replace(root, folder / revision)
             previous = _read_json(folder / "site.json")
@@ -363,6 +364,10 @@ def import_path(raw: str, name: str | None = None) -> dict:
         return import_folder(target, name)
     if target.is_file():
         resolved = target.resolve()
+        from app.services import fpub
+
+        if fpub.is_fpub(resolved):
+            return fpub.import_file(resolved, {"path": str(resolved)}, name)
         if is_fweb(resolved):
             return import_fweb_file(resolved, {"kind": "fweb", "path": str(resolved)}, f"fweb:{resolved}", name, resolved.stem)
         return import_zip_file(resolved, "zip", {"kind": "zip", "path": str(resolved)}, f"zip:{resolved}", name, resolved.stem)
@@ -371,6 +376,10 @@ def import_path(raw: str, name: str | None = None) -> dict:
 
 def import_upload(archive: Path, filename: str, name: str | None = None) -> dict:
     label = Path(filename or "upload.zip").name
+    from app.services import fpub
+
+    if fpub.is_fpub(archive, label):
+        return fpub.import_file(archive, {"path": label, "upload": True}, name)
     if is_fweb(archive, label):
         return import_fweb_file(archive, {"kind": "fweb", "path": label, "upload": True}, f"fweb-upload:{label}", name, Path(label).stem)
     return import_zip_file(archive, "zip", {"kind": "zip", "path": label, "upload": True}, f"upload:{label}", name, Path(label).stem)

@@ -1,5 +1,6 @@
 import asyncio
 import sys
+from pathlib import Path
 from typing import Any
 
 from mcp.server.mcpserver import MCPServer
@@ -13,6 +14,7 @@ INSTRUCTIONS = (
     "FormPublisher turns a site built in FormWeb into something that can be checked, packaged and published. "
     "Start with formpublisher_status, then import a FormWeb export zip or publication folder with import_site, "
     "or pull the current FormWeb export with import_formweb_current, and read the result with list_sites and site_routes. "
+    "A .fpub package (save_fpub) can be opened elsewhere with import_site. "
     "Then run_checks, build_package, sign_build (with a key the person named) and verify_build, and finish with list_targets and prepare_publish, "
     "which writes a folder per host with the commands to run; nothing is uploaded. "
     "FormPublisher only reads from FormWeb and never changes it."
@@ -47,7 +49,7 @@ def build(client: Client | None = None) -> MCPServer:
 
     @server.tool(
         name="import_site",
-        description="Import a FormWeb site export (a zip with routes.json, sitemap.xml, robots.txt and assets/) or a FormWeb publication folder from an absolute local path. It is unzipped safely into FormPublisher's data folder as a new revision and returns the site record. Importing the same source again adds a revision.",
+        description="Import a FormWeb site export (a zip with routes.json, sitemap.xml, robots.txt and assets/), a .fweb project, a FormPublisher .fpub package or a FormWeb publication folder from an absolute local path. It is unzipped safely into FormPublisher's data folder as a new revision and returns the site record. A .fpub also restores its build (publish.json, site.zip and signature, checked against the key it carries) and the record says so under build. Importing the same source again adds a revision.",
         annotations=ToolAnnotations(title="Import a site", readOnlyHint=False, destructiveHint=False, idempotentHint=False, openWorldHint=False),
     )
     async def import_site(path: str) -> dict:
@@ -123,6 +125,17 @@ def build(client: Client | None = None) -> MCPServer:
     )
     async def list_builds() -> dict:
         return await run(link.builds)
+
+    @server.tool(
+        name="save_fpub",
+        description="Save a build as a .fpub package (one file holding the build's publish.json, site.zip and signature) at an absolute path ending in .fpub. The same build gives the same bytes every time. It will not replace an existing file. Returns the file, size and SHA-256.",
+        annotations=ToolAnnotations(title="Save a build as .fpub", readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False),
+    )
+    async def save_fpub(build: str, path: str) -> dict:
+        """build: build id from list_builds. path: absolute path of the new .fpub file on this computer."""
+        if not Path(path).expanduser().is_absolute():
+            raise ToolError("error [invalid]: path must be absolute")
+        return await run(link.save_fpub, build, path, False)
 
     @server.tool(
         name="sign_build",
