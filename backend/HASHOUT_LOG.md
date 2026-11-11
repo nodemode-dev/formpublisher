@@ -448,3 +448,13 @@ Two files changed, `formpublisher.bat` and `backend/boot_backend.bat` (commit b1
 Checked: each launcher path above was run under Wine 9.0, before and after the fix. Real Windows has still not been run.
 
 Docs: `docs/MANUAL.md` (the Getting started passage on the Windows launchers).
+
+## Phase 56: a second engine binds its own preview host · v0.2.8 (2026-11-11)
+
+Three files changed: `app/host.py`, `app/services/paths.py` and `app/routers/health.py` (commit 3c3c4fd). Running the desktop shell on Linux beside another engine showed that when 8281 (or `FORMPUBLISHER_HOST_PORT`) was already taken, uvicorn failed to bind, `_run` only logged "site host stopped", and this engine kept building `host_url()` from the same number, so its preview and live checks reached the other engine's site.
+
+- `host.start()` binds the socket itself, as `serve_revision()` does, with `SO_REUSEADDR`. If the wanted port raises `OSError` it binds port 0, logs one warning naming both ports, and calls `paths.set_host_port()` with the bound port, so `host_port()`, `host_url()`, `host_origin()` and `HostApp`'s Host check all use it. The socket goes to `serve(sockets=[sock])` and is closed in `stop()`.
+- `engine.json` (written after the host starts) and `/api/health` carry `hostPort`; no existing field changed.
+- A free wanted port behaves as before: same port, no warning.
+
+Checked: two engines on 9012 and 9014 while 8281 was held by a third took different host ports, reported them in `/api/health` and `engine.json`, and each preview and its assets came from its own port, with no `live.request` errors on the second; `FORMPUBLISHER_HOST_PORT=9099` was taken exactly with no warning; `compileall`; engine `--selfcheck`.

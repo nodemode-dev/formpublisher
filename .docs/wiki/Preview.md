@@ -1,6 +1,6 @@
 # Preview
 
-Opening a site mounts a revision on the site host, a second listener at 127.0.0.1:8281 (`FORMPUBLISHER_HOST_PORT`). It serves the files the way a production static host does, on its own origin, so the site has its own storage and cannot call the engine's `/api` routes. One site is mounted at a time.
+Opening a site mounts a revision on the site host, a second listener at 127.0.0.1:8281 (`FORMPUBLISHER_HOST_PORT`). It serves the files the way a production static host does, on its own origin, so the site has its own storage and cannot call the engine's `/api` routes. One site is mounted at a time. If 8281 is taken (by a second engine, say), the engine binds a free port instead and reports it as `hostPort` in `/api/health` and `engine.json`.
 
 ## What the host does
 
