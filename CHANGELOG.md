@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.9 · 2026-11-10
+
+- The nginx folder carries `nginx-check.sh`, and Check the config now runs `sh nginx-check.sh`: it checks the config with `nginx -t` on a scratch copy, so it works without root or IPv6 and changes nothing in the folder.
+- nginx redirects keep the query string, like every other target. Folders prepared for nginx by 0.1.8 need preparing again.
+- The Publish sheet reads in your language: every host description, command label, note and warning is translated into all 26 languages.
+- The GitHub Pages description says its 404 page also follows folder redirects.
+- Checked on every target: redirects to other sites, and a GitHub Pages site whose export has no FormWeb model, which takes its address from the 404 page.
+- The FormWeb engine crates are vendored at 0.19.9.
+
 ## 0.1.8 · 2026-11-10
 
 - Restoring from the trash uses one dialog, Restore from the trash, which asks for a place, a passphrase or both at once and shows any refusal on the field it concerns.

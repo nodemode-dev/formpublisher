@@ -8,7 +8,7 @@ from app.targets._common import PreparedInput, PreparedResult, copy_site, is_spl
 
 ID = "github-pages"
 NAME = "GitHub Pages"
-DESCRIPTION = "A gh-pages branch or an Actions workflow, with a 404 page and meta-refresh redirects."
+DESCRIPTION = "A gh-pages branch or an Actions workflow, with a 404 page that also follows folder redirects, and meta-refresh redirects."
 LOCAL_TOOL = "python3 -m http.server -d site 8080"
 
 MINIMAL_404 = """<!doctype html>

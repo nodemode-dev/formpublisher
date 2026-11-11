@@ -9,7 +9,23 @@ from app.targets._common import SAFE_PATH, PreparedInput, PreparedResult, copy_s
 ID = "nginx"
 NAME = "nginx"
 DESCRIPTION = "A server block with try_files, redirects, headers and gzip, plus a docker run line."
-LOCAL_TOOL = "nginx -t -c nginx-test.conf"
+LOCAL_TOOL = "sh nginx-check.sh"
+
+CHECK_SCRIPT = """set -u
+command -v nginx >/dev/null 2>&1 || { echo "nginx-check.sh: nginx was not found on this machine." >&2; exit 127; }
+here=$(cd "$(dirname "$0")" && pwd) || exit 1
+scratch=$(mktemp -d "${TMPDIR:-/tmp}/formpublisher-nginx.XXXXXX") || exit 1
+trap 'rm -rf "$scratch"' EXIT
+trap 'exit 1' HUP INT TERM
+mkdir "$scratch/conf" || exit 1
+cp "$here/nginx-test.conf" "$scratch/conf/nginx-test.conf" || exit 1
+SCRATCH="$scratch" awk '/^[[:space:]]*listen[[:space:]]/ { n++; sub(/listen[[:space:]][^;]*;/, "listen unix:" ENVIRON["SCRATCH"] "/l" n ".sock;") } { print }' "$here/formpublisher.conf" > "$scratch/conf/formpublisher.conf" || exit 1
+cd "$scratch" || exit 1
+nginx -t -p "$scratch/" -e "$scratch/error.log" -c "$scratch/conf/nginx-test.conf" > "$scratch/out.txt" 2>&1
+status=$?
+sed "s|$scratch/conf|$here|g" "$scratch/out.txt" >&2
+exit "$status"
+"""
 
 GZIP_TYPES = "text/plain text/css text/xml text/javascript application/javascript application/json application/xml application/manifest+json image/svg+xml"
 TYPES = """        text/html html htm;
@@ -187,15 +203,16 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
         if not (src_ok and dst_ok):
             result.warnings.append(f"Skipped the redirect {src!r} because it holds characters nginx needs quoted.")
             continue
+        keep = "" if "?" in dst else "$is_args$args"
         if is_splat(row):
             prefix = src[:-1]
             target = dst.replace(":splat", "$1")
-            lines.append(f"    location ~ ^{_cut_rx(prefix)}(.*)$ {{ return {row['status']} {target}; }}")
+            lines.append(f"    location ~ ^{_cut_rx(prefix)}(.*)$ {{ return {row['status']} {target}{keep}; }}")
         else:
             plain = src.rstrip("/") or "/"
-            lines.append(f"    location = {plain} {{ return {row['status']} {dst}; }}")
+            lines.append(f"    location = {plain} {{ return {row['status']} {dst}{keep}; }}")
             if plain != "/":
-                lines.append(f"    location = {plain}/ {{ return {row['status']} {dst}; }}")
+                lines.append(f"    location = {plain}/ {{ return {row['status']} {dst}{keep}; }}")
     lines.append("")
     for prefix, values in scoped:
         merged = {**global_headers, **values}
@@ -207,13 +224,14 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
     lines += ["    location / {", "        try_files $uri $uri/ $uri.html =404;", "    }", "}"]
     put(out, "formpublisher.conf", "\n".join(lines) + "\n")
     put(out, "nginx-test.conf", TEST_CONF.format(types=TYPES))
-    result.command("Prepare a scratch folder for the check", "mkdir -p /tmp/formpublisher-nginx")
-    result.command("Check the config", 'nginx -t -p /tmp/formpublisher-nginx/ -c "$PWD/nginx-test.conf"')
+    put(out, "nginx-check.sh", CHECK_SCRIPT)
+    result.command("Check the config", "sh nginx-check.sh")
     result.command(
         "Run it in Docker",
         'docker run --rm -p 8080:80 -v "$PWD/site:/usr/share/nginx/html:ro" -v "$PWD/formpublisher.conf:/etc/nginx/conf.d/default.conf:ro" nginx:stable',
     )
     result.notes.append("formpublisher.conf is one server block for conf.d; nginx-test.conf wraps it so nginx -t can parse it alone.")
+    result.notes.append("nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, so it needs no root and no IPv6 and changes nothing in this folder.")
     result.notes.append("Unknown paths return 404 through try_files" + (" and show the site's 404.html." if inp.has_404 else "; the site has no 404.html, so nginx shows its own page."))
     if inp.fallback_404:
         result.notes.append("This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.")
