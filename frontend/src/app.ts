@@ -32,7 +32,7 @@ const SHELL = `<div class="fp-app">
 </div>
 </header>
 <div class="fp-tabs" role="tablist" aria-label="Open sites"></div>
-<div class="fp-options"><div class="fp-tb-field">${icon('link', 14)}<input class="fp-route-field" aria-label="Route" placeholder="No route selected" spellcheck="false" autocomplete="off"></div></div>
+<div class="fp-options"><div class="fp-tb-field">${icon('link', 14)}<input class="fp-route-field" aria-label="Route" title="Route" placeholder="No route selected" spellcheck="false" autocomplete="off"></div></div>
 <div class="fp-main">
 <aside class="fp-strip-col" aria-label="Routes">
 <div class="fp-strip-head"><span class="fp-strip-title">Routes</span><span class="fp-strip-count">0</span></div>

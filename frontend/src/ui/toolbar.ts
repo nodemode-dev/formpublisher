@@ -64,6 +64,17 @@ const rotateIcon = (size: number): string => `<span class="icon" style="width:${
 const select = (ctl: string, label: string, options: ReadonlyArray<readonly [string, string]>): string =>
   `<select class="fp-tb-select" data-ctl="${ctl}" aria-label="${label}" title="${label}">${options.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select>`;
 
+const FIT_BELOW = 1240;
+
+const shortLabel = (ctl: string, text: string): string => {
+  if (ctl === 'device') return text.replace(/\s+\d+\s*x\s*\d+$/, '');
+  if (ctl === 'theme' || ctl === 'motion' || ctl === 'throttle') {
+    const i = text.indexOf(': ');
+    if (i > 0) return text.charAt(i + 2).toLocaleUpperCase(document.documentElement.lang || undefined) + text.slice(i + 3);
+  }
+  return text;
+};
+
 const CONTROLS = `<span class="fp-sep"></span>
 ${select('device', 'Device', [['desktop', 'Desktop 1440 x 900'], ['laptop', 'Laptop 1280 x 800'], ['tablet', 'Tablet 834 x 1112'], ['phone', 'Phone 390 x 844'], ['custom', 'Custom']])}
 <input class="fp-tb-num" data-ctl="width" type="number" inputmode="numeric" min="${MIN_SIZE}" max="${MAX_SIZE}" step="1" aria-label="Width" title="Width">
@@ -102,6 +113,9 @@ export class Toolbar {
   private readonly motion: HTMLSelectElement;
   private readonly throttle: HTMLSelectElement;
   private readonly gated: Array<HTMLButtonElement | HTMLInputElement | HTMLSelectElement>;
+  private readonly selects: HTMLSelectElement[];
+  private readonly probe: HTMLSelectElement;
+  private rowWidth = Infinity;
 
   constructor(private readonly host: HTMLElement, private readonly hooks: ToolbarHooks) {
     host.insertAdjacentHTML('beforeend', CONTROLS);
@@ -121,6 +135,14 @@ export class Toolbar {
     const pack = ctl<HTMLButtonElement>('package');
     const publish = ctl<HTMLButtonElement>('publish');
     this.gated = [this.field, reload, browser, publish, pack];
+    this.selects = [this.device, this.zoom, this.theme, this.motion, this.throttle];
+    this.probe = document.createElement('select');
+    this.probe.className = 'fp-tb-select fp-tb-probe';
+    this.probe.setAttribute('translate', 'no');
+    this.probe.setAttribute('aria-hidden', 'true');
+    this.probe.tabIndex = -1;
+    this.probe.add(new Option(''));
+    host.append(this.probe);
     this.paintControls();
     this.setActive(false);
 
@@ -168,6 +190,46 @@ export class Toolbar {
     browser.addEventListener('click', () => hooks.openBrowser());
     pack.addEventListener('click', () => hooks.packageSite());
     publish.addEventListener('click', () => emit('fp:publish', { source: 'toolbar' }));
+
+    new ResizeObserver((entries) => {
+      const box = entries[0];
+      const w = box.contentBoxSize?.[0]?.inlineSize ?? box.contentRect.width;
+      if (w > 0 && w !== this.rowWidth) { this.rowWidth = w; this.fit(); }
+    }).observe(host);
+    const refit = new MutationObserver(() => this.fit());
+    for (const s of this.selects) {
+      s.addEventListener('change', () => this.fit());
+      refit.observe(s, { childList: true, characterData: true, subtree: true });
+    }
+    document.fonts?.addEventListener('loadingdone', () => this.fit());
+  }
+
+  private fit(): void {
+    const sized = this.rowWidth <= FIT_BELOW;
+    let stage = sized ? 1 : 0;
+    for (;;) {
+      this.host.classList.toggle('is-tight', stage >= 2);
+      this.host.classList.toggle('is-short', stage >= 3);
+      this.paint(sized, stage >= 3);
+      if (stage === 0 || stage >= 3 || this.host.scrollWidth <= this.host.clientWidth) break;
+      stage += 1;
+    }
+  }
+
+  private paint(sized: boolean, compact: boolean): void {
+    for (const s of this.selects) {
+      const ctl = s.dataset.ctl ?? '';
+      for (const o of Array.from(s.options)) {
+        const short = compact ? shortLabel(ctl, o.text) : '';
+        if (short && short !== o.text) { if (o.label !== short) o.label = short; } else if (o.hasAttribute('label')) o.removeAttribute('label');
+      }
+      if (sized && s.selectedOptions[0]) {
+        this.probe.options[0].text = s.selectedOptions[0].label;
+        s.style.width = `${Math.ceil(this.probe.getBoundingClientRect().width)}px`;
+      } else if (s.style.width) {
+        s.style.removeProperty('width');
+      }
+    }
   }
 
   current(): PreviewState {
@@ -198,5 +260,6 @@ export class Toolbar {
     if (this.theme.value !== s.theme) this.theme.value = s.theme;
     if (this.motion.value !== s.motion) this.motion.value = s.motion;
     if (this.throttle.value !== s.throttle) this.throttle.value = s.throttle;
+    this.fit();
   }
 }
