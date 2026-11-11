@@ -277,7 +277,7 @@ class PackageSheet extends Dialog {
         else say(this.f.repro, `Not reproduced. Expected ${r.expected.slice(0, 12)}, got ${r.sha256.slice(0, 12)}.`, 'error');
       } catch (e) {
         say(this.f.repro, message(e), 'error');
-        refuseStep(e, b.id);
+        refuseStep(e, b.id, () => { void this.runReproduce(); });
       }
     });
   }
@@ -313,7 +313,7 @@ class PackageSheet extends Dialog {
         else say(this.f.verify, `Invalid. ${r.reason || 'The signature does not match.'}`, 'error');
       } catch (e) {
         say(this.f.verify, message(e), 'error');
-        refuseStep(e, b.id);
+        refuseStep(e, b.id, () => { void this.runVerify(); });
       }
     });
   }

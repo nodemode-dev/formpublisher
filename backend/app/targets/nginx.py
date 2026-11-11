@@ -1,4 +1,7 @@
 import re
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 
 from app.targets._common import SAFE_PATH, PreparedInput, PreparedResult, copy_site, is_splat, ordered_redirects, put
@@ -28,7 +31,7 @@ TYPES = """        text/html html htm;
 
 TEST_CONF = """# FormPublisher: a wrapper so nginx -t can check formpublisher.conf on its own.
 daemon off;
-pid /tmp/formpublisher-nginx/nginx.pid;
+pid nginx.pid;
 error_log /dev/stderr info;
 
 events {{
@@ -52,6 +55,94 @@ def _header_lines(values: dict, indent: str) -> list[str]:
 
 def _cut_rx(text: str) -> str:
     return re.sub(r"([.+?^$(){}|\\\[\]])", r"\\\1", text)
+
+
+CHECK_SECONDS = 20
+CHECK_OUTPUT_LIMIT = 2048
+
+
+def _trim(text: str) -> str:
+    text = "\n".join(line.rstrip() for line in text.strip().splitlines() if line.strip())
+    raw = text.encode("utf-8")
+    return text if len(raw) <= CHECK_OUTPUT_LIMIT else raw[:CHECK_OUTPUT_LIMIT].decode("utf-8", "ignore")
+
+
+def _local_listens(text: str, scratch: Path) -> str:
+    count = [0]
+
+    def swap(found: re.Match) -> str:
+        count[0] += 1
+        return f"{found.group(1)}listen unix:{scratch / ('l' + str(count[0]) + '.sock')};"
+
+    return re.sub(r"^([ \t]*)listen[ \t][^;\n]*;", swap, text, flags=re.M)
+
+
+def check(folder: Path) -> dict:
+    """Run nginx -t on a prepared folder's nginx-test.conf, from a copy in a fresh scratch folder.
+
+    nginx -t opens every listen socket, so the copy swaps each listen for a unix socket inside the scratch folder: no port is bound, no network is used and a normal user can run it. The prefix, pid, temp paths and error log all sit under the scratch folder and there is no user directive.
+
+    Returns {"ran", "ok", "version", "output"}. When nginx is not on PATH, or the folder has no nginx-test.conf, "ran" is false and "ok" is None.
+    """
+    exe = shutil.which("nginx")
+    conf = Path(folder) / "nginx-test.conf"
+    if exe is None or not conf.is_file():
+        return {"ran": False, "ok": None, "version": "", "output": ""}
+    version = ""
+    scratch = Path(tempfile.mkdtemp(prefix="formpublisher-nginx-"))
+    try:
+        try:
+            probe = subprocess.run([exe, "-v"], capture_output=True, text=True, timeout=CHECK_SECONDS, stdin=subprocess.DEVNULL, cwd=scratch)
+            found = re.search(r"nginx/(\S+)", probe.stderr + probe.stdout)
+            version = found.group(1) if found else ""
+        except (OSError, subprocess.SubprocessError):
+            version = ""
+        confdir = scratch / "conf"
+        confdir.mkdir()
+        shutil.copyfile(conf, confdir / "nginx-test.conf")
+        site_conf = Path(folder) / "formpublisher.conf"
+        if site_conf.is_file():
+            (confdir / "formpublisher.conf").write_text(_local_listens(site_conf.read_text(encoding="utf-8", errors="replace"), scratch), encoding="utf-8")
+        try:
+            run = subprocess.run(
+                [exe, "-t", "-p", str(scratch) + "/", "-e", str(scratch / "error.log"), "-c", str(confdir / "nginx-test.conf")],
+                capture_output=True,
+                text=True,
+                errors="replace",
+                timeout=CHECK_SECONDS,
+                stdin=subprocess.DEVNULL,
+                cwd=scratch,
+            )
+        except subprocess.TimeoutExpired:
+            return {"ran": True, "ok": False, "version": version, "output": f"nginx -t did not finish within {CHECK_SECONDS} seconds."}
+        except OSError as exc:
+            return {"ran": False, "ok": None, "version": version, "output": _trim(str(exc))}
+        printed = run.stderr + ("\n" + run.stdout if run.stdout.strip() else "")
+        tagged = [line for line in printed.splitlines() if line.startswith("nginx:")]
+        printed = "\n".join(tagged) if tagged else printed
+        return {"ran": True, "ok": run.returncode == 0, "version": version, "output": _trim(printed.replace(str(confdir), str(Path(folder))))}
+    finally:
+        shutil.rmtree(scratch, ignore_errors=True)
+
+
+def message_of(report: dict) -> str:
+    """The first line nginx printed that names the failure, without the leading nginx: tag."""
+    lines = [line for line in str(report.get("output") or "").splitlines() if line.strip()]
+    for line in lines:
+        if "[emerg]" in line or "[alert]" in line or "[crit]" in line:
+            return re.sub(r"^nginx:\s*", "", line).strip()
+    return re.sub(r"^nginx:\s*", "", lines[0]).strip() if lines else "nginx -t failed"
+
+
+def annotate(result: PreparedResult, folder: Path) -> None:
+    """Add the nginx -t outcome for a freshly prepared folder as a note or a warning."""
+    report = check(folder)
+    if not report["ran"]:
+        result.notes.append("nginx -t runs where nginx is installed; nginx was not found on this machine, so the config was not checked here.")
+    elif report["ok"]:
+        result.notes.append(f"nginx -t passed with nginx {report['version']}." if report["version"] else "nginx -t passed.")
+    else:
+        result.warnings.append(f"nginx -t failed: {message_of(report)}")
 
 
 def prepare(inp: PreparedInput, out: Path) -> PreparedResult:

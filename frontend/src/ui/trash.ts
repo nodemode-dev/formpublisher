@@ -26,110 +26,103 @@ function shapeError(kind: TrashKind, name: string): string {
   return parts.length === 3 && SITE_ID.test(parts[0]) && HEX12.test(parts[1]) && SITE_ID.test(parts[2]) ? '' : 'A prepared folder goes at <site>/<build id>/<target>.';
 }
 
-class OriginDialog extends Dialog {
+type RestoreReason = 'origin-unknown' | 'passphrase-required';
+
+class RestoreDialog extends Dialog {
   private readonly lead = el('<p class="fp-note"></p>');
+  private readonly placeBox = el('<div class="fp-tr-field" hidden></div>');
   private readonly prefix = el('<span class="fp-tr-prefix" translate="no"></span>');
-  private readonly input = el<HTMLInputElement>('<input class="fp-input is-mono" type="text" spellcheck="false" autocomplete="off" aria-label="Name" placeholder="For example a site id or a build path" translate="no">');
-  private readonly error = el('<p class="fp-tr-origin-error" role="alert"></p>');
+  private readonly placeInput = el<HTMLInputElement>('<input class="fp-input is-mono" type="text" spellcheck="false" autocomplete="off" aria-label="Name" placeholder="For example a site id or a build path" translate="no">');
+  private readonly placeError = el('<p class="fp-tr-origin-error" role="alert"></p>');
+  private readonly passBox = el('<div class="fp-tr-field" hidden></div>');
+  private readonly passInput = el<HTMLInputElement>('<input class="fp-input" type="password" spellcheck="false" autocomplete="off" aria-label="Passphrase of the locked key" placeholder="Passphrase of the locked key">');
+  private readonly passError = el('<p class="fp-tr-origin-error" role="alert"></p>');
   private readonly ok: HTMLButtonElement;
   private item: TrashEntry | null = null;
+  private wantPlace = false;
+  private wantPass = false;
   private busy = false;
   private resolve: ((v: boolean) => void) | null = null;
 
   constructor() {
-    super('Where does it go', 460, 'fp-tr-dlg');
+    super('Restore from the trash', 460, 'fp-tr-dlg');
     const row = el('<div class="fp-tr-origin"></div>');
-    row.append(this.prefix, this.input);
-    this.body.append(this.lead, row, this.error);
+    row.append(this.prefix, this.placeInput);
+    this.placeBox.append(row, this.placeError);
+    this.passBox.append(this.passInput, this.passError);
+    this.body.append(this.lead, this.placeBox, this.passBox);
     this.button('Cancel', 'ghost', () => this.close());
     this.ok = this.button('Restore', 'primary', () => { void this.submit(); });
-    this.input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.submit(); } });
-    this.input.addEventListener('input', () => setText(this.error, ''));
-    this.onClose = () => { const r = this.resolve; this.resolve = null; r?.(false); };
-  }
-
-  ask(item: TrashEntry): Promise<boolean> {
-    this.item = item;
-    setText(this.lead, `${item.label} could not be placed on its own. Its folder is fixed by its kind (${KIND_LABEL[item.kind]}); type the name it should have there.`);
-    setText(this.prefix, `${TRASH_ROOT[item.kind]}/`);
-    this.input.value = '';
-    setText(this.error, '');
-    this.open(this.input);
-    return new Promise((r) => { this.resolve = r; });
-  }
-
-  private async submit(): Promise<void> {
-    const item = this.item;
-    const name = this.input.value.trim().replace(/^\/+/, '');
-    if (!item || this.busy) return;
-    if (!name) { setText(this.error, 'Type a name.'); this.input.focus(); return; }
-    const shape = shapeError(item.kind, name);
-    if (shape) { setText(this.error, shape); this.input.focus(); return; }
-    const origin = `${TRASH_ROOT[item.kind]}/${item.kind === 'key' && !name.endsWith('.pem') ? `${name}.pem` : name}`;
-    this.busy = true;
-    setDisabled(this.ok, true);
-    setText(this.error, '');
-    try {
-      await trashApi.restore(item.entry, origin);
-      const r = this.resolve;
-      this.resolve = null;
-      this.close();
-      r?.(true);
-    } catch (e) {
-      setText(this.error, message(e));
-      this.input.focus();
+    for (const input of [this.placeInput, this.passInput]) {
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.submit(); } });
     }
-    this.busy = false;
-    setDisabled(this.ok, false);
-  }
-}
-
-class PassphraseDialog extends Dialog {
-  private readonly lead = el('<p class="fp-note"></p>');
-  private readonly input = el<HTMLInputElement>('<input class="fp-input" type="password" spellcheck="false" autocomplete="off" aria-label="Passphrase" placeholder="Passphrase">');
-  private readonly error = el('<p class="fp-tr-origin-error" role="alert"></p>');
-  private readonly ok: HTMLButtonElement;
-  private item: TrashEntry | null = null;
-  private busy = false;
-  private resolve: ((v: boolean) => void) | null = null;
-
-  constructor() {
-    super('Passphrase needed', 460, 'fp-tr-dlg');
-    this.body.append(this.lead, this.input, this.error);
-    this.button('Cancel', 'ghost', () => this.close());
-    this.ok = this.button('Restore', 'primary', () => { void this.submit(); });
-    this.input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.submit(); } });
-    this.input.addEventListener('input', () => setText(this.error, ''));
-    this.onClose = () => { this.input.value = ''; const r = this.resolve; this.resolve = null; r?.(false); };
+    this.placeInput.addEventListener('input', () => setText(this.placeError, ''));
+    this.passInput.addEventListener('input', () => setText(this.passError, ''));
+    this.onClose = () => {
+      this.passInput.value = '';
+      const r = this.resolve;
+      this.resolve = null;
+      r?.(false);
+    };
   }
 
-  ask(item: TrashEntry): Promise<boolean> {
+  ask(item: TrashEntry, reason: RestoreReason): Promise<boolean> {
     this.item = item;
-    setText(this.lead, `${item.label} is locked. Type its passphrase to restore it.`);
-    this.input.value = '';
-    setText(this.error, '');
-    this.open(this.input);
+    this.wantPlace = reason === 'origin-unknown' || (item.origin === null && item.kind !== 'key');
+    this.wantPass = item.kind === 'key' && reason === 'passphrase-required';
+    const parts: string[] = [];
+    if (this.wantPlace) parts.push(`${item.label} could not be placed on its own. Its folder is fixed by its kind (${KIND_LABEL[item.kind]}); type the name it should have there.`);
+    if (this.wantPass) parts.push(`${item.label} is locked. Type its passphrase to restore it.`);
+    setText(this.lead, parts.join(' '));
+    setText(this.prefix, `${TRASH_ROOT[item.kind]}/`);
+    this.placeInput.value = '';
+    this.passInput.value = '';
+    setText(this.placeError, '');
+    setText(this.passError, '');
+    setHidden(this.placeBox, !this.wantPlace);
+    setHidden(this.passBox, !this.wantPass);
+    this.open(this.wantPlace ? this.placeInput : this.passInput);
     return new Promise((r) => { this.resolve = r; });
+  }
+
+  private show(code: string, text: string): void {
+    const pass = code === 'passphrase-required' || code === 'passphrase-wrong';
+    if (this.wantPass && (pass || !this.wantPlace)) {
+      setText(this.passError, text);
+      this.passInput.focus();
+    } else {
+      setText(this.placeError, text);
+      this.placeInput.focus();
+    }
   }
 
   private async submit(): Promise<void> {
     const item = this.item;
     if (!item || this.busy) return;
-    if (!this.input.value) { setText(this.error, 'Type the passphrase.'); this.input.focus(); return; }
+    let origin: string | undefined;
+    if (this.wantPlace) {
+      const name = this.placeInput.value.trim().replace(/^\/+/, '');
+      if (!name) { setText(this.placeError, 'Type a name.'); this.placeInput.focus(); return; }
+      const shape = shapeError(item.kind, name);
+      if (shape) { setText(this.placeError, shape); this.placeInput.focus(); return; }
+      origin = `${TRASH_ROOT[item.kind]}/${item.kind === 'key' && !name.endsWith('.pem') ? `${name}.pem` : name}`;
+    }
+    if (this.wantPass && !this.passInput.value) { setText(this.passError, 'Type the passphrase.'); this.passInput.focus(); return; }
     this.busy = true;
     setDisabled(this.ok, true);
-    setText(this.error, '');
+    setText(this.placeError, '');
+    setText(this.passError, '');
     try {
-      await trashApi.restore(item.entry, undefined, this.input.value);
-      this.input.value = '';
+      await trashApi.restore(item.entry, origin, this.wantPass ? this.passInput.value : undefined);
+      this.passInput.value = '';
       const r = this.resolve;
       this.resolve = null;
       this.close();
       r?.(true);
     } catch (e) {
-      this.input.value = '';
-      setText(this.error, message(e));
-      this.input.focus();
+      const code = e instanceof ApiError ? e.code : '';
+      this.passInput.value = '';
+      this.show(code ?? '', message(e));
     }
     this.busy = false;
     setDisabled(this.ok, false);
@@ -145,8 +138,7 @@ export class TrashPage {
   private loaded = false;
   private seq = 0;
   private busy = false;
-  private originDialog: OriginDialog | null = null;
-  private passDialog: PassphraseDialog | null = null;
+  private restoreDialog: RestoreDialog | null = null;
 
   constructor(private readonly app: App, private readonly host: HTMLElement) {
     host.appendChild(el(`<div class="fp-home-head"><div><h1 class="fp-home-title">Trash</h1><p class="fp-home-sub">Removed sites, builds, keys and prepared folders stay here until you delete them for good.</p></div>
@@ -238,12 +230,9 @@ export class TrashPage {
       try {
         await trashApi.restore(item.entry);
       } catch (e) {
-        if (e instanceof OriginUnknownError) {
-          this.originDialog ??= new OriginDialog();
-          done = await this.originDialog.ask(item);
-        } else if (e instanceof ApiError && e.code === 'passphrase-required') {
-          this.passDialog ??= new PassphraseDialog();
-          done = await this.passDialog.ask(item);
+        if (e instanceof OriginUnknownError || (e instanceof ApiError && e.code === 'passphrase-required')) {
+          this.restoreDialog ??= new RestoreDialog();
+          done = await this.restoreDialog.ask(item, e instanceof OriginUnknownError ? 'origin-unknown' : 'passphrase-required');
         } else {
           throw e;
         }

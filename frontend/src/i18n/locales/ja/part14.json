@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "ゴミ箱から元に戻す",
+  "Passphrase of the locked key": "ロックされたキーのパスフレーズ",
+  "nginx -t passed with nginx {0}.": "nginx {0} で nginx -t に成功しました。",
+  "nginx -t passed.": "nginx -t に成功しました。",
+  "nginx is not installed here, so nginx -t did not run.": "ここには nginx がインストールされていないため、nginx -t は実行されませんでした。",
+  "nginx -t failed: {0}": "nginx -t に失敗しました: {0}"
+}

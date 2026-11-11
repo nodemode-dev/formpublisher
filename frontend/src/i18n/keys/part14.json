@@ -1,0 +1,8 @@
+[
+"Restore from the trash",
+"Passphrase of the locked key",
+"nginx -t passed with nginx {0}.",
+"nginx -t passed.",
+"nginx is not installed here, so nginx -t did not run.",
+"nginx -t failed: {0}"
+]

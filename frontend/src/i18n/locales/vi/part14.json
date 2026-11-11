@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Khôi phục từ thùng rác",
+  "Passphrase of the locked key": "Cụm mật khẩu của khóa bị khóa",
+  "nginx -t passed with nginx {0}.": "nginx -t đã vượt qua với nginx {0}.",
+  "nginx -t passed.": "nginx -t đã vượt qua.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx chưa được cài đặt ở đây nên nginx -t không chạy.",
+  "nginx -t failed: {0}": "nginx -t thất bại: {0}"
+}

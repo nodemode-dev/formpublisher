@@ -1,5 +1,5 @@
 import { ApiError } from '../api';
-import { trashApi } from '../api-trash';
+import { trashApi, type TrashEntry } from '../api-trash';
 import { emit } from '../events';
 import type { ToastAction } from './toast';
 
@@ -7,6 +7,7 @@ export interface StepHost {
   openTrash(): void;
   showCheck(): void;
   openManual(): void;
+  refreshSites(): Promise<void>;
 }
 
 const TRASH_KIND: Record<string, 'site' | 'build'> = { 'build-missing': 'build', 'site-missing': 'site' };
@@ -22,6 +23,19 @@ export function refuseStep(e: unknown, ref?: string, run?: () => void): void {
   if (e instanceof ApiError && STEP_CODES.has(e.code)) refuse(e, 'Request failed', ref, run);
 }
 
+async function restoreFromNotice(item: TrashEntry, run: (() => void) | undefined, host: StepHost): Promise<void> {
+  try {
+    await trashApi.restore(item.entry);
+  } catch (e) {
+    host.openTrash();
+    emit('fp:notice', { kind: 'error', text: e instanceof Error && e.message ? e.message : 'Request failed' });
+    return;
+  }
+  emit('fp:notice', { kind: 'ok', text: `Restored ${item.label}` });
+  if (item.kind === 'site') await host.refreshSites().catch(() => undefined);
+  run?.();
+}
+
 export async function stepFor(code: string | undefined, ref: string | undefined, run: (() => void) | undefined, host: StepHost): Promise<ToastAction | undefined> {
   if (!code) return undefined;
   const kind = TRASH_KIND[code];
@@ -29,8 +43,10 @@ export async function stepFor(code: string | undefined, ref: string | undefined,
     if (!ref) return undefined;
     try {
       const rows = await trashApi.list();
-      const found = rows.some((r) => r.kind === kind && [r.entry, r.label, r.origin ?? ''].some((s) => s.includes(ref)));
-      return found ? { label: 'Open the trash', run: () => host.openTrash() } : undefined;
+      const found = rows.filter((r) => r.kind === kind && (r.label === ref || (r.origin ?? '').split('/').pop() === ref));
+      if (found.length !== 1) return rows.some((r) => r.kind === kind && [r.entry, r.label, r.origin ?? ''].some((s) => s.includes(ref))) ? { label: 'Open the trash', run: () => host.openTrash() } : undefined;
+      const item = found[0];
+      return { label: 'Restore', run: () => { void restoreFromNotice(item, run, host); } };
     } catch {
       return undefined;
     }

@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "从废纸篓恢复",
+  "Passphrase of the locked key": "已锁定密钥的口令",
+  "nginx -t passed with nginx {0}.": "nginx -t 在 nginx {0} 下通过。",
+  "nginx -t passed.": "nginx -t 已通过。",
+  "nginx is not installed here, so nginx -t did not run.": "此处未安装 nginx，因此未运行 nginx -t。",
+  "nginx -t failed: {0}": "nginx -t 失败：{0}"
+}

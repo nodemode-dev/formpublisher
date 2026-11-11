@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Pulihkan dari tempat sampah",
+  "Passphrase of the locked key": "Frasa sandi kunci yang terkunci",
+  "nginx -t passed with nginx {0}.": "nginx -t berhasil dengan nginx {0}.",
+  "nginx -t passed.": "nginx -t berhasil.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx tidak terpasang di sini, jadi nginx -t tidak dijalankan.",
+  "nginx -t failed: {0}": "nginx -t gagal: {0}"
+}

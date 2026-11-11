@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Відновити з кошика",
+  "Passphrase of the locked key": "Парольна фраза заблокованого ключа",
+  "nginx -t passed with nginx {0}.": "nginx -t пройшла успішно з nginx {0}.",
+  "nginx -t passed.": "nginx -t пройшла успішно.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx тут не встановлено, тому nginx -t не запускалася.",
+  "nginx -t failed: {0}": "nginx -t завершилася помилкою: {0}"
+}

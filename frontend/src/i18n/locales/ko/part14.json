@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "휴지통에서 복원",
+  "Passphrase of the locked key": "잠긴 키의 암호 문구",
+  "nginx -t passed with nginx {0}.": "nginx {0}에서 nginx -t가 통과했습니다.",
+  "nginx -t passed.": "nginx -t가 통과했습니다.",
+  "nginx is not installed here, so nginx -t did not run.": "여기에는 nginx가 설치되어 있지 않아 nginx -t를 실행하지 못했습니다.",
+  "nginx -t failed: {0}": "nginx -t 실패: {0}"
+}

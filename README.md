@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.1.7" src="https://img.shields.io/badge/version-0.1.7-4f6bff?style=flat-square">
+  <img alt="version 0.1.8" src="https://img.shields.io/badge/version-0.1.8-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -124,7 +124,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>Trash</h3>
-      Removed sites, builds, keys and prepared folders wait in a Trash on Home with their kind, time and size. Restore puts one back where it came from when the place is free, entries from before 0.1.4 included; when the place is unknown a dialog asks where it goes. Delete for good and Empty Trash ask first.
+      Removed sites, builds, keys and prepared folders wait in a Trash on Home with their kind, time and size. Restore puts one back where it came from when the place is free, entries from before 0.1.4 included; one Restore from the trash dialog asks for a place, a passphrase or both when they are needed, and a missing-build or missing-site notice offers Restore. Delete for good and Empty Trash ask first.
     </td>
     <td width="50%" valign="top">
       <h3>Rebindable shortcuts</h3>

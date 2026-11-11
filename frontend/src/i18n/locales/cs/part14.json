@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Obnovit z koše",
+  "Passphrase of the locked key": "Heslo zamčeného klíče",
+  "nginx -t passed with nginx {0}.": "nginx -t proběhl úspěšně s nginx {0}.",
+  "nginx -t passed.": "nginx -t proběhl úspěšně.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx tu není nainstalován, proto se nginx -t nespustil.",
+  "nginx -t failed: {0}": "nginx -t selhal: {0}"
+}

@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Palauta roskakorista",
+  "Passphrase of the locked key": "Lukitun avaimen salasanalause",
+  "nginx -t passed with nginx {0}.": "nginx -t meni läpi nginx-versiolla {0}.",
+  "nginx -t passed.": "nginx -t meni läpi.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx ei ole asennettuna tähän, joten nginx -t:tä ei ajettu.",
+  "nginx -t failed: {0}": "nginx -t epäonnistui: {0}"
+}

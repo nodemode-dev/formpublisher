@@ -5,12 +5,12 @@ FormPublisher builds `formweb-core` from these crates to open `.fweb` projects. 
 | Field | Value |
 | --- | --- |
 | Source | `nodemode-dev/formweb`, the `native/` workspace |
-| Version | 0.19.7 |
-| Branch | `feat/redirects-forms-clips` |
-| Tree of `native/` | `9362b9debd300cca99407f512b221e4b9d2c40a3` |
+| Version | 0.19.8 |
+| Branch | `feat/404-pages-agent-clips` |
+| Tree of `native/` | `e6cd48b224849a9916c67b4119eddd28ddd8e21d` |
 | `crates/formweb-model` | `655a2c9b7ae71e7bc4a32a820d89f0db63df3b71` |
-| `crates/formweb-engine` | `e40da83da2b095181760f985d788368ccd209f1e` |
-| `crates/formweb-export` | `d77281af69cc97bb9f82936458bf802a20729758` |
+| `crates/formweb-engine` | `7f6b0b258290aeef28b394c434e58ad50d83e757` |
+| `crates/formweb-export` | `51e428757798b51d8895dd32b679a529a633d34e` |
 | `crates/formweb-core` | `9a192034c2f2de1d5739855370dbd910062b1550` |
 | Left out | `crates/formweb-render` (its own workspace, a GPU renderer FormPublisher does not use) and `target/` |
 

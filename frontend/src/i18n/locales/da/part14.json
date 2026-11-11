@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Gendan fra papirkurven",
+  "Passphrase of the locked key": "Adgangssætning til den låste nøgle",
+  "nginx -t passed with nginx {0}.": "nginx -t blev bestået med nginx {0}.",
+  "nginx -t passed.": "nginx -t blev bestået.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx er ikke installeret her, så nginx -t blev ikke kørt.",
+  "nginx -t failed: {0}": "nginx -t fejlede: {0}"
+}

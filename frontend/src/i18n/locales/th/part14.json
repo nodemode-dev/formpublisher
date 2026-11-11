@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "กู้คืนจากถังขยะ",
+  "Passphrase of the locked key": "วลีรหัสผ่านของคีย์ที่ล็อกอยู่",
+  "nginx -t passed with nginx {0}.": "nginx -t ผ่านด้วย nginx {0}",
+  "nginx -t passed.": "nginx -t ผ่าน",
+  "nginx is not installed here, so nginx -t did not run.": "ไม่ได้ติดตั้ง nginx ไว้ที่นี่ จึงไม่ได้รัน nginx -t",
+  "nginx -t failed: {0}": "nginx -t ไม่ผ่าน: {0}"
+}

@@ -1,0 +1,8 @@
+{
+  "Restore from the trash": "Ripristina dal Cestino",
+  "Passphrase of the locked key": "Passphrase della chiave bloccata",
+  "nginx -t passed with nginx {0}.": "nginx -t è riuscito con nginx {0}.",
+  "nginx -t passed.": "nginx -t è riuscito.",
+  "nginx is not installed here, so nginx -t did not run.": "nginx non è installato qui, quindi nginx -t non è stato eseguito.",
+  "nginx -t failed: {0}": "nginx -t non è riuscito: {0}"
+}
