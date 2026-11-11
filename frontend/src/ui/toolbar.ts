@@ -205,13 +205,14 @@ export class Toolbar {
   }
 
   private fit(): void {
-    const sized = this.rowWidth <= FIT_BELOW;
-    let stage = sized ? 1 : 0;
+    let stage = this.rowWidth <= FIT_BELOW ? 1 : 0;
     for (;;) {
+      this.host.classList.toggle('is-sized', stage >= 1);
       this.host.classList.toggle('is-tight', stage >= 2);
       this.host.classList.toggle('is-short', stage >= 3);
-      this.paint(sized, stage >= 3);
-      if (stage === 0 || stage >= 3 || this.host.scrollWidth <= this.host.clientWidth) break;
+      this.host.classList.toggle('is-micro', stage >= 4);
+      this.paint(stage >= 1, stage >= 3);
+      if (stage >= 4 || this.host.scrollWidth <= this.host.clientWidth) break;
       stage += 1;
     }
   }

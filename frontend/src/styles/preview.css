@@ -42,6 +42,7 @@
   .fp-tb-num { width: 48px; padding: 0 4px; }
   .fp-tb-select { flex: none; min-width: 0; max-width: none; text-overflow: clip; }
 }
+.fp-options.is-sized .fp-tb-select { min-width: 0; max-width: none; text-overflow: clip; }
 .fp-options.is-tight { gap: 4px; }
 .fp-options.is-tight .fp-sep { display: none; }
 .fp-options.is-tight .fp-tb-num { width: 44px; padding: 0 3px; }
@@ -55,6 +56,9 @@
 .fp-options.is-short .fp-tb-num { width: 34px; padding: 0 1px; text-align: center; }
 .fp-options.is-short .fp-tb-select { padding: 0 2px; }
 .fp-options.is-short .fp-icon-btn, .fp-options.is-short .fp-btn { width: 22px; }
+.fp-options.is-micro { padding: 0 4px; }
+.fp-options.is-micro .fp-tb-x { display: none; }
+.fp-options.is-micro .fp-tb-num { width: 32px; }
 .fp-route-list .fp-route { grid-template-columns: 64px minmax(0, 1fr) 8px; grid-template-rows: auto auto; align-content: center; align-items: center; column-gap: var(--space-2); row-gap: 0; height: 50px; padding: 0 var(--space-2) 0 4px; }
 .fp-route-thumb { grid-column: 1; grid-row: 1 / span 2; position: relative; width: 64px; height: 40px; overflow: hidden; border: 1px solid var(--line-1); border-radius: var(--radius-sm); background: var(--surface-0); }
 .fp-route-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity var(--transition-fast); }
