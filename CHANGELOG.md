@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 · 2026-11-10
+
+- Preview: the open site runs from its own local host exactly as a static host would serve it, at Desktop, Laptop, Tablet, Phone or a custom size, with zoom, a forced dark or light theme, reduced motion and a slow network, in frames that never blank between pages.
+- Checks: a static pass over links, assets, redirects, sitemap and robots, titles and descriptions, images, headings, external requests and file sizes; live reports from the preview; and a deep run in your own Chrome at 1440 and 390 px under a 4x slower CPU and network, with thumbnails. Problems, Console and Network fill the bottom panel and the routes show their status.
+- Packages: deterministic `site.zip` builds with a `publish.json` manifest, a reproduce check, Ed25519 keys with passphrases, signatures and verification, and a Builds page to inspect, compare, download and delete them.
+- FormWeb `.fweb` projects open directly through `formweb-core`, built from the vendored FormWeb 0.19.1 engine with `./setup/install_compiler`.
+- Every new string is in all 26 languages.
+
 ## 0.1.0 · 2026-11-09
 
 The first release: FormPublisher opens what FormWeb makes and shows every route of it.

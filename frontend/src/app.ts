@@ -5,11 +5,15 @@ import { locale } from './i18n';
 import { brandMark } from './ui/brand';
 import { mountOnce, q, setAttr, setClass, setDisabled, setHidden, setText, setTitle, setValue } from './ui/dom';
 import { icon } from './ui/icons';
+import { openPackageSheet, installPackaging } from './ui/package-sheet';
+import { installPanel } from './ui/panel';
 import { askPath } from './ui/path-dialog';
+import { Preview, routeKey } from './ui/preview';
 import { LayoutState } from './ui/resizers';
 import { RouteList } from './ui/routes';
 import { SiteTabs } from './ui/tabs';
 import { applyTheme, nextToggleTheme, readChoice, setTheme } from './ui/themes';
+import { Toolbar } from './ui/toolbar';
 import { VERSION } from './version';
 
 const TABS_KEY = 'formpublisher.tabs';
@@ -26,7 +30,7 @@ const SHELL = `<div class="fp-app">
 </div>
 </header>
 <div class="fp-tabs" role="tablist" aria-label="Open sites"></div>
-<div class="fp-options"><div class="fp-tb-field">${icon('link', 14)}<input class="fp-route-field" readonly aria-label="Route" placeholder="No route selected" spellcheck="false" translate="no"></div></div>
+<div class="fp-options"><div class="fp-tb-field">${icon('link', 14)}<input class="fp-route-field" aria-label="Route" placeholder="No route selected" spellcheck="false" autocomplete="off" translate="no"></div></div>
 <div class="fp-main">
 <aside class="fp-strip-col" aria-label="Routes">
 <div class="fp-strip-head"><span class="fp-strip-title">Routes</span><span class="fp-strip-count">0</span></div>
@@ -46,7 +50,6 @@ const SHELL = `<div class="fp-app">
 </div>
 <div class="fp-empty-result" role="status" aria-live="polite"></div>
 </div></div>
-<div class="fp-stage-layer fp-stage-site" hidden><div class="fp-stage-site-body"><div class="fp-stage-site-name" translate="no"></div><div class="fp-stage-site-route" translate="no"></div><div class="fp-stage-site-note">The preview arrives in a later version.</div></div></div>
 </main>
 <section class="fp-bottom" aria-label="Panel">
 <div class="fp-bottom-head" role="tablist" aria-label="Panel">
@@ -84,7 +87,7 @@ const SHELL = `<div class="fp-app">
 <div class="fp-status-left"><span class="fp-st fp-st-engine"><span class="fp-st-dot"></span><span class="fp-st-engine-text">Checking the engine</span></span><span class="fp-st fp-st-routes">0 routes</span></div>
 <div class="fp-status-right"><button class="fp-icon-btn is-sm" type="button" data-act="toggle-bottom" title="Show or hide the panel" aria-label="Show or hide the panel">${icon('terminal', 14)}</button><span class="fp-st fp-st-version" translate="no">v${VERSION}</span></div>
 </footer>
-<input class="fp-file-input" type="file" accept=".zip,application/zip" hidden tabindex="-1" aria-hidden="true">
+<input class="fp-file-input" type="file" accept=".zip,.fweb,application/zip" hidden tabindex="-1" aria-hidden="true">
 </div>`;
 
 let instance: App | null = null;
@@ -155,13 +158,9 @@ export async function startApp(): Promise<App> {
   };
 
   const docTitle = q<HTMLInputElement>(root, '.fp-doc-title');
-  const routeField = q<HTMLInputElement>(root, '.fp-route-field');
   const stripCount = q(root, '.fp-strip-count');
   const stripEmpty = q(root, '.fp-strip-empty');
   const stageEmpty = q(root, '.fp-stage-empty');
-  const stageSite = q(root, '.fp-stage-site');
-  const stageSiteName = q(root, '.fp-stage-site-name');
-  const stageSiteRoute = q(root, '.fp-stage-site-route');
   const emptyResult = q(root, '.fp-empty-result');
   const fileInput = q<HTMLInputElement>(root, '.fp-file-input');
   const engineDot = q(root, '.fp-st-engine .fp-st-dot');
@@ -210,6 +209,25 @@ export async function startApp(): Promise<App> {
 
   const routeList = new RouteList(q(root, '.fp-route-list'), { select: (path) => selectRoute(path) });
 
+  const toolbar: Toolbar = new Toolbar(mounts.options, {
+    navigate: (path) => preview.navigate(path),
+    reload: () => preview.reload(),
+    openBrowser: () => preview.openInBrowser(),
+    packageSite: () => openPackageSheet(app),
+    change: (state, kind) => { if (kind === 'view') preview.setView(state); else preview.setOptions(state); },
+  });
+
+  const preview: Preview = new Preview(mounts.stage, {
+    path: (path, source) => {
+      toolbar.setRoute(path);
+      if (source !== 'frame') return;
+      const key = routeKey(path);
+      const hit = st.routes.find((r) => r.path === path) ?? st.routes.find((r) => routeKey(r.path) === key);
+      if (hit) selectRoute(hit.path);
+    },
+    error: (text) => notice('error', text),
+  }, toolbar.current());
+
   const activeName = (): string => st.site?.name ?? st.open.find((t) => t.id === st.activeId)?.name ?? '';
 
   const paintTabs = (): void => {
@@ -221,10 +239,9 @@ export async function startApp(): Promise<App> {
     const name = activeName();
     setValue(docTitle, name);
     setHidden(stageEmpty, has);
-    setHidden(stageSite, !has);
-    setText(stageSiteName, name);
-    setText(stageSiteRoute, st.route ?? '');
-    setValue(routeField, st.route ?? '');
+    preview.setVisible(has);
+    toolbar.setActive(has);
+    preview.show(st.activeId, st.route);
     setText(field('name'), name || '-');
     setText(field('source'), st.site?.source || '-');
     setText(field('imported'), st.site ? formatDate(st.site.importedAt) : '-');
@@ -234,6 +251,7 @@ export async function startApp(): Promise<App> {
   };
 
   const paintRoutes = (): void => {
+    routeList.setSite(st.activeId);
     routeList.render(st.routes, st.route);
     setText(stripCount, String(st.routes.length));
     const message = st.activeId === null ? 'Open a site to list its routes.' : st.loading ? 'Loading routes' : st.routes.length === 0 ? 'This site has no routes.' : '';
@@ -475,8 +493,9 @@ export async function startApp(): Promise<App> {
   });
 
   const onLive = (event: LiveEvent): void => {
+    emit('fp:live', event);
     if (event.type === 'site.imported') {
-      void refreshSites().then(() => { if (typeof event.id === 'string' && event.id === st.activeId) void load(event.id); });
+      void refreshSites().then(() => { if (typeof event.id === 'string' && event.id === st.activeId) void load(event.id).then(() => preview.reload()); });
     } else if (event.type === 'site.removed') {
       if (typeof event.id === 'string') closeSite(event.id);
       void refreshSites();
@@ -521,9 +540,12 @@ export async function startApp(): Promise<App> {
     pickFolder,
     togglePane,
     showBottomTab,
+    preview: () => ({ navigate: (path) => preview.navigate(path), reload: () => preview.reload() }),
   };
 
   connectLive(onLive, onLiveState);
   instance = app;
+  installPanel(app);
+  installPackaging(app);
   return app;
 }

@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.1.0" src="https://img.shields.io/badge/version-0.1.0-4f6bff?style=flat-square">
+  <img alt="version 0.1.1" src="https://img.shields.io/badge/version-0.1.1-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -81,10 +81,30 @@
       The interface comes in 26 languages, from English and Spanish to Japanese and Korean, chosen in Preferences.
     </td>
   </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Preview</h3>
+      The mounted site is served by a static host on its own origin (port 8281), as a real host would. Pick a device size, force the dark or light theme, emulate reduced motion, throttle the network to Fast or Slow, and open the current route in your browser.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Checks</h3>
+      Static checks run offline on the files: links, assets, redirects, sitemap, robots, metadata, images, headings, external requests and size budgets. Live checks report the console, failed requests and layout shift from the preview. A deep check drives the Chrome you already have, at two widths on a slow network and CPU.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Package and sign</h3>
+      Build a deterministic <code>site.zip</code> with a <code>publish.json</code> that lists every file by SHA-256, reproduce it byte for byte, and sign it with an Ed25519 key. Verify a signature, inspect a build and compare two.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Open .fweb projects</h3>
+      Import a <code>.fweb</code> project directly. <code>formweb-core</code>, built from the vendored FormWeb crates by <code>./setup/install_compiler</code>, exports it to a site the same way FormWeb does.
+    </td>
+  </tr>
 </table>
 
 > [!NOTE]
-> Device preview, checks, packaging, signing, publishing and the desktop build are in development. This version imports and lists; it does not yet preview on device sizes, check, package or publish.
+> Publishing to a host and the desktop build are in development. This version imports, previews, checks, packages and signs; it does not upload anywhere.
 
 ## Everything in the box
 
@@ -138,15 +158,33 @@ Two MCP servers are registered: `formpublisher` and `formmcp`, the Form family h
 git clone git@github.com:nodemode-dev/formpublisher.git
 cd formpublisher
 ./formpublisher_oc_install        # engine venv and interface packages
+./setup/install_compiler          # builds formweb-core for .fweb projects (needs Rust; the install runs it when cargo is present)
 ./formpublisher                   # interface at http://localhost:5280, engine on 127.0.0.1:8280
 ```
 
 `./formpublisher_oc_install` is the install, `./formpublisher` is the boot, and `./build_app` makes the desktop app start to finish and logs to `build_app.log`. On Windows use `formpublisher_oc_install.bat`, `formpublisher.bat` and `build_app.bat`.
 
-Ports: interface 5280 (Vite, localhost only), preview 5281, engine 8280 (`FORMPUBLISHER_PORT`). `./formpublisher serve` serves a production build from the engine alone, `./formpublisher desktop dev` opens the desktop window, and `./formpublisher doctor` checks the toolchain. `FORMPUBLISHER_HOME` moves the data folder (`~/FormPublisher` by default).
+Ports and folders:
+
+| Port | What |
+| --- | --- |
+| 5280 | interface (Vite, localhost only) |
+| 5281 | Vite preview of a production build |
+| 8280 | engine (`FORMPUBLISHER_PORT`) |
+| 8281 | site host, serves the mounted site (`FORMPUBLISHER_HOST_PORT`) |
+
+| Data folder | Holds |
+| --- | --- |
+| `sites/` | imported sites and their revisions |
+| `checks/` | stored check results and deep-run thumbnails |
+| `builds/` | packages: `site.zip`, `publish.json`, `site.zip.sig` |
+| `keys/` | signing keys |
+| `trash/` | deleted items |
+
+`./formpublisher serve` serves a production build from the engine alone, `./formpublisher desktop dev` opens the desktop window, and `./formpublisher doctor` checks the toolchain. `FORMPUBLISHER_HOME` moves the data folder (`~/FormPublisher` by default).
 
 > [!IMPORTANT]
-> **Status:** in development. Importing from the site open in FormWeb needs FormWeb running on the same computer. The desktop build, device preview, checks, packaging, signing and publishing are not finished.
+> **Status:** in development. Importing from the site open in FormWeb needs FormWeb running on the same computer. The desktop build and publishing are not finished. The deep check needs Chrome and the optional `requirements-deep.txt`; `.fweb` projects need `formweb-core`.
 
 **Contributing:** changes to FormPublisher come here as pull requests into `main`; changes to how a site is made or exported belong in FormWeb. See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) and [`AGENTS.md`](AGENTS.md). Report security issues privately as [`SECURITY.md`](SECURITY.md) describes.
 

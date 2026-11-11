@@ -1,0 +1,402 @@
+use formweb_model::{safe_url, validate, void_tag, Item, Node, Page, Site, Strings};
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
+
+mod advanced;
+mod cms;
+mod code;
+mod embed;
+mod isolated;
+mod inline_module;
+mod routing;
+mod route_styles;
+mod scope;
+mod search;
+mod sections;
+mod variables;
+mod wishlist;
+
+fn escape(value: &str) -> String {
+    value.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;").replace('\'', "&#39;")
+}
+
+fn icon_url(site: &Site, key: &str) -> Option<String> {
+    let value = site.settings.get(key)?.trim();
+    let owned = value.strip_prefix("/api/assets/").map(|name| { let (hash, ext) = name.split_once('.').unwrap_or(("", "")); hash.len() == 64 && hash.chars().all(|c| c.is_ascii_hexdigit()) && ["png", "jpg", "gif", "webp"].contains(&ext) }).unwrap_or(false);
+    (owned || (value.starts_with("https://") && safe_url(value))).then(|| value.to_string())
+}
+
+fn icon_type(url: &str) -> &'static str {
+    if url.ends_with(".png") { "image/png" } else if url.ends_with(".webp") { "image/webp" } else if url.ends_with(".gif") { "image/gif" } else if url.ends_with(".jpg") { "image/jpeg" } else { "image/png" }
+}
+
+pub(crate) fn icons(site: &Site, prefix: &str) -> String {
+    let Some(light) = icon_url(site, "favicon") else { return String::new() };
+    let mut html = format!("<link rel=\"icon\" type=\"{}\" href=\"{}\">", icon_type(&light), escape(&light));
+    if let Some(dark) = icon_url(site, "faviconDark") { html.push_str(&format!("<link rel=\"icon\" type=\"{}\" href=\"{}\" media=\"(prefers-color-scheme: dark)\">", icon_type(&dark), escape(&dark))); }
+    html.push_str(&format!("<link rel=\"apple-touch-icon\" href=\"{}\"><link rel=\"manifest\" href=\"{}site.webmanifest\">", escape(&light), prefix));
+    html
+}
+
+pub(crate) fn web_manifest(site: &Site) -> Option<Value> {
+    let light = icon_url(site, "favicon")?;
+    let content = json!({"name": site.name, "short_name": site.name.chars().take(12).collect::<String>(), "start_url": ".", "display": "browser", "icons": [{"src": light, "sizes": "any", "type": icon_type(&light), "purpose": "any"}]});
+    Some(json!({"path": "site.webmanifest", "content": serde_json::to_string_pretty(&content).ok()?}))
+}
+
+fn translation(site: &Site, locale: &str, key: &str, fallback: &str) -> String {
+    site.locales.get(locale).and_then(|t| t.get(key)).cloned().unwrap_or_else(|| fallback.into())
+}
+
+pub fn export(site: &Site, params: &Value) -> Result<Value, String> {
+    validate(site)?;
+    if !site.extensions.is_empty() || wishlist::needs_advanced(site) { return advanced::export(site, params); }
+    let locale = params.get("locale").map(|v| v.as_str().ok_or("locale must be a string")).transpose()?.unwrap_or(&site.default_locale);
+    if locale != site.default_locale && !site.locales.contains_key(locale) { return Err("unknown locale".into()); }
+    let base = params.get("baseUrl").map(|v| v.as_str().ok_or("baseUrl must be a string")).transpose()?.or_else(|| site.settings.get("baseUrl").map(String::as_str)).unwrap_or("https://example.com").trim_end_matches('/');
+    if !safe_url(base) || !(base.starts_with("https://") || base.starts_with("http://")) { return Err("baseUrl must be an http(s) URL".into()); }
+    let forms = params.get("formsEndpoint").map(|v| v.as_str().ok_or("formsEndpoint must be a string")).transpose()?.unwrap_or("").trim_end_matches('/');
+    if !forms.is_empty() && (!safe_url(forms) || !(forms.starts_with("https://") || forms.starts_with("http://"))) { return Err("formsEndpoint must be an http(s) origin URL".into()); }
+    let mut warnings = BTreeSet::new();
+    if base == "https://example.com" { warnings.insert("Replace the example.com base URL before deploying sitemap and canonical URLs".to_string()); }
+    if site.locales.len() > 1 { warnings.insert(format!("This archive contains the {locale} locale only; export other locales separately")); }
+    let mut files = vec![];
+    let css = stylesheet(site);
+    files.push(json!({"path":"assets/site.css", "content":css}));
+    files.push(json!({"path":"assets/runtime.js", "content":format!("{RUNTIME}{}{EFFECTS_RUNTIME}", embed::GATE_RUNTIME)}));
+    let mut sitemap = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
+    let mut route_manifest = vec![];
+    for page in &site.pages {
+        let route = page.slug.trim_matches('/');
+        let path = if route.is_empty() { "index.html".into() } else { format!("{route}/index.html") };
+        route_manifest.push(json!({"path": path, "page": page.id, "locale": locale, "item": Value::Null, "stylesheet": "assets/site.css"}));
+        let prefix = "../".repeat(if route.is_empty() { 0 } else { route.split('/').count() });
+        let canonical = if route.is_empty() { format!("{base}/") } else { format!("{base}/{route}/") };
+        let mut interactions = vec![];
+        let mut render = Renderer { site, locale, forms, prefix: &prefix, warnings: &mut warnings, interactions: &mut interactions, budget: 250000, links: None };
+        let body = format!("{}{}", render.foreign_symbols(&page.root)?, render.node(&page.root, None, None)?);
+        let title = translation(site, locale, &format!("{}.title", page.id), &page.seo.title);
+        let description = translation(site, locale, &format!("{}.description", page.id), &page.seo.description);
+        let encoded_interactions = serde_json::to_string(&interactions).map_err(|e| e.to_string())?.replace('<', "\\u003c").replace('>', "\\u003e").replace('&', "\\u0026");
+        let robots = if page.seo.noindex { "<meta name=\"robots\" content=\"noindex,nofollow\">" } else { "" };
+        let html = format!("<!doctype html>\n<html lang=\"{}\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{}</title><meta name=\"description\" content=\"{}\"><link rel=\"canonical\" href=\"{}\"><meta property=\"og:title\" content=\"{}\"><meta property=\"og:description\" content=\"{}\"><meta property=\"og:url\" content=\"{}\"><meta property=\"og:type\" content=\"website\">{}{}<link rel=\"stylesheet\" href=\"{}assets/site.css\"><script src=\"{}assets/runtime.js\" defer></script></head><body><a class=\"fw-skip\" href=\"#fw-main\">Skip to content</a><div id=\"fw-main\" tabindex=\"-1\">{}</div><script type=\"application/json\" id=\"fw-interactions\">{}</script></body></html>\n", escape(locale), escape(&title), escape(&description), escape(&canonical), escape(&title), escape(&description), escape(&canonical), robots, icons(site, &prefix), prefix, prefix, body, encoded_interactions);
+        files.push(json!({"path":path,"content":html}));
+        if !page.seo.noindex { sitemap.push_str(&format!("<url><loc>{}</loc></url>\n", escape(&canonical))); }
+    }
+    sitemap.push_str("</urlset>\n");
+    files.push(json!({"path":"sitemap.xml","content":sitemap}));
+    files.push(json!({"path":"robots.txt","content":format!("User-agent: *\nAllow: /\nSitemap: {base}/sitemap.xml\n")}));
+    files.push(json!({"path":"site.formweb.json","content":serde_json::to_string_pretty(site).map_err(|e|e.to_string())?}));
+    if let Some(manifest) = web_manifest(site) { files.push(manifest); }
+    files.push(json!({"path":"routes.json","content":serde_json::to_string(&route_manifest).map_err(|e| e.to_string())?}));
+    files.push(json!({"path":"README.txt","content":format!("FormWeb static export\nLocale: {locale}\nServe this folder with any static HTTP server.\nPages use directory routes with index.html.\nThe editable source is site.formweb.json.\nRemote assets are referenced, not bundled.\nForms submit to the configured FormWeb API; keep that service running or replace the form action with your own service.\nRuntime respects prefers-reduced-motion.\n")}));
+    Ok(json!({"files": files, "warnings": warnings.into_iter().collect::<Vec<_>>()}))
+}
+
+fn stylesheet(site: &Site) -> String {
+    let mut css = String::from("*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0}img,video{max-width:100%}button,input,select,textarea{font:inherit}a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid currentColor;outline-offset:4px}.fw-skip{position:fixed;top:8px;left:8px;transform:translateY(-160%);padding:12px;background:#fff;color:#111}.fw-skip:focus{transform:none}.fw-form-status{min-height:1.5em}\n:root{");
+    for (key, value) in &site.tokens { css.push_str(&format!("--{}:{};", key.trim_start_matches("--"), value)); }
+    css.push_str("}\n");
+    if site.settings.get("hideScrollbars").map(String::as_str) == Some("true") { css.push_str("*{scrollbar-width:none}*::-webkit-scrollbar{display:none;width:0;height:0}\n"); }
+    for node in site.nodes.values() {
+        let mut styles = node.styles.clone();
+        for bp in site.breakpoints.iter().filter(|b| b.max_width == 100000) {
+            if let Some(overrides) = node.breakpoints.get(&bp.id) { styles.extend(overrides.clone()); }
+        }
+        if !styles.is_empty() {
+            css.push_str(&format!("[data-fw-node=\"{}\"]{{", node.id));
+            for (key, value) in styles { css.push_str(&format!("{key}:{value};")); }
+            css.push_str("}\n");
+        }
+    }
+    let mut breakpoints: Vec<_> = site.breakpoints.iter().filter(|b| b.max_width < 100000).collect();
+    breakpoints.sort_by(|a,b|b.max_width.cmp(&a.max_width));
+    for bp in breakpoints {
+        css.push_str(&format!("@media(max-width:{}px){{\n", bp.max_width));
+        for node in site.nodes.values() {
+            if let Some(styles) = node.breakpoints.get(&bp.id) {
+                css.push_str(&format!("[data-fw-node=\"{}\"]{{", node.id));
+                for (key, value) in styles { css.push_str(&format!("{key}:{value};")); }
+                css.push_str("}\n");
+            }
+        }
+        css.push_str("}\n");
+    }
+    css.push_str("@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}\n");
+    css
+}
+
+#[derive(Clone, Copy)]
+struct RenderContext<'a> {
+    collection: &'a str,
+    item: &'a Item,
+    ids: &'a Strings,
+    suffix: &'a str,
+}
+
+struct Renderer<'a> {
+    site: &'a Site,
+    locale: &'a str,
+    forms: &'a str,
+    prefix: &'a str,
+    warnings: &'a mut BTreeSet<String>,
+    interactions: &'a mut Vec<Value>,
+    budget: usize,
+    links: Option<&'a BTreeMap<String, String>>,
+}
+
+impl Renderer<'_> {
+    /// Symbols are shared across the site (like Figma components across a file): a `use` on this page may point at a
+    /// symbol defined on another page. Those symbols are rendered into one hidden svg at the top of the page so every
+    /// instance resolves; symbols already on the page are left where they are.
+    fn foreign_symbols(&mut self, root: &str) -> Result<String, String> {
+        fn walk(site: &Site, id: &str, used: &mut BTreeSet<String>, local: &mut BTreeSet<String>, depth: usize) {
+            let Some(node) = site.nodes.get(id) else { return };
+            if depth > 100 { return; }
+            if node.tag == "use" { if let Some(href) = node.attrs.get("href") { used.insert(href.trim_start_matches('#').to_string()); } }
+            if node.tag == "symbol" { if let Some(sid) = node.attrs.get("id") { local.insert(sid.clone()); } }
+            for child in &node.children { walk(site, child, used, local, depth + 1); }
+        }
+        let (mut used, mut local) = (BTreeSet::new(), BTreeSet::new());
+        walk(self.site, root, &mut used, &mut local, 0);
+        let mut out = String::new();
+        for wanted in used.difference(&local) {
+            let site = self.site;
+            if let Some(node) = site.nodes.values().find(|n| n.tag == "symbol" && n.attrs.get("id") == Some(wanted)) { out.push_str(&self.node(&node.id, None, None)?); }
+        }
+        Ok(if out.is_empty() { out } else { format!("<svg aria-hidden=\"true\" focusable=\"false\" width=\"0\" height=\"0\" style=\"position:absolute;width:0;height:0;overflow:hidden\"><defs>{out}</defs></svg>") })
+    }
+
+    fn node(&mut self, id: &str, context: Option<RenderContext<'_>>, repeated: Option<&str>) -> Result<String, String> {
+        if self.budget == 0 { return Err("CMS expansion exceeds 250000 rendered nodes on one page".into()); }
+        self.budget -= 1;
+        let node = &self.site.nodes[id];
+        if cms::is_empty_target(self.site, id) && repeated != Some("__empty") { return Ok(String::new()); }
+        if let Some(collection_id) = cms::list_collection(self.site, node) {
+            if repeated != Some(id) {
+                let collection = &self.site.collections[collection_id];
+                let items = cms::query(self.site, node, collection_id, self.locale, context.map(|c| (c.collection, c.item)));
+                if items.is_empty() {
+                    if let Some(empty) = cms::empty_target(self.site, id) { return self.node(empty, context, Some("__empty")); }
+                    return Ok(String::new());
+                }
+                if let Some(html) = wishlist::list(self, id, collection_id, &items, context)? { return Ok(html); }
+                let mut result = String::new();
+                let page_size = cms::page_size(self.site, id);
+                if let Some(size) = page_size { result.push_str(&format!("<div data-fw-list=\"{}\" data-fw-page-size=\"{}\">", escape(id), size)); }
+                let html_ids = subtree_ids(self.site, id);
+                for (index, item) in items.iter().enumerate() {
+                    let segment = format!("-{}-{}", collection.id, item.id);
+                    let suffix = format!("{}{segment}", context.map(|c|c.suffix).unwrap_or(""));
+                    let mut ids = context.map(|c|c.ids.clone()).unwrap_or_default();
+                    for html_id in &html_ids {
+                        let base = ids.get(html_id).cloned().unwrap_or_else(||html_id.clone());
+                        ids.insert(html_id.clone(), format!("{base}{segment}"));
+                    }
+                    if let Some(size) = page_size { result.push_str(&format!("<div data-fw-item style=\"display:contents\"{}>", if index >= size as usize { " hidden" } else { "" })); }
+                    result.push_str(&self.node(id, Some(RenderContext { collection: &collection.id, item, ids: &ids, suffix: &suffix }), Some(id))?);
+                    if page_size.is_some() { result.push_str("</div>"); }
+                }
+                if page_size.is_some() { result.push_str("<nav class=\"fw-pagination\" data-fw-pagination aria-label=\"Collection pages\"><button type=\"button\" data-fw-prev disabled>Previous</button><span class=\"fw-pagination-output\" data-fw-page-output aria-live=\"polite\">1</span><button type=\"button\" data-fw-next>Next</button></nav></div>"); }
+                return Ok(result);
+            }
+        }
+        self.element(node, context)
+    }
+
+    fn element(&mut self, node: &Node, context: Option<RenderContext<'_>>) -> Result<String, String> {
+        let mut attrs = node.attrs.clone();
+        let mut text = translation(self.site, self.locale, &node.id, &node.text);
+        if let Some(binding) = &node.binding {
+            if let Some(field) = &binding.field {
+                let collection = &self.site.collections[&binding.collection];
+                let fallback = cms::published(self.site, &collection.id, self.locale).into_iter().next();
+                let item = context.filter(|c|c.collection == collection.id).map(|c|c.item).or(fallback.as_ref());
+                if let Some(value) = item.and_then(|i| cms::field(self.site, &collection.id, i, field, self.locale)) {
+                    let content = cms::display(&value);
+                    if node.tag == "img" { if content.is_empty() { attrs.remove("src"); } else { attrs.insert("src".into(), content); } }
+                    else { text = content; }
+                } else { if node.tag == "img" { attrs.remove("src"); } else { text.clear(); } }
+            }
+        }
+        if let Some((target, content)) = cms::binding(self.site, node, self.locale, context.map(|c|(c.collection,c.item))) {
+            if target == "text" { text = content; } else if content.is_empty() { attrs.remove(&target); } else { attrs.insert(target, content); }
+        }
+        if let Some(value) = variables::output_text(self.site, node) { text = value; }
+        for (name, value) in variables::input_attrs(self.site, node) {
+            if ["min", "max", "step"].contains(&name.as_str()) && attrs.contains_key(&name) { continue; }
+            attrs.insert(name, value);
+        }
+        advanced::attrs(self.site, node, self.locale, &mut attrs);
+        let page_host = code::page_host(self.site, &node.id)?;
+        if let Some((component, _)) = &page_host { attrs.insert("data-fw-component".into(), component.clone()); }
+        let section = sections::spec(self.site, &node.id);
+        if advanced::initially_open(self.site, node) { attrs.insert("data-fw-open".into(), String::new()); }
+        if advanced::initially_hidden(self.site, node) { attrs.insert("hidden".into(), String::new()); }
+        let suffix = context.map(|c|c.suffix).unwrap_or("");
+        let runtime_id = format!("{}{suffix}", node.id);
+        if let Some(context) = context {
+            for name in ["id", "for"] {
+                if let Some(value) = attrs.get_mut(name) {
+                    if let Some(mapped) = context.ids.get(value) { *value = mapped.clone(); }
+                }
+            }
+            for name in ["aria-labelledby", "aria-describedby"] {
+                if let Some(value) = attrs.get_mut(name) { *value = value.split_whitespace().map(|id|context.ids.get(id).cloned().unwrap_or_else(||id.into())).collect::<Vec<_>>().join(" "); }
+            }
+            if let Some(href) = attrs.get_mut("href") { *href = scoped_fragment(href, context.ids); }
+        }
+        if let Some(href) = attrs.get_mut("href") { *href = self.links.map(|links|routing::link(href,self.prefix,links)).unwrap_or_else(||portable_link(self.site,href,self.prefix)); }
+        if attrs.get("target").map(String::as_str) == Some("_blank") { attrs.insert("rel".into(), "noopener noreferrer".into()); }
+        if node.tag == "img" && !attrs.contains_key("loading") { attrs.insert("loading".into(), "lazy".into()); }
+        // FW-072: the pre-cut-out picture is editor history; it must not reach visitors or the export bundle.
+        attrs.remove("data-fw-original-src");
+        attrs.remove("data-fw-vector");
+        attrs.remove("data-fw-guides");
+        if node.tag == "svg" && !attrs.contains_key("role") && !attrs.contains_key("aria-label") { attrs.insert("aria-hidden".into(), "true".into()); }
+        if attrs.get("src").map(|s|s.starts_with("http://") || s.starts_with("https://")).unwrap_or(false) { self.warnings.insert("Remote media URLs are referenced and are not bundled into the archive".into()); }
+        if node.tag == "form" && !advanced::script_form(self.site, node) && !attrs.get("action").map(|action| !action.is_empty()).unwrap_or(false) {
+            attrs.insert("action".into(), format!("{}/api/forms/{}/{}", self.forms, self.site.id, node.id));
+            attrs.insert("method".into(), "post".into());
+            attrs.insert("data-fw-form".into(), "true".into());
+        }
+        if !node.interactions.is_empty() {
+            let mut interactions = node.interactions.clone();
+            for interaction in &mut interactions {
+                if let Some(url) = &mut interaction.url {
+                    if let Some(context) = context { *url = scoped_fragment(url, context.ids); }
+                    *url = self.links.map(|links|routing::link(url,self.prefix,links)).unwrap_or_else(||portable_link(self.site,url,self.prefix));
+                }
+            }
+            self.interactions.push(json!({"id":runtime_id,"scope":suffix,"interactions":interactions}));
+        }
+        if let Some(mut record) = advanced::record(self.site, node, &runtime_id, suffix) {
+            if let Some(actions) = record.get_mut("actions").and_then(Value::as_array_mut) {
+                for action in actions {
+                    if let Some(url) = action.get("url").and_then(Value::as_str) {
+                        let url = context.map(|c|scoped_fragment(url,c.ids)).unwrap_or_else(||url.into());
+                        let url = self.links.map(|links|routing::link(&url,self.prefix,links)).unwrap_or_else(||portable_link(self.site,&url,self.prefix));
+                        action["url"] = json!(url);
+                    }
+                }
+            }
+            self.interactions.push(record);
+        }
+        let mut result = format!("<{} data-fw-node=\"{}\" data-fw-id=\"{}\"", node.tag, node.id, runtime_id);
+        for (key, value) in attrs { result.push_str(&format!(" {}=\"{}\"", key, escape(&value))); }
+        result.push('>');
+        let field_error = if ["input","textarea","select"].contains(&node.tag.as_str()) && node.attrs.get("type").map(String::as_str) != Some("hidden") {
+            node.attrs.get("name").map(|name|format!("<span class=\"fw-field-error\" data-fw-error=\"{}\" aria-live=\"polite\"></span>",escape(name))).unwrap_or_default()
+        } else { String::new() };
+        if void_tag(&node.tag) { result.push_str(&field_error); return Ok(result); }
+        if let Some((_, Some(poster))) = &page_host { result.push_str(&format!("<img data-fw-poster src=\"{}\" alt=\"\" decoding=\"async\">", escape(poster))); }
+        if let Some(section) = section { result.push_str(sections::html(section)); }
+        else if let Some(frame) = code::render(self.site, &node.id, self.prefix)? { result.push_str(&frame); }
+        else if let Some(frame) = embed::render(self.site, node) { result.push_str(&frame); }
+        else {
+            let (panel, track) = (advanced::wraps_panel(self.site, node), advanced::wraps_track(self.site, node));
+            if panel { result.push_str("<div data-fw-inner>"); }
+            result.push_str(&wishlist::step_heading(node)); result.push_str(&advanced::text_html(self.site, node, &text));
+            if track { result.push_str("<div class=\"fw-track\" style=\"display:flex;width:max-content\">"); }
+            for child in &node.children { result.push_str(&self.node(child, context, None)?); }
+            if track { result.push_str("</div>"); }
+            if panel { result.push_str("</div>"); }
+        }
+        result.push_str(&advanced::widget(self.site,node));
+        if node.tag == "form" && !advanced::script_form(self.site, node) { result.push_str(&advanced::form_extra(self.site,node)); result.push_str("<p class=\"fw-form-status\" data-fw-form-status aria-live=\"polite\"></p>"); }
+        result.push_str(&format!("</{}>", node.tag));
+        result.push_str(&field_error);
+        if section.is_some() { if let Some(tag) = sections::tag(self.site, &node.id, self.prefix) { result.push_str(&tag); } }
+        Ok(advanced::overlay(self.site,node,suffix,result))
+    }
+}
+
+fn subtree_ids(site: &Site, root: &str) -> BTreeSet<String> {
+    let mut result = BTreeSet::new();
+    let mut pending = vec![root.to_string()];
+    while let Some(id) = pending.pop() {
+        let node = &site.nodes[&id];
+        if let Some(html_id) = node.attrs.get("id") { result.insert(html_id.clone()); }
+        pending.extend(node.children.iter().cloned());
+    }
+    result
+}
+
+fn scoped_fragment(url: &str, ids: &Strings) -> String {
+    url.strip_prefix('#').and_then(|id|ids.get(id)).map(|mapped|format!("#{mapped}")).unwrap_or_else(||url.into())
+}
+
+fn portable_link(site: &Site, url: &str, prefix: &str) -> String {
+    if url.is_empty() || url.starts_with('#') || url.starts_with('?') || url.contains(":") { return url.into(); }
+    let split = url.find(['?', '#']).unwrap_or(url.len());
+    let route = url[..split].trim_matches('/');
+    if site.pages.iter().any(|page| page.slug.trim_matches('/') == route) {
+        let target = if route.is_empty() { if prefix.is_empty() { "./".to_string() } else { prefix.into() } } else { format!("{prefix}{route}/") };
+        format!("{target}{}", &url[split..])
+    } else { url.into() }
+}
+
+pub fn page_path(page: &Page) -> String {
+    let slug = page.slug.trim_matches('/');
+    if slug.is_empty() { "index.html".into() } else { format!("{slug}/index.html") }
+}
+
+/// Scroll and pointer effects (FW-185), appended to runtime.js by both exporters.
+pub const EFFECTS_RUNTIME: &str = include_str!("effects.js");
+const RUNTIME: &str = r#"'use strict';
+(() => {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const records = JSON.parse(document.getElementById('fw-interactions')?.textContent || '[]');
+  const nodes = new Map(Array.from(document.querySelectorAll('[data-fw-id]')).map(node => [node.dataset.fwId, node]));
+  const run = (node, action, active = true) => {
+    if (action.action === 'toggle-class') {
+      if (action.trigger === 'hover') node.classList.toggle(action.className, active);
+      else node.classList.toggle(action.className);
+    } else if (action.action === 'navigate' && active) {
+      window.location.assign(action.url);
+    } else if (action.action === 'fade-in' && active) {
+      node.style.opacity = '1';
+      if (!reduced.matches && node.animate) node.animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: action.duration ?? 300, easing: 'ease-out' });
+    }
+  };
+  for (const record of records) {
+    const node = nodes.get(record.id);
+    if (!node) continue;
+    for (const action of record.interactions) {
+      if (action.trigger === 'click') node.addEventListener('click', () => run(node, action));
+      if (action.trigger === 'hover') {
+        node.addEventListener('pointerenter', () => run(node, action, true));
+        node.addEventListener('pointerleave', () => run(node, action, false));
+        node.addEventListener('focusin', () => run(node, action, true));
+        node.addEventListener('focusout', () => run(node, action, false));
+      }
+      if (action.trigger === 'scroll') {
+        if (reduced.matches || !window.IntersectionObserver) { run(node, action); continue; }
+        if (action.action === 'fade-in') node.style.opacity = '0';
+        const observer = new IntersectionObserver(entries => {
+          if (entries.some(entry => entry.isIntersecting)) { run(node, action); observer.disconnect(); }
+        }, { threshold: 0.1 });
+        observer.observe(node);
+      }
+    }
+  }
+  for (const form of document.querySelectorAll('form[data-fw-form]')) {
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const status = form.querySelector('[data-fw-form-status]');
+      const button = form.querySelector('[type=submit]');
+      if (button) button.disabled = true;
+      status.textContent = 'Sending...';
+      try {
+        const fields = new FormData(form);
+        if (Array.from(fields.values()).some(value => typeof value !== 'string')) throw new Error('File uploads are unavailable');
+        const response = await fetch(form.action, { method: 'POST', body: new URLSearchParams(fields), headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error('Submission failed');
+        status.textContent = 'Thank you. Your message has been received.';
+        form.reset();
+      } catch { status.textContent = 'We could not send your message. Please try again.'; }
+      finally { if (button) button.disabled = false; }
+    });
+  }
+})();
+"#;

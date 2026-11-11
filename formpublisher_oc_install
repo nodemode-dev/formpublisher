@@ -8,7 +8,15 @@ echo "[formpublisher] engine: backend/venv"
 [ -x "$root/backend/venv/bin/python" ] || "$pybin" -m venv "$root/backend/venv"
 "$root/backend/venv/bin/python" -m pip install -q --upgrade pip
 "$root/backend/venv/bin/python" -m pip install -q -r "$root/backend/requirements.txt"
+"$root/backend/venv/bin/python" -m pip install -q -r "$root/backend/requirements-deep.txt"
+echo "[formpublisher] deep checks: Playwright is installed; no browser is downloaded; deep checks use a Chrome or Edge you already have"
+if command -v cargo > /dev/null || [ -x "$HOME/.cargo/bin/cargo" ]; then
+  echo "[formpublisher] compiler: backend/bin/formweb-core"
+  "$root/setup/install_compiler"
+else
+  echo "[formpublisher] Rust is not installed, so .fweb projects cannot be opened yet. Get Rust from https://rustup.rs, then run ./setup/install_compiler"
+fi
 echo "[formpublisher] interface: frontend/node_modules"
 (cd "$root/frontend" && npm ci --no-audit --no-fund)
-chmod +x "$root/formpublisher" "$root/formpublisher_oc_install" "$root/build_app" "$root/setup/freeze_backend" 2>/dev/null || true
+chmod +x "$root/formpublisher" "$root/formpublisher_oc_install" "$root/build_app" "$root/setup/freeze_backend" "$root/setup/install_compiler" 2>/dev/null || true
 echo "[formpublisher] done. Start with ./formpublisher (then open http://localhost:5280); ./formpublisher agents install connects Claude Code, Codex and Cursor"

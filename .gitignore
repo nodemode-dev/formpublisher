@@ -5,7 +5,8 @@ backend/venv/
 backend/build/
 backend/dist-engine/
 backend/data/
-vendor/
+backend/bin/
+vendor/formweb-native/target/
 __pycache__/
 *.pyc
 .pytest_cache/

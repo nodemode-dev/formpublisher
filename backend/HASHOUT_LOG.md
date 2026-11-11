@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.0
-Last updated: 2026-11-10 · Phase 2 engine skeleton and site intake
+Current build version: v0.1.1
+Last updated: 2026-11-10 · Phases 4 to 6: site host, checks, packages and signatures, .fweb projects
 
 ---
 
@@ -21,18 +21,30 @@ backend/
     ├── main.py               FastAPI app, LocalAccess guard, router auto-include, SPA fallback
     ├── cli.py                Client (HTTP or in-process) and the command line
     ├── mcp.py                MCP server on stdio over the same Client
+    ├── host.py               the site host ASGI app on its own port, serve_revision for deep runs
+    ├── static/probe.js       the live probe injected into previewed pages only
     ├── routers/
     │   ├── health.py         GET /api/health
     │   ├── settings.py       GET, PUT /api/settings
     │   ├── sites.py          /api/sites, import, routes, delete
     │   ├── live.py           WS /api/live
-    │   └── formweb.py        /api/formweb status, publications, import-current
+    │   ├── formweb.py        /api/formweb status, publications, import-current
+    │   ├── host.py           /api/host, mount and unmount
+    │   ├── checks.py         /api/checks run, results, live, thumbs
+    │   ├── builds.py         /api/builds build, reproduce, list, compare, sign, verify, download, delete
+    │   └── keys.py           /api/keys create, list, public, delete
     └── services/
-        ├── paths.py          ports, origins, data folder, frontend dist
+        ├── paths.py          ports (engine and site host), origins, data folder, frontend dist
         ├── settings.py       settings.json with validated keys
         ├── bus.py            in-process event bus
-        ├── intake.py         safe unzip, folder copy, site records, routes, redirects
-        └── formweb.py        read-only FormWeb client
+        ├── intake.py         safe unzip, folder copy, .fweb, site records, routes, redirects
+        ├── formweb.py        read-only FormWeb client
+        ├── compile.py        formweb-core JSON-lines session and asset bundling for .fweb
+        ├── host.py           static host rules, mount state, throttle, probe injection
+        ├── checks.py         the static tier and stored results
+        ├── deep.py           the deep tier through the installed Chrome
+        ├── package.py        deterministic site.zip, publish.json, build library
+        └── keys.py           Ed25519 keys and signatures
 ```
 
 ## Table of contents
@@ -161,3 +173,54 @@ backend/
 - Uses `httpx2` with `trust_env=False` (no proxy variables for a loopback call) and no redirect following. Probe timeout 2 s; reads 120 s.
 - The export is streamed to a temp file with the 512 MiB cap, imported as `source.kind = formweb` with the URL, and deleted afterwards.
 - FormWeb's optional `FORMWEB_AUTH_TOKEN` is not sent: FormPublisher has no token setting yet. A token-protected FormWeb will answer 401, which surfaces as a 502 here. Revisit with the FormWeb settings pane.
+
+## Phases 4 to 6 · v0.1.1 (2026-11-10)
+
+The executor spec is `TURN_B_SPEC.md` in the 0.1.1 planning sidecar.
+
+### app/host.py, app/services/host.py, app/routers/host.py
+
+- The site host is its own ASGI app on `FORMPUBLISHER_HOST_PORT` (8281), started by the engine's lifespan as a second `uvicorn.Server` task. `capture_signals` is overridden as a no-op, because a second server in the same loop would replace the engine's SIGINT handler. A port already in use logs an error and the engine keeps running.
+- Host guard: exact `127.0.0.1:<port>` or `localhost:<port>` (421), GET and HEAD only (405), websockets closed with 1008. The engine's origin allow-list does not contain the host origin, so a page on the host cannot call `/api/*`.
+- Rules: one percent-decode; NUL, backslash and `..` give 400; symlinks resolving outside the revision give 404; lookup `a/b`, `a/b/index.html`, `a/b.html`; `redirects.json` parsed locally (intake only returns a summary), exact matches before splats, 3xx keep the query, 200 rewrites; `404.html` with status 404; single ranges only (multiple or malformed ranges serve the whole file); `no-store`, `nosniff` and `strict-origin-when-cross-origin` on every response.
+- `probe` defaults to false; the preview sends `probe: true`. Injection goes right after `<head ...>`, else after `<html ...>`, else after the doctype, else after a BOM, else at byte 0, never before the doctype (quirks mode). Ranges on injected HTML use the injected bytes. `/__fp/` is reserved; `/__fp/probe.js` is read from `app/static/probe.js` two levels above `services/host.py`, so the frozen engine needs `app/static` as data (`setup/freeze_backend` adds it).
+- Throttle waits the latency before the first byte, then paces 16 KiB chunks to the bandwidth; the probe and the 421 and 405 replies are never throttled.
+- `serve_revision(root)` pre-binds `127.0.0.1:0` so the Host guard knows the port before startup, and serves one folder with no probe and no throttle.
+
+### app/static/probe.js
+
+- One IIFE under 12 KiB that never throws into the page; every wrapper (console, fetch, XHR, matchMedia, `Storage.getItem`) calls through. Forced `matchMedia` answers are real MediaQueryLists built from always-true or always-false queries, so listeners work. Only JS `matchMedia` is forced: CSS `@media (prefers-color-scheme)` rules follow the browser, which the manual notes.
+- In `error` messages the envelope keeps `source: 'fp-probe'` and the script URL travels as `file`.
+
+### app/services/checks.py, app/routers/checks.py
+
+- Standard library only; HTML through `html.parser`; the sitemap read with a regex rather than an XML parser, to avoid entity expansion on untrusted files. Paths resolve as the host resolves them. Ids are `static:<code>:<route>:<line or key>`, stable between runs.
+- A site with no `sitemap.xml` gets one `sitemap.missing` warning on `/`. `img.size` skips `img[data-fw-poster]`, whose box comes from its component host. Own hosts for `external.request` are the canonical link hosts, the sitemap hosts and loopback.
+- Results live in `checks/<site>/<revision>/results.json` as one block per tier (`static`, `deep`); live problems stay in memory, at most 1,000 per revision, tier forced to `live`. One run per site at a time (409 otherwise). The summary's `tiers` is a count per tier and `ran` lists the tiers with results.
+- `checks.chromePath` is a settings key (an absolute path up to 1,024 characters).
+
+### app/services/deep.py
+
+- Playwright is imported inside the run, so `--selfcheck` passes without it. Chrome comes from `checks.chromePath`, then `channel="chrome"`, then the known install paths; never `playwright install`. Missing pieces give one `deep.unavailable` info problem.
+- It serves the revision with its own threaded `http.server` on `127.0.0.1:0`, reusing `checks.SiteIndex` rules, because `serve_revision` landed after it; switching is a later cleanup.
+- CDP CPU and network throttling are applied per page session after `Network.enable`. Scroll is 8 steps down, then one jump to the top. Thumbnails come from a separate unthrottled context with `device_scale_factor` 320/1440, so Chrome renders 320 by 200 directly with no image library. `ERR_ABORTED` failures and the generic "Failed to load resource" console line are ignored as duplicates of `deep.request`.
+
+### app/services/package.py, app/routers/builds.py
+
+- `site.zip` is streamed through `ZipFile.open(info, "w")` with `force_zip64=False`; intake caps trees at 1 GiB, which stays under the zip64 threshold. Names starting with `.fp`, symlinks and non-files are left out.
+- `build.json` is the only file with a time in it. A rebuild of identical bytes returns the existing build with `created: false` and writes nothing, so a build's `publish.json` reflects the checks stored when it was first built.
+- Source kinds map to `formweb-export` (zip uploads and FormWeb pulls), `folder` and `fweb`; `formwebVersion` comes from `site.formweb.json`, else the engine version an `.fweb` import recorded.
+- The check summary counts the stored static and deep problems only; live problems are left out so the manifest stays deterministic.
+- Build ids are looked up across sites by scanning `builds/*/<id>`.
+
+### app/services/keys.py, app/routers/keys.py
+
+- Ed25519 through `cryptography`; PKCS8 PEM written `0600`; `BestAvailableEncryption` when a passphrase is given. Any failure to load the key with the given passphrase maps to "The passphrase does not unlock this key."; a locked key with no passphrase answers "This key needs a passphrase."; a passphrase sent for an unencrypted key is ignored.
+- Verify checks the fingerprint against the stored public key first, then the signature over the current zip bytes.
+
+### app/services/compile.py, intake changes
+
+- `formweb-core` is found at `FORMPUBLISHER_FORMWEB_CORE`, then `backend/bin/formweb-core`, then the frozen resource folder. Each request has a 120 s timer that kills the child, which unblocks `readline`; the child is closed, terminated and killed on every path.
+- `compile.py` raises its own `CompileError`, converted by intake, because intake imports it and the reverse import would be circular. Only the envelope's `site` is loaded; the checkpoint is ignored. `baseUrl` is the site's own or `https://example.com`, as the core would pick.
+- The FormWeb `bundle_assets` rules are ported: `/api/assets/<sha>.<ext>` becomes `assets/<file>` with the right `../` depth, `asset-access.json` is rebuilt last, `CREDITS.txt` is written when assets carry licences (without the Lucide text, which is not vendored). An image the project references but the file does not carry fails the import.
+- `.fweb` detection reads the first 4 KB for the `format` field; the extension is the main signal. Upload source keys are `fweb-upload:<label>`, so an upload never shares an id with a zip of the same name.

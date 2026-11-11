@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
 from app import __version__, routers
+from app import host as site_host
 from app.services import paths
 from app.services.bus import bus
 from app.services.formweb import FormwebError
@@ -63,7 +64,11 @@ class LocalAccess:
 async def lifespan(app: FastAPI):
     bus.attach(asyncio.get_running_loop())
     paths.ensure_layout()
-    yield
+    host_server, host_task = await site_host.start()
+    try:
+        yield
+    finally:
+        await site_host.stop(host_server, host_task)
 
 
 app = FastAPI(title="FormPublisher", version=__version__, lifespan=lifespan)

@@ -7,7 +7,7 @@ from typing import Any
 from app.services import paths
 from app.services.bus import bus
 
-KEYS = ("theme", "language", "density", "formwebUrl")
+KEYS = ("theme", "language", "density", "formwebUrl", "checks.chromePath")
 LOOPBACK_URL = re.compile(r"^https?://(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?/?$")
 _lock = threading.Lock()
 
@@ -44,6 +44,10 @@ def _check(key: str, value: Any) -> Any:
         if not LOOPBACK_URL.match(value):
             raise ValueError("formwebUrl must be an http(s) loopback address such as http://127.0.0.1:8240")
         return value.rstrip("/")
+    if key == "checks.chromePath":
+        if len(value) > 1024 or "\x00" in value or not os.path.isabs(value):
+            raise ValueError("checks.chromePath must be the absolute path of a Chrome executable")
+        return value
     if len(value) > 64:
         raise ValueError(f"{key} is too long")
     return value

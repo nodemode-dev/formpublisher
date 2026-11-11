@@ -27,7 +27,7 @@ if [ ! -f "$ROOT/frontend/dist/index.html" ]; then
   command -v npm >/dev/null 2>&1 || die "frontend/dist missing and npm not found"
   (cd "$ROOT/frontend" && npm run build)
 fi
-data=(--add-data "$ROOT/frontend/dist${sep}frontend_dist")
+data=(--add-data "$ROOT/frontend/dist${sep}frontend_dist" --add-data "$ROOT/backend/app/static${sep}app/static")
 [ -d "$ROOT/docs" ] && data+=(--add-data "$ROOT/docs${sep}docs")
 cd "$ROOT/backend"
 rm -rf build/pyinstaller dist-engine
