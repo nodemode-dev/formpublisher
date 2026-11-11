@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.6
-Last updated: 2026-11-11 · Phases 46 to 48: whole panel tabs and toolbar selects in narrow windows, and Save as .fpub named SITE-BUILD.fpub
+Current build version: v0.2.7
+Last updated: 2026-11-11 · Phases 52 to 54: a compact Problems filter, a language switch without a reload, and the narrow window in WebKitGTK
 
 ---
 
@@ -344,3 +344,33 @@ Turn P left the bar 59 px tall at 760 x 640 in every language (commits 96d59ec a
 - `i18n/keys/part21.json`: "All", in all 25 other languages, in a form that stands without a noun.
 
 Checked: English, German, Finnish and Russian at 1440 x 900, 1100 x 800 and 760 x 640 with CPU 4x and every option of both filters: whole values, every control inside the bar, CLS 0 opening a site, resizing and running checks. English at 760 x 640 is one 34 px row again. Known: German, Finnish and Russian still wrap at 760 x 640, and Russian at 1100 x 800, because their widest other options (Warnungen, Varoitukset, Предупреждения; Statisch, Staattinen, Статическая) leave no room with whole values.
+
+## Phase 52: a compact Problems filter · v0.2.7 (2026-11-11)
+
+Phase 51 left German, Finnish and Russian wrapping the Problems bar to 59 px at 760 x 640, and Russian at 1100 x 800 (commits 13aad4d and 7910053).
+
+- `ui/panel.ts`: `fitBar()` now tries three modes in order, `full`, `short` (option 0 reads "All") and `compact`, and keeps the first in which no control sits on a lower row. In `compact` both selects are hidden and the `filterBtn` funnel shows, with `filterDot` while either filter is not All and a title of "Filter problems" plus both current choices. `openMenu()` builds a menu of both groups as radio items; `pickFilter()` sets the hidden select and fires its `change`, so filtering runs through the same path. The menu opens upward near the window bottom; `menuKey()` handles Enter, Space, arrows, Home, End and Escape, and `closeMenu(true)` returns focus to the funnel. The decision is still measured before first paint from the `ResizeObserver`.
+- `ui/icons.ts`: `filter`, a funnel.
+- `styles/panel.css`: `.fp-pn-filter` (one control size, open state), `.fp-pn-dot`, `.fp-pn-menu-head`.
+- `i18n/keys/part22.json`: "Filter problems", in all 25 other languages.
+
+Checked: English, German, Finnish and Russian at 1440 x 900, 1100 x 800 and 760 x 640 with CPU 4x: one 34 px row everywhere; all 16 filter pairs by mouse and by keyboard in compact mode filtered as the selects do; CLS 0 opening a site, running checks, resizing and picking filters; `npx tsc --noEmit`; `npm run build`.
+
+## Phase 53: changing the language without a reload · v0.2.7 (2026-11-11)
+
+`setLanguage()` stored the choice and reloaded the window, which flashed it white and dropped the open dialog, typed text and the preview (commit 2e17a61).
+
+- `i18n/index.ts`: `loadTables()` loads the new tables before anything visible changes; a failed load restores the stored choice, and `wanted` makes the last of several quick picks win. `switchTo()` swaps `exact` and `patterns`, clears the cache, sets `html lang` and the title (from `titleEn`, captured at load), re-translates every node from its recorded English with `rewalk()` (`textEn` and `attrEn` hold the English source and the shown string per text node and attribute), then calls the `onLanguage()` listeners, all in one task. Unrecorded nodes count as English, as on a fresh load. A shown-to-English reverse map was tried and dropped because strings such as "Info" and "About" collide. The observer is created on the first switch away from English or a non-English start. The storage key and `storedLanguage()` are unchanged.
+- Listeners repaint what is drawn with `t()` or `locale()` at build time: `app.ts` (the Imported date), `ui/home.ts`, `ui/builds.ts`, `ui/trash.ts`, `ui/revisions.ts`, `ui/publish-sheet.ts` (which also sets each target checkbox's label), `ui/package-sheet.ts`, `ui/command-palette.ts` (`relabel()`), `ui/shortcuts-dialog.ts` and `ui/native-menu.ts` (rebuilds the native menu in the desktop shell). `ui/panel.ts` needs none: `fitBar()` re-fits on option text changes.
+- `ui/preferences.ts`: the select resets to `language()` when a load fails; the hint reads "The window changes to the language you choose.", replacing the old key in `i18n/keys/part02.json` and its 25 translations.
+
+Checked (Chrome, 1440 x 900): live switches en>de>ru>en, en>de>en>ru, ru>de>ja>en, en>fr>de>fr, en>ja>zh-Hans>en and en>L>en for all 25 languages against fresh loads: no visible difference, hidden DOM and eight dialogs equal, 0 navigations; the open site, selection, panel, preview iframe (0 loads), Preferences and typed text kept. CPU 4x: one sideways shift of the toolbar selects per switch, 0.002 to 0.008, no blank frame, longest task 61 ms. The native menu rebuild was not run in the lab. `npx tsc --noEmit`; `npm run build`.
+
+## Phase 54: the narrow window in WebKitGTK · v0.2.7 (2026-11-11)
+
+Measured in WebKitGTK 2.52.6 (a minimal GTK 3 WebKit2 4.1 window under Xvfb, since the desktop shell is not built in the lab) beside Chrome, with the same script, at 1440 x 900, 1100 x 800 and 760 x 640 in English and German (commit f83e920). WebKit draws selects about 5 px wider: German at 1440 overflowed the toolbar by 17 px (Package outside the row, the Motion select capped at 170 px and cut by 3 px, because sizing only ran at 1400 px of row and below), and German at 760 by 21 px. English, the tab strip and the Problems bar were whole everywhere.
+
+- `ui/toolbar.ts`: `fit()` starts at stage 1 at 1400 px of row and below, otherwise stage 0, and escalates from either whenever the row scrolls. It sets `is-sized` from stage 1 and `is-micro` at a new stage 4; `paint()` sizes selects from stage 1.
+- `styles/preview.css`: `.fp-options.is-sized .fp-tb-select` drops the 170 px cap and minimum width; `.is-micro` gives the row 4 px padding, hides the "x" between width and height and makes the number fields 32 px.
+
+Checked: both engines at all six sizes and languages: no row scroll, nothing outside the row, no cut value, tabs and Problems bar whole; the funnel menu opens inside the window in both. At 760 in English WebKit picks the compact filter where Chrome keeps the short "All", as `fitBar()` measures. Chrome is unchanged apart from the `is-sized` class. Known: at 760 in German the device select keeps the width of its widest option, "Benutzerdefiniert".

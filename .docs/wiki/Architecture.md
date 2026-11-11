@@ -2,7 +2,7 @@
 
 ```text
 interface (vanilla TypeScript, Vite, port 5280)
-  shell: title bar, tabs, routes strip, inspector, status bar, Home, theme boot, 26 interface languages
+  shell: title bar, tabs, routes strip, inspector, status bar, Home, theme boot, 26 interface languages switched in place
     -> HTTP /api/* and the live WebSocket
 engine (Python 3.12, FastAPI, 127.0.0.1:8280)
   routers: one file each under backend/app/routers, auto-included
