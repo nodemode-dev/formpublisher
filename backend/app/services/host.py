@@ -304,9 +304,17 @@ async def serve_file(send, method: str, request_headers: dict, serving: Serving,
 
 
 async def serve_missing(send, method: str, request_headers: dict, serving: Serving) -> None:
-    page = inside(serving.root, serving.root / "404.html") or inside(serving.root, serving.root / "404" / "index.html")
+    page = inside(serving.root, serving.root / "404.html")
     if page is not None:
         await serve_file(send, method, request_headers, serving, page, 404)
+        return
+    page = inside(serving.root, serving.root / "404" / "index.html")
+    if page is not None:
+        source = re.sub(rb'((?:href|src|poster|action)=")\.\./', rb"\1/", page.read_bytes())
+        if serving.probe:
+            source = inject(source, serving)
+        headers = [(b"content-type", b"text/html; charset=utf-8"), (b"content-length", str(len(source)).encode())]
+        await deliver(send, method, 404, headers, source, 0, len(source), serving.throttle)
         return
     await plain(send, method, 404, "Not found", serving.throttle)
 

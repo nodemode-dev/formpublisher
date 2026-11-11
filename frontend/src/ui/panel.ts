@@ -4,6 +4,7 @@ import { fetchResults, postLive, siteRevision, startRun, type Problem, type Seve
 import { emit, on, type ProbeMessage, type RouteStatus } from '../events';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
+import { refuse } from './notice-step';
 import { RevisionsView } from './revisions';
 
 interface ConEntry { seq: number; level: 'error' | 'warn'; text: string; where: string }
@@ -354,7 +355,7 @@ class Panel {
     } catch (err) {
       if (deep) this.endDeep();
       setText(this.progress, '');
-      emit('fp:notice', { kind: 'error', text: err instanceof Error ? err.message : 'The check failed.' });
+      refuse(err, 'The check failed.');
     }
   }
 

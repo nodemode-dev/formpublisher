@@ -45,16 +45,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
   if (!res.ok) {
     let message = `${res.status} ${res.statusText}`.trim();
+    let code = '';
     try {
       const body = (await res.json()) as unknown;
       if (isObj(body)) {
+        code = typeof body.code === 'string' ? body.code : '';
         const d = body.detail ?? body.message ?? body.error;
         if (typeof d === 'string' && d) message = d;
       }
     } catch {
       message = message || 'Request failed';
     }
-    throw new ApiError(message, res.status);
+    throw new ApiError(message, res.status, code);
   }
   if (res.status === 204) return undefined as T;
   return (await res.json()) as T;

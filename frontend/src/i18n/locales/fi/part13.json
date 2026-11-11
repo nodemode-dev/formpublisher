@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Avaa roskakori",
+  "Try again": "Yritä uudelleen",
+  "Show the running check": "Näytä käynnissä oleva tarkistus",
+  "Open the manual": "Avaa käyttöopas",
+  "Enter the passphrase": "Anna salasanalause",
+  "Passphrase needed": "Salasanalause vaaditaan",
+  "Passphrase": "Salasanalause",
+  "{0} is locked. Type its passphrase to restore it.": "{0} on lukittu. Palauta se kirjoittamalla sen salasanalause.",
+  "Type the passphrase.": "Kirjoita salasanalause."
+}

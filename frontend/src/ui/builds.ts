@@ -6,6 +6,7 @@ import { locale } from '../i18n';
 import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
+import { refuse } from './notice-step';
 
 export function fmtBytes(n: number): string {
   if (!Number.isFinite(n) || n < 0) return '-';
@@ -80,7 +81,7 @@ class InspectDialog extends Dialog {
       const d = await buildsApi.detail(summary.id);
       if (seq === this.seq) this.fill(d, siteName || d.siteName, d.fileList);
     } catch (e) {
-      if (seq === this.seq) emit('fp:notice', { kind: 'error', text: message(e) });
+      if (seq === this.seq) refuse(e, message(e), summary.id);
     }
   }
 
@@ -311,7 +312,7 @@ export class BuildsPage {
       await buildsApi.remove(b.id);
       emit('fp:notice', { kind: 'ok', text: `Moved build ${b.id} to the trash` });
     } catch (e) {
-      emit('fp:notice', { kind: 'error', text: message(e) });
+      refuse(e, message(e), b.id);
     }
     await this.refresh();
   }

@@ -1,0 +1,11 @@
+{
+  "Open the trash": "ゴミ箱を開く",
+  "Try again": "もう一度試す",
+  "Show the running check": "実行中のチェックを表示",
+  "Open the manual": "マニュアルを開く",
+  "Enter the passphrase": "パスフレーズを入力",
+  "Passphrase needed": "パスフレーズが必要です",
+  "Passphrase": "パスフレーズ",
+  "{0} is locked. Type its passphrase to restore it.": "{0} はロックされています。復元するにはパスフレーズを入力してください。",
+  "Type the passphrase.": "パスフレーズを入力してください。"
+}

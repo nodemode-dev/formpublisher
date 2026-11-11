@@ -10,6 +10,7 @@ import { setLibraryOpener } from './builds';
 import { Home } from './home';
 import './icons-extra';
 import { MenuBar, type MenuDef } from './menu';
+import { stepFor, type StepHost } from './notice-step';
 import { NativeMenus, wantsNativeMenus } from './native-menu';
 import { openPackageSheet } from './package-sheet';
 import { runChecks } from './panel';
@@ -229,7 +230,15 @@ export function installChrome(app: App): Chrome {
   on('fp:home', () => { commands.run('view.home'); });
   on('fp:theme-toggle', (detail, ev) => { ev.preventDefault(); commands.run('view.theme', { to: detail.to }); });
   on('fp:new-tab', (_d, ev) => { ev.preventDefault(); home.show('start'); });
-  on('fp:notice', ({ kind, text }) => { toast(text, kind); });
+  const stepHost: StepHost = {
+    openTrash: () => home.show('trash'),
+    showCheck: () => app.showBottomTab('problems'),
+    openManual: () => { void openExternal(`${DOCS_URL}#error-codes`); },
+  };
+  on('fp:notice', ({ kind, text, code, ref, run }) => {
+    if (kind !== 'error' || !code) { toast(text, kind); return; }
+    void stepFor(code, ref, run, stepHost).then((action) => { toast(text, kind, action); });
+  });
 
   const hasFiles = (e: DragEvent): boolean => !!e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files');
   document.addEventListener('dragover', (e) => {

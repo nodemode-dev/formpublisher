@@ -287,6 +287,71 @@ def _restore_key(entry: Path, row: dict, dest: Path) -> dict:
     return {"id": key_row["id"], "name": key_row.get("name")}
 
 
+def _key_record(entry: Path) -> dict | None:
+    record = _read_json(entry / "entry.json") if entry.is_dir() else None
+    return record if record is not None and isinstance(record.get("id"), str) else None
+
+
+def _rescue_key(entry: Path, passphrase: str | None) -> dict:
+    """Rebuild a trashed key's index row from its .pem when entry.json is missing or damaged."""
+    import base64
+    import hashlib
+
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+    from app.services import keys
+
+    if passphrase is not None and not isinstance(passphrase, str):
+        raise _error("passphrase must be text", 400, "invalid")
+    pems = [item for item in entry.iterdir() if item.is_file() and item.suffix == ".pem"] if entry.is_dir() else []
+    if len(pems) != 1:
+        raise _error("The key record in this entry is missing or damaged, and no single key file is left to rebuild it from.", 409, "entry-damaged")
+    source = pems[0]
+    try:
+        data = source.read_bytes()
+    except OSError:
+        raise _error("The key file in this entry cannot be read.", 409, "entry-damaged")
+    encrypted = False
+    try:
+        private = serialization.load_pem_private_key(data, password=None)
+    except TypeError:
+        encrypted = True
+        private = None
+    except ValueError:
+        raise _error("The key file in this entry cannot be read as a private key.", 409, "entry-damaged")
+    if encrypted:
+        if not passphrase:
+            raise _error("This key is encrypted; give its passphrase to restore it.", 409, "passphrase-required")
+        try:
+            private = serialization.load_pem_private_key(data, password=passphrase.encode("utf-8"))
+        except (ValueError, TypeError):
+            raise _error(keys.WRONG_PASSPHRASE, 409, "passphrase-wrong")
+    if not isinstance(private, Ed25519PrivateKey):
+        raise _error("The key file in this entry is not an Ed25519 key.", 409, "entry-damaged")
+    raw = keys._raw_public(private.public_key())
+    key_id = hashlib.sha256(raw).hexdigest()[:16]
+    created = _iso(datetime.fromtimestamp(source.stat().st_mtime, timezone.utc))
+    key_row = {
+        "id": key_id,
+        "name": f"Recovered key {key_id}",
+        "fingerprint": keys.fingerprint_of(raw),
+        "created": created,
+        "encrypted": encrypted,
+        "publicKey": base64.b64encode(raw).decode("ascii"),
+    }
+    dest = keys._pem_path(key_id)
+    with keys._lock:
+        if any(r.get("id") == key_id for r in keys._load()) or dest.exists() or dest.is_symlink():
+            raise _error("A key with this id already exists.", 409, "place-taken")
+        shutil.move(str(source), str(dest))
+        os.chmod(dest, 0o600)
+        keys._save(keys._load() + [key_row])
+    shutil.rmtree(entry, ignore_errors=True)
+    bus.emit("keys.created", id=key_id, name=key_row["name"], restored=True)
+    return {"id": key_id, "name": key_row["name"], "rescued": True, "origin": f"keys/{key_id}.pem"}
+
+
 def _reprepare(entry_name: str, row: dict, dest: Path, origin: str) -> dict:
     from app.services import package, publish
 
@@ -316,7 +381,7 @@ def _reprepare(entry_name: str, row: dict, dest: Path, origin: str) -> dict:
     return {"entry": entry_name, "kind": "prepared", "restored": True, "origin": origin, "reprepared": True, "build": build_id, "target": target_id}
 
 
-def restore(entry_name: str, origin: str | None = None) -> dict:
+def restore(entry_name: str, origin: str | None = None, passphrase: str | None = None) -> dict:
     """Move an entry back to where it came from, or raise 409 saying why it cannot go.
 
     An entry whose origin is neither recorded nor inferable from its name and contents needs origin, a path relative
@@ -326,9 +391,13 @@ def restore(entry_name: str, origin: str | None = None) -> dict:
     with _lock:
         entry = _find(entry_name)
         row = _row(entry)
-        dest, used = _free_destination(row, origin)
-        row["origin"] = used
         kind = row["kind"]
+        rescue = kind == "key" and _key_record(entry) is None
+        if rescue:
+            dest, used = None, row["origin"]
+        else:
+            dest, used = _free_destination(row, origin)
+        row["origin"] = used
         if kind == "prepared" and _meta(entry) is None:
             legacy = True
         else:
@@ -338,7 +407,10 @@ def restore(entry_name: str, origin: str | None = None) -> dict:
     with _lock:
         entry = _find(entry_name)
         info: dict = {}
-        if kind == "key":
+        if rescue:
+            info = _rescue_key(entry, passphrase)
+            row["origin"] = info.pop("origin")
+        elif kind == "key":
             info = _restore_key(entry, row, dest)
         else:
             payload = (_meta(entry) or {}).get("payload")

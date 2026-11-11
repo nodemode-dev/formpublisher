@@ -6,6 +6,7 @@ import { copyText, fmtBytes, fmtCount, showInLibrary } from './builds';
 import { Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
+import { refuse, refuseStep } from './notice-step';
 import { runChecks } from './panel';
 import { installPublish } from './publish-sheet';
 
@@ -260,7 +261,7 @@ class PackageSheet extends Dialog {
       } catch (e) {
         this.build = null;
         this.resetResult();
-        emit('fp:notice', { kind: 'error', text: message(e) });
+        refuse(e, message(e), this.site);
       }
     });
   }
@@ -276,6 +277,7 @@ class PackageSheet extends Dialog {
         else say(this.f.repro, `Not reproduced. Expected ${r.expected.slice(0, 12)}, got ${r.sha256.slice(0, 12)}.`, 'error');
       } catch (e) {
         say(this.f.repro, message(e), 'error');
+        refuseStep(e, b.id);
       }
     });
   }
@@ -293,7 +295,9 @@ class PackageSheet extends Dialog {
         say(this.f.sign, `Signed with ${key.name}.`, 'ok');
         say(this.f.verify, '', '');
       } catch (e) {
+        this.pass.value = '';
         say(this.f.sign, message(e), 'error');
+        refuseStep(e, b.id, () => this.pass.focus());
       }
     });
   }
@@ -309,6 +313,7 @@ class PackageSheet extends Dialog {
         else say(this.f.verify, `Invalid. ${r.reason || 'The signature does not match.'}`, 'error');
       } catch (e) {
         say(this.f.verify, message(e), 'error');
+        refuseStep(e, b.id);
       }
     });
   }
@@ -340,7 +345,7 @@ class PackageSheet extends Dialog {
       try {
         await runChecks(this.app, false);
       } catch (e) {
-        emit('fp:notice', { kind: 'error', text: message(e) });
+        refuse(e, message(e), this.site);
       }
       await this.loadChecks();
     });

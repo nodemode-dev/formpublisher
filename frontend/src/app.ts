@@ -6,6 +6,7 @@ import { brandMark } from './ui/brand';
 import { inTauri, mountOnce, q,setAttr, setClass, setDisabled, setHidden, setText, setTitle, setValue } from './ui/dom';
 import { installHints } from './ui/hint-strip';
 import { icon } from './ui/icons';
+import { refuse } from './ui/notice-step';
 import { openPackageSheet, installPackaging } from './ui/package-sheet';
 import { installPanel } from './ui/panel';
 import { askPath } from './ui/path-dialog';
@@ -416,7 +417,7 @@ export async function startApp(): Promise<App> {
     } catch (e) {
       const text = e instanceof Error ? e.message : 'The import failed';
       showResult('error', text);
-      notice('error', text);
+      refuse(e, text, undefined, () => { void flow(run, fallback); });
       if (e instanceof ApiError && e.status === 0) setEngine('down');
       return null;
     } finally {

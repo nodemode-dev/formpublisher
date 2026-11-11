@@ -178,12 +178,12 @@ def build(client: Client | None = None) -> MCPServer:
 
     @server.tool(
         name="restore_from_trash",
-        description="Move a trash entry back to where it came from: the origin the trash recorded, or one worked out from the name and contents of an entry made before the records existed (an old prepared folder is prepared again from its build). It has no origin argument, so an entry whose origin is unknown fails with the reason and is restored by a person with the CLI (trash restore ENTRY --to PATH) or the window. It also fails when the place is taken. Deleting for good is not offered here.",
+        description="Move a trash entry back to where it came from: the origin the trash recorded, or one worked out from the name and contents of an entry made before the records existed (an old prepared folder is prepared again from its build). It has no origin argument, so an entry whose origin is unknown fails with the reason and is restored by a person with the CLI (trash restore ENTRY --to PATH) or the window. A trashed key whose record is missing is rebuilt from its key file; an encrypted one answers passphrase-required until the person's passphrase is given (never invent one). It also fails when the place is taken. Deleting for good is not offered here.",
         annotations=ToolAnnotations(title="Restore from the trash", readOnlyHint=False, destructiveHint=False, idempotentHint=False, openWorldHint=False),
     )
-    async def restore_from_trash(entry: str) -> dict:
-        """entry: the entry name from list_trash."""
-        return await run(link.trash_restore, entry)
+    async def restore_from_trash(entry: str, passphrase: str | None = None) -> dict:
+        """entry: the entry name from list_trash. passphrase: only for an encrypted key whose record is missing, and only if the person gave it."""
+        return await run(link.trash_restore, entry, None, passphrase)
 
     return server
 

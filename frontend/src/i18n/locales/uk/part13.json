@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Відкрити кошик",
+  "Try again": "Повторити",
+  "Show the running check": "Показати перевірку, що виконується",
+  "Open the manual": "Відкрити посібник",
+  "Enter the passphrase": "Ввести парольну фразу",
+  "Passphrase needed": "Потрібна парольна фраза",
+  "Passphrase": "Парольна фраза",
+  "{0} is locked. Type its passphrase to restore it.": "Ключ {0} заблоковано. Введіть його парольну фразу, щоб відновити його.",
+  "Type the passphrase.": "Введіть парольну фразу."
+}

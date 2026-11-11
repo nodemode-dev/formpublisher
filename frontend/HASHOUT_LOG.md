@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.6
-Last updated: 2026-11-10 · Phases 19 and 21: ApiError codes, the Trash origin dialog for every kind
+Current build version: v0.1.7
+Last updated: 2026-11-10 · Phase 23: one next step beside a refusal, the trash passphrase dialog
 
 ---
 
@@ -200,3 +200,11 @@ The executor spec is `TURN_G_SPEC.md` in the 0.1.6 planning sidecar.
 `ui/trash.ts`: `shapeError(kind, name)` (with `SITE_ID`, `HEX12`, `HEX16`) checks the typed name in `OriginDialog.submit` before any request, with the four part12 sentences; the engine applies the same rule (`place-invalid`), so the client check only saves a round trip. The error line already reserves its 36 px, so a refusal shifts nothing. Key entries with a readable `entry.json` restore without the dialog; a damaged one answers `entry-damaged`, which the dialog cannot fix, so it stays a notice.
 
 Checked: `npm run build`. Headless Chrome at 1280x800 on a lab data folder with an unparseable build, prepared folder, site and key: wrong names were refused inline for each kind, the right ones restored, the build downloaded (377,852 bytes), the prepared folder verified (4 files), the key signed and verified; CLS 0; only the expected 409 console lines. `docs/images/trash-origin-dark.webp` and `-light.webp` show the dialog with an inline refusal.
+
+## Phase 23: the window acts on codes · v0.1.7 (2026-11-10)
+
+The executor spec is `TURN_H_SPEC.md` in the 0.1.7 planning sidecar.
+
+`ui/notice-step.ts` (new): `refuse()`, `refuseStep()` and `stepFor(code)`, which maps a code to one action: Open the trash for `build-missing` or `site-missing`, only after `/api/trash` shows the item there; Try again for `formweb-unreachable`; Show the running check for `check-running`; Open the manual at `#error-codes` for `core-missing`; Enter the passphrase for `passphrase-required` or `passphrase-wrong` when signing. `events.ts`: `fp:notice` carries optional `code`, `ref` and `run`. `ui/chrome.ts` resolves the step and shows it through the existing toast action; `app.ts`, `ui/panel.ts`, `ui/package-sheet.ts`, `ui/publish-sheet.ts` and `ui/builds.ts` pass codes, and Sign clears the passphrase field after every attempt. `api-trash.ts` and `api-checks.ts` were dropping `code` and keep it now; `restore(entry, origin?, passphrase?)`. `ui/trash.ts`: `PassphraseDialog` (password field, autocomplete off, cleared after use, never stored) opens on `passphrase-required`, retries, and shows `passphrase-wrong` inline. `styles/overlays.css`: the action is 16.8 px high, the notice line height, so a notice is the same height with or without it. Nine keys in `i18n/keys/part13.json` and all locales.
+
+Checked: `npm run build`. Headless Chrome against lab engines: each action appeared for its real refusal and did its step, keyboard reachable; `site-missing` was not seen live because the window closes a removed site first, and it runs the same code as `build-missing`. The trash dialog restored a locked key whose record was deleted, against the key rescue engine, with a wrong passphrase refused inline first; the passphrase was found only in restore bodies, not in local or session storage. CLS 0, notice heights 34.8 px and 51.6 px with or without an action, no page errors beyond the expected refusals. `docs/images/notice-action-dark.webp` and `-light.webp`.

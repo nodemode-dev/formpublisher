@@ -21,6 +21,8 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
     result.notes.append("_redirects lists exact rules first, then splat rules; Netlify uses the first match.")
     if inp.has_404:
         result.notes.append("A final rule serves 404.html with status 404 for unknown paths.")
+        if inp.fallback_404:
+            result.notes.append("This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.")
     else:
         result.notes.append("The site has no 404.html, so Netlify shows its own not-found page.")
     return result

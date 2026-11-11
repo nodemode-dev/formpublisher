@@ -1,0 +1,11 @@
+{
+  "Open the trash": "打开废纸篓",
+  "Try again": "重试",
+  "Show the running check": "显示正在运行的检查",
+  "Open the manual": "打开手册",
+  "Enter the passphrase": "输入口令",
+  "Passphrase needed": "需要口令",
+  "Passphrase": "口令",
+  "{0} is locked. Type its passphrase to restore it.": "{0} 已锁定。请输入其口令以恢复。",
+  "Type the passphrase.": "请输入口令。"
+}

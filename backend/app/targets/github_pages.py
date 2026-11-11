@@ -95,6 +95,8 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
     put(out, "site/.nojekyll", "")
     if inp.has_404:
         result.notes.append("The site's own 404.html is used for unknown paths.")
+        if inp.fallback_404:
+            result.notes.append("This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.")
     else:
         put(out, "site/404.html", MINIMAL_404)
         result.notes.append("The site has no 404.html, so a minimal one was added.")

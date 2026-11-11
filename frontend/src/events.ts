@@ -19,7 +19,7 @@ export interface FpEventMap {
   'fp:route-selected': { siteId: string; path: string };
   'fp:settings-changed': Record<string, never>;
   'fp:ui-settings-changed': { key: string };
-  'fp:notice': { kind: NoticeKind; text: string };
+  'fp:notice': { kind: NoticeKind; text: string; code?: string; ref?: string; run?: () => void };
   'fp:engine-state': { state: 'ok' | 'down' | 'unknown' };
   'fp:probe': ProbeMessage;
   'fp:checks': { siteId: string; revision: string; status: Record<string, RouteStatus>; thumbs: Record<string, string> };

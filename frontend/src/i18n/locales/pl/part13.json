@@ -1,0 +1,11 @@
+{
+  "Open the trash": "Otwórz kosz",
+  "Try again": "Spróbuj ponownie",
+  "Show the running check": "Pokaż trwającą kontrolę",
+  "Open the manual": "Otwórz podręcznik",
+  "Enter the passphrase": "Wpisz hasło",
+  "Passphrase needed": "Wymagane hasło",
+  "Passphrase": "Hasło",
+  "{0} is locked. Type its passphrase to restore it.": "Klucz {0} jest zablokowany. Wpisz jego hasło, aby go przywrócić.",
+  "Type the passphrase.": "Wpisz hasło."
+}

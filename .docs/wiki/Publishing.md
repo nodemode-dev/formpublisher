@@ -21,6 +21,8 @@ Every folder is written from the build's own `site.zip`, never from the live sit
 
 A FormWeb 404 page exported as `404/index.html` counts as the site's 404 and is also written as `404.html`. A host that cannot represent something says so under Warnings: GitHub Pages has no server redirects and ignores custom headers, so each one is named, never dropped silently.
 
+FormWeb 0.19.7 exports splat redirects (`/blog/*` to `/docs/:splat`) and a root `404.html`. Netlify and Cloudflare Pages write the splat into `_redirects`, Vercel as `:path*` in `vercel.json`, and nginx as a regex `location`. GitHub Pages skips splats with a warning, because it has no server redirects; exact ones become refresh pages. For older exports with only `404/index.html`, every target writes it as `404.html` with its URLs made root-absolute and says so in its notes. Static zip stays byte for byte.
+
 ## FormWeb's model files
 
 A FormWeb site carries `site.formweb.json` and `asset-access.json`. Hosts do not need them, so the `site/` folder of each host is written without them. Tick Keep FormWeb's model files in the sheet (`--include-model` on the command line, `includeModel: true` in the MCP tool) to keep them for that prepare. Prepared panels show "Left out: ...", results list `leftOut`, and Verify knows what was left out. `site.zip` is unchanged and still holds both files, so the option affects the five host folders that have a `site/` folder, not the Static zip.

@@ -41,6 +41,10 @@ class PreparedInput:
         return "404.html" in self.names or "404/index.html" in self.names
 
     @property
+    def fallback_404(self) -> bool:
+        return "404.html" not in self.names and "404/index.html" in self.names
+
+    @property
     def redirects(self) -> list[dict]:
         rows = self.publish.get("redirects")
         out = []
@@ -109,7 +113,8 @@ def copy_site(inp: PreparedInput, dest: Path) -> None:
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(inp.root / name, target)
     if "404.html" not in inp.names and "404/index.html" in inp.names:
-        shutil.copyfile(inp.root / "404/index.html", dest / "404.html")
+        page = (inp.root / "404/index.html").read_bytes()
+        (dest / "404.html").write_bytes(re.sub(rb'((?:href|src|poster|action)=")\.\./', rb"\1/", page))
 
 
 def put(out: Path, rel: str, data: Any) -> None:
