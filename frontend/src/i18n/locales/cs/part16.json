@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: chybí",
+  "{0}: hash differs from publish.json": "{0}: hash se liší od publish.json",
+  "{0}: extra file": "{0}: soubor navíc",
+  "{0}: differs from a fresh prepare": "{0}: liší se od čerstvé přípravy",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "pro tento build a cíl není nic připraveno",
+  "the build has no publish.json": "build nemá publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip už neodpovídá publish.json; sestavte jej znovu",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "Konfigurace prošla nginx -t s nginx {0} a prošly i její řádky listen na loopbackovém portu.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "Konfigurace prošla nginx -t s nginx {0}; její řádky listen nebyly zkontrolovány na loopbackovém portu, protože žádný nebyl volný.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "Konfigurace prošla nginx -t a prošly i její řádky listen na loopbackovém portu.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "Konfigurace prošla nginx -t; její řádky listen nebyly zkontrolovány na loopbackovém portu, protože žádný nebyl volný."
+}

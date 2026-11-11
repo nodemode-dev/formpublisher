@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0 · 2026-11-10
+
+The version moves to 0.2.0 rather than 0.1.10, to keep the Form family's one-digit patch number (FormWeb moves to 0.20.0 the same way).
+
+- GitHub Pages redirect pages keep the visitor's query string and hash, so `/old?q=1#h` lands on `/docs?q=1#h`; without scripts they still redirect through their meta refresh.
+- `nginx-check.sh` is executable, so `./nginx-check.sh` works as well as `sh nginx-check.sh`.
+- The nginx check also checks the `listen` lines, on a free loopback port, so a bad listen parameter is caught; the prepare note says whether that ran.
+- Verify reads in your language: problem rows, refusals and the nginx notes are translated into all 26 languages, with paths and nginx's own messages left as they are.
+- The FormWeb engine crates are vendored at 0.20.0.
+- Every new string is in all 26 languages.
+
 ## 0.1.9 · 2026-11-10
 
 - The nginx folder carries `nginx-check.sh`, and Check the config now runs `sh nginx-check.sh`: it checks the config with `nginx -t` on a scratch copy, so it works without root or IPv6 and changes nothing in the folder.

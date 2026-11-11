@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: відсутній",
+  "{0}: hash differs from publish.json": "{0}: хеш відрізняється від publish.json",
+  "{0}: extra file": "{0}: зайвий файл",
+  "{0}: differs from a fresh prepare": "{0}: відрізняється від свіжої підготовки",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "для цієї збірки та цілі нічого не підготовлено",
+  "the build has no publish.json": "у збірки немає publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip більше не збігається з publish.json; зберіть його заново",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "Конфігурація пройшла nginx -t в nginx {0}, і її рядки listen також пройшли перевірку на loopback-порту.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "Конфігурація пройшла nginx -t в nginx {0}; її рядки listen не перевірялися на loopback-порту, бо вільного порту не було.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "Конфігурація пройшла nginx -t, і її рядки listen також пройшли перевірку на loopback-порту.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "Конфігурація пройшла nginx -t; її рядки listen не перевірялися на loopback-порту, бо вільного порту не було."
+}

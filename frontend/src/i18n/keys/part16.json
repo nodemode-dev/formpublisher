@@ -1,0 +1,14 @@
+[
+"{0}: missing",
+"{0}: hash differs from publish.json",
+"{0}: extra file",
+"{0}: differs from a fresh prepare",
+"{0}: nginx -t: {1}",
+"nothing is prepared for that build and target",
+"the build has no publish.json",
+"site.zip no longer matches publish.json; build it again",
+"The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.",
+"The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.",
+"The config passed nginx -t, and so did its listen lines on a loopback port.",
+"The config passed nginx -t; its listen lines were not checked on a loopback port because none was free."
+]

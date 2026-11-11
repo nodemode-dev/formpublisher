@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: hiányzik",
+  "{0}: hash differs from publish.json": "{0}: a hash eltér a publish.json fájlétól",
+  "{0}: extra file": "{0}: felesleges fájl",
+  "{0}: differs from a fresh prepare": "{0}: eltér egy friss előkészítéstől",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "ehhez a buildhez és célhoz nincs előkészítve semmi",
+  "the build has no publish.json": "a buildben nincs publish.json",
+  "site.zip no longer matches publish.json; build it again": "a site.zip már nem egyezik a publish.json fájllal; építsd újra",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "A konfiguráció átment az nginx -t ellenőrzésen nginx {0} verzióval, és a listen sorai is átmentek egy loopback porton.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "A konfiguráció átment az nginx -t ellenőrzésen nginx {0} verzióval; a listen sorait nem ellenőriztük loopback porton, mert nem volt szabad port.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "A konfiguráció átment az nginx -t ellenőrzésen, és a listen sorai is átmentek egy loopback porton.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "A konfiguráció átment az nginx -t ellenőrzésen; a listen sorait nem ellenőriztük loopback porton, mert nem volt szabad port."
+}

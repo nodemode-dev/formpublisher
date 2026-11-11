@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: puuttuu",
+  "{0}: hash differs from publish.json": "{0}: tiiviste eroaa tiedoston publish.json tiivisteestä",
+  "{0}: extra file": "{0}: ylimääräinen tiedosto",
+  "{0}: differs from a fresh prepare": "{0}: eroaa uudesta valmistelusta",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "tälle koonnille ja kohteelle ei ole valmisteltu mitään",
+  "the build has no publish.json": "koonnissa ei ole tiedostoa publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip ei enää vastaa tiedostoa publish.json; kokoa se uudelleen",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "Asetukset läpäisivät nginx -t -tarkistuksen nginx-versiolla {0}, ja niiden listen-rivit läpäisivät tarkistuksen myös loopback-portissa.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "Asetukset läpäisivät nginx -t -tarkistuksen nginx-versiolla {0}; niiden listen-rivejä ei tarkistettu loopback-portissa, koska yhtään vapaata porttia ei ollut.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "Asetukset läpäisivät nginx -t -tarkistuksen, ja niiden listen-rivit läpäisivät tarkistuksen myös loopback-portissa.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "Asetukset läpäisivät nginx -t -tarkistuksen; niiden listen-rivejä ei tarkistettu loopback-portissa, koska yhtään vapaata porttia ei ollut."
+}

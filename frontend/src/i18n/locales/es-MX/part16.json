@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: falta",
+  "{0}: hash differs from publish.json": "{0}: el hash difiere del de publish.json",
+  "{0}: extra file": "{0}: archivo de más",
+  "{0}: differs from a fresh prepare": "{0}: difiere de una preparación nueva",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "No hay nada preparado para este build y este destino",
+  "the build has no publish.json": "El build no tiene publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip ya no coincide con publish.json; vuelve a generar el build",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "La configuración pasó nginx -t con nginx {0}, y sus líneas listen también en un puerto loopback.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "La configuración pasó nginx -t con nginx {0}; sus líneas listen no se revisaron en un puerto loopback porque no había ninguno libre.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "La configuración pasó nginx -t, y sus líneas listen también en un puerto loopback.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "La configuración pasó nginx -t; sus líneas listen no se revisaron en un puerto loopback porque no había ninguno libre."
+}

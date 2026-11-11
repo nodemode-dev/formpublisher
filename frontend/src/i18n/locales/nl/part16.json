@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: ontbreekt",
+  "{0}: hash differs from publish.json": "{0}: hash wijkt af van publish.json",
+  "{0}: extra file": "{0}: extra bestand",
+  "{0}: differs from a fresh prepare": "{0}: wijkt af van een nieuwe voorbereiding",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "Voor deze build en dit doel is niets voorbereid",
+  "the build has no publish.json": "De build heeft geen publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip komt niet meer overeen met publish.json; bouw de build opnieuw",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "De configuratie is geslaagd voor nginx -t met nginx {0}, en de listen-regels ook op een loopback-poort.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "De configuratie is geslaagd voor nginx -t met nginx {0}; de listen-regels zijn niet gecontroleerd op een loopback-poort omdat er geen vrij was.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "De configuratie is geslaagd voor nginx -t, en de listen-regels ook op een loopback-poort.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "De configuratie is geslaagd voor nginx -t; de listen-regels zijn niet gecontroleerd op een loopback-poort omdat er geen vrij was."
+}

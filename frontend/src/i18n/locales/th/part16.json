@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: ไม่พบไฟล์",
+  "{0}: hash differs from publish.json": "{0}: ค่าแฮชไม่ตรงกับ publish.json",
+  "{0}: extra file": "{0}: เป็นไฟล์ส่วนเกิน",
+  "{0}: differs from a fresh prepare": "{0}: ต่างจากที่เตรียมใหม่",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "ยังไม่มีสิ่งใดที่เตรียมไว้สำหรับบิลด์และเป้าหมายนั้น",
+  "the build has no publish.json": "บิลด์นี้ไม่มี publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip ไม่ตรงกับ publish.json อีกต่อไป ให้บิลด์ใหม่อีกครั้ง",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "การตั้งค่าผ่าน nginx -t ด้วย nginx {0} และบรรทัด listen ก็ผ่านการตรวจสอบบนพอร์ตลูปแบ็กด้วย",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "การตั้งค่าผ่าน nginx -t ด้วย nginx {0} แต่ไม่ได้ตรวจสอบบรรทัด listen บนพอร์ตลูปแบ็ก เพราะไม่มีพอร์ตว่าง",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "การตั้งค่าผ่าน nginx -t และบรรทัด listen ก็ผ่านการตรวจสอบบนพอร์ตลูปแบ็กด้วย",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "การตั้งค่าผ่าน nginx -t แต่ไม่ได้ตรวจสอบบรรทัด listen บนพอร์ตลูปแบ็ก เพราะไม่มีพอร์ตว่าง"
+}

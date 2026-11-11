@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: 遺失",
+  "{0}: hash differs from publish.json": "{0}: 雜湊值與 publish.json 不一致",
+  "{0}: extra file": "{0}: 多餘的檔案",
+  "{0}: differs from a fresh prepare": "{0}: 與重新準備的結果不同",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "該建置和目標尚未準備任何內容",
+  "the build has no publish.json": "該建置沒有 publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip 與 publish.json 已不一致；請重新建置",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "設定已通過 nginx {0} 的 nginx -t，其 listen 行也已在迴路連接埠上檢查通過。",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "設定已通過 nginx {0} 的 nginx -t；由於沒有可用的迴路連接埠，其 listen 行未在迴路連接埠上檢查。",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "設定已通過 nginx -t，其 listen 行也已在迴路連接埠上檢查通過。",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "設定已通過 nginx -t；由於沒有可用的迴路連接埠，其 listen 行未在迴路連接埠上檢查。"
+}

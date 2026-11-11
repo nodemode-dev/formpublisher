@@ -1,0 +1,14 @@
+{
+  "{0}: missing": "{0}: tidak ada",
+  "{0}: hash differs from publish.json": "{0}: hash berbeda dari publish.json",
+  "{0}: extra file": "{0}: berkas tambahan",
+  "{0}: differs from a fresh prepare": "{0}: berbeda dari hasil persiapan baru",
+  "{0}: nginx -t: {1}": "{0}: nginx -t: {1}",
+  "nothing is prepared for that build and target": "belum ada yang disiapkan untuk build dan target itu",
+  "the build has no publish.json": "build tidak memiliki publish.json",
+  "site.zip no longer matches publish.json; build it again": "site.zip tidak lagi cocok dengan publish.json; build ulang",
+  "The config passed nginx -t with nginx {0}, and so did its listen lines on a loopback port.": "Konfigurasi lolos nginx -t dengan nginx {0}, begitu pula baris listen-nya pada port loopback.",
+  "The config passed nginx -t with nginx {0}; its listen lines were not checked on a loopback port because none was free.": "Konfigurasi lolos nginx -t dengan nginx {0}; baris listen-nya tidak diperiksa pada port loopback karena tidak ada yang bebas.",
+  "The config passed nginx -t, and so did its listen lines on a loopback port.": "Konfigurasi lolos nginx -t, begitu pula baris listen-nya pada port loopback.",
+  "The config passed nginx -t; its listen lines were not checked on a loopback port because none was free.": "Konfigurasi lolos nginx -t; baris listen-nya tidak diperiksa pada port loopback karena tidak ada yang bebas."
+}

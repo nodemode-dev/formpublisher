@@ -342,7 +342,7 @@ class PublishSheet extends Dialog {
     patchList(probs, (v?.problems ?? []).map((text, i) => ({ text, i })), {
       key: (it) => `${it.i}:${it.text}`,
       create: (it) => {
-        const li = el('<li class="fp-pub-line is-bad" translate="no"></li>');
+        const li = el('<li class="fp-pub-line is-bad"></li>');
         li.textContent = it.text;
         return li;
       },
