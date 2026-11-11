@@ -5,9 +5,9 @@ FormPublisher builds `formweb-core` from these crates to open `.fweb` projects. 
 | Field | Value |
 | --- | --- |
 | Source | `nodemode-dev/formweb`, the `native/` workspace |
-| Version | 0.20.3 |
-| Branch | `feat/narrow-dialogs-paste-lineage` |
-| Tree of `native/` | `3ae4695e282cf86d5cb9175704bc83f90de67e44` |
+| Version | 0.20.4 |
+| Branch | `feat/fpub-open-chips-shell` |
+| Tree of `native/` | `f10d7a6cea846405feb55daf1ae792583ad5657d` |
 | `crates/formweb-model` | `655a2c9b7ae71e7bc4a32a820d89f0db63df3b71` |
 | `crates/formweb-engine` | `0e7556b272c85902c4a1568d2b861c136566b547` |
 | `crates/formweb-export` | `51e428757798b51d8895dd32b679a529a633d34e` |
