@@ -214,7 +214,7 @@ export class Toolbar {
       this.host.classList.toggle('is-tight', stage >= 2);
       this.host.classList.toggle('is-short', stage >= 3);
       this.host.classList.toggle('is-micro', stage >= 4);
-      this.paint(stage >= 1, stage >= 3);
+      this.paint(stage >= 3);
       if (stage >= 4 || this.host.scrollWidth <= this.host.clientWidth) break;
       stage += 1;
     }
@@ -242,7 +242,7 @@ export class Toolbar {
     if (this.device.title !== title) this.device.title = title;
   }
 
-  private paint(sized: boolean, compact: boolean): void {
+  private paint(compact: boolean): void {
     this.compact = compact;
     for (const s of this.selects) {
       const ctl = s.dataset.ctl ?? '';
@@ -251,7 +251,7 @@ export class Toolbar {
         if (compact && ctl === 'device' && o.value === 'custom') short = this.customShort(s, o.text);
         if (short && short !== o.text) { if (o.label !== short) o.label = short; } else if (o.hasAttribute('label')) o.removeAttribute('label');
       }
-      if (sized && s.options.length) {
+      if (s.options.length) {
         let widest = 0;
         for (const o of Array.from(s.options)) widest = Math.max(widest, this.measure(o.label));
         const px = `${Math.ceil(widest)}px`;
