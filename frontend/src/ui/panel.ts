@@ -59,6 +59,9 @@ class Panel {
   private readonly counts: Record<'problems' | 'console' | 'network', HTMLElement>;
   private readonly sevSel: HTMLSelectElement;
   private readonly tierSel: HTMLSelectElement;
+  private readonly filterBtn: HTMLButtonElement;
+  private readonly filterDot: HTMLElement;
+  private filterMenu: HTMLElement | null = null;
   private readonly runBtn: HTMLButtonElement;
   private readonly deepBtn: HTMLButtonElement;
   private readonly progress: HTMLElement;
@@ -87,13 +90,15 @@ class Panel {
       p.classList.add('fp-pn-page');
       p.insertAdjacentHTML('beforeend', `<div class="fp-pn-bar">${toolbar}</div>${head}<div class="fp-pn-body"><div class="fp-pn-list" role="rowgroup"></div><div class="fp-pn-empty"></div></div>`);
     };
-    shell(this.pages.problems, `<select class="fp-pn-select" data-f="sev" aria-label="Filter by severity"><option value="all">All severities</option><option value="error">Errors</option><option value="warning">Warnings</option><option value="info">Info</option></select><select class="fp-pn-select" data-f="tier" aria-label="Filter by tier"><option value="all">All tiers</option><option value="static">Static</option><option value="live">Live</option><option value="deep">Deep</option></select><span class="fp-pn-progress" aria-live="polite"></span><span class="fp-pn-spacer"></span><button class="fp-btn fp-btn-sm" type="button" data-act="run" title="Run checks">${icon('check', 14)}<span>Run checks</span></button><button class="fp-btn fp-btn-sm" type="button" data-act="deep" title="Deep check">${icon('alert', 14)}<span>Deep check</span></button>`, '');
+    shell(this.pages.problems, `<select class="fp-pn-select" data-f="sev" aria-label="Filter by severity"><option value="all">All severities</option><option value="error">Errors</option><option value="warning">Warnings</option><option value="info">Info</option></select><select class="fp-pn-select" data-f="tier" aria-label="Filter by tier"><option value="all">All tiers</option><option value="static">Static</option><option value="live">Live</option><option value="deep">Deep</option></select><button class="fp-btn fp-btn-sm fp-pn-filter" type="button" aria-haspopup="menu" aria-expanded="false" title="Filter problems" aria-label="Filter problems" hidden>${icon('filter', 14)}<i class="fp-pn-dot" hidden></i></button><span class="fp-pn-progress" aria-live="polite"></span><span class="fp-pn-spacer"></span><button class="fp-btn fp-btn-sm" type="button" data-act="run" title="Run checks">${icon('check', 14)}<span>Run checks</span></button><button class="fp-btn fp-btn-sm" type="button" data-act="deep" title="Deep check">${icon('alert', 14)}<span>Deep check</span></button>`, '');
     shell(this.pages.console, `<span class="fp-pn-spacer"></span><button class="fp-btn fp-btn-sm fp-btn-ghost" type="button" data-act="clear">Clear</button>`, '');
     shell(this.pages.network, `<span class="fp-pn-spacer"></span><button class="fp-btn fp-btn-sm fp-btn-ghost" type="button" data-act="clear">Clear</button>`, '<div class="fp-pn-net fp-pn-nethead" aria-hidden="true"><span>URL</span><span>Kind</span><span>Status</span><span>Time</span><span>Size</span></div>');
     this.lists = { problems: q(this.pages.problems, '.fp-pn-list'), console: q(this.pages.console, '.fp-pn-list'), network: q(this.pages.network, '.fp-pn-list') };
     this.empties = { problems: q(this.pages.problems, '.fp-pn-empty'), console: q(this.pages.console, '.fp-pn-empty'), network: q(this.pages.network, '.fp-pn-empty') };
     this.sevSel = q(this.pages.problems, '[data-f="sev"]');
     this.tierSel = q(this.pages.problems, '[data-f="tier"]');
+    this.filterBtn = q(this.pages.problems, '.fp-pn-filter');
+    this.filterDot = q(this.filterBtn, '.fp-pn-dot');
     this.runBtn = q(this.pages.problems, '[data-act="run"]');
     this.deepBtn = q(this.pages.problems, '[data-act="deep"]');
     this.progress = q(this.pages.problems, '.fp-pn-progress');
@@ -118,32 +123,146 @@ class Panel {
   }
 
   private watchBar(): void {
-    const refit = (): void => this.fitBar();
+    const refit = (): void => { this.syncFilter(); this.fitBar(); };
     new ResizeObserver(refit).observe(this.pages.problems);
     const edits = new MutationObserver(refit);
     for (const sel of [this.sevSel, this.tierSel]) {
       sel.addEventListener('change', refit);
-      edits.observe(sel, { childList: true, characterData: true, subtree: true });
+      edits.observe(sel, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['aria-label'] });
     }
     document.fonts?.addEventListener('loadingdone', refit);
+    this.filterBtn.addEventListener('click', () => { if (this.filterMenu) this.closeMenu(false); else this.openMenu(); });
+    this.filterBtn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (!this.filterMenu) this.openMenu(); }
+    });
+    document.addEventListener('pointerdown', (e) => {
+      const menu = this.filterMenu;
+      if (menu && !menu.contains(e.target as Node) && !this.filterBtn.contains(e.target as Node)) this.closeMenu(false);
+    }, true);
+    window.addEventListener('blur', () => this.closeMenu(false));
+    window.addEventListener('resize', () => this.closeMenu(false));
+    this.syncFilter();
+  }
+
+  private syncFilter(): void {
+    const label = `${t('Filter problems')}: ${this.sevSel.selectedOptions[0]?.text ?? ''}, ${this.tierSel.selectedOptions[0]?.text ?? ''}`;
+    setAttr(this.filterBtn, 'title', label);
+    setAttr(this.filterBtn, 'aria-label', label);
+    setHidden(this.filterDot, this.sevSel.value === 'all' && this.tierSel.value === 'all');
+  }
+
+  private openMenu(): void {
+    if (this.filterMenu) return;
+    const menu = el('<div class="fp-menu fp-pn-filter-menu has-checks" role="menu" translate="no"></div>');
+    let focus: HTMLElement | null = null;
+    [this.sevSel, this.tierSel].forEach((sel, g) => {
+      if (g) menu.append(el('<div class="fp-menu-sep" role="separator"></div>'));
+      const name = sel.getAttribute('aria-label') ?? '';
+      const group = el('<div class="fp-pn-menu-group" role="group"></div>');
+      setAttr(group, 'aria-label', name);
+      const head = el('<div class="fp-pn-menu-head" aria-hidden="true"></div>');
+      setText(head, name);
+      group.append(head);
+      for (const o of Array.from(sel.options)) {
+        const item = el<HTMLButtonElement>(`<button class="fp-menu-item" role="menuitemradio" type="button" tabindex="-1"><span class="fp-menu-check">${icon('check', 14)}</span><span class="fp-menu-label"></span></button>`);
+        item.dataset.f = sel === this.sevSel ? 'sev' : 'tier';
+        item.dataset.v = o.value;
+        setText(q(item, '.fp-menu-label'), o.text);
+        const on = sel.value === o.value;
+        setAttr(item, 'aria-checked', String(on));
+        setClass(item, 'is-checked', on);
+        if (on && !focus) focus = item;
+        item.addEventListener('click', () => this.pickFilter(sel, o.value));
+        group.append(item);
+      }
+      menu.append(group);
+    });
+    menu.addEventListener('keydown', (e) => this.menuKey(e, menu));
+    menu.style.visibility = 'hidden';
+    menu.style.maxHeight = `${Math.max(120, window.innerHeight - 8)}px`;
+    document.getElementById('overlay-root')?.append(menu);
+    const b = this.filterBtn.getBoundingClientRect();
+    const w = menu.offsetWidth;
+    const h = menu.offsetHeight;
+    const below = b.bottom + 4;
+    const top = below + h <= window.innerHeight - 4 ? below : Math.max(4, b.top - 4 - h);
+    menu.style.left = `${Math.round(Math.max(4, Math.min(b.left, window.innerWidth - w - 4)))}px`;
+    menu.style.top = `${Math.round(top)}px`;
+    menu.style.visibility = '';
+    this.filterMenu = menu;
+    setAttr(this.filterBtn, 'aria-expanded', 'true');
+    setClass(this.filterBtn, 'is-open', true);
+    (focus as HTMLElement | null)?.focus();
+  }
+
+  private closeMenu(restore: boolean): void {
+    const menu = this.filterMenu;
+    if (!menu) return;
+    this.filterMenu = null;
+    menu.remove();
+    setAttr(this.filterBtn, 'aria-expanded', 'false');
+    setClass(this.filterBtn, 'is-open', false);
+    if (restore && !this.filterBtn.hidden) this.filterBtn.focus();
+  }
+
+  private pickFilter(sel: HTMLSelectElement, value: string): void {
+    if (sel.value !== value) {
+      sel.value = value;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    const menu = this.filterMenu;
+    if (!menu) return;
+    const f = sel === this.sevSel ? 'sev' : 'tier';
+    for (const item of Array.from(menu.querySelectorAll<HTMLElement>(`[data-f="${f}"]`))) {
+      const on = item.dataset.v === value;
+      setAttr(item, 'aria-checked', String(on));
+      setClass(item, 'is-checked', on);
+    }
+  }
+
+  private menuKey(e: KeyboardEvent, menu: HTMLElement): void {
+    const items = Array.from(menu.querySelectorAll<HTMLElement>('[role="menuitemradio"]'));
+    const cur = items.indexOf(document.activeElement as HTMLElement);
+    const go = (i: number): void => { e.preventDefault(); e.stopPropagation(); items[(i + items.length) % items.length]?.focus(); };
+    switch (e.key) {
+      case 'ArrowDown': go(cur + 1); break;
+      case 'ArrowUp': go(cur <= 0 ? -1 : cur - 1); break;
+      case 'Home': go(0); break;
+      case 'End': go(-1); break;
+      case 'Escape': e.preventDefault(); e.stopPropagation(); this.closeMenu(true); break;
+      case 'Tab': this.closeMenu(true); break;
+      default: break;
+    }
   }
 
   private fitBar(): void {
     const page = this.pages.problems;
-    if (page.hidden || !page.clientWidth) return;
-    const apply = (short: boolean): void => {
+    if (page.hidden || !page.clientWidth) { this.closeMenu(false); return; }
+    const kept = document.activeElement;
+    const apply = (mode: 'full' | 'short' | 'compact'): void => {
+      const short = mode === 'short';
       const word = t('All');
+      setHidden(this.filterBtn, mode !== 'compact');
       for (const sel of [this.sevSel, this.tierSel]) {
+        setHidden(sel, mode === 'compact');
         const all = sel.options[0];
         if (short) { if (all.label !== word) all.label = word; } else if (all.hasAttribute('label')) all.removeAttribute('label');
         if (short && sel.selectedIndex === 0) { if (sel.title !== all.text) sel.title = all.text; } else if (sel.hasAttribute('title')) sel.removeAttribute('title');
       }
     };
-    const wrapped = (): boolean => [this.tierSel, this.runBtn, this.deepBtn].some((c) => Math.abs(c.offsetTop - this.sevSel.offsetTop) > 2);
-    apply(false);
-    if (!wrapped()) return;
-    apply(true);
-    if (wrapped()) apply(false);
+    const wrapped = (mode: 'full' | 'short' | 'compact'): boolean => {
+      const row = mode === 'compact' ? [this.filterBtn, this.runBtn, this.deepBtn] : [this.sevSel, this.tierSel, this.runBtn, this.deepBtn];
+      return row.some((c) => Math.abs(c.offsetTop - row[0].offsetTop) > 2);
+    };
+    const settle = (): void => {
+      if (kept instanceof HTMLElement && kept.isConnected && !kept.hidden && document.activeElement !== kept && document.activeElement === document.body) kept.focus();
+    };
+    apply('full');
+    if (!wrapped('full')) { this.closeMenu(false); settle(); return; }
+    apply('short');
+    if (!wrapped('short')) { this.closeMenu(false); settle(); return; }
+    apply('compact');
+    settle();
   }
 
   private wire(): void {

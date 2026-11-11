@@ -9,6 +9,13 @@
 .fp-bottom-page.fp-pn-page { container-type: inline-size; }
 .fp-pn-bar .fp-btn > .icon { display: none; }
 .fp-pn-select { flex: none; max-width: 100%; text-overflow: ellipsis; height: var(--ctl-sm); padding: 0 6px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--surface-field); color: var(--text-primary); font: inherit; font-size: var(--fp-12); }
+.fp-pn-bar .fp-pn-filter { position: relative; width: var(--ctl-sm); padding: 0; }
+.fp-pn-bar .fp-pn-filter[hidden] { display: none; }
+.fp-pn-bar .fp-pn-filter > .icon { display: inline-flex; }
+.fp-pn-filter.is-open { background: var(--surface-raised); }
+.fp-pn-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-color); }
+.fp-pn-dot[hidden] { display: none; }
+.fp-pn-menu-head { padding: 4px 8px 2px; color: var(--text-muted); font-size: var(--fp-11); }
 @container (max-width: 520px) {
   .fp-pn-bar .fp-btn { position: relative; width: var(--ctl-sm); padding: 0; }
   .fp-pn-bar .fp-btn > .icon { display: inline-flex; }
