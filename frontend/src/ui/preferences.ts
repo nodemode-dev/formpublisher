@@ -47,13 +47,13 @@ export class Preferences extends Dialog {
 
   constructor(private readonly app: App) {
     super('Preferences', 760, 'fp-prefs-dlg');
-    const langs = LANGUAGES.map(([code, name]) => `<option value="${code}">${escapeHtml(name)}</option>`).join('');
+    const langs = LANGUAGES.map(([code, name]) => `<option value="${code}" translate="no">${escapeHtml(name)}</option>`).join('');
     const root = el(`<div class="fp-prefs">
 <nav class="fp-prefs-nav" aria-label="Preferences sections">${SECTIONS.map(([id, label, ic]) => `<button class="fp-prefs-tab" type="button" data-sec="${id}">${icon(ic, 16)}<span>${label}</span></button>`).join('')}</nav>
 <div class="fp-prefs-pages">
 <section class="fp-prefs-page" data-sec="general">
 <h3 class="fp-prefs-h">General</h3>
-<div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Language</div><div class="fp-pref-hint">The window reloads in the language you choose.</div></div><select class="fp-select" data-ctl="language" translate="no" aria-label="Language">${langs}</select></div>
+<div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Language</div><div class="fp-pref-hint">The window reloads in the language you choose.</div></div><select class="fp-select" data-ctl="language" aria-label="Language">${langs}</select></div>
 </section>
 <section class="fp-prefs-page" data-sec="interface" hidden>
 <h3 class="fp-prefs-h">Interface</h3>

@@ -2,7 +2,7 @@ import '../styles/package.css';
 import { buildsApi, type BuildDetail, type BuildSummary, type CompareResult } from '../api-builds';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
-import { locale } from '../i18n';
+import { locale, t } from '../i18n';
 import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
@@ -91,7 +91,7 @@ class InspectDialog extends Dialog {
     setText(this.fields.id, b.id);
     setText(this.fields.sha, b.sha256 || '-');
     setText(this.fields.date, fmtDate(b.created));
-    setText(this.fields.size, `${fmtBytes(b.size)}, ${fmtCount(b.files, 'file', 'files')}`);
+    setText(this.fields.size, `${fmtBytes(b.size)}, ${t(fmtCount(b.files, 'file', 'files'))}`);
     setHidden(this.empty, files.length > 0 || b.files > 0);
     patchList(this.list, files, {
       key: (f) => f.path,
