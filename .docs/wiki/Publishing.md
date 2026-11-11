@@ -31,7 +31,7 @@ A FormWeb site carries `site.formweb.json` and `asset-access.json`. Hosts do not
 
 ## Verify and remove
 
-Verify re-reads the folder and checks each file against the hashes in `publish.json`, and the host's own files against a fresh prepare. Problem rows and refusals read in the interface language, with paths and nginx's messages left as they are. Remove moves the folder to `trash/`, where Home's Trash page can restore it. Preparing again replaces the folder. Folders live at `prepared/[site]/[build]/[host]/` in the data folder.
+Verify re-reads the folder and checks each file against the hashes in `publish.json`, and the host's own files against a fresh prepare. Problem rows and refusals read in the interface language, with paths and nginx's messages left as they are. The last verify result of each host is kept beside the prepared record (`.TARGET.verify.json`, outside the host folder) with its time. `GET /api/publish/BUILD` returns it as `verified`, and the sheet shows the verdict, its problem rows and the time again after you reopen it, reload or restart the engine. Preparing a host or removing it clears that host's result. Remove moves the folder to `trash/`, where Home's Trash page can restore it. Preparing again replaces the folder. Folders live at `prepared/[site]/[build]/[host]/` in the data folder.
 
 ## Receive from FormWeb
 

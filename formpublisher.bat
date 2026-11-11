@@ -15,19 +15,19 @@ if /i "%CMD%"=="frontend" goto frontend
 if /i "%CMD%"=="build" goto build
 if /i "%CMD%"=="serve" goto serve
 if /i "%CMD%"=="desktop" goto desktop
-if /i "%CMD%"=="run" ( shift & "%PYEXE%" backend\formpublisher_engine.py cli %1 %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
-if /i "%CMD%"=="cli" ( shift & "%PYEXE%" backend\formpublisher_engine.py cli %1 %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
-if /i "%CMD%"=="mcp" ( shift & "%PYEXE%" backend\formpublisher_engine.py mcp %1 %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
-if /i "%CMD%"=="agents" ( shift & "%PYEXE%" setup\agents.py %1 %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
-if /i "%CMD%"=="vendor" ( shift & "%PYEXE%" setup\vendor_check.py %1 %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
+if /i "%CMD%"=="run" ( "%PYEXE%" backend\formpublisher_engine.py cli %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
+if /i "%CMD%"=="cli" ( "%PYEXE%" backend\formpublisher_engine.py cli %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
+if /i "%CMD%"=="mcp" ( "%PYEXE%" backend\formpublisher_engine.py mcp %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
+if /i "%CMD%"=="agents" ( "%PYEXE%" setup\agents.py %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
+if /i "%CMD%"=="vendor" ( "%PYEXE%" setup\vendor_check.py %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
 if /i "%CMD%"=="doctor" goto doctor
 if /i "%CMD%"=="version" ( "%PYEXE%" backend\formpublisher_engine.py --version & goto :eof )
 if /i "%CMD%"=="help" goto usage
 echo [formpublisher] unknown command: %CMD%
 goto usage
 :boot
-if not exist frontend\node_modules call formpublisher_oc_install.bat
-if not exist backend\venv\Scripts\python.exe call formpublisher_oc_install.bat
+if not exist frontend\node_modules ( call formpublisher_oc_install.bat & if errorlevel 1 exit /b 1 )
+if not exist backend\venv\Scripts\python.exe ( call formpublisher_oc_install.bat & if errorlevel 1 exit /b 1 )
 start "formpublisher engine" cmd /k "cd /d %~dp0backend && venv\Scripts\python.exe -m uvicorn app.main:app --reload --reload-dir app --host %FORMPUBLISHER_HOST% --port %FORMPUBLISHER_PORT%"
 start "formpublisher interface" cmd /k "cd /d %~dp0frontend && node node_modules\vite\bin\vite.js"
 echo [formpublisher] open http://localhost:5280
@@ -51,13 +51,13 @@ cd backend
 venv\Scripts\python.exe -m uvicorn app.main:app --host %FORMPUBLISHER_HOST% --port %FORMPUBLISHER_PORT%
 goto :eof
 :desktop
-if /i "%~2"=="build" ( call build_app.bat & goto :eof )
+if /i "%~2"=="build" ( call build_app.bat & goto :eof ) else if not exist frontend\node_modules\.bin\tauri.cmd ( echo [formpublisher] the desktop tools are missing: run formpublisher.bat install & exit /b 1 )
 start "formpublisher engine" cmd /k "cd /d %~dp0backend && venv\Scripts\python.exe -m uvicorn app.main:app --reload --reload-dir app --host %FORMPUBLISHER_HOST% --port %FORMPUBLISHER_PORT%"
 start "formpublisher interface" cmd /k "cd /d %~dp0frontend && node node_modules\vite\bin\vite.js"
 frontend\node_modules\.bin\tauri.cmd dev --no-dev-server-wait
 goto :eof
 :doctor
-echo   node       & node -v
+echo   node       & node -v 2>nul || echo missing
 echo   python     & "%PYEXE%" -V
 echo   claude     & where claude 2>nul || echo missing
 echo   cargo      & cargo -V 2>nul || echo missing (desktop builds only)

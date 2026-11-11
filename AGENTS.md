@@ -7,14 +7,14 @@ The Form family's site publisher. It opens what FormWeb makes (a `site-export.zi
 When the person wants a site opened, imported, listed, inspected, checked, packaged, signed or prepared for a host, use the `formpublisher` MCP server's tools guided by the `formpublisher-harness` skill in `.agents/skills/formpublisher-harness`. The tools, in the order of the loop:
 
 - `formpublisher_status`: the engine, the data folder, whether a FormWeb is reachable.
-- `list_sites`, `import_site` (a `site-export.zip` or publication folder path), `import_formweb_current` (the site open in FormWeb), `site_routes`.
+- `list_sites`, `import_site` (a `site-export.zip`, `.fweb`, `.fpub` or publication folder path), `import_formweb_current` (the site open in FormWeb), `site_routes`.
 - `run_checks` (static always, `deep` for the Chrome run), `get_checks`.
-- `build_package`, `list_builds`, `sign_build` (with a key the person named), `verify_build`.
+- `build_package`, `list_builds`, `save_fpub` (a build as one `.fpub` file at a path the person named), `sign_build` (with a key the person named), `verify_build`.
 - `list_targets`, `prepare_publish` (build id and target ids: `static-zip`, `netlify`, `cloudflare-pages`, `vercel`, `github-pages`, `nginx`), `get_prepared`.
 
 Preparing writes a folder per host with the exact commands; nothing is uploaded, and running those commands is the person's call. Ask the person before importing from a running FormWeb, and never call FormWeb's `/api/load`: FormPublisher only reads FormWeb.
 
-The MCP server is configured for Claude Code in `.mcp.json`, for Codex in `.codex/config.toml` and for Cursor in `.cursor/mcp.json`; each runs `./formpublisher mcp`, which talks to the open FormPublisher window's engine when one is running with the same data folder and otherwise runs the engine's routes in-process. For another client, run `[repo]/formpublisher mcp` on stdio. Without MCP, `./formpublisher run` has the same surface (`status`, `sites`, `import`, `import-formweb`, `routes`, `check`, `build`, `builds`, `sign`, `verify`, `keys`, `targets`, `prepare`, `prepared`, `receive-status`; `--help` after any of them, `--json` for the raw answer). Creating a signing key is a command only: `./formpublisher run keys --create NAME`.
+The MCP server is configured for Claude Code in `.mcp.json`, for Codex in `.codex/config.toml` and for Cursor in `.cursor/mcp.json`; each runs `./formpublisher mcp`, which talks to the open FormPublisher window's engine when one is running with the same data folder and otherwise runs the engine's routes in-process. For another client, run `[repo]/formpublisher mcp` on stdio. Without MCP, `./formpublisher run` has the same surface (`status`, `sites`, `import`, `import-formweb`, `routes`, `check`, `build`, `builds`, `fpub`, `sign`, `verify`, `keys`, `targets`, `prepare`, `prepared`, `receive-status`; `--help` after any of them, `--json` for the raw answer). Creating a signing key is a command only: `./formpublisher run keys --create NAME`.
 
 ## Changing FormPublisher's code
 

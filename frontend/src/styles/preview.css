@@ -18,9 +18,9 @@
 @keyframes fp-pv-pulse { 0%, 100% { transform: scale(0.7); } 50% { transform: scale(1.15); } }
 @media (prefers-reduced-motion: reduce) { .fp-pv-load.is-on { animation: none; } }
 
-.fp-options > .fp-tb-field { flex: 1 1 260px; min-width: 120px; max-width: 420px; }
+.fp-options > .fp-tb-field { flex: 1 1 260px; min-width: 96px; max-width: 420px; }
 .fp-options .fp-sep { margin: 0 2px; }
-.fp-tb-select { flex: none; height: var(--ctl-md); max-width: 170px; padding: 0 4px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--surface-field); color: var(--text-primary); font: inherit; font-size: var(--fp-12); outline: 0; cursor: pointer; }
+.fp-tb-select { flex: none; min-width: 64px; height: var(--ctl-md); max-width: 170px; padding: 0 4px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--surface-field); color: var(--text-primary); font: inherit; font-size: var(--fp-12); outline: 0; cursor: pointer; }
 .fp-tb-select:hover { border-color: var(--line-3); }
 .fp-tb-select:focus-visible { border-color: var(--accent-color); }
 .fp-tb-num { flex: none; width: 58px; height: var(--ctl-md); padding: 0 6px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--surface-field); color: var(--text-primary); font-family: var(--font-mono); font-size: var(--fp-12); font-variant-numeric: tabular-nums; outline: 0; appearance: textfield; -moz-appearance: textfield; }
@@ -30,6 +30,20 @@
 .fp-tb-grow { flex: 1 1 0; min-width: 0; }
 .fp-tb-select:disabled, .fp-tb-num:disabled { opacity: 0.5; }
 .fp-tb-field input:disabled { cursor: default; }
+.fp-options .fp-btn { position: relative; }
+@container (max-width: 1400px) {
+  .fp-tb-select { flex: 0 1 auto; text-overflow: ellipsis; }
+}
+@container (max-width: 1240px) {
+  .fp-options .fp-btn { width: var(--ctl-md); padding: 0; }
+  .fp-options .fp-btn > span:not(.icon) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
+@container (max-width: 860px) {
+  .fp-options { gap: 4px; }
+  .fp-options > .fp-tb-field { min-width: 72px; }
+  .fp-tb-num { width: 48px; padding: 0 4px; }
+  .fp-tb-select { min-width: 48px; }
+}
 
 .fp-route-list .fp-route { grid-template-columns: 64px minmax(0, 1fr) 8px; grid-template-rows: auto auto; align-content: center; align-items: center; column-gap: var(--space-2); row-gap: 0; height: 50px; padding: 0 var(--space-2) 0 4px; }
 .fp-route-thumb { grid-column: 1; grid-row: 1 / span 2; position: relative; width: 64px; height: 40px; overflow: hidden; border: 1px solid var(--line-1); border-radius: var(--radius-sm); background: var(--surface-0); }

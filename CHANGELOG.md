@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.4 · 2026-11-11
+
+- Save any build as one `.fpub` file, from the builds library, the command line (`fpub`), the MCP server (`save_fpub`) or the API, and open it on another computer with Open, drop or import. It comes back as the same site and build, with its signature checked. Saving the same build twice gives the same file. The manual describes the format.
+- FormWeb 0.20.4 opens a `.fpub` made from a FormWeb site as a project, so `.fweb` and `.fpub` are accepted in both apps.
+- The publish sheet keeps each host's last verify result, with its time, until you prepare that host again, also after a restart.
+- The toolbar and the Problems bar keep every action in view in narrow windows: below about 1240 px Publish and Package show only their icons (their names stay in the tooltip and for screen readers), so nothing is cut off at 1100 x 800 or 760 x 640. The window was also checked in all 26 languages at those two sizes.
+- On Windows, `formpublisher.bat vendor --check`, `agents sync --check`, `run`, `cli` and `mcp` pass their arguments again, and boot, desktop dev and the engine starter stop with a clear line when Node, Python or the desktop tools are missing. Found by running every launcher under Wine.
+- The FormWeb engine crates are vendored at 0.20.4.
+- Every new string is in all 26 languages.
+
 ## 0.2.3 · 2026-11-11
 
 - The window was checked in all 26 languages on every main screen. The one word still in English, the "Static zip" host name, now translates; Netlify, Cloudflare Pages, Vercel, GitHub Pages and nginx stay as written.

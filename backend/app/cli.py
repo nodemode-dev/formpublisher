@@ -11,7 +11,7 @@ from typing import Any
 
 from app import __version__
 from app.services.codes import default_code
-from app.services import checks, formweb, intake, keys, package, paths, settings
+from app.services import checks, formweb, fpub, intake, keys, package, paths, settings
 
 DEEP_WAIT_SECONDS = 900
 
@@ -221,6 +221,40 @@ class Client:
         rows = package.list_builds()
         return {"builds": rows, "count": len(rows)}
 
+    def save_fpub(self, build_id: str, out: str | None = None, force: bool = False) -> dict:
+        self.connect()
+        record = self.call("GET", f"/api/builds/{_q(build_id)}") if self.url else self._local(package.get_build, build_id)
+        target = Path(out).expanduser().resolve() if out else (Path.cwd() / f"{record['site']}-{build_id}.fpub")
+        if target.suffix.lower() != ".fpub":
+            raise OpError("the file name must end in .fpub")
+        if target.is_dir():
+            raise OpError(f"{target} is a folder")
+        if target.exists() and not force:
+            raise OpError(f"{target} already exists; use --force to replace it")
+        if not target.parent.is_dir():
+            raise OpError(f"the folder {target.parent} does not exist")
+        if not self.url:
+            return self._local(fpub.write_file, build_id, target)
+        part = target.with_name(target.name + ".part")
+        try:
+            req = urllib.request.Request(f"{self.url}/api/builds/{_q(build_id)}/fpub", headers={"User-Agent": f"formpublisher-cli/{__version__}"})
+            try:
+                with self.opener.open(req, timeout=600) as res, open(part, "wb") as out_file:
+                    while True:
+                        chunk = res.read(1024 * 1024)
+                        if not chunk:
+                            break
+                        out_file.write(chunk)
+            except urllib.error.HTTPError as err:
+                body = err.read()
+                raise OpError(_detail(body, err.code), 3 if err.code >= 500 else 1, _error_code(body, err.code)) from err
+            os.replace(part, target)
+        except OSError as exc:
+            raise OpError(f"cannot write {target}: {exc.strerror or exc}") from exc
+        finally:
+            part.unlink(missing_ok=True)
+        return {"build": build_id, "site": record["site"], "file": str(target), "size": target.stat().st_size, "sha256": package.sha256_file(target)}
+
     def keys(self) -> dict:
         self.connect()
         if self.url:
@@ -364,7 +398,18 @@ def say_sites(data: dict) -> str:
 
 
 def say_import(data: dict) -> str:
-    return f"imported {data['name']}  id {data['id']}  revision {data['revision']}  {_plural(data['routes'], 'route')}  redirects {data.get('redirects', {}).get('count', 0)}"
+    line = f"imported {data['name']}  id {data['id']}  revision {data['revision']}  {_plural(data['routes'], 'route')}  redirects {data.get('redirects', {}).get('count', 0)}"
+    built = data.get("build")
+    if not isinstance(built, dict):
+        return line
+    sig = built.get("signature")
+    state = "not signed" if not sig else f"signature valid, key {sig.get('key')}" + ("" if sig.get("known") else " (not one of your keys)")
+    moved = f" (was {built['originalId']})" if built.get("remapped") else ""
+    return f"{line}\nbuild {built['id']}{moved}  {state}"
+
+
+def say_fpub(data: dict) -> str:
+    return f"saved build {data['build']} as {data['file']}  {data['size']} bytes  sha256 {data['sha256']}"
 
 
 def say_routes(data: dict) -> str:
@@ -512,7 +557,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("status", parents=[common], help="engine, data folder, site count and FormWeb reachability")
     sub.add_parser("sites", parents=[common], help="list imported sites")
-    imp = sub.add_parser("import", parents=[common], help="import a FormWeb export zip or publication folder")
+    imp = sub.add_parser("import", parents=[common], help="import a FormWeb export zip, .fweb project, .fpub package or publication folder")
     imp.add_argument("path")
     imp.add_argument("--name", help="site name, overriding site.formweb.json")
     sub.add_parser("import-formweb", parents=[common], help="download the current FormWeb export and import it")
@@ -534,6 +579,10 @@ def build_parser() -> argparse.ArgumentParser:
     bd.add_argument("id")
     bd.add_argument("--revision", help="revision to build (default: the latest)")
     sub.add_parser("builds", parents=[common], help="list builds, newest first")
+    fp = sub.add_parser("fpub", parents=[common], help="save a build as a .fpub package (the same bytes every time)")
+    fp.add_argument("build")
+    fp.add_argument("--out", metavar="FILE", help="where to write it (default: SITE-BUILD.fpub in the current folder)")
+    fp.add_argument("--force", action="store_true", help="replace the file when it exists")
     sg = sub.add_parser("sign", parents=[common], help="sign a build with an Ed25519 key")
     sg.add_argument("build")
     sg.add_argument("--key", help="key id (default: the only key, when there is exactly one)")
@@ -592,6 +641,8 @@ def main(argv: list[str] | None = None) -> int:
             data, say = client.build(args.id, args.revision), say_build
         elif args.command == "builds":
             data, say = client.builds(), say_builds
+        elif args.command == "fpub":
+            data, say = client.save_fpub(args.build, args.out, args.force), say_fpub
         elif args.command == "sign":
             data, say = client.sign(args.build, args.key, args.passphrase), say_sign
         elif args.command == "verify":

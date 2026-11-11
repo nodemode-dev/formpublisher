@@ -97,7 +97,7 @@ export class Home {
 <span class="fp-home-hero-icon">${icon('archive', 26)}</span>
 <div class="fp-home-hero-text">
 <div class="fp-home-hero-title">Drop a site zip here</div>
-<div class="fp-home-hero-sub">Drop a FormWeb site export (.zip) or project (.fweb) anywhere on this box to import it. FormPublisher reads it and never changes it.</div>
+<div class="fp-home-hero-sub">Drop a FormWeb site export (.zip), project (.fweb) or package (.fpub) anywhere on this box to import it. FormPublisher reads it and never changes it.</div>
 <div class="fp-home-fw"><span class="fp-st-dot"></span><span class="fp-home-fw-text"></span></div>
 </div>
 <div class="fp-home-hero-actions">

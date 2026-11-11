@@ -244,7 +244,7 @@ export class BuildsPage {
     patchList(this.list, this.builds, {
       key: (b) => b.id,
       create: (b) => {
-        const n = el(`<div class="fp-bl-row"><label class="fp-bl-pick"><input type="checkbox" data-b="pick" aria-label="Choose for comparison"></label><span class="fp-bl-site" translate="no"></span><span class="fp-bl-id" translate="no"></span><span class="fp-bl-date" translate="no"></span><span class="fp-bl-size" translate="no"></span><span class="fp-bl-sig"><span class="fp-badge"></span></span><span class="fp-bl-acts"><button class="fp-icon-btn is-sm" type="button" data-b="inspect" title="Inspect" aria-label="Inspect">${icon('search', 14)}</button><a class="fp-icon-btn is-sm" data-b="download" title="Download" aria-label="Download" download>${icon('download', 14)}</a><button class="fp-icon-btn is-sm" type="button" data-b="delete" title="Delete" aria-label="Delete">${icon('trash', 14)}</button></span></div>`);
+        const n = el(`<div class="fp-bl-row"><label class="fp-bl-pick"><input type="checkbox" data-b="pick" aria-label="Choose for comparison"></label><span class="fp-bl-site" translate="no"></span><span class="fp-bl-id" translate="no"></span><span class="fp-bl-date" translate="no"></span><span class="fp-bl-size" translate="no"></span><span class="fp-bl-sig"><span class="fp-badge"></span></span><span class="fp-bl-acts"><button class="fp-icon-btn is-sm" type="button" data-b="inspect" title="Inspect" aria-label="Inspect">${icon('search', 14)}</button><a class="fp-icon-btn is-sm" data-b="download" title="Download" aria-label="Download" download>${icon('download', 14)}</a><a class="fp-icon-btn is-sm" data-b="fpub" title="Save as .fpub" aria-label="Save as .fpub" download>${icon('archive', 14)}</a><button class="fp-icon-btn is-sm" type="button" data-b="delete" title="Delete" aria-label="Delete">${icon('trash', 14)}</button></span></div>`);
         this.fillRow(n, b);
         return n;
       },
@@ -262,6 +262,8 @@ export class BuildsPage {
     setText(badge, b.signed ? 'Signed' : 'Unsigned');
     setClass(badge, 'is-signed', b.signed);
     setAttr(q(n, '[data-b="download"]'), 'href', buildsApi.downloadUrl(b.id));
+    setAttr(q(n, '[data-b="fpub"]'), 'href', buildsApi.fpubUrl(b.id));
+    setAttr(q(n, '[data-b="fpub"]'), 'download', `${b.id}.fpub`);
     const box = q<HTMLInputElement>(n, '[data-b="pick"]');
     const on = this.picked.includes(b.id);
     if (box.checked !== on) box.checked = on;

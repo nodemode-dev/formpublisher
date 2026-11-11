@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.2.3" src="https://img.shields.io/badge/version-0.2.3-4f6bff?style=flat-square">
+  <img alt="version 0.2.4" src="https://img.shields.io/badge/version-0.2.4-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -118,7 +118,7 @@
     </td>
     <td width="50%" valign="top">
       <h3>Agent tools</h3>
-      21 command line commands and 18 MCP tools cover the whole path from import to a prepared folder, and the trash, so Claude Code, Codex and Cursor do what a person does in the window. Deleting for good stays a person's action.
+      22 command line commands and 19 MCP tools cover the whole path from import to a prepared folder, and the trash, so Claude Code, Codex and Cursor do what a person does in the window. Deleting for good stays a person's action.
     </td>
   </tr>
   <tr>
@@ -149,6 +149,16 @@
     <td width="50%" valign="top">
       <h3>Desktop app</h3>
       <code>./build_app</code> freezes the engine and builds a Tauri 2 shell around it: a splash, one window with no white flash, a single instance, and the engine stopped with the app, even on a terminate signal. It prefers port 8280, where FormWeb looks first.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Save and open .fpub</h3>
+      Save a build as one <code>.fpub</code> file (its <code>publish.json</code>, <code>site.zip</code> and signature) with Save as .fpub in the builds library, <code>fpub BUILD</code> or the <code>save_fpub</code> tool. Open it in another FormPublisher like a zip: the build comes back with its id, and the checksum and the signature are checked first. The same build always saves to the same bytes.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Kept verify results</h3>
+      The last Verify result of each prepared host, with its time, is kept beside the prepared folder and shown again in the Publish sheet after a reload or a restart, until that host is prepared again or removed.
     </td>
   </tr>
 </table>
@@ -195,8 +205,8 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
 <table>
   <tr>
     <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Trash · site tabs · routes strip · inspector · status bar · Preferences · Keyboard Shortcuts</td>
-    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · targets · prepare · prepared · trash · receive-status</td>
-    <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · publication folder · the running FormWeb's current site · sent from FormWeb (endpoint or inbox) · the demo</td>
+    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · fpub · targets · prepare · prepared · trash · receive-status</td>
+    <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · .fweb project · .fpub package · publication folder · the running FormWeb's current site · sent from FormWeb (endpoint or inbox) · the demo</td>
   </tr>
 </table>
 
@@ -223,22 +233,23 @@ The window, the command line and the MCP server call one engine, so an agent and
 | --- | --- |
 | `status`, `sites`, `routes ID` | the engine, the imported sites, one site's routes |
 | `revisions ID`, `diff ID [--from R] [--to R]` | a site's revisions, and the files and routes that changed between two |
-| `import PATH`, `import-formweb` | import an export, a folder or the site open in FormWeb |
+| `import PATH`, `import-formweb` | import an export, a `.fweb` project, a `.fpub` package, a folder or the site open in FormWeb |
 | `check ID`, `build ID`, `builds` | run the checks, build the package, list builds |
+| `fpub BUILD [--out FILE] [--force]` | save a build as a `.fpub` (the same bytes every time; `--force` replaces a file) |
 | `sign BUILD`, `verify BUILD`, `keys` | sign, verify (exits 1 when invalid), list or create (`--create NAME`) keys |
 | `targets`, `prepare BUILD --target T [--include-model]`, `prepared BUILD` | list hosts, prepare a folder per host (FormWeb's model files left out unless `--include-model`), list what is prepared |
 | `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back (`--to PATH` names the place when it is unknown; `--passphrase-stdin` reads one line for a locked key rebuilt from its `.pem`), delete one for good, empty it (refuses without `--yes`) |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
 
-Every command takes `--json`. The MCP server has 18 tools over the same routes:
+Every command takes `--json`. The MCP server has 19 tools over the same routes:
 
 | MCP tool | Does |
 | --- | --- |
 | `formpublisher_status`, `list_sites`, `site_routes` | read the engine, the sites and the routes |
 | `list_revisions`, `diff_revisions` | read a site's revisions and what changed between two |
-| `import_site`, `import_formweb_current` | import an export or folder, or the site open in FormWeb |
+| `import_site`, `import_formweb_current` | import an export, a `.fweb`, a `.fpub` or a folder, or the site open in FormWeb |
 | `run_checks`, `get_checks` | run the checks, read the stored result |
-| `build_package`, `list_builds` | build the package, list builds |
+| `build_package`, `list_builds`, `save_fpub` | build the package, list builds, save a build as a `.fpub` (never replaces a file) |
 | `sign_build`, `verify_build` | sign with a named key, verify a signature |
 | `list_targets`, `prepare_publish`, `get_prepared` | list the six hosts, prepare folders with their commands (`includeModel` keeps FormWeb's model files), read what is prepared |
 | `list_trash`, `restore_from_trash` | read the trash, move an entry back to its recorded or inferred origin (no tool deletes) |

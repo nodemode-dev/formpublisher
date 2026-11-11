@@ -17,6 +17,7 @@ It imports FormWeb sites, previews them on device sizes, checks them, builds sig
 - [Preview](#preview)
 - [Checks](#checks)
 - [Packages and signatures](#packages-and-signatures)
+- [The .fpub format](#the-fpub-format)
 - [Publish](#publish)
 - [Receive from FormWeb](#receive-from-formweb)
 - [Revisions and diffs](#revisions-and-diffs)
@@ -37,7 +38,7 @@ From the repository:
 ./formpublisher                   # engine on 127.0.0.1:8280 and interface on http://localhost:5280
 ```
 
-Open http://localhost:5280. `./formpublisher build` then `./formpublisher serve` runs the built interface from the engine alone on http://127.0.0.1:8280. `./formpublisher doctor` checks the toolchain, the installs and the ports, and prints a vendor row: `vendor: in step at VERSION`, or the first problem with a pointer to `./formpublisher vendor --check` for the rest. Windows has `formpublisher.bat` and `formpublisher_oc_install.bat`.
+Open http://localhost:5280. `./formpublisher build` then `./formpublisher serve` runs the built interface from the engine alone on http://127.0.0.1:8280. `./formpublisher doctor` checks the toolchain, the installs and the ports, and prints a vendor row: `vendor: in step at VERSION`, or the first problem with a pointer to `./formpublisher vendor --check` for the rest. Windows has `formpublisher.bat` and `formpublisher_oc_install.bat`. The launchers stop with their own message and exit code 1 when something they need is missing: `boot` after a failed install, `desktop dev` without the desktop tools ("the desktop tools are missing: run formpublisher.bat install"), `backend\boot_backend.bat` without Python 3.12 ("Python 3.12 is needed") or when installing the engine requirements fails; `doctor` prints "missing" for a tool that is not installed. `formpublisher.bat run`, `cli`, `mcp`, `agents` and `vendor` pass up to 8 arguments on to the command, so `formpublisher.bat vendor --check` and `formpublisher.bat agents sync --check` work. The launchers were run under Wine 9.0; real Windows has not been run.
 
 ## The desktop app
 
@@ -61,9 +62,10 @@ Recent sites keep still while they are on screen. When a site arrives (for examp
 
 ## Importing a site
 
-There are three ways in, and all of them only read:
+There are four ways in, and all of them only read:
 
-- **A site export.** Drop FormWeb's `site-export.zip` on Home, or choose it.
+- **A site export.** Drop FormWeb's `site-export.zip` on Home, or choose it. A `.fweb` project (see [.fweb projects](#fweb-projects)) and a `.fpub` package go in the same way: Open, the file picker and the drop take `.zip`, `.fweb` and `.fpub`.
+- **A .fpub package.** One build saved from another FormPublisher. See [The .fpub format](#the-fpub-format).
 - **A publication folder.** Choose a FormWeb publication folder, `publications/[slug]/[version]/`.
 - **The site open in FormWeb.** With FormWeb running on the same computer, import its current site. FormPublisher asks FormWeb's `GET /api/export` over loopback. It never calls `/api/load` and never changes what FormWeb has open.
 
@@ -213,7 +215,7 @@ Each build lives in `builds/[site]/[id]/`:
 
 ```json
 {
-  "builtWith": "FormPublisher 0.2.3",
+  "builtWith": "FormPublisher 0.2.4",
   "checks": { "errors": 0, "infos": 0, "tiers": ["static"], "warnings": 0 },
   "files": [ { "path": "index.html", "sha256": "...", "size": 1024 } ],
   "format": "formpublisher-site",
@@ -254,7 +256,81 @@ A wrong passphrase is refused with "The passphrase does not unlock this key." Ve
 
 ### The Builds page
 
-Builds in Home lists builds newest first with site, id, date, size and signed. Inspect shows the file table from `publish.json`. Compare takes two builds and lists the files added, removed and changed by path, with the count that are the same. Delete moves a build to the [trash](#trash). Download saves the zip.
+Builds in Home lists builds newest first with site, id, date, size and signed. Inspect shows the file table from `publish.json`. Compare takes two builds and lists the files added, removed and changed by path, with the count that are the same. Delete moves a build to the [trash](#trash). Download saves the zip. Save as .fpub saves the build as a single `.fpub` file (see below).
+
+## The .fpub format
+
+A `.fpub` file is one build in one file: the build's `publish.json`, its `site.zip` and, when it is signed, its signature. It moves a build from one FormPublisher to another with nothing lost, and the signature still checks out on the other side.
+
+### Saving one
+
+- **The window.** In Home's builds library, each row has a Save as .fpub button (an archive icon, beside Download) that downloads the file. The saved name is `SITE-BUILD.fpub` from the engine and `BUILD.fpub` from the row.
+- **The command line.** `./formpublisher run fpub BUILD [--out FILE] [--force]`. Without `--out` the file is `SITE-BUILD.fpub` in the current folder. The name must end in `.fpub`. An existing file is not replaced unless `--force` is given.
+- **MCP.** `save_fpub` with `build` and an absolute `path` ending in `.fpub`. It never replaces a file. It answers the file, size and SHA-256.
+- **The engine.** `GET /api/builds/BUILD/fpub` answers the file as a download.
+
+The same build always saves to the same bytes: the entries are in a fixed order, each with the fixed time 1980-01-01 00:00:00, and nothing else varies. Saving twice, in the window, on the command line and over MCP, gives identical files. Saving refuses with `build-damaged` when the build's `site.zip` no longer matches its `publish.json` or its signature no longer holds, and with `too-large` over 512 MiB.
+
+### Opening one
+
+Open it like a site export: Open (`Mod+O`), the file picker or a drop on Home, `./formpublisher run import FILE`, the MCP tool `import_site`, or `POST /api/sites/import`. A `.fpub` is recognised first, by its `.fpub` name or, for a file without that name, by a zip whose first entry is `fpub.json`.
+
+Opening checks everything before it writes anything, and a file that fails any check changes nothing in the data folder:
+
+- the file is a zip of at most 512 MiB and not encrypted, and its entries are exactly the ones listed below, in that order, with safe names and sizes within each entry's limit;
+- `fpub.json` has format `formpublisher-package`, version 1, and valid fields;
+- `site.zip` has the size and SHA-256 that `fpub.json` records, and `publish.json` records the same digest and size, and the same site id;
+- when `fpub.json` says it is signed, `site.zip.sig` is present and valid over the exact bytes of `site.zip` with the key the file carries, and its fingerprint matches that key; when it says it is not, there is no signature entry.
+
+Then it imports `site.zip` as a new revision of the same site id and restores the build byte for byte under its id. A build id that is already taken (for instance, opening the same file twice) gets a fresh id, and the answer says so: `build.remapped` is true and `build.originalId` is the id in the file. The answer's `build.signature` is `{valid, key, keyId, known}`, where `known` says whether the key is one of this computer's own keys; a signature from a key you do not hold is still valid, and it is reported as not one of your keys. Refusals use the codes `fpub-invalid` (not a package, wrong entries, bad fields), `fpub-tampered` (a checksum, size or id that does not match), `fpub-signature` (a signature that does not hold), and `too-large`. For example, a `.fpub` with one byte of `site.zip` changed is refused with "site.zip does not match the checksum recorded in fpub.json".
+
+### Entries
+
+A `.fpub` is an ordinary zip (deflate, no encryption, no zip64 needed) with these entries, in this order and no others:
+
+| Entry | Holds | Limit |
+| --- | --- | --- |
+| `fpub.json` | the package record, below | 1 MiB |
+| `publish.json` | the build's manifest, exactly as in the build | 32 MiB |
+| `site.zip` | the build's package, exactly the bytes that were built | 512 MiB |
+| `site.zip.sig` | the build's signature file (see [Sign and verify](#sign-and-verify)); present only when the build is signed | 64 KiB |
+
+The whole file is at most 512 MiB. Every entry is stored with the time 1980-01-01 00:00:00 and the mode 0644, so a tool that writes the same content in the same order gets the same bytes.
+
+### fpub.json
+
+UTF-8 JSON, indented two spaces, with a trailing newline:
+
+```json
+{
+  "format": "formpublisher-package",
+  "version": 1,
+  "site": { "id": "northwind-notes", "name": "Northwind Notes" },
+  "build": "a1b2c3d4e5f6",
+  "revision": "20261111T010203Z",
+  "builtWith": "FormPublisher 0.2.4",
+  "createdAt": "2026-11-11T01:02:03Z",
+  "package": { "file": "site.zip", "sha256": "64 lowercase hex digits", "size": 12345 },
+  "signature": null
+}
+```
+
+| Field | Meaning |
+| --- | --- |
+| `format` | always `formpublisher-package` |
+| `version` | the layout version, an integer, `1`. A reader refuses any other number |
+| `site.id`, `site.name` | the site's id (the folder name under `sites/`) and its name, at most 120 characters |
+| `build` | the build's id when it was saved |
+| `revision` | the site revision the build was made from. When it looks like `YYYYMMDDTHHMMSSZ`, opening gives the imported revision that name |
+| `builtWith` | the program that built it, as `publish.json` records it |
+| `createdAt` | when the build was made |
+| `package.file` | always `site.zip` |
+| `package.sha256`, `package.size` | the SHA-256 (lowercase hex) and the byte size of `site.zip`; they must equal the same values in `publish.json` |
+| `signature` | `null` for an unsigned build; otherwise `{"file": "site.zip.sig", "keyId", "fingerprint", "publicKey"}` |
+
+In `signature`, `publicKey` is the base64 of the raw 32-byte Ed25519 public key, `fingerprint` is `SHA256:` and the unpadded base64 of the SHA-256 of that key, and `keyId` is the first 16 hex digits of that SHA-256. They must equal what `site.zip.sig` carries. The signature signs the bytes of `site.zip` itself, not `fpub.json`, so a reader checks it with nothing but the file's own entries.
+
+To produce one from another tool: build `site.zip` and `publish.json` as in [Packages and signatures](#packages-and-signatures), write `fpub.json` with the digest and size, and zip the entries in the order above. To read one: check the entries and `fpub.json`, compare the digest, then verify the signature with `publicKey` if there is one. `publish.json` must have format `formpublisher-site`, the same package digest and size, and the same site id as `fpub.json`.
 
 ## Publish
 
@@ -284,7 +360,7 @@ FormWeb 0.19.7 exports splat redirects (`/blog/*` to `/docs/:splat`) and a root 
 
 Left-out model files. A FormWeb site carries its editing model, `site.formweb.json`, and `asset-access.json`. A host does not need them, and they can reveal more of the site than its visitors see, so the `site/` folder of each host is written without them. The Publish sheet's Keep FormWeb's model files box, `--include-model` on the command line and `includeModel: true` in the MCP tool put them back for one prepare. Each prepared panel says "Left out: ..." and the result lists them under `leftOut`; Verify knows which files were left out and does not report them missing. The package is unchanged: `site.zip` is the build's own bytes and still holds both files, and the Static zip host writes that zip as it is, so the option affects the `site/` folders of the other five hosts only.
 
-Verify re-reads the folder and checks every file against the hashes in `publish.json`, and the host's own files against a fresh prepare (a file a target rewrites on purpose, such as the GitHub Pages 404 page, is compared with a fresh prepare instead). Where `nginx` is installed, preparing and verifying the nginx target also run `nginx -t` on the prepared config in a scratch folder (the folder's own `nginx-check.sh` does the same for anyone, with `sh nginx-check.sh` or `./nginx-check.sh`, which is written executable: it runs `nginx -t` on a scratch copy with unix sockets in place of the `listen` ports, then again with each `listen` line on a loopback port, so it needs no root, no IPv6 and no network and changes nothing in the folder; `NGINX_CHECK_PORT` sets the first port, a number from 1024 to 60999, and without it the script starts at 20000 plus the process id modulo 41000, takes one consecutive port per line, and on "Address already in use" tries the next base up to five times, after which it says the listen lines were not checked and exits 0 on the first pass; any other failure in the second pass prints nginx's message and exits 1; a config with no `listen` lines says so. nginx 1.24 does not fail `nginx -t` on a busy loopback port, so the retry only matters on builds that report it). The engine's check then runs a second pass on a copy that points every `listen` line at `127.0.0.1` and a free loopback port, keeping the other parameters, so a bad listen parameter fails the check; with no free port the pass is skipped. Prepare adds a note or a warning (it says whether the listen lines were checked), and verify answers `nginx` with `ran`, `ok`, `version` and `output`, plus `listen` with `ran`, `ok` and `output`; a failure is a problem row and makes `ok` false, and the window shows one line under the result. Without nginx the answer says `ran: false`. An nginx folder prepared by 0.1.7 differs from a fresh prepare (the pid in `nginx-test.conf` is now relative to the prefix) until it is prepared again, and so does one prepared by 0.1.8 (it lacks `nginx-check.sh` and its redirects drop the query string). Every problem row, verify refusal and nginx note reads in the interface language, with paths and nginx's own messages left as they are. Remove moves the folder to `trash/`. Preparing again replaces the folder. Prepared folders live at `prepared/[site]/[build]/[host]/` in the data folder, and the sheet remembers what is prepared for each build when you close and reopen it.
+Verify re-reads the folder and checks every file against the hashes in `publish.json`, and the host's own files against a fresh prepare (a file a target rewrites on purpose, such as the GitHub Pages 404 page, is compared with a fresh prepare instead). Where `nginx` is installed, preparing and verifying the nginx target also run `nginx -t` on the prepared config in a scratch folder (the folder's own `nginx-check.sh` does the same for anyone, with `sh nginx-check.sh` or `./nginx-check.sh`, which is written executable: it runs `nginx -t` on a scratch copy with unix sockets in place of the `listen` ports, then again with each `listen` line on a loopback port, so it needs no root, no IPv6 and no network and changes nothing in the folder; `NGINX_CHECK_PORT` sets the first port, a number from 1024 to 60999, and without it the script starts at 20000 plus the process id modulo 41000, takes one consecutive port per line, and on "Address already in use" tries the next base up to five times, after which it says the listen lines were not checked and exits 0 on the first pass; any other failure in the second pass prints nginx's message and exits 1; a config with no `listen` lines says so. nginx 1.24 does not fail `nginx -t` on a busy loopback port, so the retry only matters on builds that report it). The engine's check then runs a second pass on a copy that points every `listen` line at `127.0.0.1` and a free loopback port, keeping the other parameters, so a bad listen parameter fails the check; with no free port the pass is skipped. Prepare adds a note or a warning (it says whether the listen lines were checked), and verify answers `nginx` with `ran`, `ok`, `version` and `output`, plus `listen` with `ran`, `ok` and `output`; a failure is a problem row and makes `ok` false, and the window shows one line under the result. Without nginx the answer says `ran: false`. An nginx folder prepared by 0.1.7 differs from a fresh prepare (the pid in `nginx-test.conf` is now relative to the prefix) until it is prepared again, and so does one prepared by 0.1.8 (it lacks `nginx-check.sh` and its redirects drop the query string). Every problem row, verify refusal and nginx note reads in the interface language, with paths and nginx's own messages left as they are. The last verify result of each prepared host is kept. It sits beside the prepared record as `.TARGET.verify.json` in `prepared/[site]/[build]/`, outside the host folder, so it is never compared, packaged or copied to a host. It holds the time, `ok`, the number of files checked, the problem rows and the nginx report. `GET /api/publish/BUILD` returns it as `verified` for each host, and `verifiedAt` is in the verify answer. The Publish sheet shows the verdict, its problem rows and a muted time on each host again when you reopen it, reload the window or restart the engine. Preparing a host or removing it deletes that host's kept result; the other hosts keep theirs. Remove moves the folder to `trash/`. Preparing again replaces the folder. Prepared folders live at `prepared/[site]/[build]/[host]/` in the data folder, and the sheet remembers what is prepared for each build when you close and reopen it.
 
 ## Receive from FormWeb
 
@@ -315,7 +391,7 @@ Home has a Demos row with a FormPublisher demo card. It imports the bundled samp
 
 An agent does every step a person does. The command line and the MCP server are thin layers over the same engine routes as the window, so what an agent does appears in the open window at once. They use a running engine that has the same data folder, or run the routes in-process when none runs.
 
-The loop is: import a site, list its routes (and, for a site that arrived again, its revisions and what changed), run the checks, build, sign, verify, list the targets, prepare, read what is prepared. Asking the person comes first for anything that reads from a running FormWeb, for creating or choosing a signing key and for any passphrase. Preparing writes only inside the data folder.
+The loop is: import a site, list its routes (and, for a site that arrived again, its revisions and what changed), run the checks, build, sign, verify, list the targets, prepare, read what is prepared. A build can also be saved as a `.fpub` (`fpub`, `save_fpub`) and a `.fpub` imported again (`import`, `import_site`). Asking the person comes first for anything that reads from a running FormWeb, for creating or choosing a signing key and for any passphrase. Preparing writes only inside the data folder.
 
 `./formpublisher agents sync` mirrors `.claude/skills` to `.agents/skills` and checks the skill files; `--check` exits 1 on drift. `./formpublisher vendor --check` (also in `formpublisher.bat`) passes only when the Version row of `vendor/formweb-native/VENDOR.md` equals the vendored workspace version, the four crates resolve to it and `Cargo.lock` lists them at it; in a git checkout it also compares each crate's tree with the staged state (computed without writing to `.git`) and refuses unstaged changes and untracked files under `vendor/formweb-native` outside `target/`, and outside git it skips those with one line. It prints `vendor: in step at VERSION` or each mismatch with what to do, and `./setup/install_compiler` runs it first and refuses with "the vendored crates are out of step (see above); nothing was built". `./formpublisher agents install` registers the MCP servers and copies the skills for your account in Claude Code, Codex and Cursor. The repository's kits (`.claude/skills/formpublisher-harness`, `.claude/skills/formpublisher-skillset`, `AGENTS.md`, `CLAUDE.md`) name the tools and commands below.
 
@@ -327,12 +403,13 @@ The loop is: import a site, list its routes (and, for a site that arrived again,
 | --- | --- |
 | `status` | the engine, the data folder, the site count and whether FormWeb answers |
 | `sites` | lists the imported sites |
-| `import PATH [--name N]` | imports a FormWeb export zip or a publication folder |
+| `import PATH [--name N]` | imports a FormWeb export zip, a `.fweb` project, a `.fpub` package or a publication folder |
 | `import-formweb` | imports the site open in a running FormWeb, read-only |
 | `routes ID` | lists the routes of a site |
 | `check ID [--revision R] [--deep] [--widths 390,1440] [--last]` | runs the checks and prints the problems; `--last` prints the stored result |
 | `build ID [--revision R]` | builds the deterministic `site.zip` and `publish.json` |
 | `builds` | lists builds, newest first |
+| `fpub BUILD [--out FILE] [--force]` | saves a build as a `.fpub` (default `SITE-BUILD.fpub` in the current folder); the name must end in `.fpub`; an existing file is replaced only with `--force` |
 | `sign BUILD [--key K] [--passphrase P]` | signs a build with an Ed25519 key |
 | `verify BUILD` | verifies a signature; exits 1 when it is not valid |
 | `keys [--create NAME] [--passphrase P]` | lists signing keys, or creates one |
@@ -359,13 +436,13 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 
 ## The MCP server
 
-`./formpublisher mcp` serves MCP on stdio with 18 tools over the same routes. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor. `./formpublisher agents install` sets Claude Code, Codex and Cursor up for your account.
+`./formpublisher mcp` serves MCP on stdio with 19 tools over the same routes. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor. `./formpublisher agents install` sets Claude Code, Codex and Cursor up for your account.
 
 | Tool | Does |
 | --- | --- |
 | `formpublisher_status` | the engine, the data folder, the site count, FormWeb reachability (read only) |
 | `list_sites` | the imported sites (read only) |
-| `import_site` | imports a FormWeb export or publication folder from an absolute path |
+| `import_site` | imports a FormWeb export, a `.fweb` project, a `.fpub` package or a publication folder from an absolute path; a `.fpub` also restores its build |
 | `import_formweb_current` | imports the site open in a running FormWeb |
 | `site_routes` | the routes of a site (read only) |
 | `list_revisions` | the revisions of a site, newest first, with what changed from the one before (read only) |
@@ -374,6 +451,7 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 | `get_checks` | the stored check results (read only) |
 | `build_package` | builds `site.zip` and `publish.json` |
 | `list_builds` | the builds, newest first (read only) |
+| `save_fpub` | saves a build as a `.fpub` at an absolute path ending in `.fpub`; never replaces a file; answers the file, size and SHA-256 |
 | `sign_build` | signs a build with a named key |
 | `verify_build` | verifies a build's signature (read only) |
 | `list_targets` | the six hosts a build can be prepared for (read only) |
@@ -424,6 +502,9 @@ Specific codes:
 | `site-missing`, `revision-missing`, `build-missing`, `key-missing`, `trash-missing`, `prepared-missing` | the thing is not there |
 | `target-unknown` | no such publish target |
 | `build-damaged` | a build lost its `site.zip` or `publish.json`, or the zip no longer matches |
+| `fpub-invalid` | a `.fpub` is not a package: wrong entries, format, version or fields (400) |
+| `fpub-tampered` | a `.fpub`'s `site.zip` does not match the checksum or size in `fpub.json`, or `publish.json` does not match (400) |
+| `fpub-signature` | a `.fpub`'s signature is missing, malformed, or does not hold for its key (400) |
 | `core-missing` | `formweb-core` is not installed (422) |
 | `passphrase-required`, `passphrase-wrong` | signing with a locked key, or a trash restore of a locked key whose record is rebuilt from its `.pem` (409) |
 | `check-running` | a check is already running for the site (409) |
@@ -442,5 +523,6 @@ Specific codes:
 - A prepared folder has no `site.formweb.json`: that is the default. Prepare again with Keep FormWeb's model files (`--include-model`) to include it.
 - The preview shows a short text page: nothing is mounted (503). Open a site again.
 - A `.fweb` import answers 422: run `./setup/install_compiler`.
+- A `.fpub` is refused: the message names the check that failed (see [The .fpub format](#the-fpub-format)). The data folder is unchanged. Save it again from the source build rather than editing the file.
 - The deep check reports `deep.unavailable`: run `./formpublisher_oc_install` and make sure Chrome is installed, or set `checks.chromePath`.
 - Anything else: open an issue with `./formpublisher version` and your platform.

@@ -96,7 +96,7 @@ export function installChrome(app: App): Chrome {
   });
 
   commands.add(
-    { id: 'file.open-zip', label: 'Open Zip...', keys: ['Mod+O'], icon: 'archive', group: 'File', menu: 'File', description: 'Import a FormWeb site export (.zip) or project (.fweb)', mutates: true, enabled: engineUp, run: () => app.pickZip() },
+    { id: 'file.open-zip', label: 'Open Zip...', keys: ['Mod+O'], icon: 'archive', group: 'File', menu: 'File', description: 'Import a FormWeb site export (.zip), project (.fweb) or package (.fpub)', mutates: true, enabled: engineUp, run: () => app.pickZip() },
     {
       id: 'file.open-folder', label: 'Open Folder...', keys: ['Shift+Mod+O'], icon: 'folder', group: 'File', menu: 'File', description: 'Import a publication folder', mutates: true, enabled: engineUp,
       run: async () => {
@@ -256,8 +256,8 @@ export function installChrome(app: App): Chrome {
     if (!hasFiles(e)) return;
     e.preventDefault();
     home.setDragOver(false);
-    const zips = Array.from(e.dataTransfer?.files ?? []).filter((f) => /\.(zip|fweb)$/i.test(f.name));
-    if (!zips.length) { notice('error', 'Only .zip site exports or .fweb projects can be imported by dropping.'); return; }
+    const zips = Array.from(e.dataTransfer?.files ?? []).filter((f) => /\.(zip|fweb|fpub)$/i.test(f.name));
+    if (!zips.length) { notice('error', 'Only .zip site exports, .fweb projects or .fpub packages can be imported by dropping.'); return; }
     void (async () => {
       for (const file of zips) {
         try { await app.importZip(file); } catch { continue; }

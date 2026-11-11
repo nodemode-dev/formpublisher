@@ -15,11 +15,14 @@ export interface PreparedTarget {
   warnings: string[];
   includeModel: boolean;
   leftOut: string[];
+  verified: StoredVerify | null;
 }
 
 export interface NginxCheck { ran: boolean; ok: boolean; version: string; output: string }
 
-export interface VerifyReport { ok: boolean; checked: number; problems: string[]; leftOut: string[]; nginx: NginxCheck | null }
+export interface StoredVerify { at: string; ok: boolean; problems: string[]; nginx: NginxCheck | null }
+
+export interface VerifyReport { ok: boolean; checked: number; problems: string[]; leftOut: string[]; nginx: NginxCheck | null; at: string }
 
 export interface RevealResult { path: string; opened: boolean }
 
@@ -84,6 +87,21 @@ function toCommand(raw: unknown): PreparedCommand | null {
   return run ? { label: str(raw.label), run, cwd: str(raw.cwd) } : null;
 }
 
+function problemLines(raw: unknown): string[] {
+  return Array.isArray(raw)
+    ? raw.map((p) => (isObj(p) && str(p.path) && str(p.problem) ? `${str(p.path)}: ${str(p.problem)}` : isObj(p) ? str(p.message) || str(p.path) : str(p))).filter((s) => s !== '')
+    : [];
+}
+
+function toNginx(raw: unknown): NginxCheck | null {
+  return isObj(raw) ? { ran: raw.ran === true, ok: raw.ok === true, version: str(raw.version), output: str(raw.output) } : null;
+}
+
+function toStored(raw: unknown): StoredVerify | null {
+  if (!isObj(raw) || !str(raw.verifiedAt) || typeof raw.ok !== 'boolean') return null;
+  return { at: str(raw.verifiedAt), ok: raw.ok, problems: problemLines(raw.problems), nginx: toNginx(raw.nginx) };
+}
+
 export function toPrepared(id: string, raw: unknown): PreparedTarget | null {
   if (!isObj(raw)) return null;
   return {
@@ -95,6 +113,7 @@ export function toPrepared(id: string, raw: unknown): PreparedTarget | null {
     warnings: lines(raw.warnings),
     includeModel: raw.includeModel === true,
     leftOut: lines(raw.leftOut),
+    verified: toStored(raw.verified),
   };
 }
 
@@ -139,15 +158,10 @@ export const publishApi = {
   async verify(build: string, target: string): Promise<VerifyReport> {
     const raw = await request<unknown>(`/api/publish/${enc(build)}/${enc(target)}/verify`, { method: 'POST' });
     const o = isObj(raw) ? raw : {};
-    const raw2 = o.problems ?? o.errors ?? o.mismatches;
-    const problems = Array.isArray(raw2)
-      ? raw2.map((p) => (isObj(p) && str(p.path) && str(p.problem) ? `${str(p.path)}: ${str(p.problem)}` : isObj(p) ? str(p.message) || str(p.path) : str(p))).filter((s) => s !== '')
-      : [];
+    const problems = problemLines(o.problems ?? o.errors ?? o.mismatches);
     const checked = num(o.checked) || num(o.files) || (Array.isArray(o.files) ? o.files.length : 0);
     const ok = typeof o.ok === 'boolean' ? o.ok : typeof o.valid === 'boolean' ? o.valid : problems.length === 0;
-    const n = isObj(o.nginx) ? o.nginx : null;
-    const nginx = n ? { ran: n.ran === true, ok: n.ok === true, version: str(n.version), output: str(n.output) } : null;
-    return { ok, checked, problems, leftOut: lines(o.leftOut), nginx };
+    return { ok, checked, problems, leftOut: lines(o.leftOut), nginx: toNginx(o.nginx), at: str(o.verifiedAt) };
   },
   async remove(build: string, target: string): Promise<void> {
     await request<unknown>(`/api/publish/${enc(build)}/${enc(target)}`, { method: 'DELETE' });
