@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.4
-Last updated: 2026-11-11 · Phases 43 and 44: Save as .fpub and Open takes .fpub, and the publish sheet shows the kept verify result
+Current build version: v0.2.5
+Last updated: 2026-11-11 · Phases 46 to 48: whole panel tabs and toolbar selects in narrow windows, and Save as .fpub named SITE-BUILD.fpub
 
 ---
 
@@ -290,3 +290,38 @@ The window was swept in all 26 languages at 1100 x 800 and 760 x 640 and with a 
 - No new strings, no new z-index, the tab order is unchanged, and the 1440 x 900 row looks as before.
 
 Checked: English, German, Finnish and Russian at 1440 x 900, 1100 x 800 and 760 x 640, with CPU 4x: no control outside its row and the row's scroll width equal to its width in all 12 cases; CLS 0 opening a site and while resizing between the sizes; `npx tsc --noEmit`; `npm run build`. Known: at 760 px the selects show only the start of their value, with the full label in their title; the bottom panel's tab strip cuts "Network" at 760 px.
+
+## Phase 46: the bottom panel keeps every tab and count whole · v0.2.5 (2026-11-11)
+
+At 760 x 640 the Problems, Console, Network and Revisions strip cut Network and pushed the Revisions badge out in every language (commit 3fd764e).
+
+- `app.ts`: each tab gains an icon (`alert`, `terminal`, `globe`, `archive`), its label in a span and a `title` with the existing key.
+- `styles/panel.css`: `.fp-bottom-head` is a size container. The icon is hidden by default. Below 460 px of strip the tabs tighten (6 px padding, 4 px badge margin). Below 360 px they show icon and count badge, and the label span is kept as a visually clipped accessible name. Two rules that targeted the strip from its own container query never applied and were left out.
+- No new strings.
+
+Checked: English, German, Finnish and Russian at 1440 x 900, 1100 x 800 and 760 x 640 with CPU 4x, also with every count at 99: nothing cut or overlapping; 1440 x 900 pixel-identical; CLS 0 opening a site, switching tabs and resizing; `npx tsc --noEmit`; `npm run build`. Known: three-digit counts on more than one tab at 760 px would overflow.
+
+## Phase 47: toolbar selects show their whole value · v0.2.5 (2026-11-11)
+
+Turn O kept every control in the row but the selects at 760 x 640 showed only "D..." or "Be..." (commit 184bd71).
+
+- `ui/toolbar.ts`: below 1240 px of row, each select is sized to its value with a hidden probe select, so the engine's own arrow is counted. If the row still overflows it adds `.is-tight`, and then `.is-short`, which swaps in short labels (the value after "Theme:" and similar prefixes, the device name without its size). Option text and keys are unchanged.
+- `styles/preview.css`: the probe rule; selects no longer shrink or clip below 1240 px; `.is-tight` drops the separators and turns the route field into an icon that opens as a 300 px overlay on focus without moving the row (Enter navigates, Esc or blur collapses); `.is-short` tightens gaps, number inputs and buttons. Turn O's 860 px block is removed, because a container query cannot style its own container.
+- `app.ts`: the route input gains a `title`.
+- No new strings.
+
+Checked: English, German, Finnish and Russian at 1440 x 900, 1100 x 800 and 760 x 640 with CPU 4x and every option of every select: whole values, no control outside the row, no scrolling, CLS 0 opening a site and resizing; 1440 x 900 unchanged; `npx tsc --noEmit`; `npm run build`. Known: picking an option resizes the select, so its neighbours move after the user's own pick; the band between 1240 and 1400 px still uses Turn O's shrinking selects.
+
+The director's exit run then found the Problems bar's two filters ("All severities", "All tiers") squeezed to 40 to 52 px at 760 x 640 in every language and cut at 1100 x 800 in Russian (commit d503e8f).
+
+- `styles/panel.css`: the filters keep their own width (`flex: none`, `max-width: 100%`), which counts the engine's arrow, and `.fp-pn-bar` wraps (`flex-wrap`, `min-height: 34px` in place of a fixed height), so the filters and then the icon buttons drop to their own rows when the width cannot hold them. The rows follow the width and the language, never the results. Run checks keeps the right edge with `margin-left: auto`; the progress text takes the free space and, at 300 px or less, is visually hidden but stays in its live region. `container-type` moves from the bar to its page, so Turn O's 300 px rules, which targeted the bar from its own container, now apply.
+
+Checked: the same four languages and three sizes with every option of both filters: whole values, every control inside the bar, Run checks and Deep check reachable; CLS 0 opening a site, resizing and running checks; 1440 x 900 unchanged. Known: at 760 x 640 the bar is 59 px tall instead of 34 (one filter per row in German, Finnish and Russian), and in Russian at 1100 x 800 Deep check wraps to a second row.
+
+## Phase 48: Save as .fpub downloads as SITE-BUILD.fpub · v0.2.5 (2026-11-11)
+
+The Phase 43 link set the download name to `ID.fpub` (commit 35f207d).
+
+- `ui/builds.ts`: the link's `download` is `SITE-BUILD.fpub`, the engine's Content-Disposition name and the CLI default. Chrome already used the server's name, so nothing changed there; a webview that ignores the header would have used the shorter name. Site ids are slugs and build ids hex, so the name needs no cleaning. The site.zip link already matched.
+
+Checked: real Chrome downloads in English and German for builds of sites named Plain, an 80-character name, Café Zürich Über 日本語, my.site.v1.2.final and 日本語, each equal to the engine header and to `formpublisher run fpub` in an empty folder; `npx tsc --noEmit`; `npm run build`.

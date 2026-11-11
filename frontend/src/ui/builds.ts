@@ -263,7 +263,7 @@ export class BuildsPage {
     setClass(badge, 'is-signed', b.signed);
     setAttr(q(n, '[data-b="download"]'), 'href', buildsApi.downloadUrl(b.id));
     setAttr(q(n, '[data-b="fpub"]'), 'href', buildsApi.fpubUrl(b.id));
-    setAttr(q(n, '[data-b="fpub"]'), 'download', `${b.id}.fpub`);
+    setAttr(q(n, '[data-b="fpub"]'), 'download', `${b.site}-${b.id}.fpub`);
     const box = q<HTMLInputElement>(n, '[data-b="pick"]');
     const on = this.picked.includes(b.id);
     if (box.checked !== on) box.checked = on;

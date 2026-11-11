@@ -15,6 +15,8 @@ Route field, device presets (Desktop 1440 by 900, Laptop 1280 by 800, Tablet 834
 
 Theme, motion and network remount the site and reload the frame; size and zoom never reload. A navigation loads a hidden second frame and swaps it in once loaded, so the page never blanks.
 
+In narrow windows the toolbar keeps every control in its row. Below 1240 px Publish and Package are icon-only and each select is sized to its value. If the row still overflows, the route field becomes an icon that opens as an overlay when focused (Enter navigates, Escape or blur collapses it), and then the selects show short labels (the value after "Theme:", the device name without its size). The bottom panel's tabs show icon and count under 360 px of strip, with the label kept as the accessible name.
+
 ## The probe
 
 While previewing, the host injects a small probe script after `<head>`. It emulates the theme and reduced motion, and reports the console, errors, requests, layout shift and overflow to the window. It is never part of a package. See [Checks](Checks) for how those reports become problems.
