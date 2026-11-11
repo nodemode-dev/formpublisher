@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+root="$(cd "$(dirname "$0")" && pwd)"
+pybin="$(command -v python3.12 || command -v python3)"
+[ -n "$pybin" ] || { echo "[formpublisher] Python 3.12 is needed" >&2; exit 1; }
+command -v npm > /dev/null || { echo "[formpublisher] Node.js 22.12 or newer is needed" >&2; exit 1; }
+echo "[formpublisher] engine: backend/venv"
+[ -x "$root/backend/venv/bin/python" ] || "$pybin" -m venv "$root/backend/venv"
+"$root/backend/venv/bin/python" -m pip install -q --upgrade pip
+"$root/backend/venv/bin/python" -m pip install -q -r "$root/backend/requirements.txt"
+echo "[formpublisher] interface: frontend/node_modules"
+(cd "$root/frontend" && npm ci --no-audit --no-fund)
+chmod +x "$root/formpublisher" "$root/formpublisher_oc_install" "$root/build_app" "$root/setup/freeze_backend" 2>/dev/null || true
+echo "[formpublisher] done. Start with ./formpublisher (then open http://localhost:5280); ./formpublisher agents install connects Claude Code, Codex and Cursor"

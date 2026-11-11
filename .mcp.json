@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "formpublisher": {
+      "type": "stdio",
+      "command": "${CLAUDE_PROJECT_DIR:-.}/formpublisher",
+      "args": ["mcp"]
+    },
+    "formmcp": {
+      "type": "stdio",
+      "command": "formmcp",
+      "args": ["mcp"]
+    }
+  }
+}

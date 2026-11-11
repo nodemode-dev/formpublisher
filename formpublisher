@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+set -e
+root="$(cd "$(dirname "$0")" && pwd)"
+host="${FORMPUBLISHER_HOST:-127.0.0.1}"
+port="${FORMPUBLISHER_PORT:-8280}"
+version() { sed -n 's/^  "version": "\(.*\)",$/\1/p' "$root/frontend/package.json" 2>/dev/null | head -1; }
+usage() {
+  printf 'FormPublisher %s · open what FormWeb makes\n' "$(version)"
+  cat << 'EOF'
+
+usage: ./formpublisher [command] [options]
+
+  (none) | boot       engine (127.0.0.1:8280) and interface (localhost:5280) together; reuses either if it already runs
+  install             one-command install: backend venv and frontend packages (same as ./formpublisher_oc_install)
+  backend             the engine only (reloads on backend/app changes)
+  frontend            the interface only (Vite on 5280)
+  build               production build of the interface into frontend/dist
+  serve               the built interface served by the engine on http://127.0.0.1:8280
+  run ...             the formpublisher command line (status, sites, import, routes); run --help
+  mcp                 the formpublisher MCP server on stdio, for Claude Code and other MCP clients
+  agents install|status|sync  set up Claude Code, Codex and Cursor (install), say what is set up (status), or mirror the skills (sync [--check])
+  doctor              check the toolchain, installs and ports
+  version             the version (also --version)
+  desktop dev|build   run or bundle the desktop app (Tauri 2; in development)
+  help                this text
+EOF
+}
+listening() { (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null; }
+py() {
+  if [ -x "$root/backend/venv/bin/python" ]; then echo "$root/backend/venv/bin/python"; else command -v python3.12 || command -v python3; fi
+}
+ensure_frontend() {
+  if [ ! -d "$root/frontend/node_modules" ]; then
+    echo "[formpublisher] installing the interface packages" >&2
+    (cd "$root/frontend" && npm ci --no-audit --no-fund)
+  fi
+}
+ensure_backend() {
+  if [ ! -x "$root/backend/venv/bin/python" ]; then
+    echo "[formpublisher] creating the backend venv" >&2
+    "$root/formpublisher_oc_install"
+  fi
+}
+run_backend() {
+  ensure_backend
+  cd "$root/backend"
+  if [ "${FORMPUBLISHER_RELOAD:-1}" = 1 ]; then
+    exec venv/bin/python -m uvicorn app.main:app --reload --reload-dir app --host "$host" --port "$port" "$@"
+  fi
+  exec venv/bin/python -m uvicorn app.main:app --host "$host" --port "$port" "$@"
+}
+run_frontend() { ensure_frontend; cd "$root/frontend"; exec node node_modules/.bin/vite "$@"; }
+boot() {
+  ensure_backend
+  ensure_frontend
+  pids=()
+  stop() { [ ${#pids[@]} -gt 0 ] && kill "${pids[@]}" 2>/dev/null; wait 2>/dev/null; }
+  trap 'stop; exit 0' INT TERM
+  trap stop EXIT
+  if listening "$port"; then echo "[formpublisher] engine already on $host:$port, reusing it"; else (run_backend) & pids+=($!); fi
+  if listening 5280; then echo "[formpublisher] interface already on localhost:5280, reusing it"; else (cd "$root/frontend" && exec node node_modules/.bin/vite) & pids+=($!); fi
+  echo "[formpublisher] open http://localhost:5280"
+  if [ ${#pids[@]} -gt 0 ]; then wait; fi
+}
+desktop() {
+  sub="${1:-dev}"
+  [ $# -gt 0 ] && shift
+  ensure_frontend
+  cd "$root"
+  case "$sub" in
+    dev)
+      if ! listening "$port" || ! listening 5280; then
+        "$0" boot > /dev/null 2>&1 &
+        for _ in $(seq 1 60); do listening "$port" && listening 5280 && break; sleep 0.5; done
+      fi
+      exec node frontend/node_modules/.bin/tauri dev --no-dev-server-wait "$@" ;;
+    build) exec "$root/build_app" "$@" ;;
+    *) usage; exit 2 ;;
+  esac
+}
+passthrough() {
+  mod="$1"
+  shift
+  [ -f "$root/backend/formpublisher_engine.py" ] || { echo "[formpublisher] backend/formpublisher_engine.py is not there yet" >&2; exit 1; }
+  exec "$(py)" "$root/backend/formpublisher_engine.py" "$mod" "$@"
+}
+doctor() {
+  ok() { printf '  %-10s %s\n' "$1" "$2"; }
+  ok node "$(node -v 2>/dev/null || echo missing)"
+  ok npm "$(npm -v 2>/dev/null || echo missing)"
+  ok python "$("$(py)" -V 2>&1 || echo missing)"
+  ok venv "$([ -x "$root/backend/venv/bin/python" ] && echo backend/venv || echo 'missing (./formpublisher_oc_install)')"
+  ok packages "$([ -d "$root/frontend/node_modules" ] && echo frontend/node_modules || echo 'missing (./formpublisher_oc_install)')"
+  ok claude "$(command -v claude || echo 'missing (https://claude.com/claude-code)')"
+  ok rust "$(rustc -V 2>/dev/null || echo 'missing (desktop builds only)')"
+  ok engine "$(listening "$port" && echo "listening on $port" || echo 'not running')"
+  ok interface "$(listening 5280 && echo 'listening on 5280' || echo 'not running')"
+}
+cmd="${1:-boot}"
+[ $# -gt 0 ] && shift
+case "$cmd" in
+  boot|dev) boot ;;
+  install) exec "$root/formpublisher_oc_install" "$@" ;;
+  agents) exec "$(py)" "$root/setup/agents.py" "$@" ;;
+  backend) run_backend "$@" ;;
+  frontend) run_frontend "$@" ;;
+  build) ensure_frontend; cd "$root/frontend"; exec npm run build ;;
+  serve)
+    [ -f "$root/frontend/dist/index.html" ] || { ensure_frontend; (cd "$root/frontend" && npm run build); }
+    echo "[formpublisher] open http://$host:$port"
+    FORMPUBLISHER_RELOAD=0 run_backend "$@" ;;
+  desktop) desktop "$@" ;;
+  run|cli) passthrough cli "$@" ;;
+  mcp) passthrough mcp "$@" ;;
+  doctor) doctor ;;
+  version|--version|-V) printf 'FormPublisher %s\n' "$(version)" ;;
+  help|-h|--help) usage ;;
+  *) printf '[formpublisher] unknown command: %s\n\n' "$cmd"; usage; exit 2 ;;
+esac
