@@ -62,9 +62,13 @@ echo   python     & "%PYEXE%" -V
 echo   claude     & where claude 2>nul || echo missing
 echo   cargo      & cargo -V 2>nul || echo missing (desktop builds only)
 set "VLINE=the check did not run"
-for /f "usebackq delims=" %%L in (`"%PYEXE%" setup\vendor_check.py --check 2^>^&1 ^| findstr /v /c:"not a git checkout"`) do if not defined VLINE_SET set "VLINE=%%L" & set "VLINE_SET=1"
-if "%VLINE:~0,15%"=="vendor: in step" echo   vendor     %VLINE%& goto :eof
-echo   vendor     %VLINE% (formpublisher.bat vendor --check lists them all)
+for /f "usebackq delims=" %%L in (`""%PYEXE%" setup\vendor_check.py --check 2^>^&1 ^| findstr /v /c:"not a git checkout""`) do call :vfirst "%%L"
+set "VTAIL="
+if not "%VLINE:~0,15%"=="vendor: in step" set "VTAIL= (formpublisher.bat vendor --check lists them all)"
+echo   vendor     %VLINE%%VTAIL%
+goto :eof
+:vfirst
+if not defined VLINE_SET set "VLINE=%~1" & set "VLINE_SET=1"
 goto :eof
 :usage
 echo formpublisher.bat [command]
