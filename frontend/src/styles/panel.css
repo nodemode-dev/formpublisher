@@ -15,7 +15,7 @@
   .fp-pn-bar .fp-btn > span:not(.icon) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 }
 @container (max-width: 300px) {
-  .fp-pn-bar { gap: 4px; }
+  .fp-pn-bar { gap: 4px 2px; }
   .fp-pn-bar:has(.fp-pn-select) { padding-inline: 6px; }
   .fp-pn-select { padding: 0 2px; }
   .fp-pn-progress { position: absolute; width: 1px; height: 1px; margin: 0; clip-path: inset(50%); }

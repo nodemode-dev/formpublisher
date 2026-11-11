@@ -2,6 +2,7 @@ import '../styles/panel.css';
 import type { App } from '../app-api';
 import { fetchResults, postLive, siteRevision, startRun, type Problem, type Severity, type Tier } from '../api-checks';
 import { emit, on, type ProbeMessage, type RouteStatus } from '../events';
+import { t } from '../i18n';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
 import { refuse } from './notice-step';
@@ -111,8 +112,38 @@ class Panel {
     this.statusText = q(this.status, '.fp-st-text');
     app.mounts.statusLeft.append(this.status);
     this.wire();
+    this.watchBar();
     this.sync();
     this.paint();
+  }
+
+  private watchBar(): void {
+    const refit = (): void => this.fitBar();
+    new ResizeObserver(refit).observe(this.pages.problems);
+    const edits = new MutationObserver(refit);
+    for (const sel of [this.sevSel, this.tierSel]) {
+      sel.addEventListener('change', refit);
+      edits.observe(sel, { childList: true, characterData: true, subtree: true });
+    }
+    document.fonts?.addEventListener('loadingdone', refit);
+  }
+
+  private fitBar(): void {
+    const page = this.pages.problems;
+    if (page.hidden || !page.clientWidth) return;
+    const apply = (short: boolean): void => {
+      const word = t('All');
+      for (const sel of [this.sevSel, this.tierSel]) {
+        const all = sel.options[0];
+        if (short) { if (all.label !== word) all.label = word; } else if (all.hasAttribute('label')) all.removeAttribute('label');
+        if (short && sel.selectedIndex === 0) { if (sel.title !== all.text) sel.title = all.text; } else if (sel.hasAttribute('title')) sel.removeAttribute('title');
+      }
+    };
+    const wrapped = (): boolean => [this.tierSel, this.runBtn, this.deepBtn].some((c) => Math.abs(c.offsetTop - this.sevSel.offsetTop) > 2);
+    apply(false);
+    if (!wrapped()) return;
+    apply(true);
+    if (wrapped()) apply(false);
   }
 
   private wire(): void {
