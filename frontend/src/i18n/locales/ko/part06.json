@@ -1,0 +1,5 @@
+{
+  "Keep FormWeb's model files": "FormWeb 모델 파일 유지",
+  "Hosts do not need them, so site.formweb.json and asset-access.json are left out unless you tick this.": "호스팅에는 필요하지 않으므로 이 항목을 선택하지 않으면 site.formweb.json과 asset-access.json은 제외됩니다.",
+  "Left out: {0}": "제외됨: {0}"
+}

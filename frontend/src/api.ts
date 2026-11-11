@@ -5,6 +5,7 @@ export interface Site {
   importedAt: string;
   routeCount: number | null;
   size: number | null;
+  revisions: number;
 }
 
 export interface RouteInfo {
@@ -62,6 +63,7 @@ export function toSite(raw: unknown): Site | null {
     importedAt: str(raw.imported_at) || str(raw.importedAt) || str(raw.created_at) || str(raw.createdAt),
     routeCount: Array.isArray(routes) ? routes.length : num(routes),
     size: num(raw.size) ?? num(raw.size_bytes) ?? num(raw.bytes) ?? num(raw.sizeBytes),
+    revisions: Array.isArray(raw.revisions) ? raw.revisions.length : 0,
   };
 }
 

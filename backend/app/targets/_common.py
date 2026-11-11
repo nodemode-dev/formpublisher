@@ -6,6 +6,9 @@ from typing import Any
 
 SAFE_PATH = re.compile(r"^[A-Za-z0-9/_.~%@:+,=-]*$")
 STATUSES = (301, 302, 307, 308)
+# FormWeb's own model files: they describe how the site was built, a host has no use for them, and they
+# can be large. Prepared host folders leave them out unless the person asks to keep them.
+MODEL_FILES = ("site.formweb.json", "asset-access.json")
 
 
 @dataclass
@@ -19,6 +22,7 @@ class PreparedInput:
     root: Path
     names: list[str]
     slug: str
+    excluded: list[str] = field(default_factory=list)
 
     def has(self, name: str) -> bool:
         return name in self.names

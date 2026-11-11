@@ -129,6 +129,23 @@ class Client:
             return self.call("GET", f"/api/sites/{urllib.parse.quote(site_id, safe='')}/routes")
         return self._local(intake.site_routes, site_id)
 
+    def revisions(self, site_id: str) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", f"/api/sites/{urllib.parse.quote(site_id, safe='')}/revisions")
+        from app.services import revisions
+
+        return self._local(revisions.list_revisions, site_id)
+
+    def diff(self, site_id: str, left: str | None = None, right: str | None = None) -> dict:
+        self.connect()
+        if self.url:
+            query = urllib.parse.urlencode({k: v for k, v in (("from", left), ("to", right)) if v})
+            return self.call("GET", f"/api/sites/{urllib.parse.quote(site_id, safe='')}/diff" + (f"?{query}" if query else ""))
+        from app.services import revisions
+
+        return self._local(revisions.diff, site_id, left, right)
+
     def _revision(self, site_id: str, revision: str | None) -> str:
         if revision:
             return revision
@@ -228,15 +245,15 @@ class Client:
 
         return self._local(publish.list_targets)
 
-    def prepare(self, build_id: str, target_ids: list[str]) -> dict:
+    def prepare(self, build_id: str, target_ids: list[str], include_model: bool = False) -> dict:
         self.connect()
         if not target_ids:
             raise OpError("name at least one target (see targets)")
         if self.url:
-            return self.call("POST", "/api/publish/prepare", {"build": build_id, "targets": target_ids})
+            return self.call("POST", "/api/publish/prepare", {"build": build_id, "targets": target_ids, "includeModel": include_model})
         from app.services import publish
 
-        return self._local(publish.prepare, build_id, target_ids)
+        return self._local(publish.prepare, build_id, target_ids, include_model)
 
     def prepared(self, build_id: str) -> dict:
         self.connect()
@@ -309,6 +326,33 @@ def say_routes(data: dict) -> str:
     return "\n".join(lines)
 
 
+def say_revisions(data: dict) -> str:
+    lines = [f"{data['id']}  {_plural(data['count'], 'revision')}, newest first"]
+    for r in data["revisions"]:
+        ch = r.get("changes")
+        delta = f"+{ch['added']} -{ch['removed']} ~{ch['changed']}" if ch else "first"
+        lines.append(f"{r['revision']:<22} {_plural(r['files'], 'file'):<10} {r['bytes']:>9} bytes  {_plural(r['routes'], 'route'):<10} {delta}" + ("  latest" if r.get("latest") else ""))
+    return "\n".join(lines)
+
+
+def say_diff(data: dict) -> str:
+    s = data["summary"]
+    lines = [f"{data['id']}  {data['from']} -> {data['to']}  +{s['added']} -{s['removed']} ~{s['changed']} ={s['same']}  {s['bytesFrom']} -> {s['bytesTo']} bytes" + ("  identical" if s["identical"] else "")]
+    for row in data["added"]:
+        lines.append(f"added    {row['path']}  {row['size']} bytes  {row['sha256'][:12]}")
+    for row in data["removed"]:
+        lines.append(f"removed  {row['path']}  {row['size']} bytes  {row['sha256'][:12]}")
+    for row in data["changed"]:
+        lines.append(f"changed  {row['path']}  {row['from']['size']} -> {row['to']['size']} bytes  {row['from']['sha256'][:12]} -> {row['to']['sha256'][:12]}")
+    routes = data["routes"]
+    lines.append(f"routes   {routes['from']} -> {routes['to']}")
+    for path in routes["added"]:
+        lines.append(f"  added route    {path}")
+    for path in routes["removed"]:
+        lines.append(f"  removed route  {path}")
+    return "\n".join(lines)
+
+
 def say_check(data: dict) -> str:
     summary = data["summary"]
     ran = ", ".join(summary.get("ran", [])) or "nothing yet"
@@ -365,6 +409,8 @@ def say_prepared(data: dict) -> str:
         for cmd in row.get("commands") or []:
             where = f"  (in {cmd['cwd']})" if cmd.get("cwd") else ""
             lines.append(f"  {cmd.get('label', '')}: {cmd.get('run', '')}{where}")
+        if row.get("leftOut"):
+            lines.append(f"  left out: {', '.join(row['leftOut'])} (use --include-model to keep them)")
         for note in row.get("notes") or []:
             lines.append(f"  note: {note}")
         for warning in row.get("warnings") or []:
@@ -403,6 +449,12 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("import-formweb", parents=[common], help="download the current FormWeb export and import it")
     rt = sub.add_parser("routes", parents=[common], help="list the routes of a site")
     rt.add_argument("id")
+    rv = sub.add_parser("revisions", parents=[common], help="list the revisions of a site, newest first, with what changed from the one before")
+    rv.add_argument("id")
+    df = sub.add_parser("diff", parents=[common], help="show the added, removed and changed files and routes between two revisions of a site")
+    df.add_argument("id")
+    df.add_argument("--from", dest="left", metavar="R", help="older revision (default: the one before --to)")
+    df.add_argument("--to", dest="right", metavar="R", help="newer revision (default: the latest)")
     ck = sub.add_parser("check", parents=[common], help="run the static checks on a site (add --deep for the browser run) and print the problems")
     ck.add_argument("id")
     ck.add_argument("--revision", help="revision to check (default: the latest)")
@@ -426,6 +478,7 @@ def build_parser() -> argparse.ArgumentParser:
     pp = sub.add_parser("prepare", parents=[common], help="prepare a folder per target for a build, with the exact commands to run")
     pp.add_argument("build")
     pp.add_argument("--target", action="append", required=True, metavar="T", help="target id; repeat for several (see targets)")
+    pp.add_argument("--include-model", action="store_true", help="keep FormWeb's model files (site.formweb.json, asset-access.json) in the host folders; they are left out by default")
     pd = sub.add_parser("prepared", parents=[common], help="list what is prepared for a build")
     pd.add_argument("build")
     sub.add_parser("receive-status", parents=[common], help="the receive endpoint, the inbox folder and the last receipts")
@@ -444,6 +497,10 @@ def main(argv: list[str] | None = None) -> int:
             data, say = client.import_path(args.path, args.name), say_import
         elif args.command == "import-formweb":
             data, say = client.import_formweb(), say_import
+        elif args.command == "revisions":
+            data, say = client.revisions(args.id), say_revisions
+        elif args.command == "diff":
+            data, say = client.diff(args.id, args.left, args.right), say_diff
         elif args.command == "routes":
             data, say = client.routes(args.id), say_routes
         elif args.command == "check":
@@ -468,7 +525,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "targets":
             data, say = client.targets(), say_targets
         elif args.command == "prepare":
-            data, say = client.prepare(args.build, args.target), say_prepare
+            data, say = client.prepare(args.build, args.target, args.include_model), say_prepare
         elif args.command == "prepared":
             data, say = client.prepared(args.build), say_prepared
         else:

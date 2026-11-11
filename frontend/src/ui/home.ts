@@ -9,6 +9,7 @@ import type { Commands } from './commands';
 import { anyDialogOpen } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setHidden, setText } from './dom';
 import { icon } from './icons';
+import { RevisionsDialog, revisionsText } from './revisions';
 
 export type HomeView = 'start' | 'recent' | 'builds' | 'trash';
 type View = HomeView;
@@ -43,7 +44,7 @@ function relative(iso: string): string {
 const routeText = (n: number): string => (n === 1 ? '1 route' : `${n} routes`);
 
 const CARD_GRID = (cls: string, withEmpty: boolean): string => `<div class="fp-card-grid ${cls}">
-<div class="fp-card is-skeleton" aria-hidden="true"><span class="fp-card-preview"></span><span class="fp-card-body"><span class="fp-card-name">&nbsp;</span><span class="fp-card-meta">&nbsp;</span></span></div>
+<div class="fp-card is-skeleton" aria-hidden="true"><span class="fp-card-preview"></span><span class="fp-card-body"><span class="fp-card-name">&nbsp;</span><span class="fp-card-meta">&nbsp;</span><span class="fp-card-revs">&nbsp;</span></span></div>
 ${withEmpty ? `<div class="fp-card is-empty" hidden><span class="fp-card-preview is-blank">${icon('globe', 28)}</span><span class="fp-card-body"><span class="fp-card-name">No sites yet</span><span class="fp-card-meta">Open a zip, a folder or a site from FormWeb</span></span></div>` : ''}
 <div class="fp-card-list"></div>
 </div>`;
@@ -63,6 +64,7 @@ export class Home {
   private readonly navItems: HTMLElement[];
   private readonly pages: HTMLElement[];
   private readonly builds: BuildsPage;
+  private revisions: RevisionsDialog | null = null;
 
   constructor(private readonly app: App, private readonly commands: Commands, visible: boolean) {
     this.root = el(`<section class="fp-home" aria-label="Home"${visible ? '' : ' hidden'}>
@@ -226,7 +228,7 @@ export class Home {
   }
 
   private card(site: Site): HTMLElement {
-    const node = el(`<button class="fp-card" type="button" data-site="${site.id.replace(/"/g, '')}"><span class="fp-card-preview">${icon('globe', 28)}<span class="fp-badge"></span></span><span class="fp-card-body"><span class="fp-card-name" translate="no"></span><span class="fp-card-meta"><span class="fp-card-routes"></span><span class="fp-card-dot">&middot;</span><span class="fp-card-time" translate="no"></span></span></span></button>`);
+    const node = el(`<button class="fp-card" type="button" data-site="${site.id.replace(/"/g, '')}"><span class="fp-card-preview">${icon('globe', 28)}<span class="fp-badge"></span></span><span class="fp-card-body"><span class="fp-card-name" translate="no"></span><span class="fp-card-meta"><span class="fp-card-routes"></span><span class="fp-card-dot">&middot;</span><span class="fp-card-time" translate="no"></span></span><span class="fp-card-revs"><span class="fp-card-revbtn" role="button" tabindex="0" data-revs title="Show what changed between revisions"></span></span></span></button>`);
     this.fillCard(node, site);
     return node;
   }
@@ -240,6 +242,13 @@ export class Home {
     setText(q(node, '.fp-card-routes'), site.routeCount === null ? '-' : routeText(site.routeCount));
     setText(q(node, '.fp-card-time'), relative(site.importedAt));
     setAttr(node, 'title', site.source);
+    setText(q(node, '.fp-card-revbtn'), revisionsText(site.revisions));
+  }
+
+  private showRevisions(siteId: string): void {
+    const site = this.app.state().sites.find((s) => s.id === siteId);
+    this.revisions ??= new RevisionsDialog();
+    this.revisions.show(siteId, site?.name ?? siteId);
   }
 
   private async openDemo(card: HTMLElement): Promise<void> {
@@ -302,6 +311,11 @@ export class Home {
       const t = e.target as HTMLElement;
       const v = t.closest<HTMLElement>('[data-v]')?.dataset.v as View | undefined;
       if (v) { this.select(v); return; }
+      if (t.closest('[data-revs]')) {
+        const owner = t.closest<HTMLElement>('[data-site]')?.dataset.site;
+        if (owner) this.showRevisions(owner);
+        return;
+      }
       const demo = t.closest<HTMLElement>('[data-demo]');
       if (demo) { void this.openDemo(demo); return; }
       const cmd = t.closest<HTMLElement>('[data-cmd]')?.dataset.cmd;
@@ -311,6 +325,14 @@ export class Home {
       const open = t.closest<HTMLElement>('[data-open]')?.dataset.open;
       if (open) { void this.app.openSite(open); return; }
       if (t.closest('[data-a="prefs"]')) this.commands.run('app.preferences');
+    });
+    this.root.addEventListener('keydown', (e) => {
+      const chip = (e.target as HTMLElement).closest<HTMLElement>('[data-revs]');
+      if (!chip || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const owner = chip.closest<HTMLElement>('[data-site]')?.dataset.site;
+      if (owner) this.showRevisions(owner);
     });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.isOpen && !anyDialogOpen() && this.app.state().activeId !== null) { e.preventDefault(); this.hide(); }

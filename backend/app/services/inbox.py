@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from app.services import intake, package, paths
+from app.services import intake, package, paths, pipeline
 from app.services.bus import bus
 
 log = logging.getLogger("formpublisher")
@@ -50,6 +50,7 @@ def announce(record: dict, via: str, name: str | None) -> dict:
     }
     _record(entry)
     bus.emit("sites.received", site=record["id"], name=record.get("name"), revision=record["revision"], via=via, file=name)
+    pipeline.after_receive(record)
     return entry
 
 
@@ -78,9 +79,40 @@ def _park(path: Path, folder: str, reason: str | None) -> Path:
     return target
 
 
+def _sidecar(path: Path) -> Path:
+    return path.with_name(path.name + ".json")
+
+
+def _metadata(path: Path) -> dict | None:
+    """{"siteName": str, "project": str, "version": str} written by FormWeb beside the zip, or None."""
+    data = package._read_json(_sidecar(path))
+    if not isinstance(data, dict):
+        return None
+    out = {}
+    for key in ("siteName", "project", "version"):
+        value = data.get(key)
+        if isinstance(value, str) and value.strip():
+            out[key] = value.strip()[:200]
+    return out or None
+
+
+def _park_sidecar(path: Path, folder: str) -> None:
+    side = _sidecar(path)
+    if side.is_file():
+        try:
+            _park(side, folder, None)
+        except OSError:
+            log.exception("could not move %s to %s/", side.name, folder)
+
+
 def process(path: Path) -> None:
+    meta = _metadata(path)
     try:
-        record = intake.import_upload(path, path.name, None)
+        if meta is not None and not intake.is_fweb(path):
+            project = meta.get("project")
+            record = intake.import_formweb_zip(path, f"receive:{project}" if project else "receive:formweb", meta.get("siteName"))
+        else:
+            record = intake.import_upload(path, path.name, None)
     except intake.IntakeError as exc:
         _fail(path, exc.message)
         return
@@ -89,14 +121,21 @@ def process(path: Path) -> None:
         _fail(path, f"{type(exc).__name__}: {exc}")
         return
     _park(path, "imported", None)
+    _park_sidecar(path, "imported")
     announce(record, "inbox", path.name)
 
 
 def _fail(path: Path, reason: str) -> None:
+    side = _sidecar(path)
     try:
         _park(path, "failed", reason)
     except OSError:
         log.exception("could not move %s to failed/", path.name)
+    if side.is_file():
+        try:
+            _park(side, "failed", None)
+        except OSError:
+            log.exception("could not move %s to failed/", side.name)
     _record({"at": intake.now_iso(), "via": "inbox", "ok": False, "file": path.name, "error": reason})
     bus.emit("sites.receive_failed", file=path.name, error=reason)
 

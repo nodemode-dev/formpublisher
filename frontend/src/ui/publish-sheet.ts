@@ -16,12 +16,22 @@ interface Verdict { text: string; tone: Tone; problems: string[] }
 
 interface Memo {
   picked: Set<string>;
+  includeModel: boolean;
   results: Map<string, PreparedTarget>;
   verdicts: Map<string, Verdict>;
 }
 
 const PICKS_KEY = 'formpublisher.publish.picks';
+const MODEL_KEY = 'formpublisher.publish.model';
 const SKELETONS = 6;
+
+function readModel(): boolean {
+  try { return localStorage.getItem(MODEL_KEY) === '1'; } catch { return false; }
+}
+
+function writeModel(on: boolean): void {
+  try { localStorage.setItem(MODEL_KEY, on ? '1' : '0'); } catch { return; }
+}
 
 const message = (e: unknown): string => (e instanceof Error && e.message ? e.message : 'Request failed');
 
@@ -82,6 +92,7 @@ class PublishSheet extends Dialog {
 <section class="fp-pkg-sec">
 <div class="fp-pub-sec-head"><div class="fp-pkg-sec-h">Hosts</div><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="all">Select all</button></div>
 <div class="fp-pub-targets" role="group" aria-label="Hosts">${Array.from({ length: SKELETONS }, skeletonCard).join('')}<div class="fp-pub-tlist" hidden></div></div>
+<label class="fp-pub-model"><input type="checkbox" data-f="model"><span class="fp-pub-model-name">Keep FormWeb's model files</span><span class="fp-pub-model-desc">Hosts do not need them, so site.formweb.json and asset-access.json are left out unless you tick this.</span></label>
 <div class="fp-pkg-progress" aria-hidden="true"><i></i></div>
 <div class="fp-pub-note" data-f="prep" role="status"></div>
 </section>
@@ -142,7 +153,7 @@ class PublishSheet extends Dialog {
     if (!this.buildId) return null;
     let m = this.memos.get(this.buildId);
     if (!m) {
-      m = { picked: new Set(readPicks()), results: new Map(), verdicts: new Map() };
+      m = { picked: new Set(readPicks()), includeModel: readModel(), results: new Map(), verdicts: new Map() };
       this.memos.set(this.buildId, m);
     }
     return m;
@@ -236,6 +247,9 @@ class PublishSheet extends Dialog {
     });
     const all = this.targets.length > 0 && this.targets.every((t) => m?.picked.has(t.id));
     setText(this.allBtn, all ? 'Select none' : 'Select all');
+    const model = this.f.model as HTMLInputElement;
+    const keep = m?.includeModel ?? false;
+    if (model.checked !== keep) model.checked = keep;
   }
 
   private paintResults(): void {
@@ -262,6 +276,7 @@ class PublishSheet extends Dialog {
   private resultNode(r: PreparedTarget): HTMLElement {
     const node = el(`<article class="fp-pub-res">
 <div class="fp-pub-res-h"><span class="fp-pub-res-name" data-f="name" translate="no"></span><span class="fp-badge" data-f="count"></span><span class="fp-pkg-grow"></span><button class="fp-btn fp-btn-sm" type="button" data-a="verify">${icon('shield', 14)}<span>Verify</span></button><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="remove">${icon('trash', 14)}<span>Remove</span></button></div>
+<div class="fp-pub-note fp-pub-left" data-f="left"></div>
 <div class="fp-pub-sub">Folder</div>
 <div class="fp-pub-path"><div class="fp-pub-code" data-f="folder" translate="no"></div><button class="fp-btn fp-btn-sm" type="button" data-a="reveal">${icon('folder', 14)}<span>Reveal</span></button><button class="fp-btn fp-btn-sm" type="button" data-a="path">${icon('copy', 14)}<span>Copy path</span></button></div>
 <div class="fp-pub-sub" data-f="cmdh">Commands</div>
@@ -282,6 +297,8 @@ class PublishSheet extends Dialog {
     setText(field(node, 'count'), fmtCount(r.files.length, 'file', 'files'));
     setText(field(node, 'folder'), r.folder);
     setAttr(node, 'aria-label', this.nameOf(r.target));
+    setText(field(node, 'left'), r.leftOut.length ? `Left out: ${r.leftOut.join(', ')}` : '');
+    setHidden(field(node, 'left'), r.leftOut.length === 0);
     const list = (name: string, head: string, items: string[], cls: string): void => {
       const box = field(node, name);
       setHidden(field(node, head), items.length === 0);
@@ -340,6 +357,7 @@ class PublishSheet extends Dialog {
     this.buildSel.disabled = this.busy || !this.builds.length;
     for (const b of Array.from(this.rlist.querySelectorAll<HTMLButtonElement>('button[data-a]'))) setDisabled(b, this.busy);
     for (const box of Array.from(this.tlist.querySelectorAll<HTMLInputElement>('[data-pick]'))) setDisabled(box, this.busy || !this.buildId);
+    setDisabled(this.f.model as HTMLInputElement, this.busy || !this.buildId);
     setClass(this.bar, 'is-running', this.busy);
   }
 
@@ -387,7 +405,7 @@ class PublishSheet extends Dialog {
     await this.guard(async () => {
       say(this.f.prep, 'Preparing', '');
       try {
-        const rows = await publishApi.prepare(build, ids);
+        const rows = await publishApi.prepare(build, ids, m.includeModel);
         const memo = this.memos.get(build);
         if (!memo) return;
         for (const r of rows) {
@@ -489,6 +507,12 @@ class PublishSheet extends Dialog {
       const box = e.target as HTMLInputElement;
       const id = box.closest<HTMLElement>('.fp-pub-target')?.dataset.key;
       if (id) this.pick(id, box.checked);
+    });
+    this.f.model.addEventListener('change', () => {
+      const m = this.memo();
+      if (!m) return;
+      m.includeModel = (this.f.model as HTMLInputElement).checked;
+      writeModel(m.includeModel);
     });
     this.buildSel.addEventListener('change', () => {
       this.buildId = this.buildSel.value;

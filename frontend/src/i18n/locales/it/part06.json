@@ -1,0 +1,5 @@
+{
+  "Keep FormWeb's model files": "Mantieni i file del modello di FormWeb",
+  "Hosts do not need them, so site.formweb.json and asset-access.json are left out unless you tick this.": "Gli host non ne hanno bisogno, quindi site.formweb.json e asset-access.json vengono esclusi a meno che tu non spunti questa casella.",
+  "Left out: {0}": "Esclusi: {0}"
+}

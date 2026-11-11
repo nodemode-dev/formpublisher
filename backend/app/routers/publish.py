@@ -33,7 +33,10 @@ async def prepare(request: Request):
         raise intake.IntakeError("build is required")
     if ids is not None and not isinstance(ids, list):
         raise intake.IntakeError("targets must be a list of target ids")
-    return await run_in_threadpool(publish.prepare, build, ids)
+    include_model = body.get("includeModel", False)
+    if not isinstance(include_model, bool):
+        raise intake.IntakeError("includeModel must be true or false")
+    return await run_in_threadpool(publish.prepare, build, ids, include_model)
 
 
 @router.get("/api/publish/{build_id}")

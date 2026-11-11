@@ -1,12 +1,12 @@
 {
-  "build": "1b6cac412739",
+  "build": "c0fbe406652f",
   "results": {
     "cloudflare-pages": {
       "commands": [
         {
           "cwd": ".",
           "label": "Deploy",
-          "run": "npx wrangler pages deploy site --project-name northwind-notes-2f2448"
+          "run": "npx wrangler pages deploy site --project-name northwind-notes-17959d"
         },
         {
           "cwd": ".",
@@ -44,11 +44,6 @@
           "path": "site/about/index.html",
           "sha256": "e6918790bbff19d949921281f04db0d1904e2f415d8611fef0e59a8e2b445b47",
           "size": 11061
-        },
-        {
-          "path": "site/asset-access.json",
-          "sha256": "1f4d5bcfaf3d3decc017356c6c9c4691e501f2e26b42d3e2254a739c67ebfd0c",
-          "size": 1127
         },
         {
           "path": "site/assets/0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913.webp",
@@ -156,23 +151,24 @@
           "size": 409
         },
         {
-          "path": "site/site.formweb.json",
-          "sha256": "6380763c9bb55fc38091febbddfba2bbf8d9df2ed5169f34ae9d45b41b1ff370",
-          "size": 180291
-        },
-        {
           "path": "site/sitemap.xml",
           "sha256": "d7c9451cd194ac28600d27b3169ab41f1d1f70e967c572e356a53c4c2a928623",
           "size": 523
         }
       ],
-      "folder": "/tmp/fplab-8389/home/prepared/northwind-notes-2f2448/1b6cac412739/cloudflare-pages",
+      "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/cloudflare-pages",
+      "includeModel": false,
+      "leftOut": [
+        "asset-access.json",
+        "site.formweb.json"
+      ],
       "name": "Cloudflare Pages",
       "notes": [
         "Cloudflare allows 2000 static and 100 dynamic redirect rules in _redirects.",
-        "No 404 rule is written: Pages serves 404.html on its own when the file exists."
+        "No 404 rule is written: Pages serves 404.html on its own when the file exists.",
+        "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
       ],
-      "preparedAt": "2026-11-10T08:22:04Z",
+      "preparedAt": "2026-11-10T09:23:25Z",
       "warnings": []
     },
     "github-pages": {
@@ -243,11 +239,6 @@
           "path": "site/about/index.html",
           "sha256": "e6918790bbff19d949921281f04db0d1904e2f415d8611fef0e59a8e2b445b47",
           "size": 11061
-        },
-        {
-          "path": "site/asset-access.json",
-          "sha256": "1f4d5bcfaf3d3decc017356c6c9c4691e501f2e26b42d3e2254a739c67ebfd0c",
-          "size": 1127
         },
         {
           "path": "site/assets/0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913.webp",
@@ -365,26 +356,27 @@
           "size": 409
         },
         {
-          "path": "site/site.formweb.json",
-          "sha256": "6380763c9bb55fc38091febbddfba2bbf8d9df2ed5169f34ae9d45b41b1ff370",
-          "size": 180291
-        },
-        {
           "path": "site/sitemap.xml",
           "sha256": "d7c9451cd194ac28600d27b3169ab41f1d1f70e967c572e356a53c4c2a928623",
           "size": 523
         }
       ],
-      "folder": "/tmp/fplab-8389/home/prepared/northwind-notes-2f2448/1b6cac412739/github-pages",
+      "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/github-pages",
+      "includeModel": false,
+      "leftOut": [
+        "asset-access.json",
+        "site.formweb.json"
+      ],
       "name": "GitHub Pages",
       "notes": [
         "The site's own 404.html is used for unknown paths.",
         "2 redirect(s) became meta-refresh pages; see redirects/README.txt.",
         "Then set Settings > Pages > Source to the gh-pages branch.",
         "Or copy .github/workflows/pages.yml into your repository (with the site/ folder) and set Pages > Source to GitHub Actions.",
-        ".nojekyll stops GitHub from running Jekyll over the files."
+        ".nojekyll stops GitHub from running Jekyll over the files.",
+        "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
       ],
-      "preparedAt": "2026-11-10T08:22:04Z",
+      "preparedAt": "2026-11-10T09:23:25Z",
       "warnings": [
         "GitHub Pages ignores custom headers, so Referrer-Policy, X-Content-Type-Options for /* will not be sent.",
         "GitHub Pages ignores custom headers, so Cache-Control for /assets/* will not be sent."
@@ -440,11 +432,6 @@
           "size": 11061
         },
         {
-          "path": "site/asset-access.json",
-          "sha256": "1f4d5bcfaf3d3decc017356c6c9c4691e501f2e26b42d3e2254a739c67ebfd0c",
-          "size": 1127
-        },
-        {
           "path": "site/assets/0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913.webp",
           "sha256": "0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913",
           "size": 32348
@@ -550,24 +537,25 @@
           "size": 409
         },
         {
-          "path": "site/site.formweb.json",
-          "sha256": "6380763c9bb55fc38091febbddfba2bbf8d9df2ed5169f34ae9d45b41b1ff370",
-          "size": 180291
-        },
-        {
           "path": "site/sitemap.xml",
           "sha256": "d7c9451cd194ac28600d27b3169ab41f1d1f70e967c572e356a53c4c2a928623",
           "size": 523
         }
       ],
-      "folder": "/tmp/fplab-8389/home/prepared/northwind-notes-2f2448/1b6cac412739/netlify",
+      "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/netlify",
+      "includeModel": false,
+      "leftOut": [
+        "asset-access.json",
+        "site.formweb.json"
+      ],
       "name": "Netlify",
       "notes": [
         "You can also drag the site folder onto app.netlify.com/drop.",
         "_redirects lists exact rules first, then splat rules; Netlify uses the first match.",
-        "A final rule serves 404.html with status 404 for unknown paths."
+        "A final rule serves 404.html with status 404 for unknown paths.",
+        "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
       ],
-      "preparedAt": "2026-11-10T08:22:04Z",
+      "preparedAt": "2026-11-10T09:23:25Z",
       "warnings": []
     },
     "nginx": {
@@ -591,7 +579,7 @@
       "files": [
         {
           "path": "formpublisher.conf",
-          "sha256": "ef94cc68614e84953e5f4536bd80086f633ac6f99629589bf3957037bd403786",
+          "sha256": "f936bb5eb2d586e35b40620c26295b7f030ab998e04c6f8392f0735485480254",
           "size": 1200
         },
         {
@@ -620,11 +608,6 @@
           "size": 11061
         },
         {
-          "path": "site/asset-access.json",
-          "sha256": "1f4d5bcfaf3d3decc017356c6c9c4691e501f2e26b42d3e2254a739c67ebfd0c",
-          "size": 1127
-        },
-        {
           "path": "site/assets/0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913.webp",
           "sha256": "0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913",
           "size": 32348
@@ -730,24 +713,25 @@
           "size": 409
         },
         {
-          "path": "site/site.formweb.json",
-          "sha256": "6380763c9bb55fc38091febbddfba2bbf8d9df2ed5169f34ae9d45b41b1ff370",
-          "size": 180291
-        },
-        {
           "path": "site/sitemap.xml",
           "sha256": "d7c9451cd194ac28600d27b3169ab41f1d1f70e967c572e356a53c4c2a928623",
           "size": 523
         }
       ],
-      "folder": "/tmp/fplab-8389/home/prepared/northwind-notes-2f2448/1b6cac412739/nginx",
+      "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/nginx",
+      "includeModel": false,
+      "leftOut": [
+        "asset-access.json",
+        "site.formweb.json"
+      ],
       "name": "nginx",
       "notes": [
         "formpublisher.conf is one server block for conf.d; nginx-test.conf wraps it so nginx -t can parse it alone.",
         "Unknown paths return 404 through try_files and show the site's 404.html.",
-        "absolute_redirect is off so redirects keep working behind a port mapping or a proxy."
+        "absolute_redirect is off so redirects keep working behind a port mapping or a proxy.",
+        "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
       ],
-      "preparedAt": "2026-11-10T08:22:04Z",
+      "preparedAt": "2026-11-10T09:23:25Z",
       "warnings": []
     },
     "static-zip": {
@@ -766,18 +750,18 @@
       "files": [
         {
           "path": "README.txt",
-          "sha256": "f42639a4e909773744bf5eeca57a38f44e0c37c7971a742e60c075bff9ae501a",
+          "sha256": "a6e0ed39d4e44c8a4c19e67d806247ea04b80e18a311f8d95e1ba1f0d67c734d",
           "size": 609
         },
         {
           "path": "SHA256SUMS",
-          "sha256": "43213a3c1992ad4dc28f05d71459346bd60446713cff8c047039b755ea999ef7",
+          "sha256": "22313803a5a69c881bf3a44251ef6c9ea6e1b5247d51eb776997d2eeddf3ec47",
           "size": 154
         },
         {
           "path": "publish.json",
-          "sha256": "ca1179fe8d5c5f43d9150b82e3b30e17be1c7d8458826cb1f26bbfe135e25fb4",
-          "size": 6273
+          "sha256": "80d5b133d16ecd027ca0dff2b86f1b7adbb128a9e9b7c4e9fb7c33d55c518ca2",
+          "size": 6281
         },
         {
           "path": "site.zip",
@@ -785,13 +769,16 @@
           "size": 377852
         }
       ],
-      "folder": "/tmp/fplab-8389/home/prepared/northwind-notes-2f2448/1b6cac412739/static-zip",
+      "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/static-zip",
+      "includeModel": false,
+      "leftOut": [],
       "name": "Static zip",
       "notes": [
         "site.zip is the build's own bytes, so its hash matches publish.json and any signature.",
-        "This host has no server rules: redirects and headers in publish.json are not applied by a plain file server."
+        "This host has no server rules: redirects and headers in publish.json are not applied by a plain file server.",
+        "site.zip is unchanged, so it still holds FormWeb's model files. The includeModel option only affects the site/ folders of the other hosts."
       ],
-      "preparedAt": "2026-11-10T08:22:04Z",
+      "preparedAt": "2026-11-10T09:23:25Z",
       "warnings": []
     },
     "vercel": {
@@ -834,11 +821,6 @@
           "size": 11061
         },
         {
-          "path": "site/asset-access.json",
-          "sha256": "1f4d5bcfaf3d3decc017356c6c9c4691e501f2e26b42d3e2254a739c67ebfd0c",
-          "size": 1127
-        },
-        {
           "path": "site/assets/0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913.webp",
           "sha256": "0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913",
           "size": 32348
@@ -944,11 +926,6 @@
           "size": 409
         },
         {
-          "path": "site/site.formweb.json",
-          "sha256": "6380763c9bb55fc38091febbddfba2bbf8d9df2ed5169f34ae9d45b41b1ff370",
-          "size": 180291
-        },
-        {
           "path": "site/sitemap.xml",
           "sha256": "d7c9451cd194ac28600d27b3169ab41f1d1f70e967c572e356a53c4c2a928623",
           "size": 523
@@ -959,12 +936,18 @@
           "size": 716
         }
       ],
-      "folder": "/tmp/fplab-8389/home/prepared/northwind-notes-2f2448/1b6cac412739/vercel",
+      "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/vercel",
+      "includeModel": false,
+      "leftOut": [
+        "asset-access.json",
+        "site.formweb.json"
+      ],
       "name": "Vercel",
       "notes": [
-        "vercel.json sits inside site/ so the deploy picks it up; Vercel serves 404.html itself when the file exists."
+        "vercel.json sits inside site/ so the deploy picks it up; Vercel serves 404.html itself when the file exists.",
+        "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
       ],
-      "preparedAt": "2026-11-10T08:22:04Z",
+      "preparedAt": "2026-11-10T09:23:25Z",
       "warnings": []
     }
   }

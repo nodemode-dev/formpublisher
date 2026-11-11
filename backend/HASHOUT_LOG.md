@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.2
-Last updated: 2026-11-10 · Phases 7 to 9: host targets and Publish, Receive from FormWeb, CLI and MCP, demos
+Current build version: v0.1.3
+Last updated: 2026-11-10 · Phases 10 to 12: desktop engine, model files left out of host folders, receive pipeline, revisions and diffs
 
 ---
 
@@ -253,3 +253,29 @@ The executor spec is `TURN_C_SPEC.md` in the 0.1.2 planning sidecar.
 - CLI and MCP call the same services in-process when no engine answers. `sign` without `--key` uses the only key and refuses when there are none or several. Over HTTP a deep check polls `GET /api/checks/{site}/{revision}` until `running` clears, capped at 15 minutes. Key creation is CLI-only (`keys --create`); MCP has 14 tools with `readOnlyHint` on the eight that only read.
 
 Checked: `formpublisher_engine.py --selfcheck` lists every router with no errors; one build prepared for all six targets twice gave identical folders; receive, inbox, verify, delete, the MCP stdio walk and every CLI command were run as the spec's exits ask.
+
+## Phases 10 to 12 · v0.1.3 (2026-11-10)
+
+The executor spec is `TURN_D_SPEC.md` in the 0.1.3 planning sidecar. The vendored FormWeb crates are 0.19.3 (`vendor/formweb-native/VENDOR.md`).
+
+### formpublisher_engine.py, setup/freeze_backend
+
+- `--selfcheck` now also reports whether the built window, the demo sample and `formweb-core` were found, so a frozen engine missing any of them fails before it is copied into `src-tauri/binaries`. `freeze_backend` bundles `formweb-core` and `demo/sample-site.zip`, and collects the `mcp` package's data without its `cli` module, which pulls in a terminal stack the engine never uses. The frozen engine is about 87 MB on Linux.
+
+### app/services/publish.py, app/targets/_common.py, app/routers/publish.py
+
+- Prepared `site/` folders leave out `site.formweb.json` and `asset-access.json` (FormWeb's model files) unless `includeModel` is true. The choice is stored in the prepared metadata, so verify skips the files that were left out on purpose and names them instead of reporting them missing; every result carries `leftOut`. `site.zip` and `publish.json` still list every file, because they describe the build, not a host folder. Owner question 18, taken with its default.
+
+### app/services/pipeline.py, app/services/settings.py
+
+- Two settings, `receive.autoCheck` and `receive.autoBuild`, both off by default. `after_receive` returns at once when both are off; otherwise it starts one daemon thread that runs the static checks and then a build under a module lock, emitting the same `checks.done` event as the manual action (with `auto: true`) and then `receive.pipeline` with what ran or the error. The receive answers before the thread does any work (24 ms measured with both on). A failure is logged and reported in the event; it never undoes the import.
+
+### app/services/inbox.py
+
+- FormWeb writes `<zip>.json` beside an inbox zip with `siteName`, `project` and `version` (strings, trimmed, 200 characters at most). With it, the zip is imported under the same site id a live send would use, so it becomes a revision of that site rather than a new site; without it, the old file-name behaviour stands. The metadata file moves to `imported/` or `failed/` with its zip. `announce`, which both the receive route and the watcher go through, starts `pipeline.after_receive`.
+
+### app/services/revisions.py, app/routers/sites.py, app/cli.py, app/mcp.py
+
+- `GET /api/sites/{id}/revisions` lists revisions newest first with file count, bytes, route count and the files added, removed and changed from the revision before. `GET /api/sites/{id}/diff?from=&to=` compares two revisions by path, size and SHA-256 and lists added and removed routes; without `to` it takes the latest, without `from` the revision before `to`. Revision times come from the revision id's stamp. CLI `revisions` and `diff` and MCP `list_revisions` and `diff_revisions` (both read-only, 16 tools in all) call the same functions in-process or over HTTP. `prepare` gains `--include-model` and `includeModel`.
+
+Checked: two receives of one project gave one site with two revisions; with the settings off no checks or builds ran, with them on the check and build followed the 24 ms answer; diffs read the same through the route, the CLI in-process, HTTP and MCP; an inbox zip with metadata became the fourth revision of the same site; all six targets prepared with `includeModel` false, true and omitted verified clean, with two fewer files per site folder by default; the frozen engine selfchecked, served the window and imported the demo.

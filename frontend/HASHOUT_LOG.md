@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.2
-Last updated: 2026-11-10 · Phases 4 to 6: preview, checks panel, package sheet and builds
+Current build version: v0.1.3
+Last updated: 2026-11-10 · Phases 10 to 12: model files option, revisions, receive settings
 
 ---
 
@@ -147,3 +147,16 @@ The sheet extends `Dialog` with a fixed height (`min(86vh, 780px)`), `scrollbar-
 
 ### src/ui/home.ts, src/app.ts, src/ui/hint-strip.ts, src/api-demo.ts, src/styles/demo.css
 Home refreshes Recent on `sites.received`; a new card pushes older ones down, the one layout shift left, inherent to newest-first order. The Demos row's card calls `POST /api/demo/sample` (idempotent) and opens the site. The tour strip is absolutely positioned at the top of `.fp-main`, walks four steps and stores `formpublisher.hints = done`. Keys for the sheet and toast are in `keys/part04.json`, for the demo and tour in `keys/part05.json`.
+
+## Phases 10 to 12: model files, revisions and receive settings · v0.1.3 (2026-11-10)
+
+The executor spec is `TURN_D_SPEC.md` in the 0.1.3 planning sidecar.
+
+### src/ui/publish-sheet.ts, src/api-publish.ts, src/styles/publish.css
+The sheet has a "Keep FormWeb's model files" checkbox, off by default and remembered in `localStorage` as `formpublisher.publish.model` (reads and writes in try/catch, falling back to off). It is disabled while busy or before a build exists and is sent as `includeModel` with prepare. Each host card gains a note row listing what was left out; the row is hidden when empty, so cards keep their height. Keys are in `keys/part06.json`.
+
+### src/ui/revisions.ts, src/api-revisions.ts, src/styles/revisions.css, src/ui/home.ts, src/ui/panel.ts
+`RevisionsView` renders the revision list and the diff of any two rows; `RevisionsDialog` wraps it for Home, where each site card carries a revisions chip (click, Enter or Space opens the dialog without opening the site). The site panel has a Revisions tab with a count badge; it loads only while visible (a `MutationObserver` on the page's `hidden`) and reloads on `fp:sites-changed`. Home's skeleton card carries the chip's space, so cards do not move when the counts arrive; CLS measured 0 opening the dialog and the tab.
+
+### src/ui/preferences.ts
+Two rows, "Check a site when it arrives" and "Build a site when it arrives", write `receive.autoCheck` and `receive.autoBuild` through the settings route, and a failed save puts the box back. Keys for the revisions and receive strings are in `keys/part07.json`; parts 06 and 07 are translated into all 25 locales, with plural forms for pl, cs, ru and uk.

@@ -3,17 +3,17 @@
 mod reveal;
 
 use std::io::{Read, Write};
-use std::net::{SocketAddr, TcpStream};
+use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
+use std::sync::atomic::{AtomicI32, AtomicU16, Ordering};
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
 use tauri::{Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_dialog::DialogExt;
 
-const ENGINE_ADDR: &str = "127.0.0.1:8280";
-const ENGINE_URL: &str = "http://127.0.0.1:8280";
+const DEFAULT_PORT: u16 = 8280;
 const ENGINE_WAIT: Duration = Duration::from_secs(60);
 const ENGINE_NAME: &str = if cfg!(windows) { "formpublisher-engine.exe" } else { "formpublisher-engine" };
 const FALLBACK_SIZE: (f64, f64) = (1280.0, 800.0);
@@ -22,12 +22,66 @@ const SCREEN_FRACTION: f64 = 0.9;
 
 struct Backend(Mutex<Option<Child>>);
 
+static PORT: AtomicU16 = AtomicU16::new(DEFAULT_PORT);
+
+static ENGINE_GROUP: AtomicI32 = AtomicI32::new(0);
+
+#[cfg(unix)]
+extern "C" {
+    fn signal(signum: i32, handler: usize) -> usize;
+    fn kill(pid: i32, sig: i32) -> i32;
+    fn _exit(code: i32) -> !;
+}
+
+#[cfg(unix)]
+extern "C" fn on_signal(_: i32) {
+    let group = ENGINE_GROUP.load(Ordering::SeqCst);
+    unsafe {
+        if group > 0 {
+            kill(-group, 15);
+        }
+        _exit(0)
+    }
+}
+
+#[cfg(unix)]
+fn watch_signals() {
+    for number in [1, 2, 15] {
+        unsafe {
+            signal(number, on_signal as *const () as usize);
+        }
+    }
+}
+
+fn engine_addr() -> String {
+    format!("127.0.0.1:{}", PORT.load(Ordering::SeqCst))
+}
+
+fn engine_url() -> String {
+    format!("http://{}", engine_addr())
+}
+
+fn choose_port() -> u16 {
+    if let Some(port) = std::env::var("FORMPUBLISHER_PORT").ok().and_then(|raw| raw.trim().parse::<u16>().ok()).filter(|p| *p > 0) {
+        return port;
+    }
+    let free = |port: u16| TcpListener::bind(("127.0.0.1", port)).is_ok();
+    if free(DEFAULT_PORT) {
+        return DEFAULT_PORT;
+    }
+    TcpListener::bind(("127.0.0.1", 0))
+        .and_then(|listener| listener.local_addr())
+        .map(|addr| addr.port())
+        .unwrap_or(DEFAULT_PORT)
+}
+
 fn healthy() -> bool {
-    let Ok(addr) = ENGINE_ADDR.parse::<SocketAddr>() else { return false };
+    let address = engine_addr();
+    let Ok(addr) = address.parse::<SocketAddr>() else { return false };
     let Ok(mut stream) = TcpStream::connect_timeout(&addr, Duration::from_millis(400)) else { return false };
     let _ = stream.set_read_timeout(Some(Duration::from_millis(800)));
     let _ = stream.set_write_timeout(Some(Duration::from_millis(800)));
-    let request = format!("GET /api/health HTTP/1.1\r\nHost: {ENGINE_ADDR}\r\nConnection: close\r\n\r\n");
+    let request = format!("GET /api/health HTTP/1.1\r\nHost: {address}\r\nConnection: close\r\n\r\n");
     if stream.write_all(request.as_bytes()).is_err() {
         return false;
     }
@@ -59,12 +113,21 @@ fn spawn_engine() -> Option<Child> {
         command
     };
     command
-        .env("FORMPUBLISHER_PORT", "8280")
+        .env("FORMPUBLISHER_PORT", PORT.load(Ordering::SeqCst).to_string())
         .stdin(Stdio::null())
         .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .ok()
+        .stderr(Stdio::null());
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        command.process_group(0);
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        command.creation_flags(0x0800_0000);
+    }
+    command.spawn().ok()
 }
 
 fn kill_backend(handle: &tauri::AppHandle) {
@@ -72,10 +135,10 @@ fn kill_backend(handle: &tauri::AppHandle) {
     let Some(mut child) = child else { return };
     #[cfg(unix)]
     {
-        let pid = child.id().to_string();
+        let pid = format!("-{}", child.id());
         let signal = |sig: &str| {
             Command::new("kill")
-                .args([sig, pid.as_str()])
+                .args([sig, "--", pid.as_str()])
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
                 .status()
@@ -115,17 +178,18 @@ fn open_main(handle: &tauri::AppHandle) {
             )
         })
         .unwrap_or(FALLBACK_SIZE);
-    let Ok(url) = ENGINE_URL.parse() else { return };
-    let built = WebviewWindowBuilder::new(handle, "main", WebviewUrl::External(url))
+    let Ok(url) = engine_url().parse() else { return };
+    let builder = WebviewWindowBuilder::new(handle, "main", WebviewUrl::External(url))
         .title("FormPublisher")
         .visible(reveal::BUILD_VISIBLE)
         .background_color(reveal::BACKGROUND)
         .inner_size(width, height)
         .min_inner_size(MIN_SIZE.0, MIN_SIZE.1)
         .center()
-        .disable_drag_drop_handler()
-        .build();
-    match built {
+        .disable_drag_drop_handler();
+    #[cfg(target_os = "macos")]
+    let builder = builder.title_bar_style(tauri::TitleBarStyle::Overlay).hidden_title(true);
+    match builder.build() {
         Ok(window) => reveal::conceal(&window),
         Err(_) => reveal::close_splash(handle),
     }
@@ -146,6 +210,7 @@ fn start_engine(handle: tauri::AppHandle) {
         if !healthy() {
             match spawn_engine() {
                 Some(child) => {
+                    ENGINE_GROUP.store(child.id() as i32, Ordering::SeqCst);
                     if let Ok(mut slot) = handle.state::<Backend>().0.lock() {
                         *slot = Some(child);
                     }
@@ -172,7 +237,7 @@ fn start_engine(handle: tauri::AppHandle) {
 #[tauri::command(async)]
 fn open_window(app: tauri::AppHandle, path: String, title: Option<String>) -> Result<(), String> {
     let relative = path.trim_start_matches('/');
-    let url = format!("{ENGINE_URL}/{relative}").parse().map_err(|_| "bad path".to_string())?;
+    let url = format!("{}/{relative}", engine_url()).parse().map_err(|_| "bad path".to_string())?;
     let label = format!(
         "extra-{}",
         std::time::SystemTime::now()
@@ -196,6 +261,9 @@ fn open_window(app: tauri::AppHandle, path: String, title: Option<String>) -> Re
 
 fn main() {
     reveal::mark_launch();
+    #[cfg(unix)]
+    watch_signals();
+    PORT.store(choose_port(), Ordering::SeqCst);
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| focus_main(app)))
         .plugin(tauri_plugin_shell::init())
@@ -212,8 +280,10 @@ fn main() {
         .expect("error while building the FormPublisher app");
 
     app.run(|handle, event| {
-        if let RunEvent::Exit = event {
-            kill_backend(handle);
+        match event {
+            RunEvent::WindowEvent { event: tauri::WindowEvent::Destroyed, .. } if handle.webview_windows().is_empty() => handle.exit(0),
+            RunEvent::Exit => kill_backend(handle),
+            _ => {}
         }
     });
 }

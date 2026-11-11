@@ -57,12 +57,14 @@ const SHELL = `<div class="fp-app">
 <button class="fp-bottom-tab" type="button" role="tab" aria-selected="true" data-tab="problems">Problems</button>
 <button class="fp-bottom-tab" type="button" role="tab" aria-selected="false" data-tab="console">Console</button>
 <button class="fp-bottom-tab" type="button" role="tab" aria-selected="false" data-tab="network">Network</button>
+<button class="fp-bottom-tab" type="button" role="tab" aria-selected="false" data-tab="revisions">Revisions</button>
 <button class="fp-icon-btn is-sm" type="button" data-act="toggle-bottom" title="Hide the panel" aria-label="Hide the panel">${icon('chevronDown', 14)}</button>
 </div>
 <div class="fp-bottom-body">
 <div class="fp-bottom-page" data-page="problems" role="tabpanel">No problems found yet.</div>
 <div class="fp-bottom-page" data-page="console" role="tabpanel" hidden>Nothing in the console yet.</div>
 <div class="fp-bottom-page" data-page="network" role="tabpanel" hidden>No network requests yet.</div>
+<div class="fp-bottom-page" data-page="revisions" role="tabpanel" hidden></div>
 </div>
 </section>
 </div>

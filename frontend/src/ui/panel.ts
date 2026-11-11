@@ -4,6 +4,7 @@ import { fetchResults, postLive, siteRevision, startRun, type Problem, type Seve
 import { emit, on, type ProbeMessage, type RouteStatus } from '../events';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
+import { RevisionsView } from './revisions';
 
 interface ConEntry { seq: number; level: 'error' | 'warn'; text: string; where: string }
 interface NetEntry { seq: number; url: string; kind: string; status: number; failed: boolean; ms: number; bytes: number }
@@ -70,6 +71,9 @@ class Panel {
   private deepRun = '';
   private deepTimer: number | undefined;
   private activeSite: string | null = null;
+  private readonly revs: RevisionsView;
+  private readonly revPage: HTMLElement;
+  private readonly revCount: HTMLElement;
 
   constructor(private readonly app: App) {
     const root = app.mounts.bottom;
@@ -97,6 +101,10 @@ class Panel {
       return b;
     };
     this.counts = { problems: badge(tab('problems')), console: badge(tab('console')), network: badge(tab('network')) };
+    this.revPage = page('revisions');
+    this.revs = new RevisionsView(this.revPage);
+    this.revCount = badge(tab('revisions'));
+    new MutationObserver(() => this.refreshRevisions()).observe(this.revPage, { attributes: true, attributeFilter: ['hidden'] });
     this.status = el(`<span class="fp-st fp-st-problems" role="button" tabindex="0" title="Show problems"><span class="fp-st-dot"></span><span class="fp-st-text"></span></span>`);
     this.statusDot = q(this.status, '.fp-st-dot');
     this.statusText = q(this.status, '.fp-st-text');
@@ -125,6 +133,7 @@ class Panel {
     this.lists.problems.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick((e.target as HTMLElement).closest<HTMLElement>('.fp-pn-row')); }
     });
+    on('fp:sites-changed', () => this.schedule());
     on('fp:probe', (m) => this.probe(m));
     on('fp:site-opened', () => this.sync());
     on('fp:site-loaded', () => this.sync());
@@ -156,8 +165,13 @@ class Panel {
     if (id !== this.activeSite) {
       this.activeSite = id;
       if (id) void this.load(id, null);
+      this.refreshRevisions();
     }
     this.schedule();
+  }
+
+  private refreshRevisions(): void {
+    if (!this.revPage.hidden) void this.revs.load(this.id());
   }
 
   private async load(id: string, revision: string | null): Promise<void> {
@@ -292,6 +306,9 @@ class Panel {
       if (site && d) void this.load(site, s(ev.revision) || d.revision);
       return;
     }
+    if (ev.type === 'site.imported' || ev.type === 'sites.received') {
+      if (s(ev.id ?? ev.site) === this.id()) this.refreshRevisions();
+    }
     if (ev.type === 'site.imported') {
       const id = s(ev.id);
       if (id && this.data.has(id)) {
@@ -405,6 +422,9 @@ class Panel {
     const errors = all.filter((p) => p.severity === 'error').length;
     const warnings = all.filter((p) => p.severity === 'warning').length;
     this.paintCount('problems', errors + warnings, errors > 0);
+    const revs = this.id() ? this.app.state().sites.find((x) => x.id === this.id())?.revisions ?? 0 : 0;
+    setText(this.revCount, String(revs));
+    this.revCount.style.visibility = revs > 1 ? 'visible' : 'hidden';
     setText(this.statusText, `${plural(errors, 'error', 'errors')}, ${plural(warnings, 'warning', 'warnings')}`);
     setClass(this.statusDot, 'is-error', errors > 0);
     setClass(this.statusDot, 'is-warn', errors === 0 && warnings > 0);

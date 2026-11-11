@@ -27,20 +27,29 @@ if [ ! -f "$ROOT/frontend/dist/index.html" ]; then
   command -v npm >/dev/null 2>&1 || die "frontend/dist missing and npm not found"
   (cd "$ROOT/frontend" && npm run build)
 fi
+core="${FORMPUBLISHER_FORMWEB_CORE:-$ROOT/backend/bin/formweb-core${ext}}"
+if [ ! -f "$core" ]; then
+  say "formweb-core is missing; building it with setup/install_compiler"
+  "$ROOT/setup/install_compiler" || die "formweb-core could not be built"
+  core="$ROOT/backend/bin/formweb-core${ext}"
+fi
+[ -f "$core" ] || die "formweb-core not found at $core"
+[ -f "$ROOT/demo/sample-site.zip" ] || die "demo/sample-site.zip is missing"
 data=(--add-data "$ROOT/frontend/dist${sep}frontend_dist" --add-data "$ROOT/backend/app/static${sep}app/static")
 [ -d "$ROOT/docs" ] && data+=(--add-data "$ROOT/docs${sep}docs")
-[ -f "$ROOT/demo/sample-site.zip" ] && data+=(--add-data "$ROOT/demo/sample-site.zip${sep}demo")
+data+=(--add-data "$ROOT/demo/sample-site.zip${sep}demo" --add-binary "$core${sep}bin")
 cd "$ROOT/backend"
 rm -rf build/pyinstaller dist-engine
 "$py" -m PyInstaller --noconfirm --clean --onefile --name formpublisher-engine \
   --distpath dist-engine --workpath build/pyinstaller --specpath build/pyinstaller \
   "${data[@]}" \
   --paths "$ROOT/backend" \
-  --collect-submodules app --collect-submodules uvicorn --collect-submodules websockets --collect-submodules mcp \
-  --exclude-module tkinter \
+  --collect-submodules app --collect-submodules uvicorn --collect-submodules websockets --collect-data mcp \
+  --exclude-module mcp.cli --exclude-module tkinter \
   "$ROOT/backend/formpublisher_engine.py"
+FORMPUBLISHER_HOME="$(mktemp -d)" "dist-engine/formpublisher-engine${ext}" --selfcheck || die "the frozen engine failed its self-check; nothing was copied to src-tauri/binaries"
 mkdir -p "$ROOT/src-tauri/binaries"
 out="$ROOT/src-tauri/binaries/formpublisher-engine-${triple}${ext}"
+rm -f "$out"
 cp "dist-engine/formpublisher-engine${ext}" "$out"
-FORMPUBLISHER_HOME="$(mktemp -d)" "$out" --selfcheck || die "the frozen engine failed its self-check"
 say "sidecar ready: $out"

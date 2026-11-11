@@ -11,9 +11,15 @@ Node 22.12 or newer and Python 3.12. The desktop app also needs Rust and the Tau
 ./formpublisher                   # the engine on 127.0.0.1:8280 and the interface on http://localhost:5280
 ```
 
-`./build_app` makes the desktop app start to finish (log in `build_app.log`); the desktop build is in development. Windows: `formpublisher_oc_install.bat`, `formpublisher.bat`, `build_app.bat`. `./formpublisher agents install` connects Claude Code, Codex and Cursor.
+`./build_app` makes the desktop app start to finish (log in `build_app.log`). Windows: `formpublisher_oc_install.bat`, `formpublisher.bat`, `build_app.bat`. `./formpublisher agents install` connects Claude Code, Codex and Cursor.
 
 `./formpublisher backend` and `./formpublisher frontend` start one half each. One process serving the built interface: `./formpublisher build`, then `./formpublisher serve` (http://127.0.0.1:8280).
+
+## The desktop app
+
+`./build_app` freezes the engine with PyInstaller into `formpublisher-engine` (the built interface, the demo site and the `formweb-core` compiler go inside; `formpublisher-engine --selfcheck` proves it starts) and builds the Tauri 2 shell around it. The app shows a small splash, starts the engine, and reveals the window when the interface has drawn, with no white flash. A second launch focuses the running window. Closing the last window, or a terminate or interrupt signal, stops the engine and anything it started.
+
+The port rule: `FORMPUBLISHER_PORT` when set, else 8280 when free, else any free port. An engine already answering on that port is reused. FormWeb's Send to FormPublisher looks at 8280 first, so when the app had to take another port FormWeb leaves the site in the inbox and the engine imports it from there. See the manual's "The desktop app".
 
 ## The first import
 

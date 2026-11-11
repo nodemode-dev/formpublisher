@@ -2,7 +2,7 @@ import type { RouteInfo, Site } from './api';
 
 export type EngineState = 'unknown' | 'ok' | 'down';
 export type Pane = 'strip' | 'props' | 'bottom';
-export type BottomTab = 'problems' | 'console' | 'network';
+export type BottomTab = 'problems' | 'console' | 'network' | 'revisions';
 
 export interface OpenTab {
   id: string;

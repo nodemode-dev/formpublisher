@@ -42,6 +42,12 @@ def selfcheck() -> int:
         info["routers"] = engine.app.state.routers
         info["routerErrors"] = engine.app.state.router_errors
         info["frontend"] = bool(paths.frontend_dist())
+        info["demo"] = (paths.resource_dir() / "demo" / "sample-site.zip").is_file()
+        from app.services import compile as compiler
+
+        info["core"] = bool(compiler.core_binary())
+        if paths.frozen():
+            failed = failed or not info["frontend"] or not info["demo"] or not info["core"]
         failed = failed or bool(info["routerErrors"])
     except Exception as exc:
         info["app"] = f"failed: {exc!r}"

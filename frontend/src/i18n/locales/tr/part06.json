@@ -1,0 +1,5 @@
+{
+  "Keep FormWeb's model files": "FormWeb'in model dosyalarını koru",
+  "Hosts do not need them, so site.formweb.json and asset-access.json are left out unless you tick this.": "Barındırıcıların bunlara ihtiyacı yoktur, bu yüzden bunu işaretlemezseniz site.formweb.json ve asset-access.json dışarıda bırakılır.",
+  "Left out: {0}": "Dışarıda bırakılan: {0}"
+}

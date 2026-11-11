@@ -1,0 +1,5 @@
+{
+  "Keep FormWeb's model files": "Giữ các tệp mô hình của FormWeb",
+  "Hosts do not need them, so site.formweb.json and asset-access.json are left out unless you tick this.": "Máy chủ lưu trữ không cần chúng, nên site.formweb.json và asset-access.json sẽ bị loại ra trừ khi bạn chọn mục này.",
+  "Left out: {0}": "Đã loại ra: {0}"
+}
