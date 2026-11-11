@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "Sivuston nimessä käytetään pieniä kirjaimia, numeroita ja yhdysmerkkejä, ja se alkaa kirjaimella tai numerolla.",
+  "A key name is 16 characters from 0 to 9 and a to f.": "Avaimen nimi on 16 merkkiä väliltä 0-9 ja a-f.",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "Koonti sijoitetaan polkuun <site>/<build id>, jossa koontitunnus on 12 merkkiä väliltä 0-9 ja a-f.",
+  "A prepared folder goes at <site>/<build id>/<target>.": "Valmisteltu kansio sijoitetaan polkuun <site>/<build id>/<target>."
+}

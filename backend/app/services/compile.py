@@ -12,6 +12,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 from app.services import paths
+from app.services.codes import default_code
 
 FORMAT = "com.nodemode.formweb"
 MAX_ENVELOPE_BYTES = 128 * 1024 * 1024
@@ -40,10 +41,11 @@ HEAD_RE = re.compile(rb'"format"\s*:\s*"com\.nodemode\.formweb"')
 
 
 class CompileError(Exception):
-    def __init__(self, message: str, status: int = 400) -> None:
+    def __init__(self, message: str, status: int = 400, code: str | None = None) -> None:
         super().__init__(message)
         self.message = message
         self.status = status
+        self.code = code or default_code(status)
 
 
 def binary_name() -> str:
@@ -430,7 +432,7 @@ def write_files(files: list[dict], dest: Path, blobs: Any = None) -> int:
 def compile_fweb(envelope_path: Path, dest: Path) -> dict:
     binary = core_binary()
     if binary is None:
-        raise CompileError(MISSING, 422)
+        raise CompileError(MISSING, 422, "core-missing")
     envelope, blobs, licences = load_project(envelope_path)
     site = envelope["site"]
     locale = site.get("defaultLocale") if isinstance(site.get("defaultLocale"), str) and site.get("defaultLocale") else "en"

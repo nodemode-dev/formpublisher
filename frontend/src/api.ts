@@ -33,9 +33,25 @@ export interface FormWebImport {
   message: string;
 }
 
+const STATUS_CODES: Record<number, string> = {
+  0: 'unreachable',
+  400: 'invalid',
+  401: 'unauthorized',
+  403: 'forbidden',
+  404: 'not-found',
+  409: 'conflict',
+  413: 'too-large',
+  415: 'unsupported',
+  422: 'unprocessable',
+  500: 'internal',
+};
+
 export class ApiError extends Error {
-  constructor(message: string, readonly status: number) {
+  readonly code: string;
+
+  constructor(message: string, readonly status: number, code?: string) {
     super(message);
+    this.code = code || STATUS_CODES[status] || (status >= 500 ? 'internal' : 'invalid');
   }
 }
 
@@ -83,9 +99,11 @@ function listOf(raw: unknown, key: string): unknown[] {
 
 async function failure(res: Response): Promise<ApiError> {
   let message = `${res.status} ${res.statusText}`.trim();
+  let code = '';
   try {
     const body = (await res.json()) as unknown;
     if (isObj(body)) {
+      code = str(body.code);
       const d = body.detail ?? body.message ?? body.error;
       if (typeof d === 'string' && d) message = d;
       else if (Array.isArray(d) && d.length && isObj(d[0]) && typeof d[0].msg === 'string') message = d[0].msg;
@@ -93,7 +111,7 @@ async function failure(res: Response): Promise<ApiError> {
   } catch {
     message = message || 'Request failed';
   }
-  return new ApiError(message, res.status);
+  return new ApiError(message, res.status, code);
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

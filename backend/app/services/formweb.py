@@ -6,16 +6,18 @@ from pathlib import Path
 import httpx2
 
 from app.services import intake, settings
+from app.services.codes import default_code
 
 PROBE_TIMEOUT = 2.0
 READ_TIMEOUT = 120.0
 
 
 class FormwebError(Exception):
-    def __init__(self, message: str, status: int = 502) -> None:
+    def __init__(self, message: str, status: int = 502, code: str | None = None) -> None:
         super().__init__(message)
         self.message = message
         self.status = status
+        self.code = code or default_code(status)
 
 
 def base_url() -> str:
@@ -50,9 +52,9 @@ def publications() -> dict:
         with _client(READ_TIMEOUT) as client:
             res = client.get(f"{url}/api/publications")
     except httpx2.HTTPError as exc:
-        raise FormwebError(f"FormWeb is not reachable at {url} ({type(exc).__name__})") from exc
+        raise FormwebError(f"FormWeb is not reachable at {url} ({type(exc).__name__})", 502, "formweb-unreachable") from exc
     if res.status_code != 200:
-        raise FormwebError(f"FormWeb answered {res.status_code} for its publications")
+        raise FormwebError(f"FormWeb answered {res.status_code} for its publications", 502, "formweb-refused")
     try:
         data = res.json()
     except ValueError as exc:
@@ -69,7 +71,7 @@ def download_export() -> tuple[Path, str]:
         with os.fdopen(handle, "wb") as out, _client(READ_TIMEOUT) as client:
             with client.stream("GET", f"{url}/api/export") as res:
                 if res.status_code != 200:
-                    raise FormwebError(f"FormWeb answered {res.status_code} for its export")
+                    raise FormwebError(f"FormWeb answered {res.status_code} for its export", 502, "formweb-refused")
                 for chunk in res.iter_bytes(1024 * 1024):
                     total += len(chunk)
                     if total > intake.MAX_ZIP_BYTES:
@@ -77,7 +79,7 @@ def download_export() -> tuple[Path, str]:
                     out.write(chunk)
     except httpx2.HTTPError as exc:
         target.unlink(missing_ok=True)
-        raise FormwebError(f"FormWeb is not reachable at {url} ({type(exc).__name__})") from exc
+        raise FormwebError(f"FormWeb is not reachable at {url} ({type(exc).__name__})", 502, "formweb-unreachable") from exc
     except BaseException:
         target.unlink(missing_ok=True)
         raise

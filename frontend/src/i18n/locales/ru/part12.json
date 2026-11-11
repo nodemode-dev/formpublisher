@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "Имя сайта состоит из строчных букв, цифр и дефисов и начинается с буквы или цифры.",
+  "A key name is 16 characters from 0 to 9 and a to f.": "Имя ключа состоит из 16 символов от 0 до 9 и от a до f.",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "Сборка размещается по пути <site>/<build id>, где ID сборки состоит из 12 символов от 0 до 9 и от a до f.",
+  "A prepared folder goes at <site>/<build id>/<target>.": "Подготовленная папка размещается по пути <site>/<build id>/<target>."
+}

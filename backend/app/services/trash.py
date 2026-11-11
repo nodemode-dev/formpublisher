@@ -19,10 +19,10 @@ SITE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,100}$")
 _lock = threading.RLock()
 
 
-def _error(message: str, status: int = 400):
+def _error(message: str, status: int = 400, code: str | None = None):
     from app.services.intake import IntakeError
 
-    return IntakeError(message, status)
+    return IntakeError(message, status, code)
 
 
 def _origin_unknown():
@@ -210,8 +210,34 @@ def list_entries() -> dict:
 def _find(entry: str) -> Path:
     found = _entries().get(entry) if isinstance(entry, str) else None
     if found is None:
-        raise _error("trash entry not found", 404)
+        raise _error("trash entry not found", 404, "trash-missing")
     return found
+
+
+KEY_FILE_RE = re.compile(r"^[0-9a-f]{16}\.pem$")
+SHAPES = {
+    "site": "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.",
+    "key": "A key name is 16 characters from 0 to 9 and a to f.",
+    "build": "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.",
+    "prepared": "A prepared folder goes at <site>/<build id>/<target>.",
+}
+
+
+def _shape_ok(kind: str, parts: tuple[str, ...]) -> bool:
+    if kind == "site":
+        return len(parts) == 1 and bool(SITE_ID_RE.match(parts[0]))
+    if kind == "key":
+        return len(parts) == 1 and bool(KEY_FILE_RE.match(parts[0]))
+    if kind == "build":
+        return len(parts) == 2 and bool(SITE_ID_RE.match(parts[0]) and BUILD_ID_RE.match(parts[1]))
+    return len(parts) == 3 and bool(SITE_ID_RE.match(parts[0]) and BUILD_ID_RE.match(parts[1]) and SITE_ID_RE.match(parts[2]))
+
+
+def _settle_site_id(dest: Path) -> None:
+    record = _read_json(dest / "site.json")
+    if isinstance(record, dict) and not (isinstance(record.get("id"), str) and SITE_ID_RE.match(record["id"])):
+        record["id"] = dest.name
+        (dest / "site.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def _free_destination(row: dict, origin: str | None = None) -> tuple[Path, str]:
@@ -221,7 +247,7 @@ def _free_destination(row: dict, origin: str | None = None) -> tuple[Path, str]:
         if origin is None:
             raise _origin_unknown()
         if not isinstance(origin, str) or not origin.strip() or "\x00" in origin:
-            raise _error("origin must be a path inside the data folder, such as sites/my-site")
+            raise _error("origin must be a path inside the data folder, such as sites/my-site", 400, "place-invalid")
         chosen = origin.strip()
         given = True
     base = Path(os.path.abspath(paths.home()))
@@ -229,11 +255,13 @@ def _free_destination(row: dict, origin: str | None = None) -> tuple[Path, str]:
     root = base / ROOTS[row["kind"]]
     if dest == root or root not in dest.parents:
         what = "The origin you gave" if given else "The recorded origin"
-        raise _error(f"{what} is not a valid place for this kind of entry; it has to sit inside {ROOTS[row['kind']]}/.", 409)
+        raise _error(f"{what} is not a valid place for this kind of entry; it has to sit inside {ROOTS[row['kind']]}/.", 409, "place-invalid")
     if row["kind"] == "key" and dest.parent != root:
-        raise _error(f"A key goes straight inside {ROOTS['key']}/, as <key id>.pem.", 409)
+        raise _error(f"A key goes straight inside {ROOTS['key']}/, as <key id>.pem.", 409, "place-invalid")
+    if given and not _shape_ok(row["kind"], dest.relative_to(root).parts):
+        raise _error(SHAPES[row["kind"]], 409, "place-invalid")
     if dest.exists() or dest.is_symlink():
-        raise _error(f"Something already exists at {dest.relative_to(base).as_posix()}; remove or rename it first.", 409)
+        raise _error(f"Something already exists at {dest.relative_to(base).as_posix()}; remove or rename it first.", 409, "place-taken")
     return dest, dest.relative_to(base).as_posix()
 
 
@@ -245,12 +273,12 @@ def _restore_key(entry: Path, row: dict, dest: Path) -> dict:
     except (OSError, ValueError):
         key_row = None
     if not isinstance(key_row, dict) or not isinstance(key_row.get("id"), str):
-        raise _error("The key record in this entry is missing or damaged.", 409)
+        raise _error("The key record in this entry is missing or damaged.", 409, "entry-damaged")
     if (entry / dest.name).name != f"{key_row['id']}.pem" or not (entry / dest.name).is_file():
-        raise _error("The key file is missing from this entry.", 409)
+        raise _error("The key file is missing from this entry.", 409, "entry-damaged")
     with keys._lock:
         if any(r.get("id") == key_row["id"] for r in keys._load()):
-            raise _error("A key with this id already exists.", 409)
+            raise _error("A key with this id already exists.", 409, "place-taken")
         shutil.move(str(entry / dest.name), str(dest))
         os.chmod(dest, 0o600)
         keys._save(keys._load() + [key_row])
@@ -264,21 +292,21 @@ def _reprepare(entry_name: str, row: dict, dest: Path, origin: str) -> dict:
 
     parts = Path(origin).parts
     if len(parts) != 4 or not BUILD_ID_RE.match(parts[2]) or not SITE_ID_RE.match(parts[1]):
-        raise _error("A prepared folder goes at prepared/<site>/<build id>/<target>.", 409)
+        raise _error("A prepared folder goes at prepared/<site>/<build id>/<target>.", 409, "place-invalid")
     site, build_id, target_id = parts[1], parts[2], parts[3]
     try:
         record = package.get_build(build_id)
     except Exception as exc:
         if getattr(exc, "status", None) == 404:
-            raise _error(f"Build {build_id} is no longer here, so {target_id} cannot be prepared again from it. Restore the build from the trash first if it is there.", 409)
+            raise _error(f"Build {build_id} is no longer here, so {target_id} cannot be prepared again from it. Restore the build from the trash first if it is there.", 409, "build-missing")
         raise
     if record.get("site") != site:
-        raise _error(f"Build {build_id} belongs to a different site than {site}, so this entry cannot be prepared again from it.", 409)
+        raise _error(f"Build {build_id} belongs to a different site than {site}, so this entry cannot be prepared again from it.", 409, "place-invalid")
     try:
         publish.prepare(build_id, [target_id])
     except Exception as exc:
         if getattr(exc, "status", None) == 404:
-            raise _error(f"Target {target_id} is not available any more, so it cannot be prepared again.", 409)
+            raise _error(f"Target {target_id} is not available any more, so it cannot be prepared again.", 409, "target-unknown")
         raise
     with _lock:
         entry = _entries().get(entry_name)
@@ -316,6 +344,8 @@ def restore(entry_name: str, origin: str | None = None) -> dict:
             payload = (_meta(entry) or {}).get("payload")
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(str(entry), str(dest))
+            if kind == "site":
+                _settle_site_id(dest)
             if kind == "prepared" and isinstance(payload, dict):
                 (dest.parent / f".{dest.name}.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         entry.with_name(entry.name + SUFFIX).unlink(missing_ok=True)

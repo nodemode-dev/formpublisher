@@ -15,14 +15,14 @@ from app.targets._common import MODEL_FILES, PreparedInput, PreparedResult
 _lock = threading.RLock()
 
 
-def _error(message: str, status: int = 400) -> intake.IntakeError:
-    return intake.IntakeError(message, status)
+def _error(message: str, status: int = 400, code: str | None = None) -> intake.IntakeError:
+    return intake.IntakeError(message, status, code)
 
 
 def _target(target_id: str):
     module = targets.get(target_id) if isinstance(target_id, str) else None
     if module is None:
-        raise _error(f"unknown target: {target_id!r}", 404)
+        raise _error(f"unknown target: {target_id!r}", 404, "target-unknown")
     return module
 
 
@@ -69,11 +69,11 @@ def _load(build_id: str, work: Path, include_model: bool = False) -> PreparedInp
     record = package.get_build(build_id)
     publish = record.get("publish")
     if not isinstance(publish, dict):
-        raise _error("the build has no publish.json", 409)
+        raise _error("the build has no publish.json", 409, "build-damaged")
     archive = package.zip_path(build_id)
     expected = (publish.get("package") or {}).get("sha256")
     if expected and _hash(archive) != expected:
-        raise _error("site.zip no longer matches publish.json; build it again", 409)
+        raise _error("site.zip no longer matches publish.json; build it again", 409, "build-damaged")
     folder = archive.parent
     raw = (folder / "publish.json").read_bytes()
     root = work / "unpacked"
@@ -176,7 +176,7 @@ def _prepared_folder(build_id: str, target_id: str) -> tuple[str, Path]:
     record = package.get_build(build_id)
     folder = _site_dir(record["site"], build_id) / target_id
     if not folder.is_dir():
-        raise _error("nothing is prepared for that build and target", 404)
+        raise _error("nothing is prepared for that build and target", 404, "prepared-missing")
     return record["site"], folder
 
 

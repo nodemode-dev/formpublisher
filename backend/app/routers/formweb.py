@@ -8,7 +8,7 @@ router = APIRouter(prefix="/api/formweb", tags=["formweb"])
 
 
 def _failure(exc: formweb.FormwebError) -> JSONResponse:
-    return JSONResponse({"detail": exc.message}, status_code=exc.status)
+    return JSONResponse({"detail": exc.message, "code": exc.code}, status_code=exc.status)
 
 
 @router.get("/status")

@@ -22,8 +22,8 @@ HEADERS = [
 _lock = threading.RLock()
 
 
-def _error(message: str, status: int = 400) -> intake.IntakeError:
-    return intake.IntakeError(message, status)
+def _error(message: str, status: int = 400, code: str | None = None) -> intake.IntakeError:
+    return intake.IntakeError(message, status, code)
 
 
 def dumps(data: Any) -> str:
@@ -169,12 +169,12 @@ def _assemble(site_id: str, revision: str | None, work: Path) -> dict:
 
 def _find(build_id: str) -> Path:
     if not isinstance(build_id, str) or not ID_RE.match(build_id):
-        raise _error("build not found", 404)
+        raise _error("build not found", 404, "build-missing")
     for site in sorted(paths.builds_dir().iterdir()):
         folder = site / build_id
         if site.is_dir() and not site.name.startswith(".") and (folder / "build.json").is_file():
             return folder
-    raise _error("build not found", 404)
+    raise _error("build not found", 404, "build-missing")
 
 
 def build(site_id: str, revision: str | None = None) -> dict:
@@ -245,7 +245,7 @@ def reproduce(build_id: str) -> dict:
 def zip_path(build_id: str) -> Path:
     target = _find(build_id) / "site.zip"
     if not target.is_file():
-        raise _error("the build has no site.zip", 404)
+        raise _error("the build has no site.zip", 404, "build-damaged")
     return target
 
 

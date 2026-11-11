@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "サイト名には小文字、数字、ハイフンを使い、先頭は文字または数字にします。",
+  "A key name is 16 characters from 0 to 9 and a to f.": "キー名は 0 から 9 と a から f までの 16 文字です。",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "ビルドは <site>/<build id> に置かれます。ビルド ID は 0 から 9 と a から f までの 12 文字です。",
+  "A prepared folder goes at <site>/<build id>/<target>.": "準備済みフォルダは <site>/<build id>/<target> に置かれます。"
+}

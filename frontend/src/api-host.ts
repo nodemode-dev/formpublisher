@@ -25,16 +25,18 @@ const isObj = (v: unknown): v is Json => typeof v === 'object' && v !== null && 
 
 async function failure(res: Response): Promise<ApiError> {
   let message = `${res.status} ${res.statusText}`.trim();
+  let code = '';
   try {
     const body = (await res.json()) as unknown;
     if (isObj(body)) {
+      code = typeof body.code === 'string' ? body.code : '';
       const d = body.detail ?? body.message ?? body.error;
       if (typeof d === 'string' && d) message = d;
     }
   } catch {
     message = message || 'Request failed';
   }
-  return new ApiError(message, res.status);
+  return new ApiError(message, res.status, code);
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

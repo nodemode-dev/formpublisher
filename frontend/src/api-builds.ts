@@ -45,9 +45,11 @@ const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v)
 
 async function failure(res: Response): Promise<ApiError> {
   let message = `${res.status} ${res.statusText}`.trim();
+  let code = '';
   try {
     const body = (await res.json()) as unknown;
     if (isObj(body)) {
+      code = typeof body.code === 'string' ? body.code : '';
       const d = body.detail ?? body.message ?? body.error;
       if (typeof d === 'string' && d) message = d;
       else if (Array.isArray(d) && d.length && isObj(d[0]) && typeof d[0].msg === 'string') message = d[0].msg;
@@ -55,7 +57,7 @@ async function failure(res: Response): Promise<ApiError> {
   } catch {
     message = message || 'Request failed';
   }
-  return new ApiError(message, res.status);
+  return new ApiError(message, res.status, code);
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

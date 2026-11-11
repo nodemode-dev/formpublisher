@@ -10,16 +10,22 @@ from pathlib import Path
 from typing import Any
 
 from app import __version__
+from app.services.codes import default_code
 from app.services import checks, formweb, intake, keys, package, paths, settings
 
 DEEP_WAIT_SECONDS = 900
 
 
 class OpError(Exception):
-    def __init__(self, message: str, code: int = 1) -> None:
+    def __init__(self, message: str, code: int = 1, error_code: str | None = None) -> None:
         super().__init__(message)
         self.message = message
         self.code = code
+        self.error_code = error_code or "invalid"
+
+    def label(self) -> str:
+        """Return the message with its error code in front, as error [code]: detail."""
+        return f"error [{self.error_code}]: {self.message}"
 
 
 def _detail(payload: bytes, status: int) -> str:
@@ -30,6 +36,16 @@ def _detail(payload: bytes, status: int) -> str:
     if isinstance(body, dict) and isinstance(body.get("detail"), str):
         return body["detail"]
     return f"the engine answered {status}"
+
+
+def _error_code(payload: bytes, status: int) -> str:
+    try:
+        body = json.loads(payload)
+    except ValueError:
+        body = None
+    if isinstance(body, dict) and isinstance(body.get("code"), str) and body["code"]:
+        return body["code"]
+    return default_code(status)
 
 
 class Client:
@@ -68,7 +84,7 @@ class Client:
         if isinstance(info, dict) and info.get("app") == "formpublisher":
             return
         if self.explicit:
-            raise OpError(f"no FormPublisher engine is answering at {self.explicit}", 3)
+            raise OpError(f"no FormPublisher engine is answering at {self.explicit}", 3, "engine-unreachable")
         self.url = ""
 
     def describe(self) -> dict:
@@ -80,16 +96,16 @@ class Client:
     def call(self, method: str, path: str, body: Any = None) -> Any:
         status, payload = self._request(method, path, body)
         if status >= 400:
-            raise OpError(_detail(payload, status), 3 if status >= 500 else 1)
+            raise OpError(_detail(payload, status), 3 if status >= 500 else 1, _error_code(payload, status))
         return json.loads(payload) if payload else None
 
     def _local(self, fn, *args):
         try:
             return fn(*args)
         except (intake.IntakeError, formweb.FormwebError) as exc:
-            raise OpError(exc.message) from exc
+            raise OpError(exc.message, 1, exc.code) from exc
         except ValueError as exc:
-            raise OpError(str(exc)) from exc
+            raise OpError(str(exc), 1, "invalid") from exc
 
     def status(self) -> dict:
         self.connect()
@@ -604,7 +620,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             data, say = client.receive_status(), say_receive
     except OpError as exc:
-        print(f"formpublisher: {exc.message}", file=sys.stderr)
+        print(exc.label(), file=sys.stderr)
         return exc.code
     print(json.dumps(data, indent=2) if args.json else say(data))
     return 1 if args.command == "verify" and not data.get("valid") else 0

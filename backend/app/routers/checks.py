@@ -84,7 +84,7 @@ async def run_checks(body: RunBody):
     site, revision = body.site, root.name
     widths = _widths(body.widths)
     if site in _running:
-        raise intake.IntakeError("a check is already running for this site", 409)
+        raise intake.IntakeError("a check is already running for this site", 409, "check-running")
     run = uuid.uuid4().hex[:12]
     _running[site] = run
     tiers = set(body.tiers)

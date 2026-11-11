@@ -25,6 +25,7 @@ It imports FormWeb sites, previews them on device sizes, checks them, builds sig
 - [The command line](#the-command-line)
 - [The MCP server](#the-mcp-server)
 - [Settings and the data folder](#settings-and-the-data-folder)
+- [Error codes](#error-codes)
 - [When something goes wrong](#when-something-goes-wrong)
 
 ## Getting started
@@ -76,7 +77,13 @@ Removing a site, a build, a signing key or a prepared folder moves it to `trash/
 
 A restore only goes ahead when the place is free: if something already sits at the origin (or a key with the same id exists) it answers 409 with the reason, and the window shows it as a notice. Entries moved to the trash before 0.1.4 have no record. Their kind and origin are inferred from the name: a site from its `site.json` id, a key from its `entry.json`, a build from `build-[site]-[12 hex]-[stamp]`, and a prepared folder from `prepared-[site]-[build]-[target]-[stamp]`, matched against the known targets and the build id. A stamp may end in a `-N` counter. The list marks such rows as inferred, and they restore like any other. A prepared folder from before 0.1.4 lost its hidden record, so restoring it prepares the same target again from its build, which gives the same folder; if the build is gone or is itself in the trash, the restore answers 409 naming it.
 
-An entry whose origin cannot be recorded or inferred answers 409 with the code `origin-unknown`. Restore it to a named place: the window opens a "Where does it go" dialog that shows the kind's own folder as a fixed prefix and asks for the name, a key getting `.pem` added. The engine's refusal shows inside the dialog, which stays open until the name is accepted. The same restore is `POST /api/trash/{entry}/restore` with the body `{"origin": "..."}` and `trash restore ENTRY --to PATH` on the command line. The origin is used only when none is recorded or inferred, it must be free, and it must resolve inside the kind's own folder (a key directly in `keys/`); a path that leaves it, an absolute path, one of another kind or a taken place is refused.
+An entry whose origin cannot be recorded or inferred answers 409 with the code `origin-unknown`. Restore it to a named place: the window opens a "Where does it go" dialog that shows the kind's own folder as a fixed prefix and asks for the name, a key getting `.pem` added. The engine's refusal shows inside the dialog, which stays open until the name is accepted.
+
+The dialog checks the shape of the name before it asks, and the engine applies the same rule (a wrong shape answers 409 `place-invalid`). A site is lowercase letters, digits and hyphens. A key is 16 hex characters. A build is `<site>/<12-hex build id>`. A prepared folder is `<site>/<build id>/<target>`. A restored site whose `site.json` had no id gets its folder name as id.
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="images/trash-origin-dark.webp"><img alt="The Where does it go dialog with the kind's folder as a prefix and a name field" src="images/trash-origin-light.webp"></picture>
+
+The restore answer also carries `message`, kept for older callers. The same restore is `POST /api/trash/{entry}/restore` with the body `{"origin": "..."}` and `trash restore ENTRY --to PATH` on the command line. The origin is used only when none is recorded or inferred, it must be free, and it must resolve inside the kind's own folder (a key directly in `keys/`); a path that leaves it, an absolute path, one of another kind or a taken place is refused.
 
 ![The Trash page with a removed site, key and build](images/trash-light.webp)
 
@@ -105,7 +112,7 @@ How the host resolves a request:
 - `/a/b` is the file `a/b`, then `a/b/index.html`, then `a/b.html`; `/a/b/` is `a/b/index.html`; `/` is `index.html`. Query strings are ignored.
 - Paths with `..`, a backslash or a NUL byte are refused (400); symlinks that leave the revision are not followed.
 - `redirects.json` applies when no file matches: 301, 302, 307 and 308 answer with `Location`, 200 rewrites to the target, and a trailing `*` in `from` becomes `:splat` in `to`.
-- A missing path answers with the root `404.html` (status 404), or plain text.
+- A missing path answers with the root `404.html` (status 404). When there is no `404.html` it answers with `404/index.html`, where FormWeb puts its 404 page, and otherwise plain text.
 - Single-range requests answer 206, or 416 when unsatisfiable. Every response carries `Cache-Control: no-store`, `X-Content-Type-Options: nosniff` and `Referrer-Policy: strict-origin-when-cross-origin`.
 - Only `GET` and `HEAD` are accepted, and only for `127.0.0.1:[port]` or `localhost:[port]` as Host.
 
@@ -130,7 +137,7 @@ The routes strip shows a thumbnail box and a status dot per route: none when not
 
 ## Checks
 
-Checks produce problems. Each problem has an id (stable for the same finding, and for a deep problem the same on every run: the id hashes the failing URL with the site host's port left out, so a new run on a new port gives the same ids; messages and the url field still show the real address), a tier (`static`, `live` or `deep`), a severity (`error`, `warning`, `info`), a code, the route, a message and a fix, and optionally the file, line, selector and URL. The Problems tab lists them with filters by severity and tier, and clicking a row selects its route. Counts show in the tab and the status bar. Run checks starts the static tier; Deep check starts the deep tier.
+Checks produce problems. Each problem has an id (stable for the same finding, and for a deep problem the same on every run: the id hashes the failing URL with the site host's port left out, so a new run on a new port gives the same ids. Since 0.1.4 the URL is hashed with the host normalized, so the ids of `deep.request` problems differ from those of 0.1.3 and earlier; a check of the same site (redirects, clean URLs, a directory index and a custom 404 page) gives the same problems, summaries and thumbnails otherwise; messages and the url field still show the real address), a tier (`static`, `live` or `deep`), a severity (`error`, `warning`, `info`), a code, the route, a message and a fix, and optionally the file, line, selector and URL. The Problems tab lists them with filters by severity and tier, and clicking a row selects its route. Counts show in the tab and the status bar. Run checks starts the static tier; Deep check starts the deep tier.
 
 ### Static tier
 
@@ -202,7 +209,7 @@ Each build lives in `builds/[site]/[id]/`:
 
 ```json
 {
-  "builtWith": "FormPublisher 0.1.5",
+  "builtWith": "FormPublisher 0.1.6",
   "checks": { "errors": 0, "infos": 0, "tiers": ["static"], "warnings": 0 },
   "files": [ { "path": "index.html", "sha256": "...", "size": 1024 } ],
   "format": "formpublisher-site",
@@ -374,6 +381,46 @@ There is no tool that deletes. Deleting an entry for good or emptying the trash 
 ## Settings and the data folder
 
 Everything is kept in `~/FormPublisher`, or in the folder named by `FORMPUBLISHER_HOME`: `sites/` (imports), `checks/` (results and thumbnails), `builds/` (packages), `prepared/` (the folders Publish writes), `inbox/` (files FormWeb leaves for FormPublisher, each with its `.json` metadata), `keys/` (signing keys), `trash/` (removed items and their `.trash.json` records), `engine.json` (the running engine's app, port, pid, version and start time) and `settings.json`. The engine port is `FORMPUBLISHER_PORT` (8280 by default) and the site host port is `FORMPUBLISHER_HOST_PORT` (8281). The interface is in 26 languages.
+
+## Error codes
+
+Every JSON error answer is `{"detail": "...", "code": "..."}`. The detail is for people. The code is stable, so a script can branch on it. The command line prints `error [code]: detail` and exits 1, or 3 when the engine cannot be reached. MCP tool errors start with the same label.
+
+When no specific code is given, the code follows the status:
+
+| Status | Code |
+| --- | --- |
+| 400, 405, 421 and 422 validation errors | `invalid` |
+| 401 | `unauthorized` |
+| 403 | `forbidden` |
+| 404 | `not-found` |
+| 409 | `conflict` |
+| 413 | `too-large` |
+| 415 | `unsupported` |
+| 422 | `unprocessable` |
+| 500 | `internal` |
+| 502 | `upstream` |
+| 503 | `unavailable` |
+| 504 | `timeout` |
+
+Specific codes:
+
+| Code | Meaning |
+| --- | --- |
+| `not-a-site` | the source has no `routes.json` or `index.html` |
+| `path-missing` | the import path does not exist |
+| `site-missing`, `revision-missing`, `build-missing`, `key-missing`, `trash-missing`, `prepared-missing` | the thing is not there |
+| `target-unknown` | no such publish target |
+| `build-damaged` | a build lost its `site.zip` or `publish.json`, or the zip no longer matches |
+| `core-missing` | `formweb-core` is not installed (422) |
+| `passphrase-required`, `passphrase-wrong` | signing with a locked key |
+| `check-running` | a check is already running for the site (409) |
+| `formweb-unreachable`, `formweb-refused` | FormWeb did not answer, or answered with an error (502) |
+| `origin-unknown` | a trash restore needs a place (409) |
+| `place-invalid` | the restore place has the wrong shape or folder |
+| `place-taken` | something already sits there, or a key with that id exists |
+| `entry-damaged` | a trashed key's record or file is damaged |
+| `engine-unreachable` | the engine did not answer (command line only) |
 
 ## When something goes wrong
 

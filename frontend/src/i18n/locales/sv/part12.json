@@ -1,0 +1,6 @@
+{
+  "A site name uses lowercase letters, digits and hyphens, and starts with a letter or a digit.": "Ett webbplatsnamn består av små bokstäver, siffror och bindestreck och börjar med en bokstav eller en siffra.",
+  "A key name is 16 characters from 0 to 9 and a to f.": "Ett nyckelnamn är 16 tecken från 0 till 9 och a till f.",
+  "A build goes at <site>/<build id>, where the build id is 12 characters from 0 to 9 and a to f.": "Ett bygge placeras i <site>/<build id>, där bygg-id:t är 12 tecken från 0 till 9 och a till f.",
+  "A prepared folder goes at <site>/<build id>/<target>.": "En förberedd mapp placeras i <site>/<build id>/<target>."
+}
