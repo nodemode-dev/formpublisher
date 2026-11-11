@@ -47,7 +47,18 @@ def port() -> int:
     return value if 0 < value < 65536 else DEFAULT_PORT
 
 
+_host_port_override: int | None = None
+
+
+def set_host_port(value: int | None) -> None:
+    """Make the port the site host really bound the effective one for the whole engine."""
+    global _host_port_override
+    _host_port_override = value
+
+
 def host_port() -> int:
+    if _host_port_override:
+        return _host_port_override
     raw = os.environ.get("FORMPUBLISHER_HOST_PORT", "").strip()
     try:
         value = int(raw) if raw else DEFAULT_HOST_PORT
@@ -124,6 +135,7 @@ def write_engine_file(version: str) -> None:
     record = {
         "app": "formpublisher",
         "port": port(),
+        "hostPort": host_port(),
         "pid": os.getpid(),
         "version": version,
         "started": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),

@@ -1,5 +1,6 @@
 import type { PreviewMotion, PreviewTheme, PreviewThrottle } from '../api-host';
 import { emit } from '../events';
+import { t } from '../i18n';
 import { q, setDisabled } from './dom';
 import { icon } from './icons';
 
@@ -116,6 +117,7 @@ export class Toolbar {
   private readonly selects: HTMLSelectElement[];
   private readonly probe: HTMLSelectElement;
   private rowWidth = Infinity;
+  private compact = false;
 
   constructor(private readonly host: HTMLElement, private readonly hooks: ToolbarHooks) {
     host.insertAdjacentHTML('beforeend', CONTROLS);
@@ -168,6 +170,7 @@ export class Toolbar {
         this.state.height = h;
       }
       this.state.device = d;
+      this.deviceTitle();
       this.commit('view');
     });
     const size = (input: HTMLInputElement, key: 'width' | 'height'): void => {
@@ -211,31 +214,53 @@ export class Toolbar {
       this.host.classList.toggle('is-tight', stage >= 2);
       this.host.classList.toggle('is-short', stage >= 3);
       this.host.classList.toggle('is-micro', stage >= 4);
-      this.paint(stage >= 1, stage >= 3);
+      this.paint(stage >= 3);
       if (stage >= 4 || this.host.scrollWidth <= this.host.clientWidth) break;
       stage += 1;
     }
   }
 
-  private paint(sized: boolean, compact: boolean): void {
+  private measure(text: string): number {
+    this.probe.options[0].text = text;
+    return this.probe.getBoundingClientRect().width;
+  }
+
+  private customShort(s: HTMLSelectElement, full: string): string {
+    const other = t('Other');
+    if (other === 'Other') return '';
+    let presets = 0;
+    for (const o of Array.from(s.options)) {
+      if (o.value !== 'custom') presets = Math.max(presets, this.measure(shortLabel('device', o.text)));
+    }
+    return this.measure(full) > presets + 0.5 ? other : '';
+  }
+
+  private deviceTitle(): void {
+    const base = this.device.getAttribute('aria-label') ?? '';
+    const o = this.device.selectedOptions[0];
+    const title = this.compact && o ? `${base}: ${o.text}` : base;
+    if (this.device.title !== title) this.device.title = title;
+  }
+
+  private paint(compact: boolean): void {
+    this.compact = compact;
     for (const s of this.selects) {
       const ctl = s.dataset.ctl ?? '';
       for (const o of Array.from(s.options)) {
-        const short = compact ? shortLabel(ctl, o.text) : '';
+        let short = compact ? shortLabel(ctl, o.text) : '';
+        if (compact && ctl === 'device' && o.value === 'custom') short = this.customShort(s, o.text);
         if (short && short !== o.text) { if (o.label !== short) o.label = short; } else if (o.hasAttribute('label')) o.removeAttribute('label');
       }
-      if (sized && s.options.length) {
+      if (s.options.length) {
         let widest = 0;
-        for (const o of Array.from(s.options)) {
-          this.probe.options[0].text = o.label;
-          widest = Math.max(widest, this.probe.getBoundingClientRect().width);
-        }
+        for (const o of Array.from(s.options)) widest = Math.max(widest, this.measure(o.label));
         const px = `${Math.ceil(widest)}px`;
         if (s.style.width !== px) s.style.width = px;
       } else if (s.style.width) {
         s.style.removeProperty('width');
       }
     }
+    this.deviceTitle();
   }
 
   current(): PreviewState {
@@ -260,6 +285,7 @@ export class Toolbar {
   private paintControls(): void {
     const s = this.state;
     if (this.device.value !== s.device) this.device.value = s.device;
+    this.deviceTitle();
     if (this.width.value !== String(s.width)) this.width.value = String(s.width);
     if (this.height.value !== String(s.height)) this.height.value = String(s.height);
     if (this.zoom.value !== s.zoom) this.zoom.value = s.zoom;
