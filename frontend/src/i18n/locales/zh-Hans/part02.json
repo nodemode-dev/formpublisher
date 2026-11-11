@@ -48,7 +48,7 @@
   "FormWeb": "FormWeb",
   "About": "关于",
   "Language": "语言",
-  "The window reloads in the language you choose.": "窗口将以所选语言重新加载。",
+  "The window changes to the language you choose.": "窗口会立即切换为所选语言。",
   "Theme": "主题",
   "Accent colour": "强调色",
   "Custom accent colour": "自定义强调色",

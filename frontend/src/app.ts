@@ -1,7 +1,7 @@
 import { api, ApiError, connectLive, type LiveEvent, type LiveState, type RouteInfo, type Site } from './api';
 import type { App, AppState, BottomTab, EngineState, Mounts, OpenTab, Pane } from './app-api';
 import { emit, type NoticeKind } from './events';
-import { locale } from './i18n';
+import { locale, onLanguage } from './i18n';
 import { brandMark } from './ui/brand';
 import { inTauri, mountOnce, q,setAttr, setClass, setDisabled, setHidden, setText, setTitle, setValue } from './ui/dom';
 import { installHints } from './ui/hint-strip';
@@ -253,6 +253,8 @@ export async function startApp(): Promise<App> {
     setText(field('routes'), count === null ? '-' : String(count));
     setText(field('size'), st.site ? formatSize(st.site.size) : '-');
   };
+
+  onLanguage(() => { setText(field('imported'), st.site ? formatDate(st.site.importedAt) : '-'); });
 
   const paintRoutes = (): void => {
     routeList.setSite(st.activeId);

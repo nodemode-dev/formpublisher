@@ -48,7 +48,7 @@
   "FormWeb": "FormWeb",
   "About": "О программе",
   "Language": "Язык",
-  "The window reloads in the language you choose.": "Окно перезагрузится на выбранном языке.",
+  "The window changes to the language you choose.": "Окно сразу переключится на выбранный язык.",
   "Theme": "Тема",
   "Accent colour": "Цвет акцента",
   "Custom accent colour": "Свой цвет акцента",

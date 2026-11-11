@@ -48,7 +48,7 @@
   "FormWeb": "FormWeb",
   "About": "情報",
   "Language": "言語",
-  "The window reloads in the language you choose.": "選択した言語でウィンドウが再読み込みされます。",
+  "The window changes to the language you choose.": "ウィンドウがすぐに選択した言語に切り替わります。",
   "Theme": "テーマ",
   "Accent colour": "アクセントカラー",
   "Custom accent colour": "カスタムアクセントカラー",

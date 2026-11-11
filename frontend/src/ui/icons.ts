@@ -20,6 +20,7 @@ export const ICONS: Record<string, string> = {
   chevronDown: L('<path d="M6 9.5l6 6 6-6"/>'),
   routes: L('<circle cx="6" cy="6.5" r="2"/><circle cx="6" cy="17.5" r="2"/><circle cx="18" cy="12" r="2"/><path d="M8 6.5h3a3 3 0 0 1 3 3v.5M8 17.5h3a3 3 0 0 0 3-3V14"/>'),
   terminal: L('<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M7.5 9.5l3 2.5-3 2.5M12.5 15h4"/>'),
+  filter: L('<path d="M4 5.5h16l-6.2 7.3v5.2l-3.6 1.8v-7z"/>'),
   publish: L('<path d="M12 15.5V4.5M7.5 9L12 4.5 16.5 9"/><path d="M5 14.5v3A2 2 0 0 0 7 19.5h10a2 2 0 0 0 2-2v-3"/>'),
 };
 

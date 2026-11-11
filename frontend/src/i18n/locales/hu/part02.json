@@ -48,7 +48,7 @@
   "FormWeb": "FormWeb",
   "About": "Névjegy",
   "Language": "Nyelv",
-  "The window reloads in the language you choose.": "Az ablak a kiválasztott nyelven töltődik újra.",
+  "The window changes to the language you choose.": "Az ablak azonnal a kiválasztott nyelvre vált.",
   "Theme": "Téma",
   "Accent colour": "Kiemelőszín",
   "Custom accent colour": "Egyéni kiemelőszín",

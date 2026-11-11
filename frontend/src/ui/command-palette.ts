@@ -1,4 +1,4 @@
-import { t } from '../i18n';
+import { onLanguage, t } from '../i18n';
 import type { Command, Commands } from './commands';
 import { Dialog } from './dialogs';
 import { el, q, setClass, setHidden, setText } from './dom';
@@ -38,6 +38,7 @@ export class CommandPalette extends Dialog {
       this.listEl.appendChild(row);
       this.entries.push(entry);
     }
+    onLanguage(() => this.relabel());
     this.input.addEventListener('input', () => this.filter());
     this.input.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -51,7 +52,7 @@ export class CommandPalette extends Dialog {
     });
   }
 
-  show(): void {
+  private relabel(): void {
     for (const en of this.entries) {
       en.text = t(this.commands.label(en.cmd));
       const group = t(en.cmd.group ?? '');
@@ -60,6 +61,10 @@ export class CommandPalette extends Dialog {
       setText(en.group, group);
       setText(en.keys, this.commands.keyLabel(en.cmd));
     }
+  }
+
+  show(): void {
+    this.relabel();
     this.input.value = '';
     this.filter();
     this.open(this.input);

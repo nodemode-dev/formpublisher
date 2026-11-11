@@ -1,5 +1,5 @@
 import '../styles/shortcuts.css';
-import { t } from '../i18n';
+import { onLanguage, t } from '../i18n';
 import { comboOf, formatKeys, rejectCombo, type Command, type Commands } from './commands';
 import { Dialog } from './dialogs';
 import { el, q, setAttr, setClass, setDisabled, setText } from './dom';
@@ -60,6 +60,7 @@ export class ShortcutsDialog extends Dialog {
     }, true);
     this.onClose = () => { this.stop(); this.dismiss(); };
     commands.onChange(() => this.paint());
+    onLanguage(() => this.paint());
   }
 
   show(): void {

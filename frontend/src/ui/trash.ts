@@ -3,6 +3,7 @@ import { ApiError } from '../api';
 import { OriginUnknownError, TRASH_ROOT, trashApi, type TrashEntry, type TrashKind } from '../api-trash';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
+import { onLanguage } from '../i18n';
 import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
@@ -154,6 +155,7 @@ export class TrashPage {
     this.list = q(host, '.fp-tr-list');
     this.emptyBtn = q<HTMLButtonElement>(host, '[data-t="empty"]');
     this.wire();
+    onLanguage(() => this.paint());
   }
 
   async refresh(): Promise<void> {
