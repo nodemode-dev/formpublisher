@@ -1,0 +1,21 @@
+{
+  "Demos": "เดโม",
+  "Demo": "เดโม",
+  "FormPublisher demo": "เดโม FormPublisher",
+  "Try it on a sample site": "ลองกับไซต์ตัวอย่าง",
+  "Bundled sample site": "ไซต์ตัวอย่างที่มาพร้อมกัน",
+  "The sample site could not be opened": "เปิดไซต์ตัวอย่างไม่ได้",
+  "The bundled sample site is missing from this install": "ไม่พบไซต์ตัวอย่างที่มาพร้อมกันในการติดตั้งนี้",
+  "Quick tour": "ทัวร์สั้น ๆ",
+  "Skip the tour": "ข้ามทัวร์",
+  "Back": "ย้อนกลับ",
+  "Next": "ถัดไป",
+  "Done": "เสร็จสิ้น",
+  "Step {0} of {1}": "ขั้นตอนที่ {0} จาก {1}",
+  "Preview": "ตัวอย่าง",
+  "Checks": "การตรวจสอบ",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "ทุกเส้นทางจะแสดงที่นี่ตามความกว้างอุปกรณ์ที่คุณเลือก คลิกเส้นทางทางซ้ายเพื่อเลื่อนดูไปทั่วไซต์",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "เปิดแผงเพื่อรันการตรวจสอบ รายการปัญหาจะแสดงลิงก์เสียและรายละเอียดที่ขาดหายไป พร้อมบอกวิธีแก้ไขแต่ละข้อ",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "แพ็กเกจจะรวมไซต์เป็นไฟล์ zip เดียวที่สร้างซ้ำได้ พร้อมแฮชของทุกไฟล์ และพร้อมให้ลงนาม",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "เผยแพร่จะเขียนโฟลเดอร์และคำสั่งที่ถูกต้องสำหรับแต่ละโฮสต์ FormPublisher ไม่อัปโหลดอะไรเลย"
+}

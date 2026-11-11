@@ -29,6 +29,7 @@ if [ ! -f "$ROOT/frontend/dist/index.html" ]; then
 fi
 data=(--add-data "$ROOT/frontend/dist${sep}frontend_dist" --add-data "$ROOT/backend/app/static${sep}app/static")
 [ -d "$ROOT/docs" ] && data+=(--add-data "$ROOT/docs${sep}docs")
+[ -f "$ROOT/demo/sample-site.zip" ] && data+=(--add-data "$ROOT/demo/sample-site.zip${sep}demo")
 cd "$ROOT/backend"
 rm -rf build/pyinstaller dist-engine
 "$py" -m PyInstaller --noconfirm --clean --onefile --name formpublisher-engine \

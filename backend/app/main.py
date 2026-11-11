@@ -64,10 +64,14 @@ class LocalAccess:
 async def lifespan(app: FastAPI):
     bus.attach(asyncio.get_running_loop())
     paths.ensure_layout()
+    from app.services import inbox
+
     host_server, host_task = await site_host.start()
+    inbox.start()
     try:
         yield
     finally:
+        inbox.stop()
         await site_host.stop(host_server, host_task)
 
 

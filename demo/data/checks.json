@@ -1,0 +1,54 @@
+{
+  "problems": [
+    {
+      "code": "link.broken",
+      "file": "about/index.html",
+      "fix": "Remove the link or add the page in FormWeb.",
+      "id": "static:link.broken:about/index.html:2",
+      "line": 2,
+      "message": "The link to /missing has no page.",
+      "route": "/about/index.html",
+      "selector": "a[href=\"/missing\"]",
+      "severity": "error",
+      "tier": "static",
+      "url": "/missing"
+    },
+    {
+      "code": "heading.h1",
+      "file": "index.html",
+      "fix": "Use exactly one h1 heading per page.",
+      "id": "static:heading.h1:index.html:2",
+      "line": 2,
+      "message": "The page has 2 h1 headings.",
+      "route": "/index.html",
+      "severity": "warning",
+      "tier": "static"
+    },
+    {
+      "code": "heading.h1",
+      "file": "product/index.html",
+      "fix": "Use exactly one h1 heading per page.",
+      "id": "static:heading.h1:product/index.html:2",
+      "line": 2,
+      "message": "The page has 2 h1 headings.",
+      "route": "/product/index.html",
+      "severity": "warning",
+      "tier": "static"
+    }
+  ],
+  "running": null,
+  "summary": {
+    "errors": 1,
+    "infos": 0,
+    "ran": [
+      "static"
+    ],
+    "tiers": {
+      "deep": 0,
+      "live": 0,
+      "static": 3
+    },
+    "warnings": 2
+  },
+  "thumbs": {}
+}

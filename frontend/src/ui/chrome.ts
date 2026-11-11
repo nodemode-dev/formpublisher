@@ -151,6 +151,7 @@ export function installChrome(app: App): Chrome {
     tab('view.network', 'Network', 'globe', 'network'),
 
     { id: 'site.package', label: 'Package Site...', keys: ['Shift+Mod+B'], icon: 'package', group: 'Site', menu: 'File', description: 'Build, sign and verify a package of the open site', enabled: () => hasSite() && engineUp(), run: () => openPackageSheet(app) },
+    { id: 'publish.open', label: 'Publish Site...', icon: 'publish', group: 'Site', menu: 'File', description: 'Prepare a folder and the commands for each host', enabled: () => hasSite() && engineUp(), run: () => { emit('fp:publish', { source: 'palette' }); } },
     { id: 'site.check', label: 'Run Checks', icon: 'check', group: 'Site', menu: 'Site', description: 'Run the static checks on the open site', enabled: () => hasSite() && engineUp(), run: () => runChecks(app, false) },
     { id: 'site.check-deep', label: 'Run Deep Checks', icon: 'check', group: 'Site', menu: 'Site', description: 'Run the static and deep checks in a headless browser', enabled: () => hasSite() && engineUp(), run: () => runChecks(app, true) },
     {
@@ -199,7 +200,7 @@ export function installChrome(app: App): Chrome {
   commands.onError = (_cmd, error) => notice('error', error instanceof Error && error.message ? error.message : 'Request failed');
 
   const menuDefs = (native: boolean): MenuDef[] => [
-    { label: 'File', items: ['file.open-zip', 'file.open-folder', 'file.import-formweb', '-', 'file.new-window', 'file.close-tab', '-', 'site.package', ...(native ? [] : ['-', 'app.preferences'])] },
+    { label: 'File', items: ['file.open-zip', 'file.open-folder', 'file.import-formweb', '-', 'file.new-window', 'file.close-tab', '-', 'site.package', 'publish.open', ...(native ? [] : ['-', 'app.preferences'])] },
     { label: 'Edit', items: ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.select-all'] },
     { label: 'View', items: ['view.home', 'view.builds', 'view.palette', '-', 'view.theme', { label: 'Density', items: ['view.density-compact', 'view.density-regular', 'view.density-comfortable'] }, '-', 'view.toggle-routes', 'view.toggle-inspector', 'view.toggle-bottom', '-', 'view.problems', 'view.console', 'view.network'] },
     { label: 'Site', items: ['site.check', 'site.check-deep', '-', 'site.reload-routes', 'site.reveal-folder', '-', 'site.remove'] },

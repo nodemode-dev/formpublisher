@@ -1,0 +1,21 @@
+{
+  "Demos": "示範",
+  "Demo": "示範",
+  "FormPublisher demo": "FormPublisher 示範",
+  "Try it on a sample site": "用範例網站試試看",
+  "Bundled sample site": "內建範例網站",
+  "The sample site could not be opened": "無法開啟範例網站",
+  "The bundled sample site is missing from this install": "此安裝中缺少內建範例網站",
+  "Quick tour": "快速導覽",
+  "Skip the tour": "略過導覽",
+  "Back": "上一步",
+  "Next": "下一步",
+  "Done": "完成",
+  "Step {0} of {1}": "第 {0} 步，共 {1} 步",
+  "Preview": "預覽",
+  "Checks": "檢查",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "每個路由都會依您選擇的裝置寬度顯示在這裡。點選左側的路由即可在網站中瀏覽。",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "開啟面板以執行檢查。問題清單會列出失效連結與缺少的資訊，並說明如何修正。",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "封裝會把網站變成一個可重現的 zip，並為每個檔案產生雜湊值，隨時可以簽署。",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "發布會為每個主機服務寫出資料夾和確切的指令。FormPublisher 不會上傳任何內容。"
+}

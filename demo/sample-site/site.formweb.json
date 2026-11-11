@@ -1,0 +1,7240 @@
+{
+  "schemaVersion": 1,
+  "id": "site-4a103361ea7e8c6b48be3803d3a06884",
+  "name": "Northwind Notes",
+  "pages": [
+    {
+      "id": "home",
+      "name": "Home",
+      "slug": "/",
+      "root": "root",
+      "seo": {
+        "title": "Northwind Notes",
+        "description": "Northwind Notes keeps every note as a plain file in a folder you choose.",
+        "noindex": false
+      }
+    },
+    {
+      "id": "page-1",
+      "name": "Product",
+      "slug": "/product",
+      "root": "page-root-1",
+      "seo": {
+        "title": "Product - Northwind Notes",
+        "description": "Write, link and export: how Northwind Notes works.",
+        "noindex": false
+      }
+    },
+    {
+      "id": "page-2",
+      "name": "About",
+      "slug": "/about",
+      "root": "page-root-2",
+      "seo": {
+        "title": "About - Northwind Notes",
+        "description": "Northwind Notes is a made-up product that gives FormPublisher a sample site.",
+        "noindex": false
+      }
+    },
+    {
+      "id": "page-3",
+      "name": "Not found",
+      "slug": "/404",
+      "root": "page-root-3",
+      "seo": {
+        "title": "Not found - Northwind Notes",
+        "description": "This page is not here.",
+        "noindex": true
+      }
+    }
+  ],
+  "nodes": {
+    "a1-3df0ba": {
+      "id": "a1-3df0ba",
+      "tag": "div",
+      "name": "Answer 1 panel",
+      "text": "",
+      "children": [
+        "a1-in-3df0ba"
+      ],
+      "attrs": {
+        "role": "region"
+      },
+      "styles": {
+        "opacity": "var(--fw-v-faq_open1)",
+        "transition": "grid-template-rows 700ms var(--ease-out), opacity 700ms var(--ease-out)"
+      },
+      "breakpoints": {}
+    },
+    "a1-in-3df0ba": {
+      "id": "a1-in-3df0ba",
+      "tag": "div",
+      "name": "Answer 1 content",
+      "text": "",
+      "children": [
+        "elbow1-3df0ba",
+        "a1-p-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "flex-start",
+        "color": "var(--ink-soft)",
+        "display": "flex",
+        "gap": "var(--sp-2)",
+        "padding": "0 var(--sp-5) var(--sp-5) calc(var(--sp-5) + 29px)"
+      },
+      "breakpoints": {
+        "mobile": {
+          "padding": "0 var(--sp-3) var(--sp-3) calc(var(--sp-3) + 29px)"
+        }
+      }
+    },
+    "a1-p-3df0ba": {
+      "id": "a1-p-3df0ba",
+      "tag": "p",
+      "name": "Answer 1 text",
+      "text": "In a folder you choose, one plain text file for each note. There is no database and no account.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "line-height": "20px",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "a2-3df0ba": {
+      "id": "a2-3df0ba",
+      "tag": "div",
+      "name": "Answer 2 panel",
+      "text": "",
+      "children": [
+        "a2-in-3df0ba"
+      ],
+      "attrs": {
+        "role": "region"
+      },
+      "styles": {
+        "opacity": "var(--fw-v-faq_open2)",
+        "transition": "grid-template-rows 700ms var(--ease-out), opacity 700ms var(--ease-out)"
+      },
+      "breakpoints": {}
+    },
+    "a2-in-3df0ba": {
+      "id": "a2-in-3df0ba",
+      "tag": "div",
+      "name": "Answer 2 content",
+      "text": "",
+      "children": [
+        "elbow2-3df0ba",
+        "a2-p-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "flex-start",
+        "color": "var(--ink-soft)",
+        "display": "flex",
+        "gap": "var(--sp-2)",
+        "padding": "0 var(--sp-5) var(--sp-5) calc(var(--sp-5) + 29px)"
+      },
+      "breakpoints": {
+        "mobile": {
+          "padding": "0 var(--sp-3) var(--sp-3) calc(var(--sp-3) + 29px)"
+        }
+      }
+    },
+    "a2-p-3df0ba": {
+      "id": "a2-p-3df0ba",
+      "tag": "p",
+      "name": "Answer 2 text",
+      "text": "Yes. Any editor that opens text files can open your notes, and Northwind Notes picks up the changes at once.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "line-height": "20px",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "a3-3df0ba": {
+      "id": "a3-3df0ba",
+      "tag": "div",
+      "name": "Answer 3 panel",
+      "text": "",
+      "children": [
+        "a3-in-3df0ba"
+      ],
+      "attrs": {
+        "role": "region"
+      },
+      "styles": {
+        "opacity": "var(--fw-v-faq_open3)",
+        "transition": "grid-template-rows 700ms var(--ease-out), opacity 700ms var(--ease-out)"
+      },
+      "breakpoints": {}
+    },
+    "a3-in-3df0ba": {
+      "id": "a3-in-3df0ba",
+      "tag": "div",
+      "name": "Answer 3 content",
+      "text": "",
+      "children": [
+        "elbow3-3df0ba",
+        "a3-p-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "flex-start",
+        "color": "var(--ink-soft)",
+        "display": "flex",
+        "gap": "var(--sp-2)",
+        "padding": "0 var(--sp-5) var(--sp-5) calc(var(--sp-5) + 29px)"
+      },
+      "breakpoints": {
+        "mobile": {
+          "padding": "0 var(--sp-3) var(--sp-3) calc(var(--sp-3) + 29px)"
+        }
+      }
+    },
+    "a3-p-3df0ba": {
+      "id": "a3-p-3df0ba",
+      "tag": "p",
+      "name": "Answer 3 text",
+      "text": "It never needs a network. The sample site you are reading is a static export and needs none either.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "line-height": "20px",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "a4-3df0ba": {
+      "id": "a4-3df0ba",
+      "tag": "div",
+      "name": "Answer 4 panel",
+      "text": "",
+      "children": [
+        "a4-in-3df0ba"
+      ],
+      "attrs": {
+        "role": "region"
+      },
+      "styles": {
+        "opacity": "var(--fw-v-faq_open4)",
+        "transition": "grid-template-rows 700ms var(--ease-out), opacity 700ms var(--ease-out)"
+      },
+      "breakpoints": {}
+    },
+    "a4-in-3df0ba": {
+      "id": "a4-in-3df0ba",
+      "tag": "div",
+      "name": "Answer 4 content",
+      "text": "",
+      "children": [
+        "elbow4-3df0ba",
+        "a4-p-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "flex-start",
+        "color": "var(--ink-soft)",
+        "display": "flex",
+        "gap": "var(--sp-2)",
+        "padding": "0 var(--sp-5) var(--sp-5) calc(var(--sp-5) + 29px)"
+      },
+      "breakpoints": {
+        "mobile": {
+          "padding": "0 var(--sp-3) var(--sp-3) calc(var(--sp-3) + 29px)"
+        }
+      }
+    },
+    "a4-p-3df0ba": {
+      "id": "a4-p-3df0ba",
+      "tag": "p",
+      "name": "Answer 4 text",
+      "text": "Copy the folder. Export also writes a single archive with every note and its links.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "line-height": "20px",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "about-a1": {
+      "id": "about-a1",
+      "tag": "a",
+      "name": "See the product",
+      "text": "See the product",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "align-items": "center",
+        "background": "var(--hue)",
+        "border-radius": "var(--radius-m)",
+        "color": "#06161a",
+        "display": "inline-flex",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "min-height": "var(--control-h)",
+        "padding": "0 var(--sp-4)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "about-a2": {
+      "id": "about-a2",
+      "tag": "a",
+      "name": "An address that does not exist",
+      "text": "An address that does not exist",
+      "children": [],
+      "attrs": {
+        "href": "/missing"
+      },
+      "styles": {
+        "align-items": "center",
+        "border": "1px solid var(--edge-strong)",
+        "border-radius": "var(--radius-m)",
+        "color": "var(--ink)",
+        "display": "inline-flex",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "min-height": "var(--control-h)",
+        "padding": "0 var(--sp-4)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "about-actions": {
+      "id": "about-actions",
+      "tag": "div",
+      "name": "Actions",
+      "text": "",
+      "children": [
+        "about-a1",
+        "about-a2"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "gap": "var(--sp-3)"
+      },
+      "breakpoints": {}
+    },
+    "about-f": {
+      "id": "about-f",
+      "tag": "div",
+      "name": "Frame",
+      "text": "",
+      "children": [
+        "about-kicker",
+        "about-h",
+        "about-p1",
+        "about-p2",
+        "about-actions"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "about-h": {
+      "id": "about-h",
+      "tag": "h1",
+      "name": "A small sample for a publishing tool.",
+      "text": "A small sample for a publishing tool.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "var(--fs-hero)",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-tight)",
+        "line-height": "1.08",
+        "margin": "0 0 var(--sp-4)",
+        "max-width": "18em"
+      },
+      "breakpoints": {}
+    },
+    "about-kicker": {
+      "id": "about-kicker",
+      "tag": "p",
+      "name": "Kicker",
+      "text": "About",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "margin": "0 0 var(--sp-3)"
+      },
+      "breakpoints": {}
+    },
+    "about-main": {
+      "id": "about-main",
+      "tag": "section",
+      "name": "About",
+      "text": "",
+      "children": [
+        "about-f"
+      ],
+      "attrs": {},
+      "styles": {
+        "--hue": "#3bb3c4",
+        "box-sizing": "border-box",
+        "color": "var(--ink)",
+        "padding-bottom": "var(--sp-8)",
+        "padding-top": "var(--sp-10)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "about-p1": {
+      "id": "about-p1",
+      "tag": "p",
+      "name": "Text",
+      "text": "Northwind Notes does not exist. This three page site was built in FormWeb to give FormPublisher something real to open, check, package and prepare for six hosts.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-m)",
+        "margin": "0 0 var(--sp-5)",
+        "max-width": "var(--prose-max)"
+      },
+      "breakpoints": {}
+    },
+    "about-p2": {
+      "id": "about-p2",
+      "tag": "p",
+      "name": "Text",
+      "text": "It has a redirect from an old address, a page for addresses that do not exist and pictures that were drawn for it, so every check has something to look at.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-m)",
+        "margin": "0 0 var(--sp-5)",
+        "max-width": "var(--prose-max)"
+      },
+      "breakpoints": {}
+    },
+    "actions-7ee392": {
+      "id": "actions-7ee392",
+      "tag": "div",
+      "name": "Actions",
+      "text": "",
+      "children": [
+        "btn-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "justify-content": "center",
+        "margin": "var(--sp-6) 0 0"
+      },
+      "breakpoints": {}
+    },
+    "arrow-78e412": {
+      "id": "arrow-78e412",
+      "tag": "svg",
+      "name": "Arrow",
+      "text": "",
+      "children": [
+        "arrow-a-78e412",
+        "arrow-b-78e412"
+      ],
+      "attrs": {
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.75",
+        "viewBox": "0 0 24 24"
+      },
+      "styles": {
+        "display": "block",
+        "flex": "none",
+        "height": "18px",
+        "width": "18px"
+      },
+      "breakpoints": {}
+    },
+    "arrow-a-1-3df0ba": {
+      "id": "arrow-a-1-3df0ba",
+      "tag": "path",
+      "name": "Arrow shaft",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M4.5 12h15"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow-a-2-3df0ba": {
+      "id": "arrow-a-2-3df0ba",
+      "tag": "path",
+      "name": "Arrow head",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M13.5 6l6 6-6 6"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow-a-3df0ba": {
+      "id": "arrow-a-3df0ba",
+      "tag": "svg",
+      "name": "Arrow",
+      "text": "",
+      "children": [
+        "arrow-a-1-3df0ba",
+        "arrow-a-2-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.75",
+        "viewBox": "0 0 24 24"
+      },
+      "styles": {
+        "display": "block",
+        "flex": "none",
+        "height": "var(--icon-s)",
+        "width": "var(--icon-s)"
+      },
+      "breakpoints": {}
+    },
+    "arrow-a-78e412": {
+      "id": "arrow-a-78e412",
+      "tag": "path",
+      "name": "Shaft",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M5 12h14"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow-a-c4805b": {
+      "id": "arrow-a-c4805b",
+      "tag": "path",
+      "name": "Shaft",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M5 12h14"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow-b-1-3df0ba": {
+      "id": "arrow-b-1-3df0ba",
+      "tag": "path",
+      "name": "Arrow shaft",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M4.5 12h15"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow-b-2-3df0ba": {
+      "id": "arrow-b-2-3df0ba",
+      "tag": "path",
+      "name": "Arrow head",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M13.5 6l6 6-6 6"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow-b-3df0ba": {
+      "id": "arrow-b-3df0ba",
+      "tag": "svg",
+      "name": "Arrow",
+      "text": "",
+      "children": [
+        "arrow-b-1-3df0ba",
+        "arrow-b-2-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.75",
+        "viewBox": "0 0 24 24"
+      },
+      "styles": {
+        "display": "block",
+        "flex": "none",
+        "height": "var(--icon-s)",
+        "width": "var(--icon-s)"
+      },
+      "breakpoints": {}
+    },
+    "arrow-b-78e412": {
+      "id": "arrow-b-78e412",
+      "tag": "path",
+      "name": "Head",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M13 6l6 6-6 6"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow-b-c4805b": {
+      "id": "arrow-b-c4805b",
+      "tag": "path",
+      "name": "Head",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M13 6l6 6-6 6"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow-c4805b": {
+      "id": "arrow-c4805b",
+      "tag": "svg",
+      "name": "Arrow",
+      "text": "",
+      "children": [
+        "arrow-a-c4805b",
+        "arrow-b-c4805b"
+      ],
+      "attrs": {
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.75",
+        "viewBox": "0 0 24 24"
+      },
+      "styles": {
+        "display": "block",
+        "flex": "none",
+        "height": "18px",
+        "width": "18px"
+      },
+      "breakpoints": {}
+    },
+    "arrow2-78e412": {
+      "id": "arrow2-78e412",
+      "tag": "svg",
+      "name": "Arrow",
+      "text": "",
+      "children": [
+        "arrow2-a-78e412",
+        "arrow2-b-78e412"
+      ],
+      "attrs": {
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.75",
+        "viewBox": "0 0 24 24"
+      },
+      "styles": {
+        "display": "block",
+        "flex": "none",
+        "height": "18px",
+        "width": "18px"
+      },
+      "breakpoints": {}
+    },
+    "arrow2-a-78e412": {
+      "id": "arrow2-a-78e412",
+      "tag": "path",
+      "name": "Shaft",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M5 12h14"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow2-a-c4805b": {
+      "id": "arrow2-a-c4805b",
+      "tag": "path",
+      "name": "Shaft",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M5 12h14"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow2-b-78e412": {
+      "id": "arrow2-b-78e412",
+      "tag": "path",
+      "name": "Head",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M13 6l6 6-6 6"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow2-b-c4805b": {
+      "id": "arrow2-b-c4805b",
+      "tag": "path",
+      "name": "Head",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M13 6l6 6-6 6"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "arrow2-c4805b": {
+      "id": "arrow2-c4805b",
+      "tag": "svg",
+      "name": "Arrow",
+      "text": "",
+      "children": [
+        "arrow2-a-c4805b",
+        "arrow2-b-c4805b"
+      ],
+      "attrs": {
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.75",
+        "viewBox": "0 0 24 24"
+      },
+      "styles": {
+        "display": "block",
+        "flex": "none",
+        "height": "18px",
+        "width": "18px"
+      },
+      "breakpoints": {}
+    },
+    "badge-78e412": {
+      "id": "badge-78e412",
+      "tag": "span",
+      "name": "Arrow badge",
+      "text": "",
+      "children": [
+        "arrow-78e412"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--on-ink)",
+        "bottom": "5px",
+        "color": "var(--ink)",
+        "display": "grid",
+        "left": "5px",
+        "place-items": "center",
+        "pointer-events": "none",
+        "position": "absolute",
+        "top": "5px",
+        "width": "calc(var(--control-h) - 10px)"
+      },
+      "breakpoints": {}
+    },
+    "badge-a-3df0ba": {
+      "id": "badge-a-3df0ba",
+      "tag": "span",
+      "name": "Arrow badge rest",
+      "text": "",
+      "children": [
+        "arrow-a-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-shadow": "inset 0 0 0 1px color-mix(in srgb, currentColor 40%, transparent)",
+        "display": "inline-grid",
+        "flex": "none",
+        "height": "24px",
+        "place-items": "center",
+        "pointer-events": "none",
+        "transform": "translateX(calc(var(--cta, 0) * 32rem))",
+        "transition": "transform 900ms var(--ease-out)",
+        "width": "24px"
+      },
+      "breakpoints": {}
+    },
+    "badge-b-3df0ba": {
+      "id": "badge-b-3df0ba",
+      "tag": "span",
+      "name": "Arrow badge hover",
+      "text": "",
+      "children": [
+        "arrow-b-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "box-shadow": "inset 0 0 0 1px color-mix(in srgb, currentColor 40%, transparent)",
+        "display": "inline-grid",
+        "flex": "none",
+        "height": "24px",
+        "left": "var(--sp-4)",
+        "margin-top": "-12px",
+        "opacity": "var(--cta, 0)",
+        "place-items": "center",
+        "pointer-events": "none",
+        "position": "absolute",
+        "top": "50%",
+        "transform": "translateX(calc(-70px + var(--cta, 0) * 70px))",
+        "transition": "opacity 600ms var(--ease-out), transform 900ms var(--ease-out)",
+        "width": "24px"
+      },
+      "breakpoints": {}
+    },
+    "badge-c4805b": {
+      "id": "badge-c4805b",
+      "tag": "span",
+      "name": "Arrow badge",
+      "text": "",
+      "children": [
+        "arrow-c4805b"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--on-ink)",
+        "bottom": "5px",
+        "color": "var(--ink)",
+        "display": "grid",
+        "left": "5px",
+        "place-items": "center",
+        "pointer-events": "none",
+        "position": "absolute",
+        "top": "5px",
+        "width": "calc(var(--control-h) - 10px)"
+      },
+      "breakpoints": {}
+    },
+    "badge2-78e412": {
+      "id": "badge2-78e412",
+      "tag": "span",
+      "name": "Arrow badge on hover",
+      "text": "",
+      "children": [
+        "arrow2-78e412"
+      ],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "background": "var(--on-ink)",
+        "bottom": "5px",
+        "color": "var(--ink)",
+        "display": "grid",
+        "left": "5px",
+        "opacity": "var(--cc-h)",
+        "place-items": "center",
+        "pointer-events": "none",
+        "position": "absolute",
+        "top": "5px",
+        "transform": "translateX(calc((1 - var(--cc-h)) * -70px))",
+        "transition": "opacity var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1) var(--cc-d2), transform var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1) var(--cc-d2)",
+        "width": "calc(var(--control-h) - 10px)"
+      },
+      "breakpoints": {}
+    },
+    "badge2-c4805b": {
+      "id": "badge2-c4805b",
+      "tag": "span",
+      "name": "Arrow badge on hover",
+      "text": "",
+      "children": [
+        "arrow2-c4805b"
+      ],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "background": "var(--on-ink)",
+        "bottom": "5px",
+        "color": "var(--ink)",
+        "display": "grid",
+        "left": "5px",
+        "opacity": "var(--cc-h)",
+        "place-items": "center",
+        "pointer-events": "none",
+        "position": "absolute",
+        "top": "5px",
+        "transform": "translateX(calc((1 - var(--cc-h)) * -70px))",
+        "transition": "opacity var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1) var(--cc-d2), transform var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1) var(--cc-d2)",
+        "width": "calc(var(--control-h) - 10px)"
+      },
+      "breakpoints": {}
+    },
+    "band-3df0ba": {
+      "id": "band-3df0ba",
+      "tag": "section",
+      "name": "FAQ band",
+      "text": "",
+      "children": [
+        "grid-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "--hue": "color-mix(in oklab, #3bb3c4 calc(100% - var(--hue-depth)), #000)",
+        "background": "var(--inset)",
+        "border-bottom": "1px solid var(--edge)",
+        "border-top": "1px solid var(--edge)",
+        "box-sizing": "border-box",
+        "padding-bottom": "clamp(104px, 13vw, 168px)",
+        "padding-top": "clamp(104px, 13vw, 168px)"
+      },
+      "breakpoints": {}
+    },
+    "band-78e412": {
+      "id": "band-78e412",
+      "tag": "section",
+      "name": "Call to action",
+      "text": "",
+      "children": [
+        "media-78e412",
+        "veil-78e412",
+        "in-78e412"
+      ],
+      "attrs": {},
+      "styles": {
+        "--hue": "color-mix(in oklab, #3bb3c4 calc(100% - var(--hue-depth)), #000)",
+        "align-content": "end",
+        "background": "var(--ground)",
+        "display": "grid",
+        "isolation": "isolate",
+        "margin": "0",
+        "min-height": "680px",
+        "overflow": "hidden",
+        "padding-bottom": "90px",
+        "padding-top": "300px",
+        "position": "relative"
+      },
+      "breakpoints": {
+        "tablet": {
+          "min-height": "600px",
+          "padding-bottom": "70px",
+          "padding-top": "100px"
+        }
+      }
+    },
+    "band-7ee392": {
+      "id": "band-7ee392",
+      "tag": "section",
+      "name": "How it works",
+      "text": "",
+      "children": [
+        "wrap-7ee392"
+      ],
+      "attrs": {
+        "aria-labelledby": "hw-h"
+      },
+      "styles": {
+        "--hue": "color-mix(in oklab, #3bb3c4 calc(100% - var(--hue-depth)), #000)",
+        "border-top": "1px solid var(--edge)",
+        "padding-bottom": "var(--sp-8)",
+        "padding-top": "var(--sp-8)"
+      },
+      "breakpoints": {}
+    },
+    "band-c4805b": {
+      "id": "band-c4805b",
+      "tag": "section",
+      "name": "Call to action",
+      "text": "",
+      "children": [
+        "media-c4805b",
+        "veil-c4805b",
+        "in-c4805b"
+      ],
+      "attrs": {},
+      "styles": {
+        "--hue": "color-mix(in oklab, #3bb3c4 calc(100% - var(--hue-depth)), #000)",
+        "align-content": "end",
+        "background": "var(--ground)",
+        "display": "grid",
+        "isolation": "isolate",
+        "margin": "0",
+        "min-height": "680px",
+        "overflow": "hidden",
+        "padding-bottom": "90px",
+        "padding-top": "300px",
+        "position": "relative"
+      },
+      "breakpoints": {
+        "tablet": {
+          "min-height": "600px",
+          "padding-bottom": "70px",
+          "padding-top": "100px"
+        }
+      }
+    },
+    "bottom-ae8e1f": {
+      "id": "bottom-ae8e1f",
+      "tag": "div",
+      "name": "Figures block",
+      "text": "",
+      "children": [
+        "figure-ae8e1f",
+        "note-ae8e1f",
+        "counts-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-content": "start",
+        "display": "grid",
+        "gap": "var(--sp-4)",
+        "min-width": "0"
+      },
+      "breakpoints": {}
+    },
+    "btn-78e412": {
+      "id": "btn-78e412",
+      "tag": "a",
+      "name": "Button",
+      "text": "",
+      "children": [
+        "run-78e412",
+        "badge2-78e412",
+        "lab-78e412"
+      ],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "--cc-d2": "0s",
+        "--cc-dur": "0.6s",
+        "--cc-h": "0",
+        "align-items": "center",
+        "background": "var(--ink)",
+        "border-radius": "0",
+        "color": "var(--on-ink)",
+        "display": "inline-flex",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "font-weight": "500",
+        "gap": "var(--sp-2)",
+        "height": "48px",
+        "justify-content": "center",
+        "letter-spacing": "0.14em",
+        "line-height": "1.55",
+        "overflow": "hidden",
+        "padding-left": "calc(var(--control-h) + var(--sp-4))",
+        "padding-right": "var(--sp-5)",
+        "position": "relative",
+        "text-decoration": "none",
+        "text-transform": "uppercase",
+        "transition": "background-color var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out)",
+        "white-space": "nowrap"
+      },
+      "breakpoints": {}
+    },
+    "btn-7ee392": {
+      "id": "btn-7ee392",
+      "tag": "a",
+      "name": "Button",
+      "text": "About the project",
+      "children": [],
+      "attrs": {
+        "href": "/about"
+      },
+      "styles": {
+        "align-items": "center",
+        "background": "transparent",
+        "border-radius": "0",
+        "box-shadow": "inset 0 0 0 1px var(--edge-strong)",
+        "color": "var(--ink)",
+        "display": "inline-flex",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "font-weight": "500",
+        "gap": "var(--sp-2)",
+        "height": "48px",
+        "justify-content": "center",
+        "letter-spacing": "0.14em",
+        "line-height": "1.55",
+        "padding-left": "var(--sp-5)",
+        "padding-right": "var(--sp-5)",
+        "text-decoration": "none",
+        "text-transform": "uppercase",
+        "transition": "background-color var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out)",
+        "white-space": "nowrap"
+      },
+      "breakpoints": {}
+    },
+    "btn-c4805b": {
+      "id": "btn-c4805b",
+      "tag": "a",
+      "name": "Button",
+      "text": "",
+      "children": [
+        "run-c4805b",
+        "badge2-c4805b",
+        "lab-c4805b"
+      ],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "--cc-d2": "0s",
+        "--cc-dur": "0.6s",
+        "--cc-h": "0",
+        "align-items": "center",
+        "background": "var(--ink)",
+        "border-radius": "0",
+        "color": "var(--on-ink)",
+        "display": "inline-flex",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "font-weight": "500",
+        "gap": "var(--sp-2)",
+        "height": "48px",
+        "justify-content": "center",
+        "letter-spacing": "0.14em",
+        "line-height": "1.55",
+        "overflow": "hidden",
+        "padding-left": "calc(var(--control-h) + var(--sp-4))",
+        "padding-right": "var(--sp-5)",
+        "position": "relative",
+        "text-decoration": "none",
+        "text-transform": "uppercase",
+        "transition": "background-color var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out)",
+        "white-space": "nowrap"
+      },
+      "breakpoints": {}
+    },
+    "c1-7ee392": {
+      "id": "c1-7ee392",
+      "tag": "li",
+      "name": "Step card one",
+      "text": "",
+      "children": [
+        "top1-7ee392",
+        "fig1-7ee392",
+        "lw1-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--pane)",
+        "border-radius": "var(--radius-l)",
+        "box-shadow": "inset 0 0 0 1px var(--edge)",
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "var(--sp-5)",
+        "justify-content": "space-between",
+        "padding": "30px"
+      },
+      "breakpoints": {
+        "mobile": {
+          "gap": "40px",
+          "padding": "15px"
+        }
+      }
+    },
+    "c2-7ee392": {
+      "id": "c2-7ee392",
+      "tag": "li",
+      "name": "Step card two",
+      "text": "",
+      "children": [
+        "top2-7ee392",
+        "fig2-7ee392",
+        "lw2-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--pane)",
+        "border-radius": "var(--radius-l)",
+        "box-shadow": "inset 0 0 0 1px var(--edge)",
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "var(--sp-5)",
+        "justify-content": "space-between",
+        "padding": "30px"
+      },
+      "breakpoints": {
+        "mobile": {
+          "gap": "40px",
+          "padding": "15px"
+        }
+      }
+    },
+    "c3-7ee392": {
+      "id": "c3-7ee392",
+      "tag": "li",
+      "name": "Step card three",
+      "text": "",
+      "children": [
+        "top3-7ee392",
+        "fig3-7ee392",
+        "lw3-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--pane)",
+        "border-radius": "var(--radius-l)",
+        "box-shadow": "inset 0 0 0 1px var(--edge)",
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "var(--sp-5)",
+        "justify-content": "space-between",
+        "padding": "30px"
+      },
+      "breakpoints": {
+        "mobile": {
+          "gap": "40px",
+          "padding": "15px"
+        }
+      }
+    },
+    "cap-ae8e1f": {
+      "id": "cap-ae8e1f",
+      "tag": "p",
+      "name": "Caption",
+      "text": "Weekly notes written during the beta, from 40 people who agreed to share a count.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "margin": "0",
+        "max-width": "31rem"
+      },
+      "breakpoints": {}
+    },
+    "count-1-ae8e1f": {
+      "id": "count-1-ae8e1f",
+      "tag": "div",
+      "name": "Count",
+      "text": "",
+      "children": [
+        "count-1-n-ae8e1f",
+        "count-1-l-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "count-1-l-ae8e1f": {
+      "id": "count-1-l-ae8e1f",
+      "tag": "dd",
+      "name": "Count label",
+      "text": "notes in the test library",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-faint)",
+        "font-size": "var(--fs-s)",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "count-1-n-ae8e1f": {
+      "id": "count-1-n-ae8e1f",
+      "tag": "dt",
+      "name": "Count figure",
+      "text": "26",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "var(--fs-xl)",
+        "font-variant-numeric": "tabular-nums",
+        "font-weight": "var(--weight-display)",
+        "line-height": "1.1"
+      },
+      "breakpoints": {}
+    },
+    "count-2-ae8e1f": {
+      "id": "count-2-ae8e1f",
+      "tag": "div",
+      "name": "Count",
+      "text": "",
+      "children": [
+        "count-2-n-ae8e1f",
+        "count-2-l-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "count-2-l-ae8e1f": {
+      "id": "count-2-l-ae8e1f",
+      "tag": "dd",
+      "name": "Count label",
+      "text": "linked notes in the largest graph",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-faint)",
+        "font-size": "var(--fs-s)",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "count-2-n-ae8e1f": {
+      "id": "count-2-n-ae8e1f",
+      "tag": "dt",
+      "name": "Count figure",
+      "text": "76",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "var(--fs-xl)",
+        "font-variant-numeric": "tabular-nums",
+        "font-weight": "var(--weight-display)",
+        "line-height": "1.1"
+      },
+      "breakpoints": {}
+    },
+    "counts-ae8e1f": {
+      "id": "counts-ae8e1f",
+      "tag": "dl",
+      "name": "Counts",
+      "text": "",
+      "children": [
+        "count-1-ae8e1f",
+        "count-2-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "gap": "var(--sp-4) var(--sp-6)",
+        "margin": "var(--sp-3) 0 0"
+      },
+      "breakpoints": {}
+    },
+    "cta-3df0ba": {
+      "id": "cta-3df0ba",
+      "tag": "a",
+      "name": "Read the full page button",
+      "text": "",
+      "children": [
+        "badge-a-3df0ba",
+        "cta-label-3df0ba",
+        "badge-b-3df0ba",
+        "label-wide-3df0ba"
+      ],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "--cta": "0",
+        "align-items": "center",
+        "background": "var(--ink)",
+        "border-radius": "0",
+        "box-sizing": "border-box",
+        "color": "var(--on-ink)",
+        "display": "inline-flex",
+        "flex": "none",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "font-weight": "500",
+        "gap": "var(--sp-2)",
+        "height": "48px",
+        "justify-content": "flex-start",
+        "letter-spacing": "0.14em",
+        "line-height": "1.55",
+        "min-width": "15rem",
+        "overflow": "hidden",
+        "padding-left": "var(--sp-5)",
+        "padding-right": "var(--sp-5)",
+        "position": "relative",
+        "text-decoration": "none",
+        "text-transform": "uppercase",
+        "transition": "background-color var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out)",
+        "white-space": "nowrap"
+      },
+      "breakpoints": {
+        "mobile": {
+          "width": "100%"
+        },
+        "tablet": {
+          "min-width": "0"
+        }
+      }
+    },
+    "cta-label-3df0ba": {
+      "id": "cta-label-3df0ba",
+      "tag": "span",
+      "name": "Button label",
+      "text": "",
+      "children": [
+        "label-rest-3df0ba",
+        "label-hover-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "inline-block",
+        "pointer-events": "none",
+        "position": "relative"
+      },
+      "breakpoints": {
+        "mobile": {
+          "margin-left": "auto",
+          "margin-right": "auto"
+        }
+      }
+    },
+    "d1-7ee392": {
+      "id": "d1-7ee392",
+      "tag": "p",
+      "name": "Description",
+      "text": "Press N and start typing. Each note is saved as you go, as a plain text file in your notebook folder.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "16px",
+        "margin": "0"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "14px"
+        }
+      }
+    },
+    "d2-7ee392": {
+      "id": "d2-7ee392",
+      "tag": "p",
+      "name": "Description",
+      "text": "Type two square brackets to link to another note. Links show up on both notes, so you can walk the trail either way.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "16px",
+        "margin": "0"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "14px"
+        }
+      }
+    },
+    "d3-7ee392": {
+      "id": "d3-7ee392",
+      "tag": "p",
+      "name": "Description",
+      "text": "Press Export to write every note and its links to a folder or one archive. It takes seconds, even for a big notebook.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "16px",
+        "margin": "0"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "14px"
+        }
+      }
+    },
+    "elbow1-3df0ba": {
+      "id": "elbow1-3df0ba",
+      "tag": "svg",
+      "name": "Answer 1 elbow",
+      "text": "",
+      "children": [
+        "elbow1-d-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 14 14"
+      },
+      "styles": {
+        "flex": "none",
+        "height": "14px",
+        "margin-top": "3px",
+        "opacity": "0.7",
+        "width": "14px"
+      },
+      "breakpoints": {}
+    },
+    "elbow1-d-3df0ba": {
+      "id": "elbow1-d-3df0ba",
+      "tag": "path",
+      "name": "Elbow stroke",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M2 1v8a2 2 0 0 0 2 2h8"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "elbow2-3df0ba": {
+      "id": "elbow2-3df0ba",
+      "tag": "svg",
+      "name": "Answer 2 elbow",
+      "text": "",
+      "children": [
+        "elbow2-d-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 14 14"
+      },
+      "styles": {
+        "flex": "none",
+        "height": "14px",
+        "margin-top": "3px",
+        "opacity": "0.7",
+        "width": "14px"
+      },
+      "breakpoints": {}
+    },
+    "elbow2-d-3df0ba": {
+      "id": "elbow2-d-3df0ba",
+      "tag": "path",
+      "name": "Elbow stroke",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M2 1v8a2 2 0 0 0 2 2h8"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "elbow3-3df0ba": {
+      "id": "elbow3-3df0ba",
+      "tag": "svg",
+      "name": "Answer 3 elbow",
+      "text": "",
+      "children": [
+        "elbow3-d-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 14 14"
+      },
+      "styles": {
+        "flex": "none",
+        "height": "14px",
+        "margin-top": "3px",
+        "opacity": "0.7",
+        "width": "14px"
+      },
+      "breakpoints": {}
+    },
+    "elbow3-d-3df0ba": {
+      "id": "elbow3-d-3df0ba",
+      "tag": "path",
+      "name": "Elbow stroke",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M2 1v8a2 2 0 0 0 2 2h8"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "elbow4-3df0ba": {
+      "id": "elbow4-3df0ba",
+      "tag": "svg",
+      "name": "Answer 4 elbow",
+      "text": "",
+      "children": [
+        "elbow4-d-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 14 14"
+      },
+      "styles": {
+        "flex": "none",
+        "height": "14px",
+        "margin-top": "3px",
+        "opacity": "0.7",
+        "width": "14px"
+      },
+      "breakpoints": {}
+    },
+    "elbow4-d-3df0ba": {
+      "id": "elbow4-d-3df0ba",
+      "tag": "path",
+      "name": "Elbow stroke",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M2 1v8a2 2 0 0 0 2 2h8"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "faq-3df0ba": {
+      "id": "faq-3df0ba",
+      "tag": "div",
+      "name": "Questions panel",
+      "text": "",
+      "children": [
+        "row1-3df0ba",
+        "row2-3df0ba",
+        "row3-3df0ba",
+        "row4-3df0ba",
+        "prompt-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--pane)",
+        "border": "1px solid var(--edge)",
+        "border-radius": "14px",
+        "display": "block",
+        "overflow": "hidden"
+      },
+      "breakpoints": {}
+    },
+    "fig1-7ee392": {
+      "id": "fig1-7ee392",
+      "tag": "figure",
+      "name": "Screenshot",
+      "text": "",
+      "children": [
+        "fig1-d-7ee392",
+        "fig1-l-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-radius": "14px",
+        "box-shadow": "var(--shadow-window, 0 1px 1px rgb(0 0 0 / 0.3), 0 28px 64px -28px rgb(0 0 0 / 0.8))",
+        "margin": "0",
+        "overflow": "hidden"
+      },
+      "breakpoints": {}
+    },
+    "fig1-d-7ee392": {
+      "id": "fig1-d-7ee392",
+      "tag": "img",
+      "name": "Screenshot dark",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "The notes board with nine notes in three columns",
+        "data-fw-theme-only": "dark",
+        "decoding": "async",
+        "height": "1500",
+        "loading": "lazy",
+        "src": "assets/289750288b82a4e90d2f1ef234ce998e17939c7f9b4cd0ab6dbe0ed1da55e057.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "display": "block",
+        "height": "auto",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "fig1-l-7ee392": {
+      "id": "fig1-l-7ee392",
+      "tag": "img",
+      "name": "Screenshot light",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "The notes board with nine notes in three columns",
+        "data-fw-theme-only": "light",
+        "decoding": "async",
+        "height": "1500",
+        "loading": "lazy",
+        "src": "assets/dca2d4522b477684cd568f9a3b30e6b7eceebd3bffa0384a16a9d0a87e7d220f.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "display": "block",
+        "height": "auto",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "fig2-7ee392": {
+      "id": "fig2-7ee392",
+      "tag": "figure",
+      "name": "Screenshot",
+      "text": "",
+      "children": [
+        "fig2-d-7ee392",
+        "fig2-l-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-radius": "14px",
+        "box-shadow": "var(--shadow-window, 0 1px 1px rgb(0 0 0 / 0.3), 0 28px 64px -28px rgb(0 0 0 / 0.8))",
+        "margin": "0",
+        "overflow": "hidden"
+      },
+      "breakpoints": {}
+    },
+    "fig2-d-7ee392": {
+      "id": "fig2-d-7ee392",
+      "tag": "img",
+      "name": "Screenshot dark",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "A note in the editor with its source beside the preview",
+        "data-fw-theme-only": "dark",
+        "decoding": "async",
+        "height": "1500",
+        "loading": "lazy",
+        "src": "assets/d7d316c70b86deb53c0840d24493e777c2f2f1f0268b556ffed404ecb884fd42.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "display": "block",
+        "height": "auto",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "fig2-l-7ee392": {
+      "id": "fig2-l-7ee392",
+      "tag": "img",
+      "name": "Screenshot light",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "A note in the editor with its source beside the preview",
+        "data-fw-theme-only": "light",
+        "decoding": "async",
+        "height": "1500",
+        "loading": "lazy",
+        "src": "assets/49e8b23f2b857a60d28b74e4079405d681d4bb6368951936c4087ea66c8e1332.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "display": "block",
+        "height": "auto",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "fig3-7ee392": {
+      "id": "fig3-7ee392",
+      "tag": "figure",
+      "name": "Screenshot",
+      "text": "",
+      "children": [
+        "fig3-i-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-radius": "14px",
+        "box-shadow": "var(--shadow-window, 0 1px 1px rgb(0 0 0 / 0.3), 0 28px 64px -28px rgb(0 0 0 / 0.8))",
+        "margin": "0",
+        "overflow": "hidden"
+      },
+      "breakpoints": {}
+    },
+    "fig3-i-7ee392": {
+      "id": "fig3-i-7ee392",
+      "tag": "img",
+      "name": "Screenshot",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "The export view with three notebooks and a progress bar for each",
+        "decoding": "async",
+        "height": "1500",
+        "loading": "lazy",
+        "src": "assets/804db4ff396f33457834bf718b51613bc3e9c4bc9bbd65f966019dbff12fd7a3.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "display": "block",
+        "height": "auto",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "figure-ae8e1f": {
+      "id": "figure-ae8e1f",
+      "tag": "p",
+      "name": "Big figure row",
+      "text": "",
+      "children": [
+        "num-ae8e1f",
+        "unit-ae8e1f"
+      ],
+      "attrs": {
+        "aria-label": "23 comparisons"
+      },
+      "styles": {
+        "align-items": "center",
+        "border-top": "1px solid var(--edge-strong)",
+        "display": "flex",
+        "gap": "var(--sp-4)",
+        "margin": "0",
+        "padding-top": "var(--sp-5)"
+      },
+      "breakpoints": {}
+    },
+    "fine-78e412": {
+      "id": "fine-78e412",
+      "tag": "p",
+      "name": "Small print",
+      "text": "Free to try, no account needed.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-faint)",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "font-weight": "500",
+        "letter-spacing": "0.14em",
+        "margin": "0",
+        "text-transform": "uppercase"
+      },
+      "breakpoints": {}
+    },
+    "fine-c4805b": {
+      "id": "fine-c4805b",
+      "tag": "p",
+      "name": "Small print",
+      "text": "A sample product for the FormPublisher demo.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-faint)",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "font-weight": "500",
+        "letter-spacing": "0.14em",
+        "margin": "0",
+        "text-transform": "uppercase"
+      },
+      "breakpoints": {}
+    },
+    "ft-404": {
+      "id": "ft-404",
+      "tag": "footer",
+      "name": "Footer",
+      "text": "",
+      "children": [
+        "ft-404-row"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-top": "1px solid var(--edge)",
+        "color": "var(--ink-faint)",
+        "font-size": "var(--fs-s)",
+        "padding-bottom": "var(--sp-7)",
+        "padding-top": "var(--sp-7)"
+      },
+      "breakpoints": {}
+    },
+    "ft-404-c0": {
+      "id": "ft-404-c0",
+      "tag": "p",
+      "name": "Line",
+      "text": "Northwind Notes is a made-up product for the FormPublisher sample site. Nothing here is for sale.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "margin": "0",
+        "max-width": "32em"
+      },
+      "breakpoints": {}
+    },
+    "ft-404-c1": {
+      "id": "ft-404-c1",
+      "tag": "nav",
+      "name": "Footer links",
+      "text": "",
+      "children": [
+        "ft-404-l0",
+        "ft-404-l1",
+        "ft-404-l2"
+      ],
+      "attrs": {
+        "aria-label": "Footer"
+      },
+      "styles": {
+        "display": "flex",
+        "gap": "var(--sp-4)"
+      },
+      "breakpoints": {}
+    },
+    "ft-404-l0": {
+      "id": "ft-404-l0",
+      "tag": "a",
+      "name": "Home",
+      "text": "Home",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-404-l1": {
+      "id": "ft-404-l1",
+      "tag": "a",
+      "name": "Product",
+      "text": "Product",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-404-l2": {
+      "id": "ft-404-l2",
+      "tag": "a",
+      "name": "About",
+      "text": "About",
+      "children": [],
+      "attrs": {
+        "href": "/about"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-404-row": {
+      "id": "ft-404-row",
+      "tag": "div",
+      "name": "Frame",
+      "text": "",
+      "children": [
+        "ft-404-c0",
+        "ft-404-c1"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "gap": "var(--sp-6)",
+        "justify-content": "space-between",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "ft-about": {
+      "id": "ft-about",
+      "tag": "footer",
+      "name": "Footer",
+      "text": "",
+      "children": [
+        "ft-about-row"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-top": "1px solid var(--edge)",
+        "color": "var(--ink-faint)",
+        "font-size": "var(--fs-s)",
+        "padding-bottom": "var(--sp-7)",
+        "padding-top": "var(--sp-7)"
+      },
+      "breakpoints": {}
+    },
+    "ft-about-c0": {
+      "id": "ft-about-c0",
+      "tag": "p",
+      "name": "Line",
+      "text": "Northwind Notes is a made-up product for the FormPublisher sample site. Nothing here is for sale.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "margin": "0",
+        "max-width": "32em"
+      },
+      "breakpoints": {}
+    },
+    "ft-about-c1": {
+      "id": "ft-about-c1",
+      "tag": "nav",
+      "name": "Footer links",
+      "text": "",
+      "children": [
+        "ft-about-l0",
+        "ft-about-l1",
+        "ft-about-l2"
+      ],
+      "attrs": {
+        "aria-label": "Footer"
+      },
+      "styles": {
+        "display": "flex",
+        "gap": "var(--sp-4)"
+      },
+      "breakpoints": {}
+    },
+    "ft-about-l0": {
+      "id": "ft-about-l0",
+      "tag": "a",
+      "name": "Home",
+      "text": "Home",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-about-l1": {
+      "id": "ft-about-l1",
+      "tag": "a",
+      "name": "Product",
+      "text": "Product",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-about-l2": {
+      "id": "ft-about-l2",
+      "tag": "a",
+      "name": "About",
+      "text": "About",
+      "children": [],
+      "attrs": {
+        "href": "/about"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-about-row": {
+      "id": "ft-about-row",
+      "tag": "div",
+      "name": "Frame",
+      "text": "",
+      "children": [
+        "ft-about-c0",
+        "ft-about-c1"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "gap": "var(--sp-6)",
+        "justify-content": "space-between",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "ft-home": {
+      "id": "ft-home",
+      "tag": "footer",
+      "name": "Footer",
+      "text": "",
+      "children": [
+        "ft-home-row"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-top": "1px solid var(--edge)",
+        "color": "var(--ink-faint)",
+        "font-size": "var(--fs-s)",
+        "padding-bottom": "var(--sp-7)",
+        "padding-top": "var(--sp-7)"
+      },
+      "breakpoints": {}
+    },
+    "ft-home-c0": {
+      "id": "ft-home-c0",
+      "tag": "p",
+      "name": "Line",
+      "text": "Northwind Notes is a made-up product for the FormPublisher sample site. Nothing here is for sale.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "margin": "0",
+        "max-width": "32em"
+      },
+      "breakpoints": {}
+    },
+    "ft-home-c1": {
+      "id": "ft-home-c1",
+      "tag": "nav",
+      "name": "Footer links",
+      "text": "",
+      "children": [
+        "ft-home-l0",
+        "ft-home-l1",
+        "ft-home-l2"
+      ],
+      "attrs": {
+        "aria-label": "Footer"
+      },
+      "styles": {
+        "display": "flex",
+        "gap": "var(--sp-4)"
+      },
+      "breakpoints": {}
+    },
+    "ft-home-l0": {
+      "id": "ft-home-l0",
+      "tag": "a",
+      "name": "Home",
+      "text": "Home",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-home-l1": {
+      "id": "ft-home-l1",
+      "tag": "a",
+      "name": "Product",
+      "text": "Product",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-home-l2": {
+      "id": "ft-home-l2",
+      "tag": "a",
+      "name": "About",
+      "text": "About",
+      "children": [],
+      "attrs": {
+        "href": "/about"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-home-row": {
+      "id": "ft-home-row",
+      "tag": "div",
+      "name": "Frame",
+      "text": "",
+      "children": [
+        "ft-home-c0",
+        "ft-home-c1"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "gap": "var(--sp-6)",
+        "justify-content": "space-between",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "ft-prod": {
+      "id": "ft-prod",
+      "tag": "footer",
+      "name": "Footer",
+      "text": "",
+      "children": [
+        "ft-prod-row"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-top": "1px solid var(--edge)",
+        "color": "var(--ink-faint)",
+        "font-size": "var(--fs-s)",
+        "padding-bottom": "var(--sp-7)",
+        "padding-top": "var(--sp-7)"
+      },
+      "breakpoints": {}
+    },
+    "ft-prod-c0": {
+      "id": "ft-prod-c0",
+      "tag": "p",
+      "name": "Line",
+      "text": "Northwind Notes is a made-up product for the FormPublisher sample site. Nothing here is for sale.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "margin": "0",
+        "max-width": "32em"
+      },
+      "breakpoints": {}
+    },
+    "ft-prod-c1": {
+      "id": "ft-prod-c1",
+      "tag": "nav",
+      "name": "Footer links",
+      "text": "",
+      "children": [
+        "ft-prod-l0",
+        "ft-prod-l1",
+        "ft-prod-l2"
+      ],
+      "attrs": {
+        "aria-label": "Footer"
+      },
+      "styles": {
+        "display": "flex",
+        "gap": "var(--sp-4)"
+      },
+      "breakpoints": {}
+    },
+    "ft-prod-l0": {
+      "id": "ft-prod-l0",
+      "tag": "a",
+      "name": "Home",
+      "text": "Home",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-prod-l1": {
+      "id": "ft-prod-l1",
+      "tag": "a",
+      "name": "Product",
+      "text": "Product",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-prod-l2": {
+      "id": "ft-prod-l2",
+      "tag": "a",
+      "name": "About",
+      "text": "About",
+      "children": [],
+      "attrs": {
+        "href": "/about"
+      },
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "ft-prod-row": {
+      "id": "ft-prod-row",
+      "tag": "div",
+      "name": "Frame",
+      "text": "",
+      "children": [
+        "ft-prod-c0",
+        "ft-prod-c1"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "gap": "var(--sp-6)",
+        "justify-content": "space-between",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "grid-3df0ba": {
+      "id": "grid-3df0ba",
+      "tag": "div",
+      "name": "FAQ grid",
+      "text": "",
+      "children": [
+        "side-3df0ba",
+        "faq-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "start",
+        "box-sizing": "border-box",
+        "display": "grid",
+        "gap": "clamp(32px, 5vw, 88px)",
+        "grid-template-columns": "minmax(0, 0.8fr) minmax(0, 1.2fr)",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {
+        "tablet": {
+          "grid-template-columns": "minmax(0, 1fr)"
+        }
+      }
+    },
+    "grid-7ee392": {
+      "id": "grid-7ee392",
+      "tag": "ol",
+      "name": "Steps",
+      "text": "",
+      "children": [
+        "c1-7ee392",
+        "c2-7ee392",
+        "c3-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "grid",
+        "gap": "16px",
+        "grid-template-columns": "repeat(3, minmax(0, 1fr))",
+        "list-style": "none",
+        "margin": "var(--sp-5) 0 0",
+        "padding": "0"
+      },
+      "breakpoints": {
+        "mobile": {
+          "grid-template-columns": "minmax(0, 1fr)"
+        },
+        "tablet": {
+          "grid-template-columns": "repeat(2, minmax(0, 1fr))"
+        }
+      }
+    },
+    "group-78e412": {
+      "id": "group-78e412",
+      "tag": "div",
+      "name": "Button group",
+      "text": "",
+      "children": [
+        "btn-78e412",
+        "fine-78e412"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "grid",
+        "gap": "var(--sp-4)",
+        "justify-items": "center",
+        "margin-top": "var(--sp-6)"
+      },
+      "breakpoints": {}
+    },
+    "group-c4805b": {
+      "id": "group-c4805b",
+      "tag": "div",
+      "name": "Button group",
+      "text": "",
+      "children": [
+        "btn-c4805b",
+        "fine-c4805b"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "grid",
+        "gap": "var(--sp-4)",
+        "justify-items": "center",
+        "margin-top": "var(--sp-6)"
+      },
+      "breakpoints": {}
+    },
+    "h-78e412": {
+      "id": "h-78e412",
+      "tag": "h1",
+      "name": "Headline",
+      "text": "Start a notebook in one minute.",
+      "children": [],
+      "attrs": {
+        "id": "cc-h"
+      },
+      "styles": {
+        "font-size": "clamp(2rem, 4vw, 3.5rem)",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-display)",
+        "line-height": "1.05",
+        "margin": "0",
+        "max-width": "52rem",
+        "text-wrap": "balance"
+      },
+      "breakpoints": {}
+    },
+    "h-7ee392": {
+      "id": "h-7ee392",
+      "tag": "h2",
+      "name": "Heading",
+      "text": "",
+      "children": [
+        "h-how-7ee392",
+        "h-form-7ee392",
+        "h-suffix-7ee392",
+        "h-works-7ee392"
+      ],
+      "attrs": {
+        "id": "hw-h"
+      },
+      "styles": {
+        "font-size": "45px",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-display)",
+        "line-height": "1.1",
+        "margin": "0",
+        "max-width": "800px",
+        "text-wrap": "balance"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "28px"
+        },
+        "tablet": {
+          "font-size": "32px"
+        }
+      }
+    },
+    "h-c4805b": {
+      "id": "h-c4805b",
+      "tag": "h1",
+      "name": "Headline",
+      "text": "Your notes, your folder.",
+      "children": [],
+      "attrs": {
+        "id": "cc-h"
+      },
+      "styles": {
+        "font-size": "clamp(2rem, 4vw, 3.5rem)",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-display)",
+        "line-height": "1.05",
+        "margin": "0",
+        "max-width": "52rem",
+        "text-wrap": "balance"
+      },
+      "breakpoints": {}
+    },
+    "h-form-7ee392": {
+      "id": "h-form-7ee392",
+      "tag": "span",
+      "name": "Name first part",
+      "text": "Northwind",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink)"
+      },
+      "breakpoints": {}
+    },
+    "h-how-7ee392": {
+      "id": "h-how-7ee392",
+      "tag": "span",
+      "name": "How",
+      "text": "How ",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "h-suffix-7ee392": {
+      "id": "h-suffix-7ee392",
+      "tag": "span",
+      "name": "Name second part",
+      "text": " Notes",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)"
+      },
+      "breakpoints": {}
+    },
+    "h-works-7ee392": {
+      "id": "h-works-7ee392",
+      "tag": "span",
+      "name": "Works",
+      "text": " works",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "h1-3df0ba": {
+      "id": "h1-3df0ba",
+      "tag": "h3",
+      "name": "Question 1 heading",
+      "text": "",
+      "children": [
+        "q1-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "font-size": "inherit",
+        "font-weight": "inherit",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "h2-3df0ba": {
+      "id": "h2-3df0ba",
+      "tag": "h3",
+      "name": "Question 2 heading",
+      "text": "",
+      "children": [
+        "q2-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "font-size": "inherit",
+        "font-weight": "inherit",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "h3-3df0ba": {
+      "id": "h3-3df0ba",
+      "tag": "h3",
+      "name": "Question 3 heading",
+      "text": "",
+      "children": [
+        "q3-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "font-size": "inherit",
+        "font-weight": "inherit",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "h4-3df0ba": {
+      "id": "h4-3df0ba",
+      "tag": "h3",
+      "name": "Question 4 heading",
+      "text": "",
+      "children": [
+        "q4-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "font-size": "inherit",
+        "font-weight": "inherit",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "hd-404": {
+      "id": "hd-404",
+      "tag": "header",
+      "name": "Header",
+      "text": "",
+      "children": [
+        "hd-404-in"
+      ],
+      "attrs": {},
+      "styles": {
+        "backdrop-filter": "blur(12px)",
+        "background": "var(--bar-veil)",
+        "border-bottom": "1px solid var(--edge)",
+        "color": "var(--ink)",
+        "position": "sticky",
+        "top": "0",
+        "z-index": "var(--z-sticky)"
+      },
+      "breakpoints": {}
+    },
+    "hd-404-brand": {
+      "id": "hd-404-brand",
+      "tag": "a",
+      "name": "Brand",
+      "text": "Northwind Notes",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink)",
+        "font-size": "var(--fs-m)",
+        "font-weight": "var(--weight-strong)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-404-in": {
+      "id": "hd-404-in",
+      "tag": "div",
+      "name": "Bar",
+      "text": "",
+      "children": [
+        "hd-404-brand",
+        "hd-404-nav"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "center",
+        "box-sizing": "border-box",
+        "display": "flex",
+        "justify-content": "space-between",
+        "min-height": "var(--bar-h)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "hd-404-nav": {
+      "id": "hd-404-nav",
+      "tag": "nav",
+      "name": "Navigation",
+      "text": "",
+      "children": [
+        "hd-404-nav0",
+        "hd-404-nav1",
+        "hd-404-nav2"
+      ],
+      "attrs": {
+        "aria-label": "Main"
+      },
+      "styles": {
+        "display": "flex",
+        "gap": "var(--sp-2)"
+      },
+      "breakpoints": {}
+    },
+    "hd-404-nav0": {
+      "id": "hd-404-nav0",
+      "tag": "a",
+      "name": "Home",
+      "text": "Home",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-404-nav1": {
+      "id": "hd-404-nav1",
+      "tag": "a",
+      "name": "Product",
+      "text": "Product",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-404-nav2": {
+      "id": "hd-404-nav2",
+      "tag": "a",
+      "name": "About",
+      "text": "About",
+      "children": [],
+      "attrs": {
+        "href": "/about"
+      },
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-about": {
+      "id": "hd-about",
+      "tag": "header",
+      "name": "Header",
+      "text": "",
+      "children": [
+        "hd-about-in"
+      ],
+      "attrs": {},
+      "styles": {
+        "backdrop-filter": "blur(12px)",
+        "background": "var(--bar-veil)",
+        "border-bottom": "1px solid var(--edge)",
+        "color": "var(--ink)",
+        "position": "sticky",
+        "top": "0",
+        "z-index": "var(--z-sticky)"
+      },
+      "breakpoints": {}
+    },
+    "hd-about-brand": {
+      "id": "hd-about-brand",
+      "tag": "a",
+      "name": "Brand",
+      "text": "Northwind Notes",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink)",
+        "font-size": "var(--fs-m)",
+        "font-weight": "var(--weight-strong)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-about-in": {
+      "id": "hd-about-in",
+      "tag": "div",
+      "name": "Bar",
+      "text": "",
+      "children": [
+        "hd-about-brand",
+        "hd-about-nav"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "center",
+        "box-sizing": "border-box",
+        "display": "flex",
+        "justify-content": "space-between",
+        "min-height": "var(--bar-h)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "hd-about-nav": {
+      "id": "hd-about-nav",
+      "tag": "nav",
+      "name": "Navigation",
+      "text": "",
+      "children": [
+        "hd-about-nav0",
+        "hd-about-nav1",
+        "hd-about-nav2"
+      ],
+      "attrs": {
+        "aria-label": "Main"
+      },
+      "styles": {
+        "display": "flex",
+        "gap": "var(--sp-2)"
+      },
+      "breakpoints": {}
+    },
+    "hd-about-nav0": {
+      "id": "hd-about-nav0",
+      "tag": "a",
+      "name": "Home",
+      "text": "Home",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-about-nav1": {
+      "id": "hd-about-nav1",
+      "tag": "a",
+      "name": "Product",
+      "text": "Product",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-about-nav2": {
+      "id": "hd-about-nav2",
+      "tag": "a",
+      "name": "About",
+      "text": "About",
+      "children": [],
+      "attrs": {
+        "aria-current": "page",
+        "href": "/about"
+      },
+      "styles": {
+        "color": "var(--ink)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-home": {
+      "id": "hd-home",
+      "tag": "header",
+      "name": "Header",
+      "text": "",
+      "children": [
+        "hd-home-in"
+      ],
+      "attrs": {},
+      "styles": {
+        "backdrop-filter": "blur(12px)",
+        "background": "var(--bar-veil)",
+        "border-bottom": "1px solid var(--edge)",
+        "color": "var(--ink)",
+        "position": "sticky",
+        "top": "0",
+        "z-index": "var(--z-sticky)"
+      },
+      "breakpoints": {}
+    },
+    "hd-home-brand": {
+      "id": "hd-home-brand",
+      "tag": "a",
+      "name": "Brand",
+      "text": "Northwind Notes",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink)",
+        "font-size": "var(--fs-m)",
+        "font-weight": "var(--weight-strong)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-home-in": {
+      "id": "hd-home-in",
+      "tag": "div",
+      "name": "Bar",
+      "text": "",
+      "children": [
+        "hd-home-brand",
+        "hd-home-nav"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "center",
+        "box-sizing": "border-box",
+        "display": "flex",
+        "justify-content": "space-between",
+        "min-height": "var(--bar-h)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "hd-home-nav": {
+      "id": "hd-home-nav",
+      "tag": "nav",
+      "name": "Navigation",
+      "text": "",
+      "children": [
+        "hd-home-nav0",
+        "hd-home-nav1",
+        "hd-home-nav2"
+      ],
+      "attrs": {
+        "aria-label": "Main"
+      },
+      "styles": {
+        "display": "flex",
+        "gap": "var(--sp-2)"
+      },
+      "breakpoints": {}
+    },
+    "hd-home-nav0": {
+      "id": "hd-home-nav0",
+      "tag": "a",
+      "name": "Home",
+      "text": "Home",
+      "children": [],
+      "attrs": {
+        "aria-current": "page",
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-home-nav1": {
+      "id": "hd-home-nav1",
+      "tag": "a",
+      "name": "Product",
+      "text": "Product",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-home-nav2": {
+      "id": "hd-home-nav2",
+      "tag": "a",
+      "name": "About",
+      "text": "About",
+      "children": [],
+      "attrs": {
+        "href": "/about"
+      },
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-prod": {
+      "id": "hd-prod",
+      "tag": "header",
+      "name": "Header",
+      "text": "",
+      "children": [
+        "hd-prod-in"
+      ],
+      "attrs": {},
+      "styles": {
+        "backdrop-filter": "blur(12px)",
+        "background": "var(--bar-veil)",
+        "border-bottom": "1px solid var(--edge)",
+        "color": "var(--ink)",
+        "position": "sticky",
+        "top": "0",
+        "z-index": "var(--z-sticky)"
+      },
+      "breakpoints": {}
+    },
+    "hd-prod-brand": {
+      "id": "hd-prod-brand",
+      "tag": "a",
+      "name": "Brand",
+      "text": "Northwind Notes",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink)",
+        "font-size": "var(--fs-m)",
+        "font-weight": "var(--weight-strong)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-prod-in": {
+      "id": "hd-prod-in",
+      "tag": "div",
+      "name": "Bar",
+      "text": "",
+      "children": [
+        "hd-prod-brand",
+        "hd-prod-nav"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "center",
+        "box-sizing": "border-box",
+        "display": "flex",
+        "justify-content": "space-between",
+        "min-height": "var(--bar-h)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "hd-prod-nav": {
+      "id": "hd-prod-nav",
+      "tag": "nav",
+      "name": "Navigation",
+      "text": "",
+      "children": [
+        "hd-prod-nav0",
+        "hd-prod-nav1",
+        "hd-prod-nav2"
+      ],
+      "attrs": {
+        "aria-label": "Main"
+      },
+      "styles": {
+        "display": "flex",
+        "gap": "var(--sp-2)"
+      },
+      "breakpoints": {}
+    },
+    "hd-prod-nav0": {
+      "id": "hd-prod-nav0",
+      "tag": "a",
+      "name": "Home",
+      "text": "Home",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-prod-nav1": {
+      "id": "hd-prod-nav1",
+      "tag": "a",
+      "name": "Product",
+      "text": "Product",
+      "children": [],
+      "attrs": {
+        "aria-current": "page",
+        "href": "/product"
+      },
+      "styles": {
+        "color": "var(--ink)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hd-prod-nav2": {
+      "id": "hd-prod-nav2",
+      "tag": "a",
+      "name": "About",
+      "text": "About",
+      "children": [],
+      "attrs": {
+        "href": "/about"
+      },
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-s)",
+        "padding": "var(--sp-2) var(--sp-3)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "head-7ee392": {
+      "id": "head-7ee392",
+      "tag": "div",
+      "name": "Head",
+      "text": "",
+      "children": [
+        "label-7ee392",
+        "hout-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "center",
+        "display": "flex",
+        "flex-direction": "column",
+        "text-align": "center"
+      },
+      "breakpoints": {}
+    },
+    "heading-ae8e1f": {
+      "id": "heading-ae8e1f",
+      "tag": "h2",
+      "name": "Heading",
+      "text": "How quick is a note, really?",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "var(--fs-2xl)",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-display)",
+        "line-height": "1.05",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "hero-a1": {
+      "id": "hero-a1",
+      "tag": "a",
+      "name": "See how it works",
+      "text": "See how it works",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "align-items": "center",
+        "background": "var(--hue)",
+        "border-radius": "var(--radius-m)",
+        "color": "#06161a",
+        "display": "inline-flex",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "min-height": "var(--control-h)",
+        "padding": "0 var(--sp-4)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hero-a2": {
+      "id": "hero-a2",
+      "tag": "a",
+      "name": "About the project",
+      "text": "About the project",
+      "children": [],
+      "attrs": {
+        "href": "/about"
+      },
+      "styles": {
+        "align-items": "center",
+        "border": "1px solid var(--edge-strong)",
+        "border-radius": "var(--radius-m)",
+        "color": "var(--ink)",
+        "display": "inline-flex",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "min-height": "var(--control-h)",
+        "padding": "0 var(--sp-4)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "hero-actions": {
+      "id": "hero-actions",
+      "tag": "div",
+      "name": "Actions",
+      "text": "",
+      "children": [
+        "hero-a1",
+        "hero-a2"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-wrap": "wrap",
+        "gap": "var(--sp-3)"
+      },
+      "breakpoints": {}
+    },
+    "hero-h": {
+      "id": "hero-h",
+      "tag": "h1",
+      "name": "Notes that stay on your computer.",
+      "text": "Notes that stay on your computer.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "var(--fs-hero)",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-tight)",
+        "line-height": "1.08",
+        "margin": "0 0 var(--sp-4)",
+        "max-width": "18em"
+      },
+      "breakpoints": {}
+    },
+    "hero-home": {
+      "id": "hero-home",
+      "tag": "section",
+      "name": "Hero",
+      "text": "",
+      "children": [
+        "hero-home-f"
+      ],
+      "attrs": {},
+      "styles": {
+        "--hue": "#3bb3c4",
+        "box-sizing": "border-box",
+        "color": "var(--ink)",
+        "padding-bottom": "var(--sp-8)",
+        "padding-top": "var(--sp-10)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "hero-home-f": {
+      "id": "hero-home-f",
+      "tag": "div",
+      "name": "Frame",
+      "text": "",
+      "children": [
+        "hero-kicker",
+        "hero-h",
+        "hero-p",
+        "hero-actions"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "hero-kicker": {
+      "id": "hero-kicker",
+      "tag": "p",
+      "name": "Kicker",
+      "text": "Local first notes",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "margin": "0 0 var(--sp-3)"
+      },
+      "breakpoints": {}
+    },
+    "hero-p": {
+      "id": "hero-p",
+      "tag": "p",
+      "name": "Text",
+      "text": "Northwind Notes keeps every note as a plain file in a folder you choose. Link notes together, search them in a blink and export the lot whenever you like.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-m)",
+        "margin": "0 0 var(--sp-5)",
+        "max-width": "var(--prose-max)"
+      },
+      "breakpoints": {}
+    },
+    "hin-7ee392": {
+      "id": "hin-7ee392",
+      "tag": "div",
+      "name": "Heading inner",
+      "text": "",
+      "children": [
+        "h-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "hout-7ee392": {
+      "id": "hout-7ee392",
+      "tag": "div",
+      "name": "Heading outer",
+      "text": "",
+      "children": [
+        "hin-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic1-7ee392": {
+      "id": "ic1-7ee392",
+      "tag": "svg",
+      "name": "Icon",
+      "text": "",
+      "children": [
+        "ic1-a-7ee392",
+        "ic1-b-7ee392",
+        "ic1-c-7ee392",
+        "ic1-d-7ee392"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 24 24"
+      },
+      "styles": {
+        "color": "var(--hue)",
+        "display": "block",
+        "flex": "none",
+        "height": "38px",
+        "width": "38px"
+      },
+      "breakpoints": {}
+    },
+    "ic1-a-7ee392": {
+      "id": "ic1-a-7ee392",
+      "tag": "path",
+      "name": "ic1-a",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M6 3.5h8l4 4v13H6z"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic1-b-7ee392": {
+      "id": "ic1-b-7ee392",
+      "tag": "path",
+      "name": "ic1-b",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M14 3.5v4h4"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic1-c-7ee392": {
+      "id": "ic1-c-7ee392",
+      "tag": "path",
+      "name": "ic1-c",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M9 13h6"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic1-d-7ee392": {
+      "id": "ic1-d-7ee392",
+      "tag": "path",
+      "name": "ic1-d",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M9 16.5h6"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic2-7ee392": {
+      "id": "ic2-7ee392",
+      "tag": "svg",
+      "name": "Icon",
+      "text": "",
+      "children": [
+        "ic2-a-7ee392",
+        "ic2-b-7ee392",
+        "ic2-c-7ee392",
+        "ic2-d-7ee392",
+        "ic2-e-7ee392",
+        "ic2-f-7ee392",
+        "ic2-g-7ee392",
+        "ic2-h-7ee392",
+        "ic2-i-7ee392"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 24 24"
+      },
+      "styles": {
+        "color": "var(--hue)",
+        "display": "block",
+        "flex": "none",
+        "height": "38px",
+        "width": "38px"
+      },
+      "breakpoints": {}
+    },
+    "ic2-a-7ee392": {
+      "id": "ic2-a-7ee392",
+      "tag": "path",
+      "name": "ic2-a",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M4 7h9"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic2-b-7ee392": {
+      "id": "ic2-b-7ee392",
+      "tag": "path",
+      "name": "ic2-b",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M17 7h3"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic2-c-7ee392": {
+      "id": "ic2-c-7ee392",
+      "tag": "path",
+      "name": "ic2-c",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M13 7a2 2 0 1 0 4 0 2 2 0 1 0-4 0z"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic2-d-7ee392": {
+      "id": "ic2-d-7ee392",
+      "tag": "path",
+      "name": "ic2-d",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M4 17h3"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic2-e-7ee392": {
+      "id": "ic2-e-7ee392",
+      "tag": "path",
+      "name": "ic2-e",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M11 17h9"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic2-f-7ee392": {
+      "id": "ic2-f-7ee392",
+      "tag": "path",
+      "name": "ic2-f",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M7 17a2 2 0 1 0 4 0 2 2 0 1 0-4 0z"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic2-g-7ee392": {
+      "id": "ic2-g-7ee392",
+      "tag": "path",
+      "name": "ic2-g",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M4 12h5"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic2-h-7ee392": {
+      "id": "ic2-h-7ee392",
+      "tag": "path",
+      "name": "ic2-h",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M13 12h7"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic2-i-7ee392": {
+      "id": "ic2-i-7ee392",
+      "tag": "path",
+      "name": "ic2-i",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M9 12a2 2 0 1 0 4 0 2 2 0 1 0-4 0z"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic3-7ee392": {
+      "id": "ic3-7ee392",
+      "tag": "svg",
+      "name": "Icon",
+      "text": "",
+      "children": [
+        "ic3-a-7ee392",
+        "ic3-b-7ee392",
+        "ic3-c-7ee392"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 24 24"
+      },
+      "styles": {
+        "color": "var(--hue)",
+        "display": "block",
+        "flex": "none",
+        "height": "38px",
+        "width": "38px"
+      },
+      "breakpoints": {}
+    },
+    "ic3-a-7ee392": {
+      "id": "ic3-a-7ee392",
+      "tag": "path",
+      "name": "ic3-a",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M12 3.5l8 4v9l-8 4-8-4v-9z"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic3-b-7ee392": {
+      "id": "ic3-b-7ee392",
+      "tag": "path",
+      "name": "ic3-b",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M4 7.5l8 4 8-4"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "ic3-c-7ee392": {
+      "id": "ic3-c-7ee392",
+      "tag": "path",
+      "name": "ic3-c",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M12 11.5v9"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "in-78e412": {
+      "id": "in-78e412",
+      "tag": "div",
+      "name": "Content",
+      "text": "",
+      "children": [
+        "h-78e412",
+        "p-78e412",
+        "group-78e412"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "display": "grid",
+        "gap": "var(--sp-3)",
+        "justify-items": "center",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--sp-5)",
+        "padding-right": "var(--sp-5)",
+        "position": "relative",
+        "text-align": "center",
+        "transform": "translateY(-30px)",
+        "width": "100%",
+        "z-index": "var(--z-raised)"
+      },
+      "breakpoints": {
+        "mobile": {
+          "padding-left": "27px",
+          "padding-right": "27px"
+        },
+        "tablet": {
+          "padding-left": "40px",
+          "padding-right": "40px"
+        }
+      }
+    },
+    "in-c4805b": {
+      "id": "in-c4805b",
+      "tag": "div",
+      "name": "Content",
+      "text": "",
+      "children": [
+        "h-c4805b",
+        "p-c4805b",
+        "group-c4805b"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "display": "grid",
+        "gap": "var(--sp-3)",
+        "justify-items": "center",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--sp-5)",
+        "padding-right": "var(--sp-5)",
+        "position": "relative",
+        "text-align": "center",
+        "transform": "translateY(-30px)",
+        "width": "100%",
+        "z-index": "var(--z-raised)"
+      },
+      "breakpoints": {
+        "mobile": {
+          "padding-left": "27px",
+          "padding-right": "27px"
+        },
+        "tablet": {
+          "padding-left": "40px",
+          "padding-right": "40px"
+        }
+      }
+    },
+    "inner-ae8e1f": {
+      "id": "inner-ae8e1f",
+      "tag": "div",
+      "name": "Columns",
+      "text": "",
+      "children": [
+        "left-ae8e1f",
+        "right-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "grid",
+        "gap": "var(--sp-8)",
+        "grid-template-columns": "minmax(0, 1fr) minmax(0, 1fr)",
+        "padding-bottom": "calc(var(--sp-9) + var(--sp-3))",
+        "padding-top": "calc(var(--sp-9) + var(--sp-3))"
+      },
+      "breakpoints": {
+        "mobile": {
+          "gap": "var(--sp-8)",
+          "grid-template-columns": "minmax(0, 1fr)",
+          "padding-bottom": "var(--sp-8)",
+          "padding-top": "var(--sp-8)"
+        }
+      }
+    },
+    "intro-h": {
+      "id": "intro-h",
+      "tag": "h1",
+      "name": "Write, link, take it with you.",
+      "text": "Write, link, take it with you.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "var(--fs-hero)",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-tight)",
+        "line-height": "1.08",
+        "margin": "0 0 var(--sp-4)",
+        "max-width": "18em"
+      },
+      "breakpoints": {}
+    },
+    "intro-kicker": {
+      "id": "intro-kicker",
+      "tag": "p",
+      "name": "Kicker",
+      "text": "The product",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "margin": "0 0 var(--sp-3)"
+      },
+      "breakpoints": {}
+    },
+    "intro-p": {
+      "id": "intro-p",
+      "tag": "p",
+      "name": "Text",
+      "text": "Three ideas, and no more: notes are files, links are written in the note, and leaving is a copy.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-m)",
+        "margin": "0 0 var(--sp-5)",
+        "max-width": "var(--prose-max)"
+      },
+      "breakpoints": {}
+    },
+    "intro-prod": {
+      "id": "intro-prod",
+      "tag": "section",
+      "name": "Intro",
+      "text": "",
+      "children": [
+        "intro-prod-f"
+      ],
+      "attrs": {},
+      "styles": {
+        "--hue": "#3bb3c4",
+        "box-sizing": "border-box",
+        "color": "var(--ink)",
+        "padding-bottom": "var(--sp-5)",
+        "padding-top": "var(--sp-10)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "intro-prod-f": {
+      "id": "intro-prod-f",
+      "tag": "div",
+      "name": "Frame",
+      "text": "",
+      "children": [
+        "intro-kicker",
+        "intro-h",
+        "intro-p"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "l1-7ee392": {
+      "id": "l1-7ee392",
+      "tag": "ul",
+      "name": "Points",
+      "text": "",
+      "children": [
+        "l1a-7ee392",
+        "l1b-7ee392",
+        "l1c-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "14px",
+        "line-height": "1.5",
+        "list-style": "disc",
+        "margin": "0",
+        "padding": "0 0 0 15px"
+      },
+      "breakpoints": {}
+    },
+    "l1a-7ee392": {
+      "id": "l1a-7ee392",
+      "tag": "li",
+      "name": "l1a",
+      "text": "",
+      "children": [
+        "l1a-t-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "l1a-t-7ee392": {
+      "id": "l1a-t-7ee392",
+      "tag": "span",
+      "name": "l1a-t",
+      "text": "One plain file for each note",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "l1b-7ee392": {
+      "id": "l1b-7ee392",
+      "tag": "li",
+      "name": "l1b",
+      "text": "",
+      "children": [
+        "l1b-t-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "l1b-t-7ee392": {
+      "id": "l1b-t-7ee392",
+      "tag": "span",
+      "name": "l1b-t",
+      "text": "Saved as you type, with undo",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "l1c-7ee392": {
+      "id": "l1c-7ee392",
+      "tag": "li",
+      "name": "l1c",
+      "text": "",
+      "children": [
+        "l1c-t-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "l1c-t-7ee392": {
+      "id": "l1c-t-7ee392",
+      "tag": "span",
+      "name": "l1c-t",
+      "text": "Folders watched for outside edits",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "l2-7ee392": {
+      "id": "l2-7ee392",
+      "tag": "ul",
+      "name": "Points",
+      "text": "",
+      "children": [
+        "l2a-7ee392",
+        "l2b-7ee392",
+        "l2c-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "14px",
+        "line-height": "1.5",
+        "list-style": "disc",
+        "margin": "0",
+        "padding": "0 0 0 15px"
+      },
+      "breakpoints": {}
+    },
+    "l2a-7ee392": {
+      "id": "l2a-7ee392",
+      "tag": "li",
+      "name": "l2a",
+      "text": "",
+      "children": [
+        "l2a-t-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "l2a-t-7ee392": {
+      "id": "l2a-t-7ee392",
+      "tag": "span",
+      "name": "l2a-t",
+      "text": "Links written in double brackets",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "l2b-7ee392": {
+      "id": "l2b-7ee392",
+      "tag": "li",
+      "name": "l2b",
+      "text": "",
+      "children": [
+        "l2b-t-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "l2b-t-7ee392": {
+      "id": "l2b-t-7ee392",
+      "tag": "span",
+      "name": "l2b-t",
+      "text": "Backlinks listed on every note",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "l2c-7ee392": {
+      "id": "l2c-7ee392",
+      "tag": "li",
+      "name": "l2c",
+      "text": "",
+      "children": [
+        "l2c-t-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "l2c-t-7ee392": {
+      "id": "l2c-t-7ee392",
+      "tag": "span",
+      "name": "l2c-t",
+      "text": "Rename a note and its links follow",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "l3-7ee392": {
+      "id": "l3-7ee392",
+      "tag": "ul",
+      "name": "Points",
+      "text": "",
+      "children": [
+        "l3a-7ee392",
+        "l3b-7ee392",
+        "l3c-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "14px",
+        "line-height": "1.5",
+        "list-style": "disc",
+        "margin": "0",
+        "padding": "0 0 0 15px"
+      },
+      "breakpoints": {}
+    },
+    "l3a-7ee392": {
+      "id": "l3a-7ee392",
+      "tag": "li",
+      "name": "l3a",
+      "text": "",
+      "children": [
+        "l3a-t-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "l3a-t-7ee392": {
+      "id": "l3a-t-7ee392",
+      "tag": "span",
+      "name": "l3a-t",
+      "text": "A folder of files or one archive",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "l3b-7ee392": {
+      "id": "l3b-7ee392",
+      "tag": "li",
+      "name": "l3b",
+      "text": "",
+      "children": [
+        "l3b-t-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "l3b-t-7ee392": {
+      "id": "l3b-t-7ee392",
+      "tag": "span",
+      "name": "l3b-t",
+      "text": "Links and tags kept intact",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "l3c-7ee392": {
+      "id": "l3c-7ee392",
+      "tag": "li",
+      "name": "l3c",
+      "text": "",
+      "children": [
+        "l3c-t-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "l3c-t-7ee392": {
+      "id": "l3c-t-7ee392",
+      "tag": "span",
+      "name": "l3c-t",
+      "text": "Plain files, readable anywhere",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)"
+      },
+      "breakpoints": {}
+    },
+    "lab-78e412": {
+      "id": "lab-78e412",
+      "tag": "span",
+      "name": "Label",
+      "text": "",
+      "children": [
+        "lab1-78e412",
+        "lab2-78e412"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "grid",
+        "position": "relative"
+      },
+      "breakpoints": {}
+    },
+    "lab-c4805b": {
+      "id": "lab-c4805b",
+      "tag": "span",
+      "name": "Label",
+      "text": "",
+      "children": [
+        "lab1-c4805b",
+        "lab2-c4805b"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "grid",
+        "position": "relative"
+      },
+      "breakpoints": {}
+    },
+    "lab1-78e412": {
+      "id": "lab1-78e412",
+      "tag": "span",
+      "name": "Label text",
+      "text": "See how it works",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "grid-column": "1",
+        "grid-row": "1"
+      },
+      "breakpoints": {}
+    },
+    "lab1-c4805b": {
+      "id": "lab1-c4805b",
+      "tag": "span",
+      "name": "Label text",
+      "text": "Back to the start",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "grid-column": "1",
+        "grid-row": "1"
+      },
+      "breakpoints": {}
+    },
+    "lab2-78e412": {
+      "id": "lab2-78e412",
+      "tag": "span",
+      "name": "Label text on hover",
+      "text": "See how it works",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "grid-column": "1",
+        "grid-row": "1",
+        "opacity": "var(--cc-h)",
+        "transform": "translateX(calc((1 - var(--cc-h)) * -30px))",
+        "transition": "opacity var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1) var(--cc-d2), transform var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1) var(--cc-d2)"
+      },
+      "breakpoints": {}
+    },
+    "lab2-c4805b": {
+      "id": "lab2-c4805b",
+      "tag": "span",
+      "name": "Label text on hover",
+      "text": "Back to the start",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "grid-column": "1",
+        "grid-row": "1",
+        "opacity": "var(--cc-h)",
+        "transform": "translateX(calc((1 - var(--cc-h)) * -30px))",
+        "transition": "opacity var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1) var(--cc-d2), transform var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1) var(--cc-d2)"
+      },
+      "breakpoints": {}
+    },
+    "label-3df0ba": {
+      "id": "label-3df0ba",
+      "tag": "p",
+      "name": "Product label",
+      "text": "",
+      "children": [
+        "label-form-3df0ba",
+        "label-suffix-3df0ba",
+        "label-meta-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "font-size": "var(--fs-l)",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-tight)",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "label-7ee392": {
+      "id": "label-7ee392",
+      "tag": "p",
+      "name": "Label",
+      "text": "How it works",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-faint)",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "letter-spacing": "0.14em",
+        "margin": "0 0 var(--sp-3)",
+        "text-transform": "uppercase"
+      },
+      "breakpoints": {}
+    },
+    "label-ae8e1f": {
+      "id": "label-ae8e1f",
+      "tag": "p",
+      "name": "Chapter label",
+      "text": "",
+      "children": [
+        "label-form-ae8e1f",
+        "label-suffix-ae8e1f",
+        "label-meta-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {
+        "font-size": "var(--fs-l)",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-tight)",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "label-form-3df0ba": {
+      "id": "label-form-3df0ba",
+      "tag": "span",
+      "name": "Product name first part",
+      "text": "Northwind",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink)"
+      },
+      "breakpoints": {}
+    },
+    "label-form-ae8e1f": {
+      "id": "label-form-ae8e1f",
+      "tag": "span",
+      "name": "Form",
+      "text": "Northwind",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink)"
+      },
+      "breakpoints": {}
+    },
+    "label-hover-3df0ba": {
+      "id": "label-hover-3df0ba",
+      "tag": "span",
+      "name": "Label hover",
+      "text": "How it works",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "bottom": "0",
+        "left": "0",
+        "opacity": "var(--cta, 0)",
+        "position": "absolute",
+        "right": "0",
+        "top": "0",
+        "transform": "translateX(calc(-30px + var(--cta, 0) * 36px))",
+        "transition": "opacity 600ms var(--ease-out), transform 900ms var(--ease-out)",
+        "white-space": "nowrap"
+      },
+      "breakpoints": {}
+    },
+    "label-meta-3df0ba": {
+      "id": "label-meta-3df0ba",
+      "tag": "span",
+      "name": "Product category",
+      "text": "Four questions / Free",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-faint)",
+        "display": "block",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "font-weight": "400",
+        "letter-spacing": "0.14em",
+        "margin-top": "var(--sp-1)",
+        "text-transform": "uppercase"
+      },
+      "breakpoints": {}
+    },
+    "label-meta-ae8e1f": {
+      "id": "label-meta-ae8e1f",
+      "tag": "span",
+      "name": "Chapter meta",
+      "text": "Measured, not claimed",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-faint)",
+        "display": "block",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "font-weight": "400",
+        "letter-spacing": "0.14em",
+        "margin-top": "var(--sp-1)",
+        "text-transform": "uppercase"
+      },
+      "breakpoints": {}
+    },
+    "label-rest-3df0ba": {
+      "id": "label-rest-3df0ba",
+      "tag": "span",
+      "name": "Label rest",
+      "text": "How it works",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "display": "inline-block",
+        "opacity": "calc(1 - var(--cta, 0))",
+        "transition": "opacity 600ms var(--ease-out)"
+      },
+      "breakpoints": {}
+    },
+    "label-suffix-3df0ba": {
+      "id": "label-suffix-3df0ba",
+      "tag": "span",
+      "name": "Product name tinted part",
+      "text": " Notes",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)"
+      },
+      "breakpoints": {}
+    },
+    "label-suffix-ae8e1f": {
+      "id": "label-suffix-ae8e1f",
+      "tag": "span",
+      "name": "Product suffix",
+      "text": " Notes",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)"
+      },
+      "breakpoints": {}
+    },
+    "label-wide-3df0ba": {
+      "id": "label-wide-3df0ba",
+      "tag": "span",
+      "name": "Label hover wide",
+      "text": "How it works",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "bottom": "0",
+        "left": "0",
+        "opacity": "var(--cta, 0)",
+        "pointer-events": "none",
+        "position": "absolute",
+        "right": "0",
+        "top": "0",
+        "transform": "translateX(calc(-30px + var(--cta, 0) * 36px))",
+        "transition": "opacity 600ms var(--ease-out), transform 900ms var(--ease-out)",
+        "white-space": "nowrap"
+      },
+      "breakpoints": {}
+    },
+    "left-ae8e1f": {
+      "id": "left-ae8e1f",
+      "tag": "div",
+      "name": "Left column",
+      "text": "",
+      "children": [
+        "top-ae8e1f",
+        "bottom-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "var(--sp-8)",
+        "justify-content": "space-between",
+        "min-width": "0"
+      },
+      "breakpoints": {}
+    },
+    "lw1-7ee392": {
+      "id": "lw1-7ee392",
+      "tag": "div",
+      "name": "List wrap",
+      "text": "",
+      "children": [
+        "l1-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "lw2-7ee392": {
+      "id": "lw2-7ee392",
+      "tag": "div",
+      "name": "List wrap",
+      "text": "",
+      "children": [
+        "l2-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "lw3-7ee392": {
+      "id": "lw3-7ee392",
+      "tag": "div",
+      "name": "List wrap",
+      "text": "",
+      "children": [
+        "l3-7ee392"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "mark-l-ae8e1f": {
+      "id": "mark-l-ae8e1f",
+      "tag": "span",
+      "name": "Corner mark left",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "background": "linear-gradient(var(--ink-faint), var(--ink-faint)) center / 1px 100% no-repeat, linear-gradient(var(--ink-faint), var(--ink-faint)) center / 100% 1px no-repeat",
+        "bottom": "calc(var(--sp-2) * -1 - 0.5px)",
+        "height": "calc(var(--sp-4) + 1px)",
+        "left": "calc(var(--sp-2) * -1 - 0.5px)",
+        "pointer-events": "none",
+        "position": "absolute",
+        "width": "calc(var(--sp-4) + 1px)"
+      },
+      "breakpoints": {}
+    },
+    "mark-r-ae8e1f": {
+      "id": "mark-r-ae8e1f",
+      "tag": "span",
+      "name": "Corner mark right",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "background": "linear-gradient(var(--ink-faint), var(--ink-faint)) center / 1px 100% no-repeat, linear-gradient(var(--ink-faint), var(--ink-faint)) center / 100% 1px no-repeat",
+        "bottom": "calc(var(--sp-2) * -1 - 0.5px)",
+        "height": "calc(var(--sp-4) + 1px)",
+        "pointer-events": "none",
+        "position": "absolute",
+        "right": "calc(var(--sp-2) * -1 - 0.5px)",
+        "width": "calc(var(--sp-4) + 1px)"
+      },
+      "breakpoints": {}
+    },
+    "mask-78e412": {
+      "id": "mask-78e412",
+      "tag": "span",
+      "name": "Sweep shade",
+      "text": "",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "background": "linear-gradient(to right, color-mix(in srgb, var(--on-ink) 14%, transparent), transparent 70%)",
+        "bottom": "0",
+        "left": "0",
+        "opacity": "var(--cc-h)",
+        "position": "absolute",
+        "top": "0",
+        "transition": "opacity var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "mask-c4805b": {
+      "id": "mask-c4805b",
+      "tag": "span",
+      "name": "Sweep shade",
+      "text": "",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "background": "linear-gradient(to right, color-mix(in srgb, var(--on-ink) 14%, transparent), transparent 70%)",
+        "bottom": "0",
+        "left": "0",
+        "opacity": "var(--cc-h)",
+        "position": "absolute",
+        "top": "0",
+        "transition": "opacity var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "media-78e412": {
+      "id": "media-78e412",
+      "tag": "figure",
+      "name": "Picture frame",
+      "text": "",
+      "children": [
+        "shot-dark-78e412",
+        "shot-light-78e412"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--ground)",
+        "inset": "0",
+        "margin": "0",
+        "overflow": "hidden",
+        "position": "absolute",
+        "z-index": "var(--z-behind)"
+      },
+      "breakpoints": {}
+    },
+    "media-c4805b": {
+      "id": "media-c4805b",
+      "tag": "figure",
+      "name": "Picture frame",
+      "text": "",
+      "children": [
+        "shot-dark-c4805b",
+        "shot-light-c4805b"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--ground)",
+        "inset": "0",
+        "margin": "0",
+        "overflow": "hidden",
+        "position": "absolute",
+        "z-index": "var(--z-behind)"
+      },
+      "breakpoints": {}
+    },
+    "n1-7ee392": {
+      "id": "n1-7ee392",
+      "tag": "span",
+      "name": "Step 1",
+      "text": "1",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "background": "var(--ground)",
+        "box-shadow": "inset 0 0 0 1px var(--hue)",
+        "color": "var(--hue)",
+        "display": "grid",
+        "font-family": "var(--font-mono)",
+        "font-size": "18px",
+        "height": "34px",
+        "place-items": "center",
+        "position": "relative",
+        "width": "34px"
+      },
+      "breakpoints": {}
+    },
+    "n2-7ee392": {
+      "id": "n2-7ee392",
+      "tag": "span",
+      "name": "Step 2",
+      "text": "2",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "background": "var(--ground)",
+        "box-shadow": "inset 0 0 0 1px var(--hue)",
+        "color": "var(--hue)",
+        "display": "grid",
+        "font-family": "var(--font-mono)",
+        "font-size": "18px",
+        "height": "34px",
+        "place-items": "center",
+        "position": "relative",
+        "width": "34px"
+      },
+      "breakpoints": {}
+    },
+    "n3-7ee392": {
+      "id": "n3-7ee392",
+      "tag": "span",
+      "name": "Step 3",
+      "text": "3",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "background": "var(--ground)",
+        "box-shadow": "inset 0 0 0 1px var(--hue)",
+        "color": "var(--hue)",
+        "display": "grid",
+        "font-family": "var(--font-mono)",
+        "font-size": "18px",
+        "height": "34px",
+        "place-items": "center",
+        "position": "relative",
+        "width": "34px"
+      },
+      "breakpoints": {}
+    },
+    "nf-a1": {
+      "id": "nf-a1",
+      "tag": "a",
+      "name": "Go to the start page",
+      "text": "Go to the start page",
+      "children": [],
+      "attrs": {
+        "href": "/"
+      },
+      "styles": {
+        "align-items": "center",
+        "background": "var(--hue)",
+        "border-radius": "var(--radius-m)",
+        "color": "#06161a",
+        "display": "inline-flex",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "min-height": "var(--control-h)",
+        "padding": "0 var(--sp-4)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "nf-a2": {
+      "id": "nf-a2",
+      "tag": "a",
+      "name": "See the product",
+      "text": "See the product",
+      "children": [],
+      "attrs": {
+        "href": "/product"
+      },
+      "styles": {
+        "align-items": "center",
+        "border": "1px solid var(--edge-strong)",
+        "border-radius": "var(--radius-m)",
+        "color": "var(--ink)",
+        "display": "inline-flex",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "min-height": "var(--control-h)",
+        "padding": "0 var(--sp-4)",
+        "text-decoration": "none"
+      },
+      "breakpoints": {}
+    },
+    "nf-actions": {
+      "id": "nf-actions",
+      "tag": "div",
+      "name": "Actions",
+      "text": "",
+      "children": [
+        "nf-a1",
+        "nf-a2"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "gap": "var(--sp-3)"
+      },
+      "breakpoints": {}
+    },
+    "nf-f": {
+      "id": "nf-f",
+      "tag": "div",
+      "name": "Frame",
+      "text": "",
+      "children": [
+        "nf-kicker",
+        "nf-h",
+        "nf-p",
+        "nf-actions"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "nf-h": {
+      "id": "nf-h",
+      "tag": "h1",
+      "name": "That page is not here.",
+      "text": "That page is not here.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "var(--fs-hero)",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-tight)",
+        "line-height": "1.08",
+        "margin": "0 0 var(--sp-4)",
+        "max-width": "18em"
+      },
+      "breakpoints": {}
+    },
+    "nf-kicker": {
+      "id": "nf-kicker",
+      "tag": "p",
+      "name": "Kicker",
+      "text": "Error 404",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "var(--fs-s)",
+        "font-weight": "var(--weight-strong)",
+        "margin": "0 0 var(--sp-3)"
+      },
+      "breakpoints": {}
+    },
+    "nf-main": {
+      "id": "nf-main",
+      "tag": "section",
+      "name": "Not found",
+      "text": "",
+      "children": [
+        "nf-f"
+      ],
+      "attrs": {},
+      "styles": {
+        "--hue": "#3bb3c4",
+        "box-sizing": "border-box",
+        "color": "var(--ink)",
+        "min-height": "60vh",
+        "padding-bottom": "var(--sp-8)",
+        "padding-top": "var(--sp-10)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "nf-p": {
+      "id": "nf-p",
+      "tag": "p",
+      "name": "Text",
+      "text": "The address may have moved or may never have existed. The start page lists everything on this site.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-m)",
+        "margin": "0 0 var(--sp-5)",
+        "max-width": "var(--prose-max)"
+      },
+      "breakpoints": {}
+    },
+    "note-ae8e1f": {
+      "id": "note-ae8e1f",
+      "tag": "p",
+      "name": "Note",
+      "text": "Measured with the timing script that ships with the app, on a laptop with a spinning disk. Your numbers will differ.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "margin": "0",
+        "max-width": "31rem"
+      },
+      "breakpoints": {}
+    },
+    "num-ae8e1f": {
+      "id": "num-ae8e1f",
+      "tag": "span",
+      "name": "Figure",
+      "text": "23 ",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "color": "var(--hue)",
+        "font-size": "5.625rem",
+        "font-variant-numeric": "tabular-nums",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-display)",
+        "line-height": "0.95"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "5rem"
+        }
+      }
+    },
+    "p-78e412": {
+      "id": "p-78e412",
+      "tag": "p",
+      "name": "Intro",
+      "text": "",
+      "children": [
+        "p-lead-78e412",
+        "p-form-78e412",
+        "p-suffix-78e412",
+        "p-rest-78e412"
+      ],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-l)",
+        "margin": "0",
+        "max-width": "30rem",
+        "text-wrap": "balance"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "var(--fs-s)"
+        }
+      }
+    },
+    "p-c4805b": {
+      "id": "p-c4805b",
+      "tag": "p",
+      "name": "Intro",
+      "text": "",
+      "children": [
+        "p-lead-c4805b",
+        "p-form-c4805b",
+        "p-suffix-c4805b",
+        "p-rest-c4805b"
+      ],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-l)",
+        "margin": "0",
+        "max-width": "30rem",
+        "text-wrap": "balance"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "var(--fs-s)"
+        }
+      }
+    },
+    "p-form-78e412": {
+      "id": "p-form-78e412",
+      "tag": "span",
+      "name": "Name first part",
+      "text": "Northwind",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink)"
+      },
+      "breakpoints": {}
+    },
+    "p-form-c4805b": {
+      "id": "p-form-c4805b",
+      "tag": "span",
+      "name": "Name first part",
+      "text": "Northwind",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink)"
+      },
+      "breakpoints": {}
+    },
+    "p-lead-78e412": {
+      "id": "p-lead-78e412",
+      "tag": "span",
+      "name": "Lead",
+      "text": "Install it, pick a folder and write. ",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "p-lead-c4805b": {
+      "id": "p-lead-c4805b",
+      "tag": "span",
+      "name": "Lead",
+      "text": "Nothing to sign up for. ",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "p-rest-78e412": {
+      "id": "p-rest-78e412",
+      "tag": "span",
+      "name": "Rest",
+      "text": " keeps your notes as plain files, so any other tool can open them too.",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "p-rest-c4805b": {
+      "id": "p-rest-c4805b",
+      "tag": "span",
+      "name": "Rest",
+      "text": " is free while it is a sample, and it is not real, so there is nothing to download.",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "p-suffix-78e412": {
+      "id": "p-suffix-78e412",
+      "tag": "span",
+      "name": "Name second part",
+      "text": " Notes",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)"
+      },
+      "breakpoints": {}
+    },
+    "p-suffix-c4805b": {
+      "id": "p-suffix-c4805b",
+      "tag": "span",
+      "name": "Name second part",
+      "text": " Notes",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--hue)"
+      },
+      "breakpoints": {}
+    },
+    "page-root-1": {
+      "id": "page-root-1",
+      "tag": "main",
+      "name": "Product",
+      "text": "",
+      "children": [
+        "hd-prod",
+        "intro-prod",
+        "band-7ee392",
+        "band-c4805b",
+        "ft-prod"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--ground)",
+        "color": "var(--ink)",
+        "font-family": "Arial, Helvetica, sans-serif",
+        "font-weight": "var(--weight-body)",
+        "line-height": "1.55",
+        "margin": "0",
+        "min-height": "100vh",
+        "overflow-x": "clip",
+        "padding": "64px"
+      },
+      "breakpoints": {}
+    },
+    "page-root-2": {
+      "id": "page-root-2",
+      "tag": "main",
+      "name": "About",
+      "text": "",
+      "children": [
+        "hd-about",
+        "about-main",
+        "ft-about"
+      ],
+      "attrs": {},
+      "styles": {
+        "font-family": "Arial, Helvetica, sans-serif",
+        "min-height": "100vh",
+        "padding": "64px"
+      },
+      "breakpoints": {}
+    },
+    "page-root-3": {
+      "id": "page-root-3",
+      "tag": "main",
+      "name": "Not found",
+      "text": "",
+      "children": [
+        "hd-404",
+        "nf-main",
+        "ft-404"
+      ],
+      "attrs": {},
+      "styles": {
+        "font-family": "Arial, Helvetica, sans-serif",
+        "min-height": "100vh",
+        "padding": "64px"
+      },
+      "breakpoints": {}
+    },
+    "plus1-3df0ba": {
+      "id": "plus1-3df0ba",
+      "tag": "svg",
+      "name": "Question 1 plus",
+      "text": "",
+      "children": [
+        "plus1-v-3df0ba",
+        "plus1-h-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 12 12"
+      },
+      "styles": {
+        "color": "color-mix(in srgb, var(--hue) calc(var(--fw-v-faq_open1) * 100%), var(--ink-faint))",
+        "flex": "none",
+        "height": "12px",
+        "margin-top": "4px",
+        "transform": "rotate(calc(var(--fw-v-faq_open1) * 45deg))",
+        "transition": "transform 600ms var(--ease-out), color 600ms var(--ease-out)",
+        "width": "12px"
+      },
+      "breakpoints": {}
+    },
+    "plus1-h-3df0ba": {
+      "id": "plus1-h-3df0ba",
+      "tag": "path",
+      "name": "Plus horizontal",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M1 6h10"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "plus1-v-3df0ba": {
+      "id": "plus1-v-3df0ba",
+      "tag": "path",
+      "name": "Plus vertical",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M6 1v10"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "plus2-3df0ba": {
+      "id": "plus2-3df0ba",
+      "tag": "svg",
+      "name": "Question 2 plus",
+      "text": "",
+      "children": [
+        "plus2-v-3df0ba",
+        "plus2-h-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 12 12"
+      },
+      "styles": {
+        "color": "color-mix(in srgb, var(--hue) calc(var(--fw-v-faq_open2) * 100%), var(--ink-faint))",
+        "flex": "none",
+        "height": "12px",
+        "margin-top": "4px",
+        "transform": "rotate(calc(var(--fw-v-faq_open2) * 45deg))",
+        "transition": "transform 600ms var(--ease-out), color 600ms var(--ease-out)",
+        "width": "12px"
+      },
+      "breakpoints": {}
+    },
+    "plus2-h-3df0ba": {
+      "id": "plus2-h-3df0ba",
+      "tag": "path",
+      "name": "Plus horizontal",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M1 6h10"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "plus2-v-3df0ba": {
+      "id": "plus2-v-3df0ba",
+      "tag": "path",
+      "name": "Plus vertical",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M6 1v10"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "plus3-3df0ba": {
+      "id": "plus3-3df0ba",
+      "tag": "svg",
+      "name": "Question 3 plus",
+      "text": "",
+      "children": [
+        "plus3-v-3df0ba",
+        "plus3-h-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 12 12"
+      },
+      "styles": {
+        "color": "color-mix(in srgb, var(--hue) calc(var(--fw-v-faq_open3) * 100%), var(--ink-faint))",
+        "flex": "none",
+        "height": "12px",
+        "margin-top": "4px",
+        "transform": "rotate(calc(var(--fw-v-faq_open3) * 45deg))",
+        "transition": "transform 600ms var(--ease-out), color 600ms var(--ease-out)",
+        "width": "12px"
+      },
+      "breakpoints": {}
+    },
+    "plus3-h-3df0ba": {
+      "id": "plus3-h-3df0ba",
+      "tag": "path",
+      "name": "Plus horizontal",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M1 6h10"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "plus3-v-3df0ba": {
+      "id": "plus3-v-3df0ba",
+      "tag": "path",
+      "name": "Plus vertical",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M6 1v10"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "plus4-3df0ba": {
+      "id": "plus4-3df0ba",
+      "tag": "svg",
+      "name": "Question 4 plus",
+      "text": "",
+      "children": [
+        "plus4-v-3df0ba",
+        "plus4-h-3df0ba"
+      ],
+      "attrs": {
+        "aria-hidden": "true",
+        "fill": "none",
+        "stroke": "currentColor",
+        "stroke-linecap": "round",
+        "stroke-width": "1.5",
+        "viewBox": "0 0 12 12"
+      },
+      "styles": {
+        "color": "color-mix(in srgb, var(--hue) calc(var(--fw-v-faq_open4) * 100%), var(--ink-faint))",
+        "flex": "none",
+        "height": "12px",
+        "margin-top": "4px",
+        "transform": "rotate(calc(var(--fw-v-faq_open4) * 45deg))",
+        "transition": "transform 600ms var(--ease-out), color 600ms var(--ease-out)",
+        "width": "12px"
+      },
+      "breakpoints": {}
+    },
+    "plus4-h-3df0ba": {
+      "id": "plus4-h-3df0ba",
+      "tag": "path",
+      "name": "Plus horizontal",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M1 6h10"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "plus4-v-3df0ba": {
+      "id": "plus4-v-3df0ba",
+      "tag": "path",
+      "name": "Plus vertical",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "d": "M6 1v10"
+      },
+      "styles": {},
+      "breakpoints": {}
+    },
+    "prompt-3df0ba": {
+      "id": "prompt-3df0ba",
+      "tag": "div",
+      "name": "More questions row",
+      "text": "",
+      "children": [
+        "prompt-t-3df0ba",
+        "cta-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-items": "center",
+        "border-top": "1px solid var(--edge)",
+        "box-sizing": "border-box",
+        "display": "flex",
+        "gap": "var(--sp-5)",
+        "justify-content": "space-between",
+        "padding": "var(--sp-5)"
+      },
+      "breakpoints": {
+        "mobile": {
+          "padding": "var(--sp-3)"
+        },
+        "tablet": {
+          "align-items": "stretch",
+          "flex-direction": "column"
+        }
+      }
+    },
+    "prompt-h-3df0ba": {
+      "id": "prompt-h-3df0ba",
+      "tag": "p",
+      "name": "More questions title",
+      "text": "More questions?",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "var(--fs-l)",
+        "font-weight": "var(--weight-display)",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "prompt-s-3df0ba": {
+      "id": "prompt-s-3df0ba",
+      "tag": "p",
+      "name": "More questions line",
+      "text": "The product page walks through the three steps.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "prompt-t-3df0ba": {
+      "id": "prompt-t-3df0ba",
+      "tag": "div",
+      "name": "More questions copy",
+      "text": "",
+      "children": [
+        "prompt-h-3df0ba",
+        "prompt-s-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "grid",
+        "gap": "var(--sp-1)"
+      },
+      "breakpoints": {}
+    },
+    "q1-3df0ba": {
+      "id": "q1-3df0ba",
+      "tag": "button",
+      "name": "Question 1 button",
+      "text": "",
+      "children": [
+        "plus1-3df0ba",
+        "q1-t-3df0ba"
+      ],
+      "attrs": {
+        "type": "button"
+      },
+      "styles": {
+        "align-items": "flex-start",
+        "background": "transparent",
+        "border": "0",
+        "box-sizing": "border-box",
+        "color": "var(--ink)",
+        "cursor": "pointer",
+        "display": "flex",
+        "font-family": "inherit",
+        "font-size": "var(--fs-l)",
+        "font-weight": "var(--weight-strong)",
+        "gap": "var(--sp-3)",
+        "line-height": "20px",
+        "padding": "var(--sp-5)",
+        "text-align": "start",
+        "width": "100%"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "var(--fs-m)",
+          "padding": "var(--sp-3)"
+        }
+      }
+    },
+    "q1-t-3df0ba": {
+      "id": "q1-t-3df0ba",
+      "tag": "span",
+      "name": "Question 1 text",
+      "text": "Where are my notes kept?",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "q2-3df0ba": {
+      "id": "q2-3df0ba",
+      "tag": "button",
+      "name": "Question 2 button",
+      "text": "",
+      "children": [
+        "plus2-3df0ba",
+        "q2-t-3df0ba"
+      ],
+      "attrs": {
+        "type": "button"
+      },
+      "styles": {
+        "align-items": "flex-start",
+        "background": "transparent",
+        "border": "0",
+        "box-sizing": "border-box",
+        "color": "var(--ink)",
+        "cursor": "pointer",
+        "display": "flex",
+        "font-family": "inherit",
+        "font-size": "var(--fs-l)",
+        "font-weight": "var(--weight-strong)",
+        "gap": "var(--sp-3)",
+        "line-height": "20px",
+        "padding": "var(--sp-5)",
+        "text-align": "start",
+        "width": "100%"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "var(--fs-m)",
+          "padding": "var(--sp-3)"
+        }
+      }
+    },
+    "q2-t-3df0ba": {
+      "id": "q2-t-3df0ba",
+      "tag": "span",
+      "name": "Question 2 text",
+      "text": "Can I use another editor?",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "q3-3df0ba": {
+      "id": "q3-3df0ba",
+      "tag": "button",
+      "name": "Question 3 button",
+      "text": "",
+      "children": [
+        "plus3-3df0ba",
+        "q3-t-3df0ba"
+      ],
+      "attrs": {
+        "type": "button"
+      },
+      "styles": {
+        "align-items": "flex-start",
+        "background": "transparent",
+        "border": "0",
+        "box-sizing": "border-box",
+        "color": "var(--ink)",
+        "cursor": "pointer",
+        "display": "flex",
+        "font-family": "inherit",
+        "font-size": "var(--fs-l)",
+        "font-weight": "var(--weight-strong)",
+        "gap": "var(--sp-3)",
+        "line-height": "20px",
+        "padding": "var(--sp-5)",
+        "text-align": "start",
+        "width": "100%"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "var(--fs-m)",
+          "padding": "var(--sp-3)"
+        }
+      }
+    },
+    "q3-t-3df0ba": {
+      "id": "q3-t-3df0ba",
+      "tag": "span",
+      "name": "Question 3 text",
+      "text": "Does it work offline?",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "q4-3df0ba": {
+      "id": "q4-3df0ba",
+      "tag": "button",
+      "name": "Question 4 button",
+      "text": "",
+      "children": [
+        "plus4-3df0ba",
+        "q4-t-3df0ba"
+      ],
+      "attrs": {
+        "type": "button"
+      },
+      "styles": {
+        "align-items": "flex-start",
+        "background": "transparent",
+        "border": "0",
+        "box-sizing": "border-box",
+        "color": "var(--ink)",
+        "cursor": "pointer",
+        "display": "flex",
+        "font-family": "inherit",
+        "font-size": "var(--fs-l)",
+        "font-weight": "var(--weight-strong)",
+        "gap": "var(--sp-3)",
+        "line-height": "20px",
+        "padding": "var(--sp-5)",
+        "text-align": "start",
+        "width": "100%"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "var(--fs-m)",
+          "padding": "var(--sp-3)"
+        }
+      }
+    },
+    "q4-t-3df0ba": {
+      "id": "q4-t-3df0ba",
+      "tag": "span",
+      "name": "Question 4 text",
+      "text": "How do I leave?",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "rail-7ee392": {
+      "id": "rail-7ee392",
+      "tag": "div",
+      "name": "Step rail",
+      "text": "",
+      "children": [
+        "rail-line-7ee392",
+        "n1-7ee392",
+        "n2-7ee392",
+        "n3-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "justify-content": "space-between",
+        "margin": "var(--sp-7) auto 0",
+        "max-width": "100%",
+        "position": "relative",
+        "width": "calc((200% + 134px) / 3)"
+      },
+      "breakpoints": {
+        "mobile": {
+          "margin-top": "var(--sp-5)"
+        },
+        "tablet": {
+          "width": "70%"
+        }
+      }
+    },
+    "rail-line-7ee392": {
+      "id": "rail-line-7ee392",
+      "tag": "div",
+      "name": "Line",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "background": "var(--edge-strong)",
+        "height": "2px",
+        "left": "0",
+        "position": "absolute",
+        "right": "0",
+        "top": "calc(50% - 1px)"
+      },
+      "breakpoints": {}
+    },
+    "right-ae8e1f": {
+      "id": "right-ae8e1f",
+      "tag": "div",
+      "name": "Right column",
+      "text": "",
+      "children": [
+        "shot-ae8e1f",
+        "cap-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-content": "start",
+        "display": "grid",
+        "gap": "var(--sp-4)",
+        "min-width": "0"
+      },
+      "breakpoints": {}
+    },
+    "root": {
+      "id": "root",
+      "tag": "main",
+      "name": "Page",
+      "text": "",
+      "children": [
+        "hd-home",
+        "hero-home",
+        "section-ae8e1f",
+        "band-3df0ba",
+        "band-78e412",
+        "ft-home"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--ground)",
+        "color": "var(--ink)",
+        "font-family": "var(--font-ui)",
+        "font-weight": "var(--weight-body)",
+        "line-height": "1.55",
+        "margin": "0",
+        "min-height": "100vh",
+        "overflow-x": "clip",
+        "padding": "0"
+      },
+      "breakpoints": {}
+    },
+    "row1-3df0ba": {
+      "id": "row1-3df0ba",
+      "tag": "div",
+      "name": "Question 1",
+      "text": "",
+      "children": [
+        "h1-3df0ba",
+        "a1-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "row2-3df0ba": {
+      "id": "row2-3df0ba",
+      "tag": "div",
+      "name": "Question 2",
+      "text": "",
+      "children": [
+        "h2-3df0ba",
+        "a2-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-top": "1px solid var(--edge)"
+      },
+      "breakpoints": {}
+    },
+    "row3-3df0ba": {
+      "id": "row3-3df0ba",
+      "tag": "div",
+      "name": "Question 3",
+      "text": "",
+      "children": [
+        "h3-3df0ba",
+        "a3-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-top": "1px solid var(--edge)"
+      },
+      "breakpoints": {}
+    },
+    "row4-3df0ba": {
+      "id": "row4-3df0ba",
+      "tag": "div",
+      "name": "Question 4",
+      "text": "",
+      "children": [
+        "h4-3df0ba",
+        "a4-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-top": "1px solid var(--edge)"
+      },
+      "breakpoints": {}
+    },
+    "run-78e412": {
+      "id": "run-78e412",
+      "tag": "span",
+      "name": "Sweep",
+      "text": "",
+      "children": [
+        "mask-78e412",
+        "badge-78e412"
+      ],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "inset": "0",
+        "pointer-events": "none",
+        "position": "absolute",
+        "transform": "translateX(calc(var(--cc-h) * 100%))",
+        "transition": "transform var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1)"
+      },
+      "breakpoints": {}
+    },
+    "run-c4805b": {
+      "id": "run-c4805b",
+      "tag": "span",
+      "name": "Sweep",
+      "text": "",
+      "children": [
+        "mask-c4805b",
+        "badge-c4805b"
+      ],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "inset": "0",
+        "pointer-events": "none",
+        "position": "absolute",
+        "transform": "translateX(calc(var(--cc-h) * 100%))",
+        "transition": "transform var(--cc-dur) cubic-bezier(0.16, 1, 0.3, 1)"
+      },
+      "breakpoints": {}
+    },
+    "section-ae8e1f": {
+      "id": "section-ae8e1f",
+      "tag": "section",
+      "name": "Figures band",
+      "text": "",
+      "children": [
+        "wrap-ae8e1f"
+      ],
+      "attrs": {
+        "aria-labelledby": "heading-ae8e1f"
+      },
+      "styles": {
+        "--hue": "color-mix(in oklab, #3bb3c4 calc(100% - var(--hue-depth)), #000)",
+        "border-bottom": "1px solid var(--edge)",
+        "position": "relative"
+      },
+      "breakpoints": {}
+    },
+    "shot-ae8e1f": {
+      "id": "shot-ae8e1f",
+      "tag": "figure",
+      "name": "Screenshot frame",
+      "text": "",
+      "children": [
+        "shot-dark-ae8e1f",
+        "shot-light-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {
+        "background": "var(--pane)",
+        "border-radius": "var(--radius-l)",
+        "box-shadow": "var(--shadow-window, 0 1px 1px rgb(0 0 0 / 0.3), 0 28px 64px -28px rgb(0 0 0 / 0.8))",
+        "display": "block",
+        "margin": "0",
+        "overflow": "hidden"
+      },
+      "breakpoints": {}
+    },
+    "shot-dark-78e412": {
+      "id": "shot-dark-78e412",
+      "tag": "img",
+      "name": "Picture dark",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "The Northwind Notes window with a notebook, a note list and an open note",
+        "data-fw-theme-only": "dark",
+        "decoding": "async",
+        "height": "1500",
+        "src": "assets/f3119a1025aaae4445e18e59a28053d9d5c0a5c761d9390cf9fc5f33dc0645e7.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "height": "100%",
+        "inset": "0",
+        "object-fit": "cover",
+        "object-position": "50% 30%",
+        "position": "absolute",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "shot-dark-ae8e1f": {
+      "id": "shot-dark-ae8e1f",
+      "tag": "img",
+      "name": "Screenshot dark",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "A bar chart of notes written each week, rising over four months",
+        "data-fw-theme-only": "dark",
+        "decoding": "async",
+        "height": "1500",
+        "loading": "lazy",
+        "src": "assets/9fc1e58401e68cf494ccf91886506414015d54065ef6408933370d1a73a758b0.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "aspect-ratio": "1.1 / 1",
+        "display": "block",
+        "height": "auto",
+        "object-fit": "cover",
+        "object-position": "34% 0",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "shot-dark-c4805b": {
+      "id": "shot-dark-c4805b",
+      "tag": "img",
+      "name": "Picture dark",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "The Northwind Notes window with a notebook, a note list and an open note",
+        "data-fw-theme-only": "dark",
+        "decoding": "async",
+        "height": "1500",
+        "src": "assets/f3119a1025aaae4445e18e59a28053d9d5c0a5c761d9390cf9fc5f33dc0645e7.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "height": "100%",
+        "inset": "0",
+        "object-fit": "cover",
+        "object-position": "50% 30%",
+        "position": "absolute",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "shot-light-78e412": {
+      "id": "shot-light-78e412",
+      "tag": "img",
+      "name": "Picture light",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "The Northwind Notes window with a notebook, a note list and an open note",
+        "data-fw-theme-only": "light",
+        "decoding": "async",
+        "height": "1500",
+        "src": "assets/0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "height": "100%",
+        "inset": "0",
+        "object-fit": "cover",
+        "object-position": "50% 30%",
+        "position": "absolute",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "shot-light-ae8e1f": {
+      "id": "shot-light-ae8e1f",
+      "tag": "img",
+      "name": "Screenshot light",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "A bar chart of notes written each week, rising over four months",
+        "data-fw-theme-only": "light",
+        "decoding": "async",
+        "height": "1500",
+        "loading": "lazy",
+        "src": "assets/f4779dace2030ee2561c832d6d0a63d25ed90859a3ea52cc51f1003139f6b361.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "aspect-ratio": "1.1 / 1",
+        "display": "block",
+        "height": "auto",
+        "object-fit": "cover",
+        "object-position": "34% 0",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "shot-light-c4805b": {
+      "id": "shot-light-c4805b",
+      "tag": "img",
+      "name": "Picture light",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "alt": "The Northwind Notes window with a notebook, a note list and an open note",
+        "data-fw-theme-only": "light",
+        "decoding": "async",
+        "height": "1500",
+        "src": "assets/0d8c8f6a3de880ba0aefe53966ab2ab1b05be126e9d166d48215233c13c45913.webp",
+        "width": "2400"
+      },
+      "styles": {
+        "height": "100%",
+        "inset": "0",
+        "object-fit": "cover",
+        "object-position": "50% 30%",
+        "position": "absolute",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "side-3df0ba": {
+      "id": "side-3df0ba",
+      "tag": "div",
+      "name": "Heading block",
+      "text": "",
+      "children": [
+        "label-3df0ba",
+        "title-3df0ba"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-content": "start",
+        "display": "grid",
+        "gap": "var(--sp-3)"
+      },
+      "breakpoints": {}
+    },
+    "summary-ae8e1f": {
+      "id": "summary-ae8e1f",
+      "tag": "p",
+      "name": "Summary",
+      "text": "Timed on an eight year old laptop, from key press to saved file.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "color": "var(--ink-soft)",
+        "font-size": "var(--fs-l)",
+        "margin": "0",
+        "max-width": "20rem"
+      },
+      "breakpoints": {}
+    },
+    "t1-7ee392": {
+      "id": "t1-7ee392",
+      "tag": "h3",
+      "name": "Title",
+      "text": "Write",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "26px",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-display)",
+        "line-height": "1.1",
+        "margin": "0"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "20px"
+        },
+        "tablet": {}
+      }
+    },
+    "t2-7ee392": {
+      "id": "t2-7ee392",
+      "tag": "h3",
+      "name": "Title",
+      "text": "Link",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "26px",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-display)",
+        "line-height": "1.1",
+        "margin": "0"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "20px"
+        }
+      }
+    },
+    "t3-7ee392": {
+      "id": "t3-7ee392",
+      "tag": "h3",
+      "name": "Title",
+      "text": "Export",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "26px",
+        "font-weight": "var(--weight-display)",
+        "letter-spacing": "var(--track-display)",
+        "line-height": "1.1",
+        "margin": "0"
+      },
+      "breakpoints": {
+        "mobile": {
+          "font-size": "20px"
+        }
+      }
+    },
+    "title-3df0ba": {
+      "id": "title-3df0ba",
+      "tag": "h2",
+      "name": "Heading",
+      "text": "Questions about Northwind Notes.",
+      "children": [],
+      "attrs": {},
+      "styles": {
+        "font-size": "clamp(2rem, 1.1rem + 3.2vw, 3.8rem)",
+        "font-weight": "700",
+        "letter-spacing": "-0.036em",
+        "line-height": "1.02",
+        "margin": "0"
+      },
+      "breakpoints": {}
+    },
+    "top-ae8e1f": {
+      "id": "top-ae8e1f",
+      "tag": "div",
+      "name": "Heading block",
+      "text": "",
+      "children": [
+        "label-ae8e1f",
+        "heading-ae8e1f",
+        "summary-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {
+        "align-content": "start",
+        "display": "grid",
+        "gap": "var(--sp-4)",
+        "min-width": "0"
+      },
+      "breakpoints": {}
+    },
+    "top1-7ee392": {
+      "id": "top1-7ee392",
+      "tag": "div",
+      "name": "Top",
+      "text": "",
+      "children": [
+        "ic1-7ee392",
+        "tx1-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "20px"
+      },
+      "breakpoints": {}
+    },
+    "top2-7ee392": {
+      "id": "top2-7ee392",
+      "tag": "div",
+      "name": "Top",
+      "text": "",
+      "children": [
+        "ic2-7ee392",
+        "tx2-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "20px"
+      },
+      "breakpoints": {}
+    },
+    "top3-7ee392": {
+      "id": "top3-7ee392",
+      "tag": "div",
+      "name": "Top",
+      "text": "",
+      "children": [
+        "ic3-7ee392",
+        "tx3-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "20px"
+      },
+      "breakpoints": {}
+    },
+    "tx1-7ee392": {
+      "id": "tx1-7ee392",
+      "tag": "div",
+      "name": "Text",
+      "text": "",
+      "children": [
+        "t1-7ee392",
+        "d1-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "9px"
+      },
+      "breakpoints": {}
+    },
+    "tx2-7ee392": {
+      "id": "tx2-7ee392",
+      "tag": "div",
+      "name": "Text",
+      "text": "",
+      "children": [
+        "t2-7ee392",
+        "d2-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "9px"
+      },
+      "breakpoints": {}
+    },
+    "tx3-7ee392": {
+      "id": "tx3-7ee392",
+      "tag": "div",
+      "name": "Text",
+      "text": "",
+      "children": [
+        "t3-7ee392",
+        "d3-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "9px"
+      },
+      "breakpoints": {}
+    },
+    "unit-1-ae8e1f": {
+      "id": "unit-1-ae8e1f",
+      "tag": "span",
+      "name": "Unit",
+      "text": "Milliseconds to open a note",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "unit-2-ae8e1f": {
+      "id": "unit-2-ae8e1f",
+      "tag": "span",
+      "name": "Unit note",
+      "text": "Median over 10,000 notes",
+      "children": [],
+      "attrs": {},
+      "styles": {},
+      "breakpoints": {}
+    },
+    "unit-ae8e1f": {
+      "id": "unit-ae8e1f",
+      "tag": "span",
+      "name": "Figure unit",
+      "text": "",
+      "children": [
+        "unit-1-ae8e1f",
+        "unit-2-ae8e1f"
+      ],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "color": "var(--ink-faint)",
+        "display": "grid",
+        "font-family": "var(--font-mono)",
+        "font-size": "var(--fs-xs)",
+        "gap": "var(--sp-1)",
+        "letter-spacing": "0.14em",
+        "text-transform": "uppercase"
+      },
+      "breakpoints": {}
+    },
+    "veil-78e412": {
+      "id": "veil-78e412",
+      "tag": "div",
+      "name": "Veil",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "background": "linear-gradient(to bottom, var(--ground) 0%, transparent 27%), linear-gradient(to top, var(--ground) 9%, transparent 49%), color-mix(in srgb, var(--ground) 62%, transparent)",
+        "inset": "0",
+        "pointer-events": "none",
+        "position": "absolute",
+        "z-index": "var(--z-behind)"
+      },
+      "breakpoints": {}
+    },
+    "veil-c4805b": {
+      "id": "veil-c4805b",
+      "tag": "div",
+      "name": "Veil",
+      "text": "",
+      "children": [],
+      "attrs": {
+        "aria-hidden": "true"
+      },
+      "styles": {
+        "background": "linear-gradient(to bottom, var(--ground) 0%, transparent 27%), linear-gradient(to top, var(--ground) 9%, transparent 49%), color-mix(in srgb, var(--ground) 62%, transparent)",
+        "inset": "0",
+        "pointer-events": "none",
+        "position": "absolute",
+        "z-index": "var(--z-behind)"
+      },
+      "breakpoints": {}
+    },
+    "wrap-7ee392": {
+      "id": "wrap-7ee392",
+      "tag": "div",
+      "name": "Wrap",
+      "text": "",
+      "children": [
+        "head-7ee392",
+        "rail-7ee392",
+        "grid-7ee392",
+        "actions-7ee392"
+      ],
+      "attrs": {},
+      "styles": {
+        "box-sizing": "border-box",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    },
+    "wrap-ae8e1f": {
+      "id": "wrap-ae8e1f",
+      "tag": "div",
+      "name": "Frame",
+      "text": "",
+      "children": [
+        "mark-l-ae8e1f",
+        "mark-r-ae8e1f",
+        "inner-ae8e1f"
+      ],
+      "attrs": {},
+      "styles": {
+        "border-left": "1px solid var(--edge)",
+        "border-right": "1px solid var(--edge)",
+        "box-sizing": "border-box",
+        "margin-left": "auto",
+        "margin-right": "auto",
+        "max-width": "var(--page-max)",
+        "padding-left": "var(--gutter)",
+        "padding-right": "var(--gutter)",
+        "position": "relative",
+        "width": "100%"
+      },
+      "breakpoints": {}
+    }
+  },
+  "tokens": {
+    "accent": "#d6f05d",
+    "band-pad": "clamp(64px, 10vw, 128px)",
+    "bar-h": "64px",
+    "bar-veil": "rgb(15 14 13 / 0.92)",
+    "black": "#000000",
+    "card-light": "var(--pane)",
+    "card-light-ink": "var(--ink)",
+    "card-light-soft": "var(--ink-soft)",
+    "control": "#24211d",
+    "control-h": "40px",
+    "control-h-compact": "32px",
+    "control-hover": "#2d2924",
+    "control-press": "#36312b",
+    "dur": "240ms",
+    "dur-fast": "140ms",
+    "ease-out": "cubic-bezier(0.2, 0.7, 0.2, 1)",
+    "edge": "rgb(243 235 227 / 0.1)",
+    "edge-strong": "rgb(243 235 227 / 0.22)",
+    "fault": "#ff5d6c",
+    "float": "#1d1a17",
+    "focus": "#f3ebe3",
+    "font-mono": "\"SF Mono\", \"Cascadia Mono\", ui-monospace, Menlo, Consolas, monospace",
+    "font-ui": "\"Inter Web\", \"Inter Fallback\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+    "footage-edge": "rgb(255 255 255 / 0.55)",
+    "footage-faint": "rgb(255 255 255 / 0.5)",
+    "footage-glass": "rgb(10 12 13 / 0.45)",
+    "footage-hue": "#ffae2b",
+    "footage-ink": "#ffffff",
+    "footage-line": "rgb(255 255 255 / 0.16)",
+    "footage-soft": "rgb(255 255 255 / 0.78)",
+    "fs-2xl": "clamp(1.875rem, 1.3rem + 2.2vw, 2.75rem)",
+    "fs-hero": "clamp(2.5rem, 1.1rem + 5.2vw, 5rem)",
+    "fs-l": "1.125rem",
+    "fs-m": "1rem",
+    "fs-s": "0.875rem",
+    "fs-xl": "clamp(1.375rem, 1.15rem + 0.8vw, 1.75rem)",
+    "fs-xs": "0.8125rem",
+    "glow": "0 0 var(--sp-3) color-mix(in srgb, var(--hue) 30%, transparent), 0 var(--sp-2) var(--sp-7) calc(var(--sp-2) * -1) color-mix(in srgb, var(--hue) 62%, transparent)",
+    "glow-soft": "0 var(--sp-2) var(--sp-6) calc(var(--sp-2) * -1) color-mix(in srgb, var(--hue) 38%, transparent)",
+    "ground": "#0f0e0d",
+    "gutter": "clamp(20px, 4vw, 40px)",
+    "hue": "var(--hue-portal)",
+    "hue-cut": "#ffae2b",
+    "hue-depth": "0%",
+    "hue-line": "color-mix(in srgb, var(--hue) 42%, transparent)",
+    "hue-portal": "#f3ebe3",
+    "hue-vis": "#a98bf0",
+    "hue-wash": "color-mix(in srgb, var(--hue) 14%, transparent)",
+    "hue-wav": "#1fe5c0",
+    "icon-m": "20px",
+    "icon-s": "16px",
+    "ink": "#f3ebe3",
+    "ink-faint": "#857e77",
+    "ink-soft": "#a39a92",
+    "inset": "#0b0a09",
+    "motif-h": "40px",
+    "motif-w": "160px",
+    "on-ink": "#0f0e0d",
+    "page-max": "1120px",
+    "pane": "#161412",
+    "paper": "var(--inset)",
+    "paper-edge": "var(--edge)",
+    "paper-ink": "var(--ink)",
+    "paper-soft": "var(--ink-soft)",
+    "prose-max": "62ch",
+    "radius-l": "16px",
+    "radius-m": "10px",
+    "radius-pill": "999px",
+    "radius-s": "6px",
+    "rail-dark": "var(--pane)",
+    "rail-ink": "var(--ink-soft)",
+    "rail-w": "208px",
+    "row-h": "88px",
+    "shade-mid": "rgb(0 0 0 / 0.45)",
+    "shade-soft": "rgb(0 0 0 / 0.25)",
+    "shade-strong": "rgb(0 0 0 / 0.8)",
+    "shadow-frame": "0 40px 100px -50px rgb(0 0 0 / 0.9)",
+    "shadow-shot": "0 30px 80px -40px rgb(0 0 0 / 0.55)",
+    "shadow-tile": "none",
+    "shadow-window": "0 1px 1px rgb(0 0 0 / 0.3), 0 28px 64px -28px rgb(0 0 0 / 0.8)",
+    "sp-1": "4px",
+    "sp-10": "128px",
+    "sp-2": "8px",
+    "sp-3": "12px",
+    "sp-4": "16px",
+    "sp-5": "24px",
+    "sp-6": "32px",
+    "sp-7": "48px",
+    "sp-8": "64px",
+    "sp-9": "96px",
+    "terminal": "#0c0f10",
+    "terminal-bar": "#161c1d",
+    "terminal-faint": "#88827b",
+    "terminal-ink": "#f3ebe3",
+    "terminal-key": "#ffae2b",
+    "terminal-ok": "#1fe5c0",
+    "track-display": "-0.035em",
+    "track-tight": "-0.015em",
+    "veil": "rgb(8 9 12 / 0.6)",
+    "weight-body": "420",
+    "weight-display": "640",
+    "weight-strong": "560",
+    "z-base": "0",
+    "z-behind": "-1",
+    "z-chrome": "300",
+    "z-debug": "1000",
+    "z-dropdown": "400",
+    "z-field": "150",
+    "z-overlay": "600",
+    "z-popover": "700",
+    "z-raised": "100",
+    "z-scrim": "500",
+    "z-sticky": "200",
+    "z-toast": "800",
+    "z-tooltip": "900"
+  },
+  "breakpoints": [
+    {
+      "id": "desktop",
+      "name": "Desktop",
+      "maxWidth": 100000
+    },
+    {
+      "id": "tablet",
+      "name": "Tablet",
+      "maxWidth": 991
+    },
+    {
+      "id": "mobile",
+      "name": "Mobile",
+      "maxWidth": 767
+    }
+  ],
+  "components": {},
+  "collections": {},
+  "locales": {
+    "en": {}
+  },
+  "defaultLocale": "en",
+  "settings": {
+    "baseUrl": "https://example.com"
+  },
+  "extensions": {
+    "behaviors": {
+      "nodes": {
+        "btn-78e412": {
+          "states": {
+            "focus": {
+              "outline": "2px solid var(--focus)",
+              "outline-offset": "3px"
+            },
+            "hover": {
+              "--cc-d2": "0.25s",
+              "--cc-dur": "1.2s",
+              "--cc-h": "1"
+            }
+          }
+        },
+        "btn-7ee392": {
+          "states": {
+            "focus": {
+              "outline": "2px solid var(--focus)",
+              "outline-offset": "2px"
+            },
+            "hover": {
+              "background": "var(--control)"
+            }
+          }
+        },
+        "btn-c4805b": {
+          "states": {
+            "focus": {
+              "outline": "2px solid var(--focus)",
+              "outline-offset": "3px"
+            },
+            "hover": {
+              "--cc-d2": "0.25s",
+              "--cc-dur": "1.2s",
+              "--cc-h": "1"
+            }
+          }
+        },
+        "cta-3df0ba": {
+          "states": {
+            "focus": {
+              "--cta": "1",
+              "opacity": "0.88"
+            },
+            "hover": {
+              "--cta": "1",
+              "opacity": "0.88"
+            }
+          }
+        },
+        "q1-3df0ba": {
+          "states": {
+            "focus": {
+              "outline": "2px solid var(--focus)",
+              "outline-offset": "-2px"
+            }
+          }
+        },
+        "q2-3df0ba": {
+          "states": {
+            "focus": {
+              "outline": "2px solid var(--focus)",
+              "outline-offset": "-2px"
+            }
+          }
+        },
+        "q3-3df0ba": {
+          "states": {
+            "focus": {
+              "outline": "2px solid var(--focus)",
+              "outline-offset": "-2px"
+            }
+          }
+        },
+        "q4-3df0ba": {
+          "states": {
+            "focus": {
+              "outline": "2px solid var(--focus)",
+              "outline-offset": "-2px"
+            }
+          }
+        }
+      },
+      "overlays": {},
+      "timelines": {}
+    },
+    "design": {
+      "applications": {
+        "btn-78e412": {
+          "overrides": [
+            "padding-left",
+            "padding-right"
+          ],
+          "preset": "button"
+        },
+        "btn-7ee392": {
+          "overrides": [],
+          "preset": "button-quiet"
+        },
+        "btn-c4805b": {
+          "overrides": [
+            "padding-left",
+            "padding-right"
+          ],
+          "preset": "button"
+        },
+        "cta-3df0ba": {
+          "overrides": [
+            "flex",
+            "justify-content",
+            "min-width",
+            "overflow",
+            "position"
+          ],
+          "preset": "button"
+        },
+        "h-form-7ee392": {
+          "overrides": [],
+          "preset": "app-form"
+        },
+        "h-suffix-7ee392": {
+          "overrides": [],
+          "preset": "app-suffix"
+        },
+        "heading-ae8e1f": {
+          "overrides": [
+            "line-height"
+          ],
+          "preset": "heading"
+        },
+        "label-form-3df0ba": {
+          "overrides": [],
+          "preset": "app-form"
+        },
+        "label-form-ae8e1f": {
+          "overrides": [],
+          "preset": "app-form"
+        },
+        "label-meta-3df0ba": {
+          "overrides": [
+            "color",
+            "display",
+            "font-size",
+            "font-weight",
+            "letter-spacing",
+            "margin-top",
+            "text-transform"
+          ],
+          "preset": "mono"
+        },
+        "label-suffix-3df0ba": {
+          "overrides": [],
+          "preset": "app-suffix"
+        },
+        "label-suffix-ae8e1f": {
+          "overrides": [],
+          "preset": "app-suffix"
+        },
+        "p-form-78e412": {
+          "overrides": [],
+          "preset": "app-form"
+        },
+        "p-form-c4805b": {
+          "overrides": [],
+          "preset": "app-form"
+        },
+        "p-suffix-78e412": {
+          "overrides": [],
+          "preset": "app-suffix"
+        },
+        "p-suffix-c4805b": {
+          "overrides": [],
+          "preset": "app-suffix"
+        },
+        "title-3df0ba": {
+          "overrides": [
+            "font-size",
+            "font-weight",
+            "letter-spacing",
+            "line-height"
+          ],
+          "preset": "heading"
+        }
+      },
+      "fonts": {
+        "inter": {
+          "display": "optional",
+          "family": "Inter Web",
+          "src": "assets/2c295d99e26dcf357d4d01bcf270fd6924b600c9a13dd8c363ef114f4c6976fa.woff2",
+          "style": "normal",
+          "weight": "100 900"
+        }
+      },
+      "textPresets": {
+        "app-form": {
+          "styles": {
+            "color": "var(--ink)"
+          }
+        },
+        "app-suffix": {
+          "styles": {
+            "color": "var(--hue)"
+          }
+        },
+        "body": {
+          "styles": {
+            "font-size": "var(--fs-m)",
+            "font-weight": "var(--weight-body)",
+            "line-height": "1.55"
+          }
+        },
+        "brand-word": {
+          "styles": {
+            "aspect-ratio": "2465 / 1318",
+            "color": "inherit",
+            "display": "block",
+            "flex": "none",
+            "height": "round(down, min(var(--brand-h, 2.5rem), calc(var(--brand-cap, 8rem) / 1.87)), 2px)"
+          }
+        },
+        "button": {
+          "styles": {
+            "align-items": "center",
+            "background": "var(--ink)",
+            "border-radius": "0",
+            "color": "var(--on-ink)",
+            "display": "inline-flex",
+            "font-family": "var(--font-mono)",
+            "font-size": "var(--fs-xs)",
+            "font-weight": "500",
+            "gap": "var(--sp-2)",
+            "height": "48px",
+            "justify-content": "center",
+            "letter-spacing": "0.14em",
+            "line-height": "1.55",
+            "padding-left": "var(--sp-5)",
+            "padding-right": "var(--sp-5)",
+            "text-decoration": "none",
+            "text-transform": "uppercase",
+            "transition": "background-color var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out)",
+            "white-space": "nowrap"
+          }
+        },
+        "button-quiet": {
+          "styles": {
+            "align-items": "center",
+            "background": "transparent",
+            "border-radius": "0",
+            "box-shadow": "inset 0 0 0 1px var(--edge-strong)",
+            "color": "var(--ink)",
+            "display": "inline-flex",
+            "font-family": "var(--font-mono)",
+            "font-size": "var(--fs-xs)",
+            "font-weight": "500",
+            "gap": "var(--sp-2)",
+            "height": "48px",
+            "justify-content": "center",
+            "letter-spacing": "0.14em",
+            "line-height": "1.55",
+            "padding-left": "var(--sp-5)",
+            "padding-right": "var(--sp-5)",
+            "text-decoration": "none",
+            "text-transform": "uppercase",
+            "transition": "background-color var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out)",
+            "white-space": "nowrap"
+          }
+        },
+        "chip": {
+          "styles": {
+            "align-items": "center",
+            "background": "var(--hue)",
+            "border-radius": "var(--radius-pill)",
+            "color": "var(--on-ink)",
+            "display": "inline-flex",
+            "font-size": "var(--fs-xs)",
+            "font-weight": "var(--weight-strong)",
+            "height": "var(--sp-5)",
+            "line-height": "1.55",
+            "padding-left": "var(--sp-3)",
+            "padding-right": "var(--sp-3)",
+            "white-space": "nowrap"
+          }
+        },
+        "display": {
+          "styles": {
+            "font-size": "var(--fs-hero)",
+            "font-weight": "var(--weight-display)",
+            "letter-spacing": "var(--track-display)",
+            "line-height": "1.02",
+            "max-width": "17ch"
+          }
+        },
+        "eyebrow": {
+          "styles": {
+            "color": "var(--ink-soft)",
+            "font-size": "var(--fs-xs)",
+            "font-weight": "var(--weight-strong)",
+            "letter-spacing": "0.04em"
+          }
+        },
+        "foot-heading": {
+          "styles": {
+            "color": "var(--ink)",
+            "font-size": "var(--fs-s)",
+            "font-weight": "var(--weight-strong)",
+            "line-height": "1.55",
+            "margin": "0 0 var(--sp-2)",
+            "white-space": "nowrap"
+          }
+        },
+        "heading": {
+          "styles": {
+            "font-size": "var(--fs-2xl)",
+            "font-weight": "var(--weight-display)",
+            "letter-spacing": "var(--track-display)",
+            "line-height": "1.08"
+          }
+        },
+        "lead": {
+          "styles": {
+            "color": "var(--ink-soft)",
+            "font-size": "var(--fs-l)",
+            "font-weight": "var(--weight-body)",
+            "line-height": "1.5",
+            "max-width": "var(--prose-max)"
+          }
+        },
+        "mono": {
+          "styles": {
+            "font-family": "var(--font-mono)",
+            "font-size": "var(--fs-s)"
+          }
+        },
+        "nav-link": {
+          "styles": {
+            "align-items": "center",
+            "border-radius": "var(--radius-s)",
+            "color": "var(--ink-soft)",
+            "display": "inline-flex",
+            "font-family": "var(--font-mono)",
+            "font-size": "var(--fs-xs)",
+            "font-weight": "500",
+            "height": "var(--control-h-compact)",
+            "letter-spacing": "0.14em",
+            "line-height": "1.55",
+            "padding-left": "var(--sp-3)",
+            "padding-right": "var(--sp-3)",
+            "text-decoration": "none",
+            "text-transform": "uppercase",
+            "transition": "color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out)",
+            "white-space": "nowrap"
+          }
+        },
+        "small": {
+          "styles": {
+            "color": "var(--ink-soft)",
+            "font-size": "var(--fs-s)",
+            "line-height": "1.45"
+          }
+        },
+        "title": {
+          "styles": {
+            "font-size": "var(--fs-xl)",
+            "font-weight": "var(--weight-strong)",
+            "letter-spacing": "var(--track-tight)",
+            "line-height": "1.2"
+          }
+        }
+      },
+      "themes": {
+        "default": "dark",
+        "followSystem": false,
+        "values": {
+          "light": {
+            "bar-veil": "rgb(242 241 238 / 0.92)",
+            "control": "#e5e3dd",
+            "control-hover": "#dbd8d1",
+            "control-press": "#d0ccc4",
+            "edge": "rgb(16 16 20 / 0.13)",
+            "edge-strong": "rgb(16 16 20 / 0.3)",
+            "fault": "#c9283a",
+            "float": "#fbfaf8",
+            "focus": "#101014",
+            "ground": "#f2f1ee",
+            "hue-cut": "#844e00",
+            "hue-depth": "48%",
+            "hue-portal": "#101014",
+            "hue-vis": "#6343bc",
+            "hue-wav": "#006654",
+            "ink": "#101014",
+            "ink-faint": "#6a6861",
+            "ink-soft": "#55544f",
+            "inset": "#e9e7e2",
+            "on-ink": "#f2f1ee",
+            "pane": "#f7f6f3",
+            "paper": "#edeae2",
+            "paper-edge": "rgb(20 24 25 / 0.12)",
+            "rail-dark": "#ffffff",
+            "rail-ink": "#465052",
+            "shadow-tile": "none",
+            "shadow-window": "0 1px 1px rgb(40 32 20 / 0.04), 0 28px 64px -28px rgb(40 32 20 / 0.3)",
+            "veil": "rgb(20 22 27 / 0.4)"
+          }
+        }
+      }
+    },
+    "motion": {
+      "actions": {
+        "q1-3df0ba": [
+          {
+            "action": "set-variable",
+            "formula": "!faq_open1",
+            "trigger": "click",
+            "variable": "faq_open1"
+          }
+        ],
+        "q2-3df0ba": [
+          {
+            "action": "set-variable",
+            "formula": "!faq_open2",
+            "trigger": "click",
+            "variable": "faq_open2"
+          }
+        ],
+        "q3-3df0ba": [
+          {
+            "action": "set-variable",
+            "formula": "!faq_open3",
+            "trigger": "click",
+            "variable": "faq_open3"
+          }
+        ],
+        "q4-3df0ba": [
+          {
+            "action": "set-variable",
+            "formula": "!faq_open4",
+            "trigger": "click",
+            "variable": "faq_open4"
+          }
+        ]
+      },
+      "counters": {
+        "count-1-n-ae8e1f": {
+          "duration": 1200,
+          "from": 0,
+          "to": 10000,
+          "trigger": "view"
+        },
+        "count-2-n-ae8e1f": {
+          "duration": 1600,
+          "from": 0,
+          "to": 412,
+          "trigger": "view"
+        },
+        "num-ae8e1f": {
+          "duration": 1400,
+          "from": 0,
+          "to": 40,
+          "trigger": "view"
+        }
+      },
+      "disclosure": {
+        "faq-3df0ba": {
+          "items": [
+            {
+              "panel": "a1-3df0ba",
+              "trigger": "q1-3df0ba"
+            },
+            {
+              "panel": "a2-3df0ba",
+              "trigger": "q2-3df0ba"
+            },
+            {
+              "panel": "a3-3df0ba",
+              "trigger": "q3-3df0ba"
+            },
+            {
+              "panel": "a4-3df0ba",
+              "trigger": "q4-3df0ba"
+            }
+          ],
+          "type": "accordion"
+        }
+      },
+      "reveals": {
+        "c1-7ee392": {
+          "delay": 150,
+          "duration": 1000,
+          "easing": "cubic-bezier(0.25, 1, 0.5, 1)",
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(100px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px 0px 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "c2-7ee392": {
+          "delay": 250,
+          "duration": 1000,
+          "easing": "cubic-bezier(0.25, 1, 0.5, 1)",
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(100px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px 0px 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "c3-7ee392": {
+          "delay": 350,
+          "duration": 1000,
+          "easing": "cubic-bezier(0.25, 1, 0.5, 1)",
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(100px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px 0px 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "cap-ae8e1f": {
+          "delay": 300,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "counts-ae8e1f": {
+          "delay": 300,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "figure-ae8e1f": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "group-78e412": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "group-c4805b": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "h-78e412": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "h-c4805b": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "heading-ae8e1f": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "hin-7ee392": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px 0px 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "hout-7ee392": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "label-ae8e1f": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "lw1-7ee392": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px 0px 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "lw2-7ee392": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px 0px 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "lw3-7ee392": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px 0px 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "note-ae8e1f": {
+          "delay": 300,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "p-78e412": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "p-c4805b": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "prompt-3df0ba": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "threshold": 0.15
+        },
+        "rail-7ee392": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "once": true,
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "row1-3df0ba": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "threshold": 0.15
+        },
+        "row2-3df0ba": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "threshold": 0.15
+        },
+        "row3-3df0ba": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "threshold": 0.15
+        },
+        "row4-3df0ba": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "threshold": 0.15
+        },
+        "shot-ae8e1f": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        },
+        "side-3df0ba": {
+          "delay": 150,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "threshold": 0.15
+        },
+        "summary-ae8e1f": {
+          "delay": 300,
+          "duration": 800,
+          "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "from": {
+            "filter": "blur(10px)",
+            "opacity": "0",
+            "transform": "translateY(45px)"
+          },
+          "rootMargin": "0px 0px -10% 0px",
+          "threshold": 0,
+          "trigger": "view"
+        }
+      }
+    },
+    "seo": {
+      "redirects": {
+        "/notes": "/product",
+        "/pricing": {
+          "status": 302,
+          "to": "/about"
+        }
+      }
+    },
+    "variables": {
+      "values": {
+        "faq_open1": {
+          "cssVar": true,
+          "initial": false,
+          "type": "boolean"
+        },
+        "faq_open2": {
+          "cssVar": true,
+          "initial": false,
+          "type": "boolean"
+        },
+        "faq_open3": {
+          "cssVar": true,
+          "initial": false,
+          "type": "boolean"
+        },
+        "faq_open4": {
+          "cssVar": true,
+          "initial": false,
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

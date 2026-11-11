@@ -1,0 +1,21 @@
+{
+  "Demos": "Demo's",
+  "Demo": "Demo",
+  "FormPublisher demo": "FormPublisher-demo",
+  "Try it on a sample site": "Probeer het op een voorbeeldsite",
+  "Bundled sample site": "Meegeleverde voorbeeldsite",
+  "The sample site could not be opened": "De voorbeeldsite kon niet worden geopend",
+  "The bundled sample site is missing from this install": "De meegeleverde voorbeeldsite ontbreekt in deze installatie",
+  "Quick tour": "Korte rondleiding",
+  "Skip the tour": "Rondleiding overslaan",
+  "Back": "Terug",
+  "Next": "Volgende",
+  "Done": "Klaar",
+  "Step {0} of {1}": "Stap {0} van {1}",
+  "Preview": "Voorbeeld",
+  "Checks": "Controles",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Elke route wordt hier getoond in de apparaatbreedte die u kiest. Klik links op een route om door de site te navigeren.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Open het paneel om de controles uit te voeren. Problemen tonen de kapotte links en ontbrekende gegevens, en bij elk staat hoe u het oplost.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "Verpakken maakt van de site één reproduceerbare zip met een hash voor elk bestand, klaar om te ondertekenen.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "Publiceren schrijft een map en de exacte opdrachten voor elke host. FormPublisher uploadt nooit iets."
+}

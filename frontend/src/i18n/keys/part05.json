@@ -1,0 +1,21 @@
+[
+"Demos",
+"Demo",
+"FormPublisher demo",
+"Try it on a sample site",
+"Bundled sample site",
+"The sample site could not be opened",
+"The bundled sample site is missing from this install",
+"Quick tour",
+"Skip the tour",
+"Back",
+"Next",
+"Done",
+"Step {0} of {1}",
+"Preview",
+"Checks",
+"Every route renders here at the device width you pick. Click a route on the left to move around the site.",
+"Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.",
+"Package turns the site into one reproducible zip with a hash for every file, ready to sign.",
+"Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything."
+]

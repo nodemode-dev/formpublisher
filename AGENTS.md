@@ -1,12 +1,20 @@
 # FormPublisher
 
-The Form family's site publisher. It opens what FormWeb makes (a `site-export.zip`, a publication folder, or the site currently open in a running FormWeb), lists the routes, and shows them in a FormDeck-style window. Vanilla TypeScript and Vite interface, Python 3.12 FastAPI engine, Tauri 2 shell, and a command line with an MCP server. Device preview, checks, packaging, signing, publishing and the desktop build are in development.
+The Form family's site publisher. It opens what FormWeb makes (a `site-export.zip`, a publication folder, or the site currently open in a running FormWeb), lists the routes, and shows them in a FormDeck-style window. Vanilla TypeScript and Vite interface, Python 3.12 FastAPI engine, Tauri 2 shell, and a command line with an MCP server. It previews the site on device sizes, runs checks, builds a deterministic signed package and prepares a folder per host (static zip, Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx) with the commands to run; it never uploads. The desktop build is in development.
 
 ## Driving FormPublisher (natural language)
 
-When the person wants a site opened, imported, listed or inspected, use the `formpublisher` MCP server's tools guided by the `formpublisher-harness` skill in `.agents/skills/formpublisher-harness`. Start with `status` (the engine, the data folder, whether a FormWeb is reachable), then `sites` to list what is imported, `import` to bring in a `site-export.zip`, a publication folder or the site open in FormWeb, and `routes` to list a site's routes. Ask the person before importing from a running FormWeb, and never call FormWeb's `/api/load`: FormPublisher only reads FormWeb.
+When the person wants a site opened, imported, listed, inspected, checked, packaged, signed or prepared for a host, use the `formpublisher` MCP server's tools guided by the `formpublisher-harness` skill in `.agents/skills/formpublisher-harness`. The tools, in the order of the loop:
 
-The MCP server is configured for Claude Code in `.mcp.json`, for Codex in `.codex/config.toml` and for Cursor in `.cursor/mcp.json`; each runs `./formpublisher mcp`, which talks to the open FormPublisher window's engine when one is running with the same data folder and otherwise runs the engine's routes in-process. For another client, run `[repo]/formpublisher mcp` on stdio. Without MCP, `./formpublisher run` has the same surface, one command per tool (`--help` after any of them; `--json` for the raw answer).
+- `formpublisher_status`: the engine, the data folder, whether a FormWeb is reachable.
+- `list_sites`, `import_site` (a `site-export.zip` or publication folder path), `import_formweb_current` (the site open in FormWeb), `site_routes`.
+- `run_checks` (static always, `deep` for the Chrome run), `get_checks`.
+- `build_package`, `list_builds`, `sign_build` (with a key the person named), `verify_build`.
+- `list_targets`, `prepare_publish` (build id and target ids: `static-zip`, `netlify`, `cloudflare-pages`, `vercel`, `github-pages`, `nginx`), `get_prepared`.
+
+Preparing writes a folder per host with the exact commands; nothing is uploaded, and running those commands is the person's call. Ask the person before importing from a running FormWeb, and never call FormWeb's `/api/load`: FormPublisher only reads FormWeb.
+
+The MCP server is configured for Claude Code in `.mcp.json`, for Codex in `.codex/config.toml` and for Cursor in `.cursor/mcp.json`; each runs `./formpublisher mcp`, which talks to the open FormPublisher window's engine when one is running with the same data folder and otherwise runs the engine's routes in-process. For another client, run `[repo]/formpublisher mcp` on stdio. Without MCP, `./formpublisher run` has the same surface (`status`, `sites`, `import`, `import-formweb`, `routes`, `check`, `build`, `builds`, `sign`, `verify`, `keys`, `targets`, `prepare`, `prepared`, `receive-status`; `--help` after any of them, `--json` for the raw answer). Creating a signing key is a command only: `./formpublisher run keys --create NAME`.
 
 ## Changing FormPublisher's code
 

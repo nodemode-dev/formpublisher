@@ -13,6 +13,8 @@ INSTRUCTIONS = (
     "FormPublisher turns a site built in FormWeb into something that can be checked, packaged and published. "
     "Start with formpublisher_status, then import a FormWeb export zip or publication folder with import_site, "
     "or pull the current FormWeb export with import_formweb_current, and read the result with list_sites and site_routes. "
+    "Then run_checks, build_package, sign_build (with a key the person named) and verify_build, and finish with list_targets and prepare_publish, "
+    "which writes a folder per host with the commands to run; nothing is uploaded. "
     "FormPublisher only reads from FormWeb and never changes it."
 )
 
@@ -68,6 +70,85 @@ def build(client: Client | None = None) -> MCPServer:
     async def site_routes(id: str) -> dict:
         """id: the site id as returned by list_sites."""
         return await run(link.routes, id)
+
+    @server.tool(
+        name="run_checks",
+        description="Run the checks on an imported site's revision and return the problems with route, severity, code, message and fix. The static tier is offline and always runs; set deep to also drive the installed Chrome at the given widths (slow, needs Playwright). Stores the result for get_checks.",
+        annotations=ToolAnnotations(title="Run checks", readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False),
+    )
+    async def run_checks(id: str, deep: bool = False, widths: list[int] | None = None, revision: str | None = None) -> dict:
+        """id: site id from list_sites. deep: also run the browser tier. widths: viewport widths for the deep tier, default 1440 and 390. revision: default the latest."""
+        return await run(link.check, id, deep, widths, revision)
+
+    @server.tool(
+        name="get_checks",
+        description="Read the stored check results of a site's revision (problems, counts per severity, which tiers ran) without running anything. Read only.",
+        annotations=ToolAnnotations(title="Stored check results", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def get_checks(id: str, revision: str | None = None) -> dict:
+        """id: site id from list_sites. revision: default the latest."""
+        return await run(link.get_checks, id, revision)
+
+    @server.tool(
+        name="build_package",
+        description="Build the deterministic package for a site's revision: site.zip plus publish.json with the SHA-256 and size of every file. Building the same site twice returns the same build id. Returns the build record.",
+        annotations=ToolAnnotations(title="Build a package", readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False),
+    )
+    async def build_package(id: str, revision: str | None = None) -> dict:
+        """id: site id from list_sites. revision: default the latest."""
+        return await run(link.build, id, revision)
+
+    @server.tool(
+        name="list_builds",
+        description="List every build with its id, site, revision, file count, size, signed flag and time, newest first. Read only.",
+        annotations=ToolAnnotations(title="List builds", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def list_builds() -> dict:
+        return await run(link.builds)
+
+    @server.tool(
+        name="sign_build",
+        description="Sign a build's site.zip with an Ed25519 key (a detached signature stored beside the zip). Name the key; when key is omitted and exactly one key exists it is used, otherwise the call fails. Never invent a passphrase.",
+        annotations=ToolAnnotations(title="Sign a build", readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False),
+    )
+    async def sign_build(build: str, key: str | None = None, passphrase: str | None = None) -> dict:
+        """build: build id from list_builds. key: key id the person named. passphrase: only if the key has one and the person gave it."""
+        return await run(link.sign, build, key, passphrase)
+
+    @server.tool(
+        name="verify_build",
+        description="Verify a build's detached signature against its site.zip bytes. Returns valid true with the key fingerprint, or valid false with the reason (not signed, malformed, or the package does not match). Read only.",
+        annotations=ToolAnnotations(title="Verify a build", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def verify_build(build: str) -> dict:
+        """build: build id from list_builds."""
+        return await run(link.verify, build)
+
+    @server.tool(
+        name="list_targets",
+        description="List the host targets a build can be prepared for (static-zip, netlify, cloudflare-pages, vercel, github-pages, nginx) with name, description and the local tool that serves each one. Read only.",
+        annotations=ToolAnnotations(title="List publish targets", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def list_targets() -> dict:
+        return await run(link.targets)
+
+    @server.tool(
+        name="prepare_publish",
+        description="Prepare a folder per target for a build and return, for each, the folder path, files, the exact commands to run, notes and warnings. Nothing is uploaded; running the commands is up to the person. Preparing again replaces the folder.",
+        annotations=ToolAnnotations(title="Prepare for publishing", readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False),
+    )
+    async def prepare_publish(build: str, targets: list[str]) -> dict:
+        """build: build id from list_builds. targets: target ids from list_targets."""
+        return await run(link.prepare, build, targets)
+
+    @server.tool(
+        name="get_prepared",
+        description="Read what is already prepared for a build: per target the folder, files, commands, notes and warnings. Read only.",
+        annotations=ToolAnnotations(title="Prepared folders", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def get_prepared(build: str) -> dict:
+        """build: build id from list_builds."""
+        return await run(link.prepared, build)
 
     return server
 

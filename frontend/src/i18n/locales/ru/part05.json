@@ -1,0 +1,21 @@
+{
+  "Demos": "Демо",
+  "Demo": "Демо",
+  "FormPublisher demo": "Демо FormPublisher",
+  "Try it on a sample site": "Попробуйте на примере сайта",
+  "Bundled sample site": "Встроенный пример сайта",
+  "The sample site could not be opened": "Не удалось открыть пример сайта",
+  "The bundled sample site is missing from this install": "Встроенный пример сайта отсутствует в этой установке",
+  "Quick tour": "Быстрый тур",
+  "Skip the tour": "Пропустить тур",
+  "Back": "Назад",
+  "Next": "Далее",
+  "Done": "Готово",
+  "Step {0} of {1}": "Шаг {0} из {1}",
+  "Preview": "Просмотр",
+  "Checks": "Проверки",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Каждый маршрут отображается здесь в выбранной ширине устройства. Нажмите маршрут слева, чтобы перемещаться по сайту.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Откройте панель, чтобы запустить проверки. В списке проблем указаны неработающие ссылки и недостающие данные, и для каждой сказано, как её исправить.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "Упаковка превращает сайт в один воспроизводимый zip с хешем каждого файла, готовый к подписи.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "Публикация записывает папку и точные команды для каждого хостинга. FormPublisher ничего не загружает."
+}

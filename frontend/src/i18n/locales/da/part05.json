@@ -1,0 +1,21 @@
+{
+  "Demos": "Demoer",
+  "Demo": "Demo",
+  "FormPublisher demo": "FormPublisher-demo",
+  "Try it on a sample site": "Prøv det på et eksempelwebsted",
+  "Bundled sample site": "Medfølgende eksempelwebsted",
+  "The sample site could not be opened": "Eksempelwebstedet kunne ikke åbnes",
+  "The bundled sample site is missing from this install": "Det medfølgende eksempelwebsted mangler i denne installation",
+  "Quick tour": "Hurtig rundtur",
+  "Skip the tour": "Spring rundturen over",
+  "Back": "Tilbage",
+  "Next": "Næste",
+  "Done": "Færdig",
+  "Step {0} of {1}": "Trin {0} af {1}",
+  "Preview": "Forhåndsvisning",
+  "Checks": "Kontroller",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Hver rute vises her i den enhedsbredde, du vælger. Klik på en rute til venstre for at bevæge dig rundt på webstedet.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Åbn panelet for at køre kontrollerne. Problemer viser de ødelagte links og manglende oplysninger, og hvert enkelt fortæller, hvordan det rettes.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "Pakke gør webstedet til én reproducerbar zip med en hash for hver fil, klar til at blive signeret.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "Udgiv skriver en mappe og de præcise kommandoer til hver vært. FormPublisher uploader aldrig noget."
+}

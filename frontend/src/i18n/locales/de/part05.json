@@ -1,0 +1,21 @@
+{
+  "Demos": "Demos",
+  "Demo": "Demo",
+  "FormPublisher demo": "FormPublisher-Demo",
+  "Try it on a sample site": "Mit einer Beispiel-Website ausprobieren",
+  "Bundled sample site": "Mitgelieferte Beispiel-Website",
+  "The sample site could not be opened": "Die Beispiel-Website konnte nicht geöffnet werden",
+  "The bundled sample site is missing from this install": "Die mitgelieferte Beispiel-Website fehlt in dieser Installation",
+  "Quick tour": "Kurze Tour",
+  "Skip the tour": "Tour überspringen",
+  "Back": "Zurück",
+  "Next": "Weiter",
+  "Done": "Fertig",
+  "Step {0} of {1}": "Schritt {0} von {1}",
+  "Preview": "Vorschau",
+  "Checks": "Prüfungen",
+  "Every route renders here at the device width you pick. Click a route on the left to move around the site.": "Jede Route wird hier in der gewählten Gerätebreite dargestellt. Klicken Sie links auf eine Route, um sich durch die Website zu bewegen.",
+  "Open the panel to run the checks. Problems list the broken links and missing details, and each one says how to fix it.": "Öffnen Sie das Panel, um die Prüfungen auszuführen. Probleme listen die defekten Links und fehlenden Angaben auf, und jedes sagt, wie es sich beheben lässt.",
+  "Package turns the site into one reproducible zip with a hash for every file, ready to sign.": "Paketieren macht aus der Website ein reproduzierbares Zip mit einem Hash für jede Datei, bereit zum Signieren.",
+  "Publish writes a folder and the exact commands for each host. FormPublisher never uploads anything.": "Veröffentlichen schreibt einen Ordner und die genauen Befehle für jeden Host. FormPublisher lädt nie etwas hoch."
+}
