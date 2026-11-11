@@ -2,7 +2,7 @@ import '../styles/package.css';
 import { buildsApi, type BuildDetail, type BuildSummary, type CompareResult } from '../api-builds';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
-import { locale, t } from '../i18n';
+import { locale, onLanguage, t } from '../i18n';
 import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
@@ -205,6 +205,7 @@ export class BuildsPage {
     this.list = q(host, '.fp-bl-list');
     this.compareBtn = q<HTMLButtonElement>(host, '[data-b="compare"]');
     this.wire();
+    onLanguage(() => this.paint());
   }
 
   async refresh(): Promise<void> {

@@ -2,7 +2,7 @@ import '../styles/package.css';
 import { buildsApi, type BuildDetail, type CheckSummary, type KeyInfo } from '../api-builds';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
-import { t } from '../i18n';
+import { onLanguage, t } from '../i18n';
 import { copyText, fmtBytes, fmtCount, showInLibrary } from './builds';
 import { Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
@@ -101,6 +101,7 @@ class PackageSheet extends Dialog {
     this.buildBtn = this.button('Build', 'primary', () => { void this.runBuild(); });
     this.wire();
     this.sync();
+    onLanguage(() => this.paintKeys(this.keySel.value));
   }
 
   async show(): Promise<void> {

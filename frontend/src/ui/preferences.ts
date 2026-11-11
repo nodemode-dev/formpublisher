@@ -1,7 +1,7 @@
 import { api } from '../api';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
-import { LANGUAGES, setLanguage, storedLanguage } from '../i18n';
+import { LANGUAGES, language, setLanguage, storedLanguage } from '../i18n';
 import { VERSION } from '../version';
 import { Dialog } from './dialogs';
 import { el, escapeHtml, q, setAttr, setClass, setDisabled, setText, setValue } from './dom';
@@ -53,7 +53,7 @@ export class Preferences extends Dialog {
 <div class="fp-prefs-pages">
 <section class="fp-prefs-page" data-sec="general">
 <h3 class="fp-prefs-h">General</h3>
-<div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Language</div><div class="fp-pref-hint">The window reloads in the language you choose.</div></div><select class="fp-select" data-ctl="language" aria-label="Language">${langs}</select></div>
+<div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Language</div><div class="fp-pref-hint">The window changes to the language you choose.</div></div><select class="fp-select" data-ctl="language" aria-label="Language">${langs}</select></div>
 </section>
 <section class="fp-prefs-page" data-sec="interface" hidden>
 <h3 class="fp-prefs-h">Interface</h3>
@@ -119,7 +119,10 @@ export class Preferences extends Dialog {
       if (act === 'fw-save') void this.saveFormWeb();
       else if (act === 'fw-test') void this.testFormWeb();
     });
-    lang.addEventListener('change', () => setLanguage(lang.value));
+    lang.addEventListener('change', () => {
+      const want = lang.value;
+      void setLanguage(want).then(() => { if (lang.value === want) lang.value = language(); });
+    });
     this.accentInput.addEventListener('input', () => setAccent(this.accentInput.value));
     this.intensity.addEventListener('input', () => {
       const value = Number(this.intensity.value);

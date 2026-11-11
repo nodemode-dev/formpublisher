@@ -4,7 +4,7 @@ import { buildsApi, type BuildSummary } from '../api-builds';
 import { publishApi, type NginxCheck, type PreparedCommand, type PreparedTarget, type TargetInfo } from '../api-publish';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
-import { t } from '../i18n';
+import { onLanguage, t } from '../i18n';
 import { copyText, fmtCount, fmtDate } from './builds';
 import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
@@ -130,6 +130,7 @@ class PublishSheet extends Dialog {
     this.prepareBtn = this.button('Prepare', 'primary', () => { void this.runPrepare(); });
     this.wire();
     this.sync();
+    onLanguage(() => { this.paintBuilds(); this.paintAll(); });
   }
 
   async show(build?: string): Promise<void> {
@@ -262,6 +263,7 @@ class PublishSheet extends Dialog {
         if (box.checked !== on) box.checked = on;
         setClass(node, 'is-picked', on);
         setText(q(node, '.fp-pub-tname'), t(tg.name));
+        setAttr(q(node, '[data-pick]'), 'aria-label', t(tg.name));
         setText(q(node, '.fp-pub-tdesc'), tg.description);
         setAttr(node, 'title', tg.localTool);
       },

@@ -10,14 +10,26 @@ const SKIP = 'script, style, textarea, code, pre, kbd, [translate="no"], [conten
 const keyParts = import.meta.glob<string[]>('./keys/*.json', { import: 'default' });
 const localeParts = import.meta.glob<Record<string, string>>('./locales/*/*.json', { import: 'default' });
 
+interface Tables { exact: Map<string, string>; patterns: Array<[RegExp, string]> }
+interface Rec { en: string; shown: string }
+
 let code = 'en';
-const exact = new Map<string, string>();
-const patterns: Array<[RegExp, string]> = [];
+let exact = new Map<string, string>();
+let patterns: Array<[RegExp, string]> = [];
 const cache = new Map<string, string | null>();
-const wroteText = new WeakMap<Node, string>();
-const wroteAttr = new WeakMap<Element, Map<string, string>>();
+const textEn = new WeakMap<Text, Rec>();
+const attrEn = new WeakMap<Element, Map<string, Rec>>();
+const listeners = new Set<() => void>();
+const titleEn = document.title;
+let observer: MutationObserver | null = null;
+let wanted = 'en';
 
 export function language(): string { return code; }
+
+export function onLanguage(fn: () => void): () => void {
+  listeners.add(fn);
+  return () => { listeners.delete(fn); };
+}
 
 export function locale(): string { return code === 'zh-Hans' ? 'zh-CN' : code === 'zh-Hant' ? 'zh-TW' : code; }
 
@@ -25,9 +37,22 @@ export function storedLanguage(): string {
   try { return localStorage.getItem(STORE) || 'en'; } catch { return 'en'; }
 }
 
-export function setLanguage(next: string): void {
-  try { localStorage.setItem(STORE, next); } catch { return; }
-  window.location.reload();
+export async function setLanguage(next: string): Promise<void> {
+  if (!LANGUAGES.some(([c]) => c === next)) return;
+  wanted = next;
+  try { localStorage.setItem(STORE, next); } catch {}
+  let tables: Tables | null = null;
+  if (next !== 'en') {
+    try { tables = await loadTables(next); } catch { tables = null; }
+    if (wanted !== next) return;
+    if (!tables) {
+      wanted = code;
+      try { localStorage.setItem(STORE, code); } catch {}
+      return;
+    }
+  }
+  if (next === code) return;
+  switchTo(next, tables);
 }
 
 function escape(s: string): string { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
@@ -90,9 +115,9 @@ function skipped(node: Element | null): boolean {
 
 function text(node: Text): void {
   const cur = node.data;
-  if (wroteText.get(node) === cur || !/\p{L}/u.test(cur) || skipped(node.parentElement)) return;
+  if (textEn.get(node)?.shown === cur || !/\p{L}/u.test(cur) || skipped(node.parentElement)) return;
   const next = t(cur);
-  if (next !== cur) { wroteText.set(node, next); node.data = next; }
+  if (next !== cur) { textEn.set(node, { en: cur, shown: next }); node.data = next; }
 }
 
 function attrs(node: Element): void {
@@ -100,15 +125,55 @@ function attrs(node: Element): void {
   for (const a of ATTRS) {
     const cur = node.getAttribute(a);
     if (!cur) continue;
-    const mine = wroteAttr.get(node);
-    if (mine?.get(a) === cur) continue;
+    const mine = attrEn.get(node);
+    if (mine?.get(a)?.shown === cur) continue;
     const next = t(cur);
     if (next !== cur) {
-      const map = mine ?? new Map<string, string>();
-      map.set(a, next);
-      wroteAttr.set(node, map);
+      const map = mine ?? new Map<string, Rec>();
+      map.set(a, { en: cur, shown: next });
+      attrEn.set(node, map);
       node.setAttribute(a, next);
     }
+  }
+}
+
+function retext(node: Text): void {
+  const raw = node.data;
+  const rec = textEn.get(node);
+  let en = raw;
+  if (rec && rec.shown === raw) en = rec.en;
+  else if (!/\p{L}/u.test(raw) || skipped(node.parentElement)) return;
+  const next = code === 'en' ? en : t(en);
+  if (next !== raw) node.data = next;
+  if (next !== en) textEn.set(node, { en, shown: next }); else textEn.delete(node);
+}
+
+function reattrs(node: Element): void {
+  if (skipped(node)) return;
+  for (const a of ATTRS) {
+    const raw = node.getAttribute(a);
+    if (!raw) continue;
+    const mine = attrEn.get(node);
+    const rec = mine?.get(a);
+    const en = rec && rec.shown === raw ? rec.en : raw;
+    const next = code === 'en' ? en : t(en);
+    if (next !== raw) node.setAttribute(a, next);
+    if (next !== en) {
+      const map = mine ?? new Map<string, Rec>();
+      map.set(a, { en, shown: next });
+      attrEn.set(node, map);
+    } else mine?.delete(a);
+  }
+}
+
+function rewalk(root: Element): void {
+  if (skipped(root)) return;
+  reattrs(root);
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => (n.nodeType === Node.ELEMENT_NODE && (n as Element).matches(SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  for (let n = w.nextNode(); n; n = w.nextNode()) {
+    if (n.nodeType === Node.TEXT_NODE) retext(n as Text); else reattrs(n as Element);
   }
 }
 
@@ -126,20 +191,19 @@ function walk(root: Node): void {
   }
 }
 
-function add(en: string, tr: string | undefined): void {
+function add(into: Tables, en: string, tr: string | undefined): void {
   if (!tr || tr === en) return;
-  if (!/\{\d+\}/.test(en)) { exact.set(en, tr); return; }
+  if (!/\{\d+\}/.test(en)) { into.exact.set(en, tr); return; }
   const suffix = new Set([...en.matchAll(/[A-Za-z]\{(\d+)\}/g)].map((m) => m[1]));
   const fixed = suffix.size ? tr.replace(/\{(\d+)\}/g, (all, n: string) => (suffix.has(n) ? `{p${n}}` : all)) : tr;
   const re = new RegExp('^' + escape(en).replace(/\\\{\d+\\\}/g, '([\\s\\S]*?)') + '$');
-  const had = patterns.findIndex(([r]) => r.source === re.source);
-  if (had >= 0) patterns.splice(had, 1);
-  patterns.push([re, fixed]);
+  const had = into.patterns.findIndex(([r]) => r.source === re.source);
+  if (had >= 0) into.patterns.splice(had, 1);
+  into.patterns.push([re, fixed]);
 }
 
-export async function initLanguage(): Promise<void> {
-  const want = storedLanguage();
-  if (want === 'en' || !LANGUAGES.some(([c]) => c === want)) return;
+async function loadTables(want: string): Promise<Tables | null> {
+  if (want === 'en' || !LANGUAGES.some(([c]) => c === want)) return null;
   const parts = Object.keys(keyParts).map((path) => /\/([^/]+)\.json$/.exec(path)?.[1] ?? '').filter(Boolean).sort();
   const loaded = await Promise.all(parts.map(async (part) => {
     const tr = localeParts[`./locales/${want}/${part}.json`];
@@ -147,18 +211,63 @@ export async function initLanguage(): Promise<void> {
     const [keys, values] = await Promise.all([keyParts[`./keys/${part}.json`](), tr()]);
     return [keys, values] as const;
   }));
-  if (!loaded.some(Boolean)) return;
-  code = want;
-  document.documentElement.lang = locale();
-  for (const pair of loaded) if (pair) pair[0].forEach((en, i) => add(en, pair[1][String(i)] ?? pair[1][en]));
-  patterns.sort((a, b) => b[0].source.length - a[0].source.length);
-  document.title = t(document.title);
-  walk(document.body);
-  new MutationObserver((list) => {
+  if (!loaded.some(Boolean)) return null;
+  const out: Tables = { exact: new Map(), patterns: [] };
+  for (const pair of loaded) if (pair) pair[0].forEach((en, i) => add(out, en, pair[1][String(i)] ?? pair[1][en]));
+  out.patterns.sort((a, b) => b[0].source.length - a[0].source.length);
+  return out;
+}
+
+function direct(lang: string): void {
+  const root = document.documentElement;
+  if (/^(ar|he|fa|ur)(-|$)/.test(lang)) root.dir = 'rtl';
+  else if (root.hasAttribute('dir')) root.removeAttribute('dir');
+}
+
+function watch(): void {
+  if (observer) return;
+  observer = new MutationObserver((list) => {
+    if (code === 'en') return;
     for (const m of list) {
       if (m.type === 'characterData') text(m.target as Text);
       else if (m.type === 'attributes') attrs(m.target as Element);
       else m.addedNodes.forEach(walk);
     }
-  }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+  });
+  observer.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+}
+
+function switchTo(next: string, tables: Tables | null): void {
+  observer?.disconnect();
+  observer?.takeRecords();
+  exact = tables ? tables.exact : new Map();
+  patterns = tables ? tables.patterns : [];
+  cache.clear();
+  code = next;
+  const root = document.documentElement;
+  root.lang = locale();
+  direct(next);
+  document.title = t(titleEn);
+  rewalk(document.body);
+  watch();
+  observer?.takeRecords();
+  observer?.observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+  for (const fn of listeners) {
+    try { fn(); } catch {}
+  }
+}
+
+export async function initLanguage(): Promise<void> {
+  const want = storedLanguage();
+  wanted = want;
+  const tables = await loadTables(want);
+  if (!tables) return;
+  exact = tables.exact;
+  patterns = tables.patterns;
+  code = want;
+  document.documentElement.lang = locale();
+  direct(want);
+  document.title = t(document.title);
+  walk(document.body);
+  watch();
 }

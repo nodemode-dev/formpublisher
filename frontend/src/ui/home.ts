@@ -3,7 +3,7 @@ import { api, type Site } from '../api';
 import { openSample } from '../api-demo';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
-import { locale } from '../i18n';
+import { locale, onLanguage } from '../i18n';
 import { brandMark } from './brand';
 import { BuildsPage } from './builds';
 import type { Commands } from './commands';
@@ -134,6 +134,7 @@ export class Home {
     this.wire();
     this.sidePanel();
     this.paint();
+    onLanguage(() => this.paint());
     if (visible) {
       this.lock(true);
       this.startPolling();

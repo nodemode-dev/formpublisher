@@ -1,4 +1,4 @@
-import { t } from '../i18n';
+import { onLanguage, t } from '../i18n';
 import type { Commands } from './commands';
 import { anyDialogOpen } from './dialogs';
 import type { MenuDef, MenuItem as MenuSpec } from './menu';
@@ -57,6 +57,7 @@ export class NativeMenus {
     document.addEventListener('focusout', focus);
     window.addEventListener('focus', () => { if (this.items.length) void this.build().catch(() => undefined); });
     this.commands.onChange(() => { if (this.items.length) void this.build().catch(() => undefined); });
+    onLanguage(() => { if (this.items.length) void this.build().catch(() => undefined); });
   }
 
   private signature(): string {

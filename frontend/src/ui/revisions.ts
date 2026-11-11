@@ -1,6 +1,6 @@
 import '../styles/revisions.css';
 import { fetchDiff, fetchRevisions, type DiffRow, type RevisionDiff, type RevisionRow } from '../api-revisions';
-import { locale } from '../i18n';
+import { locale, onLanguage } from '../i18n';
 import { Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setHidden, setText } from './dom';
 
@@ -66,6 +66,7 @@ export class RevisionsView {
     this.sum = { added: q(this.root, '[data-f="added"]'), removed: q(this.root, '[data-f="removed"]'), changed: q(this.root, '[data-f="changed"]') };
     setText(this.listEmpty, 'Open a site to see its revisions.');
     setText(this.empty, '');
+    onLanguage(() => this.paintList());
     const pick = (node: HTMLElement | null): void => {
       const id = node?.dataset.key;
       if (id) void this.select(id);
