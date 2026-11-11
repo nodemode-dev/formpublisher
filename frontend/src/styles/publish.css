@@ -14,14 +14,14 @@ body.theme-light .fp-pub-note.is-error { color: var(--danger-fill); }
 .fp-pub-targets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
 .fp-pub-targets > [hidden] { display: none; }
 .fp-pub-tlist { display: contents; }
-.fp-pub-target { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: start; column-gap: var(--space-2); row-gap: 2px; min-height: 84px; padding: var(--space-2) var(--space-3); border: 1px solid var(--line-1); border-radius: var(--radius-md); background: var(--surface-1); color: var(--text-primary); cursor: pointer; transition: background-color var(--transition-fast), border-color var(--transition-fast); }
+.fp-pub-target { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: start; column-gap: var(--space-2); row-gap: 2px; height: 90px; overflow: hidden; padding: var(--space-2) var(--space-3); border: 1px solid var(--line-1); border-radius: var(--radius-md); background: var(--surface-1); color: var(--text-primary); cursor: pointer; transition: background-color var(--transition-fast), border-color var(--transition-fast); }
 .fp-pub-target:hover { background: var(--bg-hover); }
 .fp-pub-target.is-picked { border-color: var(--accent-color); background: var(--accent-wash); }
 .fp-pub-target.is-skeleton { cursor: default; pointer-events: none; }
 .fp-pub-target.is-skeleton .fp-pub-tname, .fp-pub-target.is-skeleton .fp-pub-tdesc { color: transparent; }
 .fp-pub-target input { grid-row: 1 / span 2; width: 16px; height: 16px; margin: 1px 0 0; accent-color: var(--accent-color); }
 .fp-pub-target:focus-within { outline: 2px solid var(--accent-color); outline-offset: 1px; }
-.fp-pub-tname { font-size: var(--fp-13); font-weight: 600; line-height: 18px; }
+.fp-pub-tname { overflow: hidden; font-size: var(--fp-13); font-weight: 600; line-height: 18px; text-overflow: ellipsis; white-space: nowrap; }
 .fp-pub-tdesc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; color: var(--text-secondary); font-size: var(--fp-12); line-height: 1.4; }
 
 .fp-pub-model { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: start; column-gap: var(--space-2); row-gap: 2px; margin-top: var(--space-2); cursor: pointer; }

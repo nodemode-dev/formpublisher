@@ -239,21 +239,21 @@ class PublishSheet extends Dialog {
     const m = this.memo();
     patchList(this.tlist, this.targets, {
       key: (t) => t.id,
-      create: (t) => {
+      create: (tg) => {
         const node = el(`<label class="fp-pub-target"><input type="checkbox" data-pick><span class="fp-pub-tname" translate="no"></span><span class="fp-pub-tdesc"></span></label>`);
-        setText(q(node, '.fp-pub-tname'), t.name);
-        setText(q(node, '.fp-pub-tdesc'), t.description);
-        setAttr(q(node, '[data-pick]'), 'aria-label', t.name);
+        setText(q(node, '.fp-pub-tname'), t(tg.name));
+        setText(q(node, '.fp-pub-tdesc'), tg.description);
+        setAttr(q(node, '[data-pick]'), 'aria-label', t(tg.name));
         return node;
       },
-      update: (node, t) => {
+      update: (node, tg) => {
         const box = q<HTMLInputElement>(node, '[data-pick]');
-        const on = m?.picked.has(t.id) ?? false;
+        const on = m?.picked.has(tg.id) ?? false;
         if (box.checked !== on) box.checked = on;
         setClass(node, 'is-picked', on);
-        setText(q(node, '.fp-pub-tname'), t.name);
-        setText(q(node, '.fp-pub-tdesc'), t.description);
-        setAttr(node, 'title', t.localTool);
+        setText(q(node, '.fp-pub-tname'), t(tg.name));
+        setText(q(node, '.fp-pub-tdesc'), tg.description);
+        setAttr(node, 'title', tg.localTool);
       },
     });
     const all = this.targets.length > 0 && this.targets.every((t) => m?.picked.has(t.id));
@@ -281,7 +281,8 @@ class PublishSheet extends Dialog {
   }
 
   private nameOf(id: string): string {
-    return this.targets.find((t) => t.id === id)?.name ?? id;
+    const name = this.targets.find((x) => x.id === id)?.name;
+    return name ? t(name) : id;
   }
 
   private resultNode(r: PreparedTarget): HTMLElement {

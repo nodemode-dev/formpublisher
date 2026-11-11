@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.2
-Last updated: 2026-11-10 · Phases 37 and 39: the window load measured with no shift, and every window word translates (the translate="no" audit and part18)
+Current build version: v0.2.3
+Last updated: 2026-11-11 · Phases 40 and 41: the language sweep of all 25 other languages, "Static zip" keyed in part19, and the publish sheet holding still while it fills
 
 ---
 
@@ -247,3 +247,15 @@ Checked: every problem kind made for real on a lab engine gave 21 texts, each ma
 - `i18n/keys/part18.json` (3 keys: "Choose a key", "No keys yet", "Signing key"), in all 26 languages.
 
 Checked: no layout shift at window load, measured at 1440x900 and 1100x800, dark and light, English and German, with the CPU throttled 4x, in three data states, three runs each: every run CLS 0 with no entries. Turn L's 0.0007 did not reproduce, so nothing changed for it. `npm run build`.
+
+## The publish sheet holds still, and host names translate · v0.2.3 (2026-11-11)
+
+With three real builds and four prepared hosts at 4x CPU throttling, opening the publish sheet shifted the prepared-folders section, the model checkbox, the prepare note and the progress bar by 4 px (0.0003) in both sizes and themes: skeleton host cards were 84 px and a real card with a three-line description 88.4 px (commit 8d65622).
+
+- `styles/publish.css`: host cards have a fixed 90 px height, and the name is one line, clipped.
+- `ui/publish-sheet.ts`: host names pass through `t()` as text and as aria-label, while the name keeps `translate="no"`, so the generic "Static zip" translates and Netlify, Cloudflare Pages, Vercel, GitHub Pages and nginx stay as written. The callbacks no longer shadow `t`.
+- `i18n/keys/part19.json` (1 key: "Static zip"), in all 26 languages, keeping zip as each locale writes it (commit eb9a8b6).
+
+The language sweep: the built window was opened in all 25 other languages over every main surface (Home, the open site and its panels, menus, the command palette, Preferences, shortcuts, the package sheet, the publish sheet with a failed verify, the trash page). "Static zip" was the only interface word left in English.
+
+Checked: at 1440x900 and 1100x800, dark and light, CLS 0 opening and filling, switching between builds (including one with nothing prepared), Prepare and two Verify runs; every part19.json loads as JSON with the key and a non-empty value; `npm run build`.

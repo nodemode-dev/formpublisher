@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.2
-Last updated: 2026-11-10 · Phase 38: the vendor check in setup/install_compiler.bat and a vendor row in doctor
+Current build version: v0.2.3
+Last updated: 2026-11-11 · Phase 42: the Windows doctor vendor row fixed after running the scripts under Wine
 
 ---
 
@@ -395,3 +395,16 @@ One change, none of which touches the engine's routes (commit b833812).
 Checked: `./formpublisher doctor` printed "vendor: in step at 0.20.1" on the tree and the Version row problem with the pointer in a /tmp clone with a changed row; `bash -n formpublisher` passes; the `.bat` changes were checked by reading, since Windows is not available here.
 
 Docs: `docs/MANUAL.md` (doctor and the install_compiler passage), the wiki pages Getting-Started and Importing-Sites, and the harness and skillset skills in both trees.
+
+## The Windows doctor vendor row works when run · v0.2.3 (2026-11-11)
+
+One file changed, `formpublisher.bat` (commit 0a31cb9). Running `formpublisher.bat doctor` and `setup\install_compiler.bat` under Wine 9.0 (with a stand-in `python.exe` handing off to the Linux Python) showed three defects in the v0.2.2 vendor row, which had been checked by reading only.
+
+- The `for /f` command began with a quote, so `cmd /c` stripped the outer quotes and the check never ran; it is now wrapped in an extra pair.
+- The first-line capture kept the last line under Wine; it is now a `:vfirst` subroutine.
+- Echoing a problem line with parentheses and a comma ran its tail as a command; the line is now held in a quoted `VTAIL` variable.
+- `setup\install_compiler.bat` needed no change.
+
+Checked: under Wine 9.0 in a /tmp clone, doctor printed "vendor: in step at 0.20.2", and with a changed Version row it printed the problem line and the pointer with no stray errors; `install_compiler.bat` refused before the cargo check when out of step and reached the cargo-missing line when in step. Real Windows has still not been run.
+
+Docs: `docs/MANUAL.md` (the install_compiler passage) and the wiki page Getting-Started.
