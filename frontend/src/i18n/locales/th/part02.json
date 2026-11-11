@@ -48,7 +48,7 @@
   "FormWeb": "FormWeb",
   "About": "เกี่ยวกับ",
   "Language": "ภาษา",
-  "The window reloads in the language you choose.": "หน้าต่างจะโหลดใหม่เป็นภาษาที่คุณเลือก",
+  "The window changes to the language you choose.": "หน้าต่างจะเปลี่ยนเป็นภาษาที่คุณเลือกทันที",
   "Theme": "ธีม",
   "Accent colour": "สีเน้น",
   "Custom accent colour": "สีเน้นที่กำหนดเอง",
