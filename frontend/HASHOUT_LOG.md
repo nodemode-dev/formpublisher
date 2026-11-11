@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.2
-Last updated: 2026-11-10 · Phases 37 and 39: the window load measured with no shift, and every window word translates (the translate="no" audit and part18)
+Current build version: v0.2.3
+Last updated: 2026-11-11 · Phases 40 and 41: the language sweep of all 25 other languages, "Static zip" keyed in part19, and the publish sheet holding still while it fills
 
 ---
 

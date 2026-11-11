@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.2
-Last updated: 2026-11-10 · Phase 38: the vendor check in setup/install_compiler.bat and a vendor row in doctor
+Current build version: v0.2.3
+Last updated: 2026-11-11 · Phase 42: the Windows doctor vendor row fixed after running the scripts under Wine
 
 ---
 

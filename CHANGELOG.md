@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.3 · 2026-11-11
+
+- The window was checked in all 26 languages on every main screen. The one word still in English, the "Static zip" host name, now translates; Netlify, Cloudflare Pages, Vercel, GitHub Pages and nginx stay as written.
+- The publish sheet no longer jumps by a few pixels while its host cards fill in.
+- `formpublisher.bat doctor` on Windows now shows the vendor line correctly. Running the Windows scripts under Wine found three problems in last release's doctor line, which had only been checked by reading.
+- The FormWeb engine crates are vendored at 0.20.3.
+- Every new string is in all 26 languages.
+
 ## 0.2.2 · 2026-11-10
 
 - Every word in the window translates: the signing-key list's "Choose a key" and "No keys yet", the build list's "No builds yet", the tour's step count, the home screen's FormWeb status and several labels and placeholders now follow your language. Names, paths, hashes and commands stay as written.
