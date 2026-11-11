@@ -3,8 +3,8 @@ setlocal
 cd /d "%~dp0"
 if not exist venv\Scripts\python.exe (
   echo [formpublisher] creating the backend venv
-  py -3.12 -m venv venv
-  venv\Scripts\python.exe -m pip install -q -r requirements.txt
+  py -3.12 -m venv venv || ( echo [formpublisher] Python 3.12 is needed & exit /b 1 )
+  venv\Scripts\python.exe -m pip install -q -r requirements.txt || ( echo [formpublisher] installing the engine requirements failed & exit /b 1 )
 )
 if "%FORMPUBLISHER_HOST%"=="" set "FORMPUBLISHER_HOST=127.0.0.1"
 if "%FORMPUBLISHER_PORT%"=="" set "FORMPUBLISHER_PORT=8280"
