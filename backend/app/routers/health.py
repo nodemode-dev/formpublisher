@@ -21,4 +21,5 @@ def health(request: Request):
         "routerErrors": getattr(state, "router_errors", {}),
         "liveClients": bus.clients(),
         "frontend": bool(paths.frontend_dist()),
+        "hostPort": paths.host_port(),
     }

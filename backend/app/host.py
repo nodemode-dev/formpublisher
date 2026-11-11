@@ -86,13 +86,28 @@ async def _stop(server: uvicorn.Server, task: asyncio.Task) -> None:
 
 
 async def start() -> tuple[uvicorn.Server, asyncio.Task]:
-    config = uvicorn.Config(app, host="127.0.0.1", port=paths.host_port(), log_level="warning", lifespan="off", access_log=False)
+    wanted = paths.host_port()
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        sock.bind(("127.0.0.1", wanted))
+    except OSError:
+        sock.close()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(("127.0.0.1", 0))
+        log.warning("site host port %s is in use; this engine serves previews on port %s", wanted, sock.getsockname()[1])
+    paths.set_host_port(sock.getsockname()[1])
+    config = uvicorn.Config(app, log_level="warning", lifespan="off", access_log=False)
     server = HostServer(config)
-    return server, asyncio.create_task(_run(server, None))
+    server.bound_socket = sock
+    return server, asyncio.create_task(_run(server, [sock]))
 
 
 async def stop(server: uvicorn.Server, task: asyncio.Task) -> None:
     await _stop(server, task)
+    sock = getattr(server, "bound_socket", None)
+    if sock is not None:
+        sock.close()
 
 
 async def serve_revision(root: Path) -> tuple[str, Callable[[], Awaitable[None]]]:
