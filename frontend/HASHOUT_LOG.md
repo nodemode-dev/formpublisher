@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.3
+Current build version: v0.2.4
 Last updated: 2026-11-11 · Phases 43 and 44: Save as .fpub and Open takes .fpub, and the publish sheet shows the kept verify result
 
 ---
