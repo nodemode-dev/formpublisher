@@ -2,7 +2,7 @@
 
 ## Requirements
 
-Node 22.12 or newer and Python 3.12. The desktop app also needs Rust and the Tauri 2 toolchain. `./formpublisher doctor` checks the toolchain, the installs and the ports, and prints a vendor row (in step at a version, or the first problem).
+Node 22.12 or newer and Python 3.12. The desktop app also needs Rust and the Tauri 2 toolchain. `./formpublisher doctor` checks the toolchain, the installs and the ports, and prints a vendor row (in step at a version, or the first problem). `formpublisher.bat doctor` on Windows prints the same row; it has been run under Wine, not on real Windows.
 
 ## Install and run
 

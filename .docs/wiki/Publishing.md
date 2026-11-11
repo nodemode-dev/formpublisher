@@ -4,7 +4,7 @@ Publish prepares a package for a host. It writes a folder and shows the exact co
 
 ## The sheet
 
-Open it from the toolbar's Publish button, from the Package sheet's Publish button or from the command palette (`publish.open`). Pick a build (the latest is selected; Build now makes one when there is none), tick the hosts and press Prepare. Each prepared host gets a panel with its folder (Reveal, Copy path), its commands (each with a copy button), notes and warnings, Verify and Remove. The sheet remembers what is prepared for a build when you close and reopen it.
+Open it from the toolbar's Publish button, from the Package sheet's Publish button or from the command palette (`publish.open`). Pick a build (the latest is selected; Build now makes one when there is none), tick the hosts and press Prepare. Each prepared host gets a panel with its folder (Reveal, Copy path), its commands (each with a copy button), notes and warnings, Verify and Remove. The sheet remembers what is prepared for a build when you close and reopen it. Host cards have a fixed height, so the sheet holds still while it fills; the name Static zip translates, and the brand names stay as written.
 
 ## The six hosts
 
