@@ -17,6 +17,18 @@
   .fp-pn-select { min-width: 44px; padding: 0 2px; }
   .fp-pn-progress { margin-left: 0; }
 }
+.fp-bottom-head { container-type: inline-size; }
+.fp-bottom-tab > .icon { display: none; }
+@container (max-width: 460px) {
+  .fp-bottom-tab { padding: 0 6px; }
+  .fp-bottom-tab .fp-badge { margin-left: 4px; }
+}
+@container (max-width: 360px) {
+  .fp-bottom-tab { position: relative; display: inline-flex; align-items: center; padding: 0 2px; }
+  .fp-bottom-tab > .icon { display: inline-flex; }
+  .fp-bottom-tab > span:not(.icon):not(.fp-badge) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .fp-bottom-tab .fp-badge { min-width: 16px; margin-left: 2px; padding: 0 2px; }
+}
 .fp-pn-select:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; }
 .fp-pn-body { position: relative; flex: 1 1 auto; min-height: 0; }
 .fp-pn-list { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; }

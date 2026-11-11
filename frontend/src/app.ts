@@ -55,10 +55,10 @@ const SHELL = `<div class="fp-app">
 </main>
 <section class="fp-bottom" aria-label="Panel">
 <div class="fp-bottom-head" role="tablist" aria-label="Panel">
-<button class="fp-bottom-tab" type="button" role="tab" aria-selected="true" data-tab="problems">Problems</button>
-<button class="fp-bottom-tab" type="button" role="tab" aria-selected="false" data-tab="console">Console</button>
-<button class="fp-bottom-tab" type="button" role="tab" aria-selected="false" data-tab="network">Network</button>
-<button class="fp-bottom-tab" type="button" role="tab" aria-selected="false" data-tab="revisions">Revisions</button>
+<button class="fp-bottom-tab" type="button" role="tab" aria-selected="true" data-tab="problems" title="Problems">${icon('alert', 14)}<span>Problems</span></button>
+<button class="fp-bottom-tab" type="button" role="tab" aria-selected="false" data-tab="console" title="Console">${icon('terminal', 14)}<span>Console</span></button>
+<button class="fp-bottom-tab" type="button" role="tab" aria-selected="false" data-tab="network" title="Network">${icon('globe', 14)}<span>Network</span></button>
+<button class="fp-bottom-tab" type="button" role="tab" aria-selected="false" data-tab="revisions" title="Revisions">${icon('archive', 14)}<span>Revisions</span></button>
 <button class="fp-icon-btn is-sm" type="button" data-act="toggle-bottom" title="Hide the panel" aria-label="Hide the panel">${icon('chevronDown', 14)}</button>
 </div>
 <div class="fp-bottom-body">
