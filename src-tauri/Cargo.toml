@@ -1,6 +1,6 @@
 [package]
 name = "formpublisher"
-version = "0.2.4"
+version = "0.2.5"
 description = "FormPublisher desktop shell"
 authors = ["NodeAgentc, Inc."]
 license = "GPL-3.0-only"

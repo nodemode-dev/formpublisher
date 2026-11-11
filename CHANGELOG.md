@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.5 · 2026-11-11
+
+- In narrow windows the bottom panel's tabs show an icon and their count instead of a cut-off name, and the name stays in the tooltip and for screen readers.
+- The toolbar's selects show their whole value at 1100 and 760 px wide. When room runs out, the route field turns into an icon that opens over the toolbar, and the selects show a short form of their value ("Auto" for "Theme: Auto").
+- The Problems filters keep their whole value in narrow windows, moving to their own row when needed.
+- Save as .fpub in the builds library names the file `SITE-BUILD.fpub`, as the engine and the command line do.
+- The FormWeb engine crates are vendored at 0.20.5.
+
 ## 0.2.4 · 2026-11-11
 
 - Save any build as one `.fpub` file, from the builds library, the command line (`fpub`), the MCP server (`save_fpub`) or the API, and open it on another computer with Open, drop or import. It comes back as the same site and build, with its signature checked. Saving the same build twice gives the same file. The manual describes the format.
