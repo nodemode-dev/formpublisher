@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Trang web, bản dựng, khóa và thư mục đã chuẩn bị bị gỡ sẽ nằm ở đây cho đến khi bạn xóa vĩnh viễn.",
+  "Empty Trash": "Dọn sạch thùng rác",
+  "Item": "Mục",
+  "Moved": "Đã chuyển lúc",
+  "Restore": "Khôi phục",
+  "Delete for good": "Xóa vĩnh viễn",
+  "Prepared folder": "Thư mục đã chuẩn bị",
+  "Key": "Khóa",
+  "Nothing in the trash": "Thùng rác trống",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Trang web, bản dựng, khóa và thư mục đã chuẩn bị mà bạn gỡ sẽ hiện ở đây.",
+  "Delete {0} for good? This cannot be undone.": "Xóa vĩnh viễn {0}? Không thể hoàn tác thao tác này.",
+  "Delete everything in the trash for good? This cannot be undone.": "Xóa vĩnh viễn mọi thứ trong thùng rác? Không thể hoàn tác thao tác này.",
+  "Restored {0}": "Đã khôi phục {0}",
+  "Deleted {0}": "Đã xóa {0}",
+  "The trash is empty": "Thùng rác đang trống"
+}

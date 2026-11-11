@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.4 · 2026-11-10
+
+- Trash: removed sites, builds, keys and prepared folders are listed on Home's Trash page and can be restored to where they were, deleted for good, or emptied at once. The command line gains `trash`, `trash restore`, `trash delete` and `trash empty --yes`; MCP gains `list_trash` and `restore_from_trash` (18 tools), and deleting stays a person's action.
+- Keyboard shortcuts can be changed in the shortcuts dialog: press the new keys, see which command already uses them and replace or cancel, reset one or all. Menus, the command palette and the desktop app's native menus follow at once.
+- Desktop app: Open Folder uses the system folder panel, and Reveal Site Folder opens the file manager, only for folders inside the data folder.
+- FormPublisher writes `engine.json` in its data folder with the port it runs on, so FormWeb 0.19.4's Send to FormPublisher reaches it even when the desktop app had to use a port other than 8280.
+- FormWeb's large-project `.fweb` files (version 2, a zip up to 512 MiB) import with the same checks as FormWeb's, streamed so no project sits in memory.
+- Deep checks serve the site through the same host as Preview. The builds list now refreshes when a build is removed. The FormWeb engine crates are vendored at 0.19.4.
+- Every new string is in all 26 languages.
+
 ## 0.1.3 · 2026-11-10
 
 - Desktop: the app was compiled and run for the first time, on Linux, with its splash and the Start page and no white frame. The frozen engine carries `formweb-core` and the demo sample and checks for both before it is bundled. The shell prefers port 8280 so FormWeb's Send to FormPublisher reaches it (falling back to a free port) and stops its engine on exit and on terminate, interrupt and hangup signals. The macOS and Windows bundles are not yet built.

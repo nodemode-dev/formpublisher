@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from app.services import compile as compiler
-from app.services import paths
+from app.services import paths, trash
 from app.services.bus import bus
 
 MAX_FILES = 20_000
@@ -323,7 +323,7 @@ def import_zip_file(archive: Path, kind: str, source: dict, source_key: str, nam
 def is_fweb(path: Path, filename: str | None = None) -> bool:
     if (filename or path.name).lower().endswith(".fweb"):
         return True
-    return not zipfile.is_zipfile(path) and compiler.looks_like_fweb(path)
+    return compiler.looks_like_fweb(path)
 
 
 def import_fweb_file(envelope: Path, source: dict, source_key: str, name: str | None = None, stem: str | None = None) -> dict:
@@ -428,12 +428,8 @@ def site_routes(site_id: str, revision: str | None = None) -> dict:
 def remove_site(site_id: str) -> dict:
     with _lock:
         folder = _site_folder(site_id)
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        target = paths.trash_dir() / f"{site_id}-{stamp}"
-        counter = 2
-        while target.exists():
-            target = paths.trash_dir() / f"{site_id}-{stamp}-{counter}"
-            counter += 1
-        shutil.move(str(folder), str(target))
+        record = _read_json(folder / "site.json") or {}
+        name = record.get("name") if isinstance(record.get("name"), str) and record.get("name") else site_id
+        target = trash.move(folder, "site", name, trash.rel(folder))
     bus.emit("site.removed", id=site_id)
     return {"id": site_id, "removed": True, "trash": str(target)}

@@ -56,6 +56,7 @@ export class NativeMenus {
     document.addEventListener('focusin', focus);
     document.addEventListener('focusout', focus);
     window.addEventListener('focus', () => { if (this.items.length) void this.build().catch(() => undefined); });
+    this.commands.onChange(() => { if (this.items.length) void this.build().catch(() => undefined); });
   }
 
   private signature(): string {

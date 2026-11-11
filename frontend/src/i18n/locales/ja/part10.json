@@ -1,0 +1,19 @@
+{
+  "Change": "変更",
+  "Press keys": "キーを押してください",
+  "Replace": "置き換える",
+  "Reset all": "すべてリセット",
+  "Choose Change, then press the new keys.": "[変更] を選んでから、新しいキーを押してください。",
+  "Press the new keys. Escape cancels, Backspace clears.": "新しいキーを押してください。Esc でキャンセル、Backspace でクリアします。",
+  "All shortcuts are back to their defaults.": "すべてのショートカットを既定に戻しました。",
+  "Use Ctrl, Alt or Cmd together with the key.": "Ctrl、Alt、Cmd のいずれかとキーを組み合わせてください。",
+  "The browser or system keeps that combination, so the app cannot use it.": "この組み合わせはブラウザーまたはシステムが使用しているため、アプリでは使えません。",
+  "Text editing keys cannot be moved.": "テキスト編集用のキーは移動できません。",
+  "{0} is already used by {1}. Move it to {2}?": "{0} はすでに {1} で使われています。{2} に移動しますか?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} は {1} で使われています。{2} に戻しますか?",
+  "{0} is now {1}.": "{0} は {1} になりました。",
+  "{0} has no shortcut.": "{0} にはショートカットがありません。",
+  "{0} is back to its default.": "{0} を既定に戻しました。",
+  "Change shortcut: {0}": "ショートカットを変更: {0}",
+  "Reset shortcut: {0}": "ショートカットをリセット: {0}"
+}

@@ -5,11 +5,10 @@ import sys
 import tempfile
 import threading
 import zipfile
-from datetime import datetime, timezone
 from pathlib import Path
 
 from app import targets
-from app.services import intake, package, paths
+from app.services import intake, package, paths, trash
 from app.services.bus import bus
 from app.targets._common import MODEL_FILES, PreparedInput, PreparedResult
 
@@ -256,14 +255,8 @@ def verify(build_id: str, target_id: str) -> dict:
 def remove(build_id: str, target_id: str) -> dict:
     site, folder = _prepared_folder(build_id, target_id)
     with _lock:
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        base = f"prepared-{site}-{build_id}-{target_id}-{stamp}"
-        target = paths.trash_dir() / base
-        counter = 2
-        while target.exists():
-            target = paths.trash_dir() / f"{base}-{counter}"
-            counter += 1
-        shutil.move(str(folder), str(target))
+        meta = _read_meta(_meta_file(site, build_id, target_id))
+        target = trash.move(folder, "prepared", f"{target_id} for build {build_id}", trash.rel(folder), meta if isinstance(meta, dict) else None)
         _meta_file(site, build_id, target_id).unlink(missing_ok=True)
     bus.emit("publish.removed", build=build_id, site=site, target=target_id)
     return {"build": build_id, "target": target_id, "removed": True, "trash": str(target)}

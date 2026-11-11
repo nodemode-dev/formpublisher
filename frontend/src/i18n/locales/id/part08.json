@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Situs, build, kunci, dan folder yang disiapkan yang Anda hapus tetap berada di sini sampai Anda menghapusnya secara permanen.",
+  "Empty Trash": "Kosongkan tempat sampah",
+  "Item": "Item",
+  "Moved": "Dipindahkan",
+  "Restore": "Pulihkan",
+  "Delete for good": "Hapus permanen",
+  "Prepared folder": "Folder yang disiapkan",
+  "Key": "Kunci",
+  "Nothing in the trash": "Tidak ada apa pun di tempat sampah",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Situs, build, kunci, dan folder yang disiapkan yang Anda hapus akan muncul di sini.",
+  "Delete {0} for good? This cannot be undone.": "Hapus {0} secara permanen? Tindakan ini tidak dapat dibatalkan.",
+  "Delete everything in the trash for good? This cannot be undone.": "Hapus semua isi tempat sampah secara permanen? Tindakan ini tidak dapat dibatalkan.",
+  "Restored {0}": "{0} dipulihkan",
+  "Deleted {0}": "{0} dihapus",
+  "The trash is empty": "Tempat sampah kosong"
+}

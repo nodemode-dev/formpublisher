@@ -1,0 +1,19 @@
+{
+  "Change": "변경",
+  "Press keys": "키를 누르세요",
+  "Replace": "바꾸기",
+  "Reset all": "모두 초기화",
+  "Choose Change, then press the new keys.": "변경을 선택한 다음 새 키를 누르세요.",
+  "Press the new keys. Escape cancels, Backspace clears.": "새 키를 누르세요. Esc는 취소, Backspace는 지우기입니다.",
+  "All shortcuts are back to their defaults.": "모든 단축키가 기본값으로 돌아갔습니다.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Ctrl, Alt 또는 Cmd를 다른 키와 함께 사용하세요.",
+  "The browser or system keeps that combination, so the app cannot use it.": "이 조합은 브라우저 또는 시스템에서 사용 중이므로 앱에서 사용할 수 없습니다.",
+  "Text editing keys cannot be moved.": "텍스트 편집 키는 이동할 수 없습니다.",
+  "{0} is already used by {1}. Move it to {2}?": "{0}은(는) 이미 {1}에서 사용 중입니다. {2}(으)로 옮길까요?",
+  "{0} is used by {1}. Move it back to {2}?": "{0}은(는) {1}에서 사용 중입니다. {2}(으)로 되돌릴까요?",
+  "{0} is now {1}.": "{0}의 단축키가 {1}(으)로 변경되었습니다.",
+  "{0} has no shortcut.": "{0}에는 단축키가 없습니다.",
+  "{0} is back to its default.": "{0}이(가) 기본값으로 돌아갔습니다.",
+  "Change shortcut: {0}": "단축키 변경: {0}",
+  "Reset shortcut: {0}": "단축키 초기화: {0}"
+}

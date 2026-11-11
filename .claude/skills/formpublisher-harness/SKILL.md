@@ -2,7 +2,7 @@
 name: formpublisher-harness
 description: Drives FormPublisher, the Form family's site publisher, through its formpublisher MCP server or the ./formpublisher run command line. Use whenever the person wants a FormWeb site exported as site-export.zip imported, a FormWeb publication folder opened, the site currently open in a running FormWeb brought in, the imported sites listed, a site's routes listed, its revisions listed or compared, a .fweb project opened, a site mounted for preview, checked (static or deep), built into a deterministic site.zip, or signed and verified with an Ed25519 key, or prepared for a host (Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx or a plain zip); or when formpublisher tools such as list_sites, import_site, run_checks, build_package or prepare_publish are available or fail. Not for editing a site (that is FormWeb), not for changing FormPublisher's own source code (use formpublisher-skillset), and not for uploading to a host, which FormPublisher never does.
 metadata:
-  version: "0.1.3"
+  version: "0.1.4"
 ---
 
 # formpublisher harness
@@ -41,8 +41,10 @@ These are the exact MCP tool names, with the command that does the same thing. I
 | `list_targets` | `targets` | the six hosts | yes |
 | `prepare_publish` (build, targets, includeModel) | `prepare BUILD --target T [--target T] [--include-model]` | a folder per target with the commands to run | no |
 | `get_prepared` (build) | `prepared BUILD` | what is already prepared | yes |
+| `list_trash` | `trash` | trash entries newest first, with kind, label, origin, time and size | yes |
+| `restore_from_trash` (entry) | `trash restore ENTRY` | move an entry back to where it came from; 409 with the reason when the place is taken or the entry predates 0.1.4 | no |
 
-Not tools: `keys` lists the signing keys and `keys --create NAME [--passphrase P]` makes one, and `receive-status` shows the endpoint, inbox folder and last receipts for FormWeb's Send to FormPublisher. `agents sync` is `./formpublisher agents sync`.
+Not tools: `trash delete ENTRY` deletes one trash entry for good and `trash empty --yes` deletes them all. There is no tool for either, and deleting stays a person's action: do it only when the person asks for that entry. `keys` lists the signing keys and `keys --create NAME [--passphrase P]` makes one, and `receive-status` shows the endpoint, inbox folder and last receipts for FormWeb's Send to FormPublisher. `agents sync` is `./formpublisher agents sync`.
 
 ## The loop
 
@@ -88,7 +90,9 @@ FormPublisher prepares; it never uploads. Publishing is a chain, and each link n
 
 A site sent from FormWeb's Send to FormPublisher arrives on its own: it is imported by the running window's engine, or dropped in the data folder's `inbox/` while FormPublisher is closed. Either way, a site sent again becomes a new revision of the same site, so `list_revisions` and `diff_revisions` show what changed between sends. It then shows in `list_sites` like any import. Two Preferences settings, off by default, run the static checks and a build on every arrival; when they are on, call `get_checks` and `list_builds` instead of running them again.
 
-A `.fweb` project (envelope format `com.nodemode.formweb`) imports the same way. It needs `formweb-core`; without it the import fails with 422 and the message says to run `./setup/install_compiler`. Tell the person; do not try to work around it.
+Removing a site, build, key or prepared folder moves it to the trash, so `list_trash` shows it and `restore_from_trash` brings it back when the person asks. Use the entry name `list_trash` returned.
+
+A `.fweb` project (envelope format `com.nodemode.formweb`, or FormWeb's version 2 zip of up to 512 MiB) imports the same way. It needs `formweb-core`; without it the import fails with 422 and the message says to run `./setup/install_compiler`. Tell the person; do not try to work around it.
 
 ## Preview, checks, builds and keys
 
@@ -147,7 +151,7 @@ curl -s -X POST 127.0.0.1:8280/api/builds/3f9a1c0b7d42/verify
 # {"valid": true, "key": "SHA256:..."}   or   {"valid": false, "key": "SHA256:...", "reason": "..."}
 ```
 
-A wrong passphrase answers 400 "The passphrase does not unlock this key." Ask the person for the passphrase; never invent or store one. Deleting a key (`DELETE /api/keys/KEY-ID`) or a build (`DELETE /api/builds/ID`) moves it to the trash, and should be done only when the person asks.
+A wrong passphrase answers 400 "The passphrase does not unlock this key." Ask the person for the passphrase; never invent or store one. Deleting a key (`DELETE /api/keys/KEY-ID`) or a build (`DELETE /api/builds/ID`) moves it to the trash (`GET /api/trash` lists it, `POST /api/trash/ENTRY/restore` restores it), and should be done only when the person asks. `DELETE /api/trash/ENTRY` and `DELETE /api/trash` remove for good; never call them unprompted.
 
 ## Rules
 

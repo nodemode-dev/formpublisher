@@ -1,0 +1,19 @@
+{
+  "Change": "Ubah",
+  "Press keys": "Tekan tombol",
+  "Replace": "Ganti",
+  "Reset all": "Setel ulang semua",
+  "Choose Change, then press the new keys.": "Pilih Ubah, lalu tekan tombol yang baru.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Tekan tombol yang baru. Escape membatalkan, Backspace menghapus.",
+  "All shortcuts are back to their defaults.": "Semua pintasan telah dikembalikan ke bawaan.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Gunakan Ctrl, Alt, atau Cmd bersama tombol lainnya.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Kombinasi itu dipakai oleh browser atau sistem, sehingga aplikasi tidak dapat menggunakannya.",
+  "Text editing keys cannot be moved.": "Tombol pengeditan teks tidak dapat dipindahkan.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} sudah digunakan oleh {1}. Pindahkan ke {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} digunakan oleh {1}. Pindahkan kembali ke {2}?",
+  "{0} is now {1}.": "{0} sekarang {1}.",
+  "{0} has no shortcut.": "{0} tidak memiliki pintasan.",
+  "{0} is back to its default.": "{0} telah dikembalikan ke bawaan.",
+  "Change shortcut: {0}": "Ubah pintasan: {0}",
+  "Reset shortcut: {0}": "Setel ulang pintasan: {0}"
+}

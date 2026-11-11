@@ -301,7 +301,7 @@ export class BuildsPage {
       }
     });
     on('fp:live', (ev) => {
-      if (ev.type === 'builds.created' || ev.type === 'builds.deleted') void this.refresh();
+      if (ev.type === 'builds.created' || ev.type === 'builds.removed') void this.refresh();
     });
   }
 

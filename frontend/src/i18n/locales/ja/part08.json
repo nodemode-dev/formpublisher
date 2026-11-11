@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "削除したサイト、ビルド、キー、準備済みフォルダーは、完全に削除するまでここに残ります。",
+  "Empty Trash": "ゴミ箱を空にする",
+  "Item": "項目",
+  "Moved": "移動日時",
+  "Restore": "元に戻す",
+  "Delete for good": "完全に削除",
+  "Prepared folder": "準備済みフォルダー",
+  "Key": "キー",
+  "Nothing in the trash": "ゴミ箱は空です",
+  "Sites, builds, keys and prepared folders you remove show up here.": "削除したサイト、ビルド、キー、準備済みフォルダーがここに表示されます。",
+  "Delete {0} for good? This cannot be undone.": "{0} を完全に削除しますか? この操作は元に戻せません。",
+  "Delete everything in the trash for good? This cannot be undone.": "ゴミ箱の中身をすべて完全に削除しますか? この操作は元に戻せません。",
+  "Restored {0}": "{0} を元に戻しました",
+  "Deleted {0}": "{0} を削除しました",
+  "The trash is empty": "ゴミ箱は空です"
+}

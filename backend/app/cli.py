@@ -263,6 +263,38 @@ class Client:
 
         return self._local(publish.prepared, build_id)
 
+    def trash(self) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", "/api/trash")
+        from app.services import trash
+
+        return self._local(trash.list_entries)
+
+    def trash_restore(self, entry: str) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("POST", f"/api/trash/{_q(entry)}/restore")
+        from app.services import trash
+
+        return self._local(trash.restore, entry)
+
+    def trash_delete(self, entry: str) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("DELETE", f"/api/trash/{_q(entry)}")
+        from app.services import trash
+
+        return self._local(trash.delete, entry)
+
+    def trash_empty(self) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("DELETE", "/api/trash")
+        from app.services import trash
+
+        return self._local(trash.empty)
+
     def receive_status(self) -> dict:
         self.connect()
         if self.url:
@@ -422,6 +454,24 @@ def say_prepare(data: dict) -> str:
     return say_prepared({"build": data["build"], "results": data["results"]})
 
 
+def say_trash(data: dict) -> str:
+    if not data["entries"]:
+        return "the trash is empty"
+    return "\n".join(f"{e['entry']:<52} {e['kind']:<9} {e['label'][:30]:<30} {e['size']:>10} bytes  {e['moved']}" + ("" if e.get("origin") else "  (cannot be restored)") for e in data["entries"])
+
+
+def say_trash_restore(data: dict) -> str:
+    return f"restored {data['kind']} {data['entry']} to {data['origin']}"
+
+
+def say_trash_delete(data: dict) -> str:
+    return f"deleted {data['entry']} for good"
+
+
+def say_trash_empty(data: dict) -> str:
+    return f"emptied the trash, {data['deleted']} deleted for good"
+
+
 def say_receive(data: dict) -> str:
     lines = [
         f"endpoint  {data.get('endpoint')}",
@@ -481,6 +531,14 @@ def build_parser() -> argparse.ArgumentParser:
     pp.add_argument("--include-model", action="store_true", help="keep FormWeb's model files (site.formweb.json, asset-access.json) in the host folders; they are left out by default")
     pd = sub.add_parser("prepared", parents=[common], help="list what is prepared for a build")
     pd.add_argument("build")
+    tr = sub.add_parser("trash", parents=[common], help="list the trash; trash restore ENTRY, trash delete ENTRY and trash empty --yes act on it")
+    tr_sub = tr.add_subparsers(dest="trash_command")
+    trr = tr_sub.add_parser("restore", parents=[common], help="move an entry back to where it came from")
+    trr.add_argument("entry")
+    trd = tr_sub.add_parser("delete", parents=[common], help="delete one entry for good")
+    trd.add_argument("entry")
+    tre = tr_sub.add_parser("empty", parents=[common], help="delete every entry for good")
+    tre.add_argument("--yes", action="store_true", help="confirm that everything in the trash is deleted for good")
     sub.add_parser("receive-status", parents=[common], help="the receive endpoint, the inbox folder and the last receipts")
     return parser
 
@@ -528,6 +586,18 @@ def main(argv: list[str] | None = None) -> int:
             data, say = client.prepare(args.build, args.target, args.include_model), say_prepare
         elif args.command == "prepared":
             data, say = client.prepared(args.build), say_prepared
+        elif args.command == "trash":
+            action = args.trash_command
+            if action == "restore":
+                data, say = client.trash_restore(args.entry), say_trash_restore
+            elif action == "delete":
+                data, say = client.trash_delete(args.entry), say_trash_delete
+            elif action == "empty":
+                if not args.yes:
+                    raise OpError("emptying the trash deletes everything in it for good; run again with --yes to confirm")
+                data, say = client.trash_empty(), say_trash_empty
+            else:
+                data, say = client.trash(), say_trash
         else:
             data, say = client.receive_status(), say_receive
     except OpError as exc:

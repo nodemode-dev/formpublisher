@@ -1,0 +1,19 @@
+{
+  "Change": "變更",
+  "Press keys": "請按下按鍵",
+  "Replace": "取代",
+  "Reset all": "全部重設",
+  "Choose Change, then press the new keys.": "選擇「變更」,然後按下新的按鍵。",
+  "Press the new keys. Escape cancels, Backspace clears.": "請按下新的按鍵。按 Escape 取消,按 Backspace 清除。",
+  "All shortcuts are back to their defaults.": "所有快速鍵已還原為預設值。",
+  "Use Ctrl, Alt or Cmd together with the key.": "請將 Ctrl、Alt 或 Cmd 與其他按鍵搭配使用。",
+  "The browser or system keeps that combination, so the app cannot use it.": "該組合鍵由瀏覽器或系統保留,應用程式無法使用。",
+  "Text editing keys cannot be moved.": "文字編輯按鍵無法移動。",
+  "{0} is already used by {1}. Move it to {2}?": "{0} 已被「{1}」使用。要將其改為 {2} 嗎?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} 正被「{1}」使用。要將其改回 {2} 嗎?",
+  "{0} is now {1}.": "{0} 現在是 {1}。",
+  "{0} has no shortcut.": "{0} 沒有快速鍵。",
+  "{0} is back to its default.": "{0} 已還原為預設值。",
+  "Change shortcut: {0}": "變更快速鍵:{0}",
+  "Reset shortcut: {0}": "重設快速鍵:{0}"
+}

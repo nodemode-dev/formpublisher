@@ -1,0 +1,19 @@
+{
+  "Change": "Thay đổi",
+  "Press keys": "Nhấn phím",
+  "Replace": "Thay thế",
+  "Reset all": "Đặt lại tất cả",
+  "Choose Change, then press the new keys.": "Chọn Thay đổi, rồi nhấn các phím mới.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Nhấn các phím mới. Escape để hủy, Backspace để xóa.",
+  "All shortcuts are back to their defaults.": "Tất cả phím tắt đã trở về mặc định.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Dùng Ctrl, Alt hoặc Cmd cùng với phím.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Trình duyệt hoặc hệ thống giữ tổ hợp phím này nên ứng dụng không thể dùng.",
+  "Text editing keys cannot be moved.": "Không thể chuyển các phím chỉnh sửa văn bản.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} đã được dùng cho {1}. Chuyển sang {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} đang được dùng cho {1}. Chuyển lại sang {2}?",
+  "{0} is now {1}.": "{0} hiện là {1}.",
+  "{0} has no shortcut.": "{0} chưa có phím tắt.",
+  "{0} is back to its default.": "{0} đã trở về mặc định.",
+  "Change shortcut: {0}": "Đổi phím tắt: {0}",
+  "Reset shortcut: {0}": "Đặt lại phím tắt: {0}"
+}

@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "ไซต์ บิลด์ คีย์ และโฟลเดอร์ที่เตรียมไว้ซึ่งนำออกจะอยู่ที่นี่จนกว่าคุณจะลบถาวร",
+  "Empty Trash": "ล้างถังขยะ",
+  "Item": "รายการ",
+  "Moved": "ย้ายเมื่อ",
+  "Restore": "กู้คืน",
+  "Delete for good": "ลบถาวร",
+  "Prepared folder": "โฟลเดอร์ที่เตรียมไว้",
+  "Key": "คีย์",
+  "Nothing in the trash": "ไม่มีอะไรในถังขยะ",
+  "Sites, builds, keys and prepared folders you remove show up here.": "ไซต์ บิลด์ คีย์ และโฟลเดอร์ที่เตรียมไว้ที่คุณนำออกจะแสดงที่นี่",
+  "Delete {0} for good? This cannot be undone.": "ลบ {0} ถาวรหรือไม่ การดำเนินการนี้ไม่สามารถย้อนกลับได้",
+  "Delete everything in the trash for good? This cannot be undone.": "ลบทุกอย่างในถังขยะถาวรหรือไม่ การดำเนินการนี้ไม่สามารถย้อนกลับได้",
+  "Restored {0}": "กู้คืน {0} แล้ว",
+  "Deleted {0}": "ลบ {0} แล้ว",
+  "The trash is empty": "ถังขยะว่างเปล่า"
+}

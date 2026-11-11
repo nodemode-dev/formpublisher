@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Borttagna webbplatser, byggen, nycklar och förberedda mappar ligger kvar här tills du raderar dem för gott.",
+  "Empty Trash": "Töm papperskorgen",
+  "Item": "Objekt",
+  "Moved": "Flyttad",
+  "Restore": "Återställ",
+  "Delete for good": "Radera för gott",
+  "Prepared folder": "Förberedd mapp",
+  "Key": "Nyckel",
+  "Nothing in the trash": "Inget i papperskorgen",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Webbplatser, byggen, nycklar och förberedda mappar som du tar bort visas här.",
+  "Delete {0} for good? This cannot be undone.": "Radera {0} för gott? Det går inte att ångra.",
+  "Delete everything in the trash for good? This cannot be undone.": "Radera allt i papperskorgen för gott? Det går inte att ångra.",
+  "Restored {0}": "Återställde {0}",
+  "Deleted {0}": "Raderade {0}",
+  "The trash is empty": "Papperskorgen är tom"
+}

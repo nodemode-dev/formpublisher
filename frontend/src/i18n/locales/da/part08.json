@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Fjernede websteder, builds, nøgler og forberedte mapper bliver liggende her, indtil du sletter dem permanent.",
+  "Empty Trash": "Tøm papirkurv",
+  "Item": "Element",
+  "Moved": "Flyttet",
+  "Restore": "Gendan",
+  "Delete for good": "Slet permanent",
+  "Prepared folder": "Forberedt mappe",
+  "Key": "Nøgle",
+  "Nothing in the trash": "Intet i papirkurven",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Websteder, builds, nøgler og forberedte mapper, du fjerner, vises her.",
+  "Delete {0} for good? This cannot be undone.": "Slet {0} permanent? Det kan ikke fortrydes.",
+  "Delete everything in the trash for good? This cannot be undone.": "Slet alt i papirkurven permanent? Det kan ikke fortrydes.",
+  "Restored {0}": "{0} er gendannet",
+  "Deleted {0}": "{0} er slettet",
+  "The trash is empty": "Papirkurven er tom"
+}

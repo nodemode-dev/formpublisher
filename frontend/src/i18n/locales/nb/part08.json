@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Fjernede nettsteder, bygg, nøkler og klargjorte mapper blir liggende her til du sletter dem for godt.",
+  "Empty Trash": "Tøm papirkurven",
+  "Item": "Element",
+  "Moved": "Flyttet",
+  "Restore": "Gjenopprett",
+  "Delete for good": "Slett for godt",
+  "Prepared folder": "Klargjort mappe",
+  "Key": "Nøkkel",
+  "Nothing in the trash": "Ingenting i papirkurven",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Nettsteder, bygg, nøkler og klargjorte mapper du fjerner, vises her.",
+  "Delete {0} for good? This cannot be undone.": "Slette {0} for godt? Dette kan ikke angres.",
+  "Delete everything in the trash for good? This cannot be undone.": "Slette alt i papirkurven for godt? Dette kan ikke angres.",
+  "Restored {0}": "Gjenopprettet {0}",
+  "Deleted {0}": "Slettet {0}",
+  "The trash is empty": "Papirkurven er tom"
+}

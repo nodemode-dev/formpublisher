@@ -1,0 +1,19 @@
+{
+  "Change": "Змінити",
+  "Press keys": "Натисніть клавіші",
+  "Replace": "Замінити",
+  "Reset all": "Скинути всі",
+  "Choose Change, then press the new keys.": "Виберіть «Змінити», а потім натисніть нові клавіші.",
+  "Press the new keys. Escape cancels, Backspace clears.": "Натисніть нові клавіші. Escape скасовує, Backspace очищає.",
+  "All shortcuts are back to their defaults.": "Усі комбінації клавіш повернуто до значень за замовчуванням.",
+  "Use Ctrl, Alt or Cmd together with the key.": "Використовуйте Ctrl, Alt або Cmd разом із клавішею.",
+  "The browser or system keeps that combination, so the app cannot use it.": "Цю комбінацію зарезервовано браузером або системою, тому застосунок не може її використати.",
+  "Text editing keys cannot be moved.": "Клавіші редагування тексту не можна переназначити.",
+  "{0} is already used by {1}. Move it to {2}?": "{0} уже використовується для дії «{1}». Перепризначити на {2}?",
+  "{0} is used by {1}. Move it back to {2}?": "{0} використовується для дії «{1}». Повернути на {2}?",
+  "{0} is now {1}.": "Тепер {0}: {1}.",
+  "{0} has no shortcut.": "Для дії {0} немає комбінації клавіш.",
+  "{0} is back to its default.": "{0}: повернуто значення за замовчуванням.",
+  "Change shortcut: {0}": "Змінити комбінацію клавіш: {0}",
+  "Reset shortcut: {0}": "Скинути комбінацію клавіш: {0}"
+}

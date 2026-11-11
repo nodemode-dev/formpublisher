@@ -4,16 +4,14 @@ import json
 import os
 import re
 import secrets
-import shutil
 import threading
-from datetime import datetime, timezone
 from pathlib import Path
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
-from app.services import intake, package, paths
+from app.services import intake, package, paths, trash
 from app.services.bus import bus
 
 KEY_ID_RE = re.compile(r"^[0-9a-f]{16}$")
@@ -108,18 +106,8 @@ def public_key(key_id: str) -> dict:
 def remove_key(key_id: str) -> dict:
     with _lock:
         row = _row(key_id)
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        target = paths.trash_dir() / f"key-{key_id}-{stamp}"
-        counter = 2
-        while target.exists():
-            target = paths.trash_dir() / f"key-{key_id}-{stamp}-{counter}"
-            counter += 1
-        target.mkdir(parents=True)
         pem = _pem_path(key_id)
-        if pem.is_file():
-            shutil.move(str(pem), str(target / pem.name))
-            os.chmod(target / pem.name, 0o600)
-        (target / "entry.json").write_text(package.dumps(row), encoding="utf-8")
+        target = trash.move(pem, "key", row.get("name") or key_id, trash.rel(pem), row)
         _save([r for r in _load() if r.get("id") != key_id])
     bus.emit("keys.removed", id=key_id)
     return {"id": key_id, "removed": True, "trash": str(target)}

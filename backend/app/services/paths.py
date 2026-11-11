@@ -1,5 +1,7 @@
+import json
 import os
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 DEFAULT_PORT = 8280
@@ -110,6 +112,37 @@ def inbox_dir() -> Path:
 
 def settings_file() -> Path:
     return home() / "settings.json"
+
+
+def engine_file() -> Path:
+    """Where the running engine announces itself: engine.json in the data folder."""
+    return home() / "engine.json"
+
+
+def write_engine_file(version: str) -> None:
+    """Write engine.json atomically with the port this engine serves on, its pid, version and start time."""
+    record = {
+        "app": "formpublisher",
+        "port": port(),
+        "pid": os.getpid(),
+        "version": version,
+        "started": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+    target = engine_file()
+    temp = target.with_name(f"engine.json.{os.getpid()}.tmp")
+    temp.write_text(json.dumps(record), encoding="utf-8")
+    os.replace(temp, target)
+
+
+def remove_engine_file() -> None:
+    """Remove engine.json only when it still names this process."""
+    target = engine_file()
+    try:
+        record = json.loads(target.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+    if isinstance(record, dict) and record.get("pid") == os.getpid():
+        target.unlink(missing_ok=True)
 
 
 def ensure_layout() -> None:

@@ -1,0 +1,19 @@
+{
+  "Change": "เปลี่ยน",
+  "Press keys": "กดแป้น",
+  "Replace": "แทนที่",
+  "Reset all": "รีเซ็ตทั้งหมด",
+  "Choose Change, then press the new keys.": "เลือก เปลี่ยน แล้วกดแป้นใหม่",
+  "Press the new keys. Escape cancels, Backspace clears.": "กดแป้นใหม่ Escape ยกเลิก Backspace ล้างค่า",
+  "All shortcuts are back to their defaults.": "แป้นพิมพ์ลัดทั้งหมดกลับเป็นค่าเริ่มต้นแล้ว",
+  "Use Ctrl, Alt or Cmd together with the key.": "ใช้ Ctrl, Alt หรือ Cmd ร่วมกับแป้นอื่น",
+  "The browser or system keeps that combination, so the app cannot use it.": "เบราว์เซอร์หรือระบบใช้คีย์ผสมนี้อยู่ แอปจึงใช้ไม่ได้",
+  "Text editing keys cannot be moved.": "ไม่สามารถย้ายแป้นสำหรับแก้ไขข้อความได้",
+  "{0} is already used by {1}. Move it to {2}?": "{0} ถูกใช้โดย {1} อยู่แล้ว ย้ายไปเป็น {2} หรือไม่",
+  "{0} is used by {1}. Move it back to {2}?": "{0} ถูกใช้โดย {1} ย้ายกลับไปเป็น {2} หรือไม่",
+  "{0} is now {1}.": "{0} เป็น {1} แล้ว",
+  "{0} has no shortcut.": "{0} ไม่มีแป้นพิมพ์ลัด",
+  "{0} is back to its default.": "{0} กลับเป็นค่าเริ่มต้นแล้ว",
+  "Change shortcut: {0}": "เปลี่ยนแป้นพิมพ์ลัด: {0}",
+  "Reset shortcut: {0}": "รีเซ็ตแป้นพิมพ์ลัด: {0}"
+}

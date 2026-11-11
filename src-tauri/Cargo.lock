@@ -1016,7 +1016,7 @@ dependencies = [
 
 [[package]]
 name = "formpublisher"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "gtk",
  "objc2",

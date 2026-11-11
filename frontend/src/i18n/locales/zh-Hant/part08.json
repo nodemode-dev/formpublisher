@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "移除的網站、建置、金鑰和已準備的資料夾會保留在這裡，直到你將其永久刪除。",
+  "Empty Trash": "清空垃圾桶",
+  "Item": "項目",
+  "Moved": "移動時間",
+  "Restore": "還原",
+  "Delete for good": "永久刪除",
+  "Prepared folder": "已準備的資料夾",
+  "Key": "金鑰",
+  "Nothing in the trash": "垃圾桶是空的",
+  "Sites, builds, keys and prepared folders you remove show up here.": "你移除的網站、建置、金鑰和已準備的資料夾會顯示在這裡。",
+  "Delete {0} for good? This cannot be undone.": "要永久刪除 {0} 嗎?此操作無法復原。",
+  "Delete everything in the trash for good? This cannot be undone.": "要永久刪除垃圾桶中的所有內容嗎?此操作無法復原。",
+  "Restored {0}": "已還原 {0}",
+  "Deleted {0}": "已刪除 {0}",
+  "The trash is empty": "垃圾桶是空的"
+}

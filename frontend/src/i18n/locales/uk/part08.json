@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Видалені сайти, збірки, ключі та підготовлені теки лишаються тут, доки ви не видалите їх остаточно.",
+  "Empty Trash": "Очистити кошик",
+  "Item": "Елемент",
+  "Moved": "Переміщено",
+  "Restore": "Відновити",
+  "Delete for good": "Видалити остаточно",
+  "Prepared folder": "Підготовлена тека",
+  "Key": "Ключ",
+  "Nothing in the trash": "У кошику нічого немає",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Тут з'являться видалені вами сайти, збірки, ключі та підготовлені теки.",
+  "Delete {0} for good? This cannot be undone.": "Видалити {0} остаточно? Цю дію не можна скасувати.",
+  "Delete everything in the trash for good? This cannot be undone.": "Видалити весь вміст кошика остаточно? Цю дію не можна скасувати.",
+  "Restored {0}": "Відновлено: {0}",
+  "Deleted {0}": "Видалено: {0}",
+  "The trash is empty": "Кошик порожній"
+}

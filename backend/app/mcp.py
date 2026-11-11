@@ -168,6 +168,23 @@ def build(client: Client | None = None) -> MCPServer:
         """build: build id from list_builds."""
         return await run(link.prepared, build)
 
+    @server.tool(
+        name="list_trash",
+        description="List what was removed and is waiting in the trash, newest first: per entry its name, kind (site, build, key or prepared), label, where it came from, when it was moved and its size. Read only.",
+        annotations=ToolAnnotations(title="List the trash", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def list_trash() -> dict:
+        return await run(link.trash)
+
+    @server.tool(
+        name="restore_from_trash",
+        description="Move a trash entry back to where it came from. It fails with the reason when the entry predates the trash records or the place is taken. Deleting for good is not offered here.",
+        annotations=ToolAnnotations(title="Restore from the trash", readOnlyHint=False, destructiveHint=False, idempotentHint=False, openWorldHint=False),
+    )
+    async def restore_from_trash(entry: str) -> dict:
+        """entry: the entry name from list_trash."""
+        return await run(link.trash_restore, entry)
+
     return server
 
 

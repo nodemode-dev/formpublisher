@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "Poistetut sivustot, koontiversiot, avaimet ja valmistellut kansiot pysyvät täällä, kunnes poistat ne pysyvästi.",
+  "Empty Trash": "Tyhjennä roskakori",
+  "Item": "Kohde",
+  "Moved": "Siirretty",
+  "Restore": "Palauta",
+  "Delete for good": "Poista pysyvästi",
+  "Prepared folder": "Valmisteltu kansio",
+  "Key": "Avain",
+  "Nothing in the trash": "Roskakorissa ei ole mitään",
+  "Sites, builds, keys and prepared folders you remove show up here.": "Poistamasi sivustot, koontiversiot, avaimet ja valmistellut kansiot näkyvät täällä.",
+  "Delete {0} for good? This cannot be undone.": "Poistetaanko {0} pysyvästi? Tätä ei voi kumota.",
+  "Delete everything in the trash for good? This cannot be undone.": "Poistetaanko kaikki roskakorissa oleva pysyvästi? Tätä ei voi kumota.",
+  "Restored {0}": "Palautettu: {0}",
+  "Deleted {0}": "Poistettu: {0}",
+  "The trash is empty": "Roskakori on tyhjä"
+}

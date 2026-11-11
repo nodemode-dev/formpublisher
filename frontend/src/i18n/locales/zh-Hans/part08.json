@@ -1,0 +1,17 @@
+{
+  "Removed sites, builds, keys and prepared folders stay here until you delete them for good.": "移除的站点、构建、密钥和已准备的文件夹会保留在这里，直到你将其永久删除。",
+  "Empty Trash": "清倒废纸篓",
+  "Item": "项目",
+  "Moved": "移动时间",
+  "Restore": "恢复",
+  "Delete for good": "永久删除",
+  "Prepared folder": "已准备的文件夹",
+  "Key": "密钥",
+  "Nothing in the trash": "废纸篓为空",
+  "Sites, builds, keys and prepared folders you remove show up here.": "你移除的站点、构建、密钥和已准备的文件夹会显示在这里。",
+  "Delete {0} for good? This cannot be undone.": "要永久删除 {0} 吗？此操作无法撤销。",
+  "Delete everything in the trash for good? This cannot be undone.": "要永久删除废纸篓中的所有内容吗？此操作无法撤销。",
+  "Restored {0}": "已恢复 {0}",
+  "Deleted {0}": "已删除 {0}",
+  "The trash is empty": "废纸篓是空的"
+}

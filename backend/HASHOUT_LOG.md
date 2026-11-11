@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.1.3
-Last updated: 2026-11-10 · Phases 10 to 12: desktop engine, model files left out of host folders, receive pipeline, revisions and diffs
+Current build version: v0.1.4
+Last updated: 2026-11-10 · Phases 13 to 15: trash service, engine.json, deep run through the site host, version 2 .fweb projects
 
 ---
 
@@ -279,3 +279,28 @@ The executor spec is `TURN_D_SPEC.md` in the 0.1.3 planning sidecar. The vendore
 - `GET /api/sites/{id}/revisions` lists revisions newest first with file count, bytes, route count and the files added, removed and changed from the revision before. `GET /api/sites/{id}/diff?from=&to=` compares two revisions by path, size and SHA-256 and lists added and removed routes; without `to` it takes the latest, without `from` the revision before `to`. Revision times come from the revision id's stamp. CLI `revisions` and `diff` and MCP `list_revisions` and `diff_revisions` (both read-only, 16 tools in all) call the same functions in-process or over HTTP. `prepare` gains `--include-model` and `includeModel`.
 
 Checked: two receives of one project gave one site with two revisions; with the settings off no checks or builds ran, with them on the check and build followed the 24 ms answer; diffs read the same through the route, the CLI in-process, HTTP and MCP; an inbox zip with metadata became the fourth revision of the same site; all six targets prepared with `includeModel` false, true and omitted verified clean, with two fewer files per site folder by default; the frozen engine selfchecked, served the window and imported the demo.
+
+## Phases 13 to 15 · v0.1.4 (2026-11-10)
+
+The executor spec is `TURN_E_SPEC.md` in the 0.1.4 planning sidecar. The vendored FormWeb crates are 0.19.4.
+
+### app/services/trash.py, app/routers/trash.py, the remove functions in intake.py, keys.py, publish.py and package.py
+
+- `trash.move(path, kind, label, origin, payload=None)` is the only way into `trash/`; callers keep their entry names and return shapes and no longer move folders themselves. It writes `<entry>.trash.json` (kind, label, origin relative to the data folder, moved, size). A key is a file, so its entry is a folder holding the `.pem` and `entry.json` (the key's row, passed as payload); a prepared folder's hidden `.<target>.json` is removed by the move, so it is kept in the metadata as `payload` and written back on restore, which verify needs.
+- `GET /api/trash` lists entries newest first, skipping metadata files and dot names. Entries from before 0.1.4 have no metadata: kind comes from the `build-`, `key-` or `prepared-` prefix (else site) and origin is null, so they list but answer 409 on restore.
+- An entry name is only accepted if it is in the folder listing, never joined from input. Restore resolves the origin inside the data folder and requires it to sit under the kind's own folder (`sites`, `builds`, `keys`, `prepared`), so a damaged metadata file cannot send an entry elsewhere; a taken place, an existing key id or a damaged key record answer 409 with the reason. Restore emits the event the matching create emits (`site.imported`, `builds.created`, `keys.created`, `publish.prepared`, each with `restored: true`) so Home and the builds library refresh, and every move, restore, delete and empty emits `trash.changed`.
+- CLI `trash`, `trash restore`, `trash delete`, `trash empty --yes` (refused without `--yes`), in-process or over HTTP like every command. MCP adds `list_trash` (read-only) and `restore_from_trash`; deleting stays out of MCP, so a person decides what is gone for good. 18 tools.
+
+### app/services/paths.py, app/main.py lifespan
+
+- `engine.json` in the data folder is the discovery file for FormWeb: `{app, port, pid, version, started}`, written through `engine.json.<pid>.tmp` and `os.replace`. The lifespan writes it after the site host and the inbox watcher are up, so a reader never finds an engine that is not ready, and removes it first on shutdown, only if it still names this pid, so a second engine that took over the folder keeps its file. `GET /api/health` already answers `app: formpublisher`, which FormWeb checks before sending.
+
+### app/services/deep.py
+
+- The deep run serves the revision through `host.serve_revision`, so deep checks see the site host's lookup, redirect and 404 rules instead of a second server's. Playwright's sync API runs on a threadpool worker, so `LocalServer` schedules `serve_revision` and its stop on the engine loop with `asyncio.run_coroutine_threadsafe` (the lifespan hands the loop over with `deep.attach`); without an attached loop (the in-process CLI) it runs a private loop on a daemon thread. The old `ThreadingHTTPServer` handler and MIME table are gone.
+
+### app/services/compile.py, intake.is_fweb
+
+- FormWeb's version 2 `.fweb` is a zip with `project.json` first and `assets/<id>` stored; FormWeb writes it only when version 1 would pass 64 MiB. It is checked up front with FormWeb's own rules (project.json first and at most 64 MiB, format and version 2, a site object, at most 500 assets listed once, every member exactly `assets/<listed id>`, digest, mime, and FormWeb's per-type sizes: 8 MiB images, 64 MiB mp4 and webm, 4 MiB woff2, 2 MiB svg, enforced while streaming), capped at 512 MiB, then each asset is copied from the zip into the build folder in 1 MiB chunks and hashed again on the way, so a large project never sits in memory. `looks_like_fweb` accepts a zip only when its first member is a version 2 `project.json`, so `is_fweb` now asks it for any file and ordinary site zips are unaffected. Version 1 keeps its 128 MiB file cap and no per-type sizes.
+
+Checked: on lab engines a removed site, build, key and prepared folder were listed and restored and worked again; 409, 404, delete and empty answered as above; the CLI matched in-process and over HTTP and the MCP stdio walk listed and restored. Two engines each named their own port and pid in `engine.json` and SIGTERM removed only its own. A static and deep run on the demo gave the same problems, summary and thumbnails before and after the host switch. A version 1 project and its version 2 twin built with identical file lists and hashes, and bad archives were refused with their reasons. With this engine on port 8402, FormWeb 0.19.4 found it through `engine.json` and delivered live.

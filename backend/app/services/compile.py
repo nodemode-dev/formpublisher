@@ -6,6 +6,8 @@ import re
 import subprocess
 import tempfile
 import threading
+import zipfile
+import zlib
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -13,7 +15,12 @@ from app.services import paths
 
 FORMAT = "com.nodemode.formweb"
 MAX_ENVELOPE_BYTES = 128 * 1024 * 1024
+MAX_ARCHIVE_BYTES = 512 * 1024 * 1024
+MAX_PROJECT_JSON_BYTES = 64 * 1024 * 1024
 MAX_ASSETS = 500
+SIZE_LIMITS = {"mp4": 64 * 1024 * 1024, "webm": 64 * 1024 * 1024, "woff2": 4 * 1024 * 1024, "svg": 2 * 1024 * 1024}
+DEFAULT_ASSET_LIMIT = 8 * 1024 * 1024
+CHUNK = 1024 * 1024
 REQUEST_SECONDS = 120
 MISSING = "Opening .fweb projects needs formweb-core. Run ./setup/install_compiler."
 ASSET_NAME = re.compile(r"^[0-9a-f]{64}\.(png|jpg|gif|webp|svg|mp4|webm|woff2)$")
@@ -54,8 +61,41 @@ def core_binary() -> Path | None:
     return None
 
 
+def read_project_json(archive: zipfile.ZipFile) -> dict:
+    infos = archive.infolist()
+    if not infos or infos[0].filename != "project.json":
+        raise CompileError("the .fweb archive must start with project.json")
+    if infos[0].file_size > MAX_PROJECT_JSON_BYTES:
+        raise CompileError("the .fweb archive project.json is larger than 64 MiB", 413)
+    with archive.open(infos[0]) as stream:
+        raw = stream.read(MAX_PROJECT_JSON_BYTES + 1)
+    if len(raw) > MAX_PROJECT_JSON_BYTES:
+        raise CompileError("the .fweb archive project.json is larger than 64 MiB", 413)
+    try:
+        data = json.loads(raw.decode("utf-8-sig"))
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise CompileError("the .fweb archive project.json is not valid JSON") from exc
+    if not isinstance(data, dict) or data.get("format") != FORMAT or data.get("version") != 2:
+        raise CompileError("the .fweb archive project.json is not a FormWeb version 2 project")
+    if not isinstance(data.get("site"), dict):
+        raise CompileError("the .fweb archive has no site")
+    return data
+
+
+def is_archive_project(path: Path) -> bool:
+    """True when the file is a zip whose first member is a FormWeb version 2 project.json."""
+    try:
+        with zipfile.ZipFile(path) as archive:
+            read_project_json(archive)
+        return True
+    except (CompileError, zipfile.BadZipFile, zlib.error, EOFError, NotImplementedError, RuntimeError, OSError):
+        return False
+
+
 def looks_like_fweb(path: Path) -> bool:
     try:
+        if zipfile.is_zipfile(path):
+            return is_archive_project(path)
         with open(path, "rb") as handle:
             head = handle.read(4096)
     except OSError:
@@ -101,6 +141,95 @@ def decode_assets(envelope: dict) -> tuple[dict[str, bytes], dict[str, dict]]:
         if isinstance(item.get("license"), dict):
             licences[name] = item["license"]
     return blobs, licences
+
+
+class ArchiveAssets:
+    """The assets of a version 2 archive, validated up front and copied out one at a time."""
+
+    def __init__(self, path: Path, names: set[str]) -> None:
+        self.path = path
+        self.names = names
+
+    def __contains__(self, name: object) -> bool:
+        return name in self.names
+
+    def copy(self, name: str, target: Path) -> None:
+        if name not in self.names:
+            raise CompileError(f"the .fweb archive does not carry {name}")
+        digest = hashlib.sha256()
+        try:
+            with zipfile.ZipFile(self.path) as archive, archive.open("assets/" + name) as stream, open(target, "wb") as out:
+                while chunk := stream.read(CHUNK):
+                    digest.update(chunk)
+                    out.write(chunk)
+        except (zipfile.BadZipFile, zlib.error, EOFError, NotImplementedError, RuntimeError, KeyError) as exc:
+            raise CompileError("the .fweb archive is not a valid, readable zip file") from exc
+        if digest.hexdigest() != name.split(".")[0]:
+            raise CompileError(f"the .fweb image {name} does not match its digest")
+
+
+def read_archive(path: Path) -> tuple[dict, ArchiveAssets, dict[str, dict]]:
+    """Validate a version 2 .fweb zip on disk and return its project.json, its assets and their licences."""
+    try:
+        size = path.stat().st_size
+    except OSError as exc:
+        raise CompileError(f"cannot read {path.name}: {exc.strerror}") from exc
+    if size > MAX_ARCHIVE_BYTES:
+        raise CompileError("the .fweb file is larger than 512 MiB", 413)
+    try:
+        with zipfile.ZipFile(path) as archive:
+            envelope = read_project_json(archive)
+            listed = envelope.get("assets", [])
+            if not isinstance(listed, list) or len(listed) > MAX_ASSETS:
+                raise CompileError(f"the .fweb assets must be a list of at most {MAX_ASSETS} items")
+            ids: list[str] = []
+            licences: dict[str, dict] = {}
+            for entry in listed:
+                name = entry.get("id") if isinstance(entry, dict) else None
+                if not isinstance(name, str) or not ASSET_NAME.fullmatch(name) or not isinstance(entry.get("mime"), str) or ("name" in entry and not isinstance(entry["name"], str)):
+                    raise CompileError("a .fweb image entry is invalid")
+                if entry["mime"] != MIME_TYPES[name.rsplit(".", 1)[1]]:
+                    raise CompileError(f"the .fweb image {name} has the wrong media type")
+                ids.append(name)
+                if isinstance(entry.get("license"), dict):
+                    licences[name] = entry["license"]
+            if len(set(ids)) != len(ids):
+                raise CompileError("the .fweb archive lists an asset more than once")
+            members = archive.infolist()[1:]
+            member_names = [info.filename for info in members]
+            if len(set(member_names)) != len(member_names):
+                raise CompileError("the .fweb archive contains duplicate entries")
+            for member in member_names:
+                if not member.startswith("assets/") or member[7:] not in ids:
+                    raise CompileError(f"the .fweb archive contains an entry that project.json does not list: {member[:80]}")
+            if len(member_names) != len(ids):
+                raise CompileError("the .fweb archive is missing a listed asset")
+            for info in members:
+                name = info.filename[7:]
+                limit = SIZE_LIMITS.get(name.rsplit(".", 1)[1], DEFAULT_ASSET_LIMIT)
+                if info.file_size > limit:
+                    raise CompileError(f"the .fweb image {name} is too large", 413)
+                digest, counted = hashlib.sha256(), 0
+                with archive.open(info) as stream:
+                    while chunk := stream.read(CHUNK):
+                        counted += len(chunk)
+                        if counted > limit:
+                            raise CompileError(f"the .fweb image {name} is too large", 413)
+                        digest.update(chunk)
+                if digest.hexdigest() != name.split(".")[0]:
+                    raise CompileError(f"the .fweb image {name} does not match its digest")
+    except (zipfile.BadZipFile, zlib.error, EOFError, NotImplementedError, RuntimeError, OSError) as exc:
+        raise CompileError("the .fweb archive is not a valid, readable zip file") from exc
+    return envelope, ArchiveAssets(path, set(ids)), licences
+
+
+def load_project(path: Path) -> tuple[dict, Any, dict[str, dict]]:
+    """Read a version 1 JSON .fweb or a version 2 zip .fweb; the assets are bytes (1) or an ArchiveAssets (2)."""
+    if zipfile.is_zipfile(path):
+        return read_archive(path)
+    envelope = read_envelope(path)
+    blobs, licences = decode_assets(envelope)
+    return envelope, blobs, licences
 
 
 def safe_path(value: Any) -> PurePosixPath:
@@ -251,7 +380,10 @@ def bundle(files: list[dict], blobs: dict[str, bytes], licences: dict[str, dict]
     for name in sorted(names):
         if name not in blobs:
             raise CompileError(f"the project uses the image {name} but the .fweb file does not carry it")
-        out.append({"path": "assets/" + name, "content": base64.b64encode(blobs[name]).decode(), "encoding": "base64"})
+        if isinstance(blobs, ArchiveAssets):
+            out.append({"path": "assets/" + name, "blob": name})
+        else:
+            out.append({"path": "assets/" + name, "content": base64.b64encode(blobs[name]).decode(), "encoding": "base64"})
         if licences.get(name):
             credits.append((name, licences[name]))
     if credits:
@@ -265,7 +397,7 @@ def bundle(files: list[dict], blobs: dict[str, bytes], licences: dict[str, dict]
     return out
 
 
-def write_files(files: list[dict], dest: Path) -> int:
+def write_files(files: list[dict], dest: Path, blobs: Any = None) -> int:
     root = dest.resolve()
     root.mkdir(parents=True, exist_ok=True)
     count = 0
@@ -274,6 +406,11 @@ def write_files(files: list[dict], dest: Path) -> int:
         target = (root / rel).resolve()
         if root not in target.parents:
             raise CompileError(f"the engine returned an unsafe export path: {item.get('path')!r}")
+        if isinstance(blobs, ArchiveAssets) and isinstance(item.get("blob"), str):
+            target.parent.mkdir(parents=True, exist_ok=True)
+            blobs.copy(item["blob"], target)
+            count += 1
+            continue
         content = item.get("content")
         if not isinstance(content, str):
             raise CompileError(f"the engine returned no content for {item.get('path')!r}")
@@ -294,8 +431,7 @@ def compile_fweb(envelope_path: Path, dest: Path) -> dict:
     binary = core_binary()
     if binary is None:
         raise CompileError(MISSING, 422)
-    envelope = read_envelope(envelope_path)
-    blobs, licences = decode_assets(envelope)
+    envelope, blobs, licences = load_project(envelope_path)
     site = envelope["site"]
     locale = site.get("defaultLocale") if isinstance(site.get("defaultLocale"), str) and site.get("defaultLocale") else "en"
     settings = site.get("settings") if isinstance(site.get("settings"), dict) else {}
@@ -311,7 +447,7 @@ def compile_fweb(envelope_path: Path, dest: Path) -> dict:
             raise CompileError("formweb-core returned an invalid file entry")
         safe_path(item.get("path"))
     bundled = bundle(result["files"], blobs, licences)
-    count = write_files(bundled, dest)
+    count = write_files(bundled, dest, blobs)
     name = site.get("name") if isinstance(site.get("name"), str) and site.get("name").strip() else None
     return {
         "name": name,
@@ -319,6 +455,6 @@ def compile_fweb(envelope_path: Path, dest: Path) -> dict:
         "schemaVersion": hello.get("schemaVersion") if isinstance(hello, dict) else None,
         "locale": locale,
         "files": count,
-        "assets": sum(1 for item in bundled if item["path"].startswith("assets/") and item.get("encoding") == "base64"),
+        "assets": sum(1 for item in bundled if item["path"].startswith("assets/") and (item.get("encoding") == "base64" or "blob" in item)),
         "warnings": [str(w) for w in result.get("warnings", [])][:20] if isinstance(result.get("warnings"), list) else [],
     }
