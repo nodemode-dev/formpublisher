@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.5
+Current build version: v0.2.6
 Last updated: 2026-11-11 · Phases 46 to 48: whole panel tabs and toolbar selects in narrow windows, and Save as .fpub named SITE-BUILD.fpub
 
 ---

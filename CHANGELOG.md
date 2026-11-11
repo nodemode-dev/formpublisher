@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.6 · 2026-11-11
+
+- The toolbar's dropdowns show their whole value at every window width, also between 1240 and 1400 px where they used to be cut off, and choosing another option no longer moves anything in the toolbar.
+- In a narrow window the Problems filters show "All" instead of "All severities" and "All tiers" when that keeps the bar on one row (the full name stays in the tooltip). Where the other options are still too wide, as in German, Finnish and Russian at 760 px, the filters keep their own row.
+- The FormWeb engine crates are vendored at 0.20.6.
+- The new label is in all 26 languages.
+
 ## 0.2.5 · 2026-11-11
 
 - In narrow windows the bottom panel's tabs show an icon and their count instead of a cut-off name, and the name stays in the tooltip and for screen readers.
