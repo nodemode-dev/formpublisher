@@ -32,7 +32,7 @@ body.theme-light .fp-theme-to-dark { display: inline-flex; }
 .fp-tab-add:hover { color: var(--text-primary); background: var(--surface-2); }
 :where(.fp-tab, .fp-tab-close, .fp-tab-add):focus-visible { outline-offset: -2px; }
 
-.fp-options { display: flex; align-items: center; gap: var(--space-2); min-width: 0; padding: 0 var(--space-3); background: var(--surface-0); border-bottom: 1px solid var(--line-0); overflow: hidden; white-space: nowrap; }
+.fp-options { display: flex; align-items: center; gap: var(--space-2); min-width: 0; padding: 0 var(--space-3); background: var(--surface-0); border-bottom: 1px solid var(--line-0); overflow: hidden; white-space: nowrap; container-type: inline-size; }
 .fp-tb-field { display: flex; align-items: center; gap: 6px; flex: 0 1 420px; min-width: 0; height: var(--ctl-md); padding: 0 8px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--surface-field); color: var(--text-muted); }
 .fp-tb-field input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--text-primary); font-family: var(--font-mono); font-size: var(--fp-12); text-overflow: ellipsis; cursor: default; }
 .fp-tb-field input::placeholder { color: var(--text-muted); font-family: var(--font-ui); }
