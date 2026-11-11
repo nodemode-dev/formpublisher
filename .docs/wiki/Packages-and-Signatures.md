@@ -16,7 +16,7 @@ Ed25519 through `cryptography`. The private key is PKCS8 PEM in `keys/[id].pem` 
 
 ## One build in one file
 
-Save as .fpub on a row of the builds library (or `./formpublisher run fpub BUILD`, the MCP tool `save_fpub`, `GET /api/builds/BUILD/fpub`) writes the build as a `.fpub`: a zip of `fpub.json`, `publish.json`, `site.zip` and, when signed, `site.zip.sig`, in that order, each with the time 1980-01-01, so the same build always gives the same bytes. `fpub.json` records the site, the build, the revision, the SHA-256 and size of `site.zip` and, when signed, the key id, fingerprint and public key. Opening a `.fpub` checks all of that and the signature before it restores the build; see [Importing Sites](Importing-Sites).
+Save as .fpub on a row of the builds library (or `./formpublisher run fpub BUILD`, the MCP tool `save_fpub`, `GET /api/builds/BUILD/fpub`) writes the build as a `SITE-BUILD.fpub` (the same name from the window, the CLI and the engine): a zip of `fpub.json`, `publish.json`, `site.zip` and, when signed, `site.zip.sig`, in that order, each with the time 1980-01-01, so the same build always gives the same bytes. `fpub.json` records the site, the build, the revision, the SHA-256 and size of `site.zip` and, when signed, the key id, fingerprint and public key. Opening a `.fpub` checks all of that and the signature before it restores the build; see [Importing Sites](Importing-Sites).
 
 ## In the window
 
