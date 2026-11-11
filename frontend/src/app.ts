@@ -91,7 +91,7 @@ const SHELL = `<div class="fp-app">
 <div class="fp-status-left"><span class="fp-st fp-st-engine"><span class="fp-st-dot"></span><span class="fp-st-engine-text">Checking the engine</span></span><span class="fp-st fp-st-routes">0 routes</span></div>
 <div class="fp-status-right"><button class="fp-icon-btn is-sm" type="button" data-act="toggle-bottom" title="Show or hide the panel" aria-label="Show or hide the panel">${icon('terminal', 14)}</button><span class="fp-st fp-st-version" translate="no">v${VERSION}</span></div>
 </footer>
-<input class="fp-file-input" type="file" accept=".zip,.fweb,application/zip" hidden tabindex="-1" aria-hidden="true">
+<input class="fp-file-input" type="file" accept=".zip,.fweb,.fpub,application/zip" hidden tabindex="-1" aria-hidden="true">
 </div>`;
 
 let instance: App | null = null;

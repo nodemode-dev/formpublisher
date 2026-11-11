@@ -202,6 +202,7 @@ export const buildsApi = {
   },
   remove: (id: string): Promise<void> => request<void>(`/api/builds/${enc(id)}`, { method: 'DELETE' }),
   downloadUrl: (id: string): string => `/api/builds/${enc(id)}/download`,
+  fpubUrl: (id: string): string => `/api/builds/${enc(id)}/fpub`,
   async keys(): Promise<KeyInfo[]> {
     return listOf(await request<unknown>('/api/keys'), 'keys').map(toKey).filter((k): k is KeyInfo => k !== null);
   },
