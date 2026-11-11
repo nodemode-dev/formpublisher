@@ -1,21 +1,24 @@
 .fp-bottom-page.fp-pn-page { display: flex; flex-direction: column; place-items: initial; padding: 0; text-align: left; }
 .fp-bottom-page.fp-pn-page[hidden] { display: none; }
-.fp-pn-bar { display: flex; align-items: center; gap: var(--space-2); flex: none; height: 34px; padding: 0 var(--space-3); border-bottom: 1px solid var(--line-0); }
+.fp-pn-bar { display: flex; flex-wrap: wrap; align-content: center; align-items: center; gap: 4px var(--space-2); flex: none; min-height: 34px; padding: 3px var(--space-3); border-bottom: 1px solid var(--line-0); }
 .fp-pn-spacer { flex: 1 1 auto; }
-.fp-pn-progress { flex: 0 1 auto; min-width: 0; margin-left: var(--space-2); overflow: hidden; color: var(--text-muted); font-size: var(--fp-11); text-overflow: ellipsis; white-space: nowrap; }
-.fp-pn-bar { container-type: inline-size; }
+.fp-pn-progress ~ .fp-pn-spacer { display: none; }
+.fp-pn-progress { flex: 1 1 0; min-width: 0; margin-left: var(--space-2); overflow: hidden; color: var(--text-muted); font-size: var(--fp-11); text-overflow: ellipsis; white-space: nowrap; }
+.fp-pn-bar [data-act="run"] { margin-left: auto; }
+.fp-pn-bar { position: relative; }
+.fp-bottom-page.fp-pn-page { container-type: inline-size; }
 .fp-pn-bar .fp-btn > .icon { display: none; }
-.fp-pn-select { flex: 0 1 auto; min-width: 56px; height: var(--ctl-sm); padding: 0 6px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--surface-field); color: var(--text-primary); font: inherit; font-size: var(--fp-12); }
+.fp-pn-select { flex: none; max-width: 100%; text-overflow: ellipsis; height: var(--ctl-sm); padding: 0 6px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--surface-field); color: var(--text-primary); font: inherit; font-size: var(--fp-12); }
 @container (max-width: 520px) {
-  .fp-pn-select { text-overflow: ellipsis; }
   .fp-pn-bar .fp-btn { position: relative; width: var(--ctl-sm); padding: 0; }
   .fp-pn-bar .fp-btn > .icon { display: inline-flex; }
   .fp-pn-bar .fp-btn > span:not(.icon) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 }
 @container (max-width: 300px) {
   .fp-pn-bar { gap: 4px; }
-  .fp-pn-select { min-width: 44px; padding: 0 2px; }
-  .fp-pn-progress { margin-left: 0; }
+  .fp-pn-bar:has(.fp-pn-select) { padding-inline: 6px; }
+  .fp-pn-select { padding: 0 2px; }
+  .fp-pn-progress { position: absolute; width: 1px; height: 1px; margin: 0; clip-path: inset(50%); }
 }
 .fp-bottom-head { container-type: inline-size; }
 .fp-bottom-tab > .icon { display: none; }
