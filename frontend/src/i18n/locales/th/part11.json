@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "มีไซต์ใหม่ 1 รายการเข้ามา",
+  "{0} new sites arrived": "มีไซต์ใหม่ {0} รายการเข้ามา",
+  "Show": "แสดง",
+  "Where does it go": "จะกู้คืนไปที่ใด",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "ไม่สามารถวาง {0} ได้โดยอัตโนมัติ โฟลเดอร์ถูกกำหนดตามประเภท ({1}) โปรดพิมพ์ชื่อที่ต้องการใช้ในโฟลเดอร์นั้น",
+  "For example a site id or a build path": "ตัวอย่างเช่น ID ของไซต์หรือพาธของบิลด์",
+  "Type a name.": "พิมพ์ชื่อ"
+}

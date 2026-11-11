@@ -1,6 +1,6 @@
 # Checks
 
-Checks produce problems with a stable id, a tier (`static`, `live`, `deep`), a severity (`error`, `warning`, `info`), a code, a route, a message and a fix. The Problems tab lists them, filters by severity and tier, and selects the route of a clicked row.
+Checks produce problems with a stable id (a deep problem's id does not depend on the host's port, so it is the same on every run), a tier (`static`, `live`, `deep`), a severity (`error`, `warning`, `info`), a code, a route, a message and a fix. The Problems tab lists them, filters by severity and tier, and selects the route of a clicked row.
 
 ## Static
 

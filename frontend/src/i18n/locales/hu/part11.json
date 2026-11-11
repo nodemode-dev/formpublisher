@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "1 új webhely érkezett",
+  "{0} new sites arrived": "{0} új webhely érkezett",
+  "Show": "Megjelenítés",
+  "Where does it go": "Hová kerüljön",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "A(z) {0} elemet nem sikerült önállóan elhelyezni. A mappáját a típusa határozza meg ({1}); írja be a nevet, amelyet ott viselnie kell.",
+  "For example a site id or a build path": "Például egy webhelyazonosító vagy egy build elérési útja",
+  "Type a name.": "Adjon meg egy nevet."
+}

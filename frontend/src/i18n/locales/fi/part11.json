@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "1 uusi sivusto saapui",
+  "{0} new sites arrived": "{0} uutta sivustoa saapui",
+  "Show": "Näytä",
+  "Where does it go": "Minne se menee",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "Kohdetta {0} ei voitu sijoittaa itsestään. Sen kansio määräytyy tyypin ({1}) mukaan; kirjoita nimi, joka sillä on siellä oltava.",
+  "For example a site id or a build path": "Esimerkiksi sivuston tunnus tai buildin polku",
+  "Type a name.": "Kirjoita nimi."
+}

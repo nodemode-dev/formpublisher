@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "Có 1 trang web mới đã đến",
+  "{0} new sites arrived": "Có {0} trang web mới đã đến",
+  "Show": "Hiện",
+  "Where does it go": "Khôi phục về đâu",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "Không thể tự đặt {0} vào vị trí. Thư mục được cố định theo loại ({1}); hãy nhập tên mà mục này sẽ có ở đó.",
+  "For example a site id or a build path": "Ví dụ: ID trang web hoặc đường dẫn bản dựng",
+  "Type a name.": "Hãy nhập tên."
+}

@@ -271,13 +271,13 @@ class Client:
 
         return self._local(trash.list_entries)
 
-    def trash_restore(self, entry: str) -> dict:
+    def trash_restore(self, entry: str, origin: str | None = None) -> dict:
         self.connect()
         if self.url:
-            return self.call("POST", f"/api/trash/{_q(entry)}/restore")
+            return self.call("POST", f"/api/trash/{_q(entry)}/restore", {"origin": origin} if origin else None)
         from app.services import trash
 
-        return self._local(trash.restore, entry)
+        return self._local(trash.restore, entry, origin)
 
     def trash_delete(self, entry: str) -> dict:
         self.connect()
@@ -457,10 +457,12 @@ def say_prepare(data: dict) -> str:
 def say_trash(data: dict) -> str:
     if not data["entries"]:
         return "the trash is empty"
-    return "\n".join(f"{e['entry']:<52} {e['kind']:<9} {e['label'][:30]:<30} {e['size']:>10} bytes  {e['moved']}" + ("" if e.get("origin") else "  (cannot be restored)") for e in data["entries"])
+    return "\n".join(f"{e['entry']:<52} {e['kind']:<9} {e['label'][:30]:<30} {e['size']:>10} bytes  {e['moved']}" + (f"  -> {e['origin']}" + (" (inferred)" if e.get("originInferred") else "") if e.get("origin") else "  (origin unknown: restore with --to PATH)") for e in data["entries"])
 
 
 def say_trash_restore(data: dict) -> str:
+    if data.get("reprepared"):
+        return f"prepared {data['target']} again from build {data['build']} and removed {data['entry']} from the trash"
     return f"restored {data['kind']} {data['entry']} to {data['origin']}"
 
 
@@ -535,6 +537,7 @@ def build_parser() -> argparse.ArgumentParser:
     tr_sub = tr.add_subparsers(dest="trash_command")
     trr = tr_sub.add_parser("restore", parents=[common], help="move an entry back to where it came from")
     trr.add_argument("entry")
+    trr.add_argument("--to", metavar="PATH", help="where it goes, relative to the data folder (for example sites/my-site), for an entry whose origin is not known")
     trd = tr_sub.add_parser("delete", parents=[common], help="delete one entry for good")
     trd.add_argument("entry")
     tre = tr_sub.add_parser("empty", parents=[common], help="delete every entry for good")
@@ -589,7 +592,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "trash":
             action = args.trash_command
             if action == "restore":
-                data, say = client.trash_restore(args.entry), say_trash_restore
+                data, say = client.trash_restore(args.entry, args.to), say_trash_restore
             elif action == "delete":
                 data, say = client.trash_delete(args.entry), say_trash_delete
             elif action == "empty":

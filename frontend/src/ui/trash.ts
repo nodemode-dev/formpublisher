@@ -1,8 +1,8 @@
 import '../styles/trash.css';
-import { trashApi, type TrashEntry, type TrashKind } from '../api-trash';
+import { OriginUnknownError, TRASH_ROOT, trashApi, type TrashEntry, type TrashKind } from '../api-trash';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
-import { confirmAction } from './dialogs';
+import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
 import { fmtBytes, fmtDate } from './builds';
@@ -13,6 +13,62 @@ const LIVE = new Set(['site.removed', 'site.imported', 'builds.removed', 'builds
 
 const message = (e: unknown): string => (e instanceof Error && e.message ? e.message : 'Request failed');
 
+class OriginDialog extends Dialog {
+  private readonly lead = el('<p class="fp-note"></p>');
+  private readonly prefix = el('<span class="fp-tr-prefix" translate="no"></span>');
+  private readonly input = el<HTMLInputElement>('<input class="fp-input is-mono" type="text" spellcheck="false" autocomplete="off" aria-label="Name" placeholder="For example a site id or a build path" translate="no">');
+  private readonly error = el('<p class="fp-tr-origin-error" role="alert"></p>');
+  private readonly ok: HTMLButtonElement;
+  private item: TrashEntry | null = null;
+  private busy = false;
+  private resolve: ((v: boolean) => void) | null = null;
+
+  constructor() {
+    super('Where does it go', 460, 'fp-tr-dlg');
+    const row = el('<div class="fp-tr-origin"></div>');
+    row.append(this.prefix, this.input);
+    this.body.append(this.lead, row, this.error);
+    this.button('Cancel', 'ghost', () => this.close());
+    this.ok = this.button('Restore', 'primary', () => { void this.submit(); });
+    this.input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.submit(); } });
+    this.input.addEventListener('input', () => setText(this.error, ''));
+    this.onClose = () => { const r = this.resolve; this.resolve = null; r?.(false); };
+  }
+
+  ask(item: TrashEntry): Promise<boolean> {
+    this.item = item;
+    setText(this.lead, `${item.label} could not be placed on its own. Its folder is fixed by its kind (${KIND_LABEL[item.kind]}); type the name it should have there.`);
+    setText(this.prefix, `${TRASH_ROOT[item.kind]}/`);
+    this.input.value = '';
+    setText(this.error, '');
+    this.open(this.input);
+    return new Promise((r) => { this.resolve = r; });
+  }
+
+  private async submit(): Promise<void> {
+    const item = this.item;
+    const name = this.input.value.trim().replace(/^\/+/, '');
+    if (!item || this.busy) return;
+    if (!name) { setText(this.error, 'Type a name.'); this.input.focus(); return; }
+    const origin = `${TRASH_ROOT[item.kind]}/${item.kind === 'key' && !name.endsWith('.pem') ? `${name}.pem` : name}`;
+    this.busy = true;
+    setDisabled(this.ok, true);
+    setText(this.error, '');
+    try {
+      await trashApi.restore(item.entry, origin);
+      const r = this.resolve;
+      this.resolve = null;
+      this.close();
+      r?.(true);
+    } catch (e) {
+      setText(this.error, message(e));
+      this.input.focus();
+    }
+    this.busy = false;
+    setDisabled(this.ok, false);
+  }
+}
+
 export class TrashPage {
   private readonly skeleton: HTMLElement;
   private readonly empty: HTMLElement;
@@ -22,6 +78,7 @@ export class TrashPage {
   private loaded = false;
   private seq = 0;
   private busy = false;
+  private originDialog: OriginDialog | null = null;
 
   constructor(private readonly app: App, private readonly host: HTMLElement) {
     host.appendChild(el(`<div class="fp-home-head"><div><h1 class="fp-home-title">Trash</h1><p class="fp-home-sub">Removed sites, builds, keys and prepared folders stay here until you delete them for good.</p></div>
@@ -109,9 +166,18 @@ export class TrashPage {
   private async restore(item: TrashEntry, row: HTMLElement): Promise<void> {
     this.setBusy(true, row);
     try {
-      await trashApi.restore(item.entry);
-      emit('fp:notice', { kind: 'ok', text: `Restored ${item.label}` });
-      if (item.kind === 'site') await this.app.refreshSites();
+      let done = true;
+      try {
+        await trashApi.restore(item.entry);
+      } catch (e) {
+        if (!(e instanceof OriginUnknownError)) throw e;
+        this.originDialog ??= new OriginDialog();
+        done = await this.originDialog.ask(item);
+      }
+      if (done) {
+        emit('fp:notice', { kind: 'ok', text: `Restored ${item.label}` });
+        if (item.kind === 'site') await this.app.refreshSites();
+      }
     } catch (e) {
       emit('fp:notice', { kind: 'error', text: message(e) });
     }

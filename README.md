@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.1.4" src="https://img.shields.io/badge/version-0.1.4-4f6bff?style=flat-square">
+  <img alt="version 0.1.5" src="https://img.shields.io/badge/version-0.1.5-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -74,7 +74,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>A window you know</h3>
-      Home with Start and Recent, one tab per open site, a title bar, a status bar, a dark theme and a light one, built on the same layout as FormDeck.
+      Home with Start and Recent (under the title bar, with Recent keeping still when a site arrives), one tab per open site, a title bar, a status bar, a dark theme and a light one, built on the same layout as FormDeck.
     </td>
     <td width="50%" valign="top">
       <h3>26 interface languages</h3>
@@ -124,7 +124,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>Trash</h3>
-      Removed sites, builds, keys and prepared folders wait in a Trash on Home with their kind, time and size. Restore puts one back where it came from when the place is free; Delete for good and Empty Trash ask first.
+      Removed sites, builds, keys and prepared folders wait in a Trash on Home with their kind, time and size. Restore puts one back where it came from when the place is free, entries from before 0.1.4 included; when the place is unknown a dialog asks where it goes. Delete for good and Empty Trash ask first.
     </td>
     <td width="50%" valign="top">
       <h3>Rebindable shortcuts</h3>
@@ -185,6 +185,9 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
     <td width="50%" valign="top"><b>Preferences</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/preferences-dark.webp"><img alt="Preferences, FormWeb section, with the Check a site when it arrives and Build a site when it arrives switches" src="docs/images/preferences-light.webp"></picture></td>
     <td width="50%" valign="top"><b>Desktop splash</b><br><img alt="The 360 by 200 splash of the desktop app with the gradient progress bar" src="docs/images/splash.webp"></td>
   </tr>
+  <tr>
+    <td width="50%" valign="top"><b>Recent, new site arrived</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/recent-notice-dark.webp"><img alt="Recent sites with the notice row saying 1 new site arrived and the Show button" src="docs/images/recent-notice-light.webp"></picture></td>
+  </tr>
 </table>
 
 ## Everything in the box
@@ -224,7 +227,7 @@ The window, the command line and the MCP server call one engine, so an agent and
 | `check ID`, `build ID`, `builds` | run the checks, build the package, list builds |
 | `sign BUILD`, `verify BUILD`, `keys` | sign, verify (exits 1 when invalid), list or create (`--create NAME`) keys |
 | `targets`, `prepare BUILD --target T [--include-model]`, `prepared BUILD` | list hosts, prepare a folder per host (FormWeb's model files left out unless `--include-model`), list what is prepared |
-| `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back, delete one for good, empty it (refuses without `--yes`) |
+| `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back (`--to PATH` names the place when it is unknown), delete one for good, empty it (refuses without `--yes`) |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
 
 Every command takes `--json`. The MCP server has 18 tools over the same routes:
@@ -238,7 +241,7 @@ Every command takes `--json`. The MCP server has 18 tools over the same routes:
 | `build_package`, `list_builds` | build the package, list builds |
 | `sign_build`, `verify_build` | sign with a named key, verify a signature |
 | `list_targets`, `prepare_publish`, `get_prepared` | list the six hosts, prepare folders with their commands (`includeModel` keeps FormWeb's model files), read what is prepared |
-| `list_trash`, `restore_from_trash` | read the trash, move an entry back (no tool deletes) |
+| `list_trash`, `restore_from_trash` | read the trash, move an entry back to its recorded or inferred origin (no tool deletes) |
 
 `.mcp.json`, `.codex/config.toml` and `.cursor/mcp.json` are already wired in this repo, with the `formpublisher-harness` skill for driving the app and `formpublisher-skillset` for changing it. See [`AGENTS.md`](AGENTS.md).
 

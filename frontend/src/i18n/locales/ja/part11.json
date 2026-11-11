@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "新しいサイトが1件届きました",
+  "{0} new sites arrived": "新しいサイトが{0}件届きました",
+  "Show": "表示",
+  "Where does it go": "戻し先",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "{0}を自動では配置できませんでした。フォルダは種類({1})によって決まっています。そこでの名前を入力してください。",
+  "For example a site id or a build path": "例: サイトIDまたはビルドのパス",
+  "Type a name.": "名前を入力してください。"
+}

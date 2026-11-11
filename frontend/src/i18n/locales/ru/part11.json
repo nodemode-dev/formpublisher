@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "Поступил 1 новый сайт",
+  "{0} new sites arrived": "Поступило {0} {0:one=новый сайт;few=новых сайта;many=новых сайтов;other=нового сайта}",
+  "Show": "Показать",
+  "Where does it go": "Куда восстановить",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "Не удалось автоматически разместить {0}. Папка определяется типом элемента ({1}); введите имя, которое он должен получить там.",
+  "For example a site id or a build path": "Например, идентификатор сайта или путь сборки",
+  "Type a name.": "Введите имя."
+}

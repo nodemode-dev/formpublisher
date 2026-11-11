@@ -1,0 +1,9 @@
+{
+  "1 new site arrived": "Dorazil 1 nový web",
+  "{0} new sites arrived": "{0} {0:one=nový web;few=nové weby;many=nového webu;other=nových webů} dorazilo",
+  "Show": "Zobrazit",
+  "Where does it go": "Kam to patří",
+  "{0} could not be placed on its own. Its folder is fixed by its kind ({1}); type the name it should have there.": "Položku {0} se nepodařilo umístit samostatně. Složka je dána jejím druhem ({1}); zadejte název, který tam má mít.",
+  "For example a site id or a build path": "Například ID webu nebo cesta k buildu",
+  "Type a name.": "Zadejte název."
+}

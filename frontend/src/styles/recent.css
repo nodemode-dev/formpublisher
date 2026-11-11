@@ -1,0 +1,4 @@
+.fp-recent-note { display: flex; align-items: center; gap: var(--space-3); height: 32px; margin-bottom: var(--space-2); color: var(--text-secondary); font-size: var(--fp-12); }
+.fp-recent-note > * { visibility: hidden; }
+.fp-recent-note.is-on > * { visibility: visible; }
+.fp-recent-note-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
