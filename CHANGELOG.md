@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.7 · 2026-11-11
+
+- Where the Problems filters cannot share one row even with "All", they give way to a single funnel button. A dot shows when a filter is active, the tooltip names both choices, and its menu sets severity and tier by mouse or keyboard. The bar is one row in every language and size.
+- Choosing a language in Preferences changes the open window at once instead of reloading it. The open site, the selected route, the panel, the preview, open dialogs and typed text stay as they are.
+- In the Linux desktop shell (WebKitGTK) the toolbar stays on one row with whole values in German at every width; it used to push Package off the row at 1440 and 760 px.
+- The FormWeb engine crates are vendored at 0.20.7.
+- The new and changed labels are in all 26 languages.
+
 ## 0.2.6 · 2026-11-11
 
 - The toolbar's dropdowns show their whole value at every window width, also between 1240 and 1400 px where they used to be cut off, and choosing another option no longer moves anything in the toolbar.

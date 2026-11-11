@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.6
+Current build version: v0.2.7
 Last updated: 2026-11-11 · Phases 43 to 45: .fpub, the kept verify result and the Windows launchers run under Wine
 
 ---
