@@ -51,6 +51,9 @@ body.theme-light .fp-pub-note.is-error { color: var(--danger-fill); }
 .fp-pub-line.is-warn { border-left-color: var(--warn); color: var(--text-primary); }
 .fp-pub-line.is-bad { border-left-color: var(--danger); color: var(--danger-text); }
 body.theme-light .fp-pub-line.is-bad { color: var(--danger-fill); }
+.fp-pub-vrow { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); min-width: 0; }
+.fp-pub-vrow > .fp-pkg-res { flex: 1; min-width: 0; }
+.fp-pub-vtime { flex: none; color: var(--text-muted); font-size: var(--fp-11); height: 18px; line-height: 18px; white-space: nowrap; }
 .fp-pub-nginx { height: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fp-pub-nginx:not(.is-ok):not(.is-error) { color: var(--text-secondary); }
 .fp-pub-acts { display: flex; align-items: center; gap: var(--space-2); }

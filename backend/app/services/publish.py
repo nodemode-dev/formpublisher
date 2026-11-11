@@ -112,6 +112,19 @@ def _read_meta(path: Path):
 META_KEYS = ("name", "folder", "files", "commands", "notes", "warnings", "preparedAt", "includeModel", "leftOut")
 
 
+def _verify_file(site: str, build_id: str, target_id: str) -> Path:
+    return _site_dir(site, build_id) / f".{target_id}.verify.json"
+
+
+def _stored_verify(site: str, build_id: str, target_id: str):
+    raw = _read_meta(_verify_file(site, build_id, target_id))
+    if not isinstance(raw, dict) or not isinstance(raw.get("verifiedAt"), str) or not isinstance(raw.get("ok"), bool):
+        return None
+    problems = raw.get("problems") if isinstance(raw.get("problems"), list) else []
+    nginx_report = raw.get("nginx") if isinstance(raw.get("nginx"), dict) else None
+    return {"verifiedAt": raw["verifiedAt"], "ok": raw["ok"], "checked": raw.get("checked") if isinstance(raw.get("checked"), int) else 0, "problems": problems, "nginx": nginx_report}
+
+
 def prepare(build_id: str, target_ids: list[str] | None, include_model: bool = False) -> dict:
     if not isinstance(include_model, bool):
         raise _error("includeModel must be true or false")
@@ -136,6 +149,7 @@ def prepare(build_id: str, target_ids: list[str] | None, include_model: bool = F
                 if folder.exists():
                     shutil.rmtree(folder)
                 os.replace(staged, folder)
+                _verify_file(site, build_id, module.ID).unlink(missing_ok=True)
                 annotate = getattr(module, "annotate", None)
                 if annotate is not None:
                     annotate(result, folder)
@@ -171,6 +185,7 @@ def prepared(build_id: str) -> dict:
             results[module_id] = {k: meta.get(k) for k in META_KEYS}
             results[module_id]["includeModel"] = meta.get("includeModel") is True
             results[module_id]["leftOut"] = meta.get("leftOut") if isinstance(meta.get("leftOut"), list) else []
+            results[module_id]["verified"] = _stored_verify(site, build_id, module_id)
     return {"build": build_id, "site": site, "results": results}
 
 
@@ -265,6 +280,10 @@ def verify(build_id: str, target_id: str) -> dict:
     answer = {"build": build_id, "target": target_id, "folder": str(folder), "ok": not unique, "checked": len(current), "problems": unique, "includeModel": include_model, "leftOut": left_out}
     if nginx_report is not None:
         answer["nginx"] = nginx_report
+    answer["verifiedAt"] = intake.now_iso()
+    with _lock:
+        if folder.is_dir():
+            package._write_text(_verify_file(site, build_id, target_id), package.dumps({"target": target_id, "verifiedAt": answer["verifiedAt"], "ok": answer["ok"], "checked": answer["checked"], "problems": unique, "nginx": nginx_report}))
     return answer
 
 
@@ -274,5 +293,6 @@ def remove(build_id: str, target_id: str) -> dict:
         meta = _read_meta(_meta_file(site, build_id, target_id))
         target = trash.move(folder, "prepared", f"{target_id} for build {build_id}", trash.rel(folder), meta if isinstance(meta, dict) else None)
         _meta_file(site, build_id, target_id).unlink(missing_ok=True)
+        _verify_file(site, build_id, target_id).unlink(missing_ok=True)
     bus.emit("publish.removed", build=build_id, site=site, target=target_id)
     return {"build": build_id, "target": target_id, "removed": True, "trash": str(target)}

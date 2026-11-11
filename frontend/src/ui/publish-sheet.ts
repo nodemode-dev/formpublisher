@@ -14,7 +14,11 @@ import { toast } from './toast';
 
 type Tone = '' | 'ok' | 'error';
 
-interface Verdict { text: string; tone: Tone; problems: string[]; nginx?: { text: string; tone: Tone } }
+interface Verdict { text: string; tone: Tone; problems: string[]; nginx?: { text: string; tone: Tone }; at?: string }
+
+function verdictOf(ok: boolean, problems: string[], nginx: NginxCheck | null, at: string): Verdict {
+  return ok ? { text: 'Verified. Every file matches.', tone: 'ok', problems: [], nginx: nginxLine(nginx), at } : { text: 'Verification failed.', tone: 'error', problems, nginx: nginxLine(nginx), at };
+}
 
 function nginxLine(n: NginxCheck | null): { text: string; tone: Tone } | undefined {
   if (!n) return undefined;
@@ -210,6 +214,12 @@ class PublishSheet extends Dialog {
       if (!m) return;
       m.results = new Map(rows.map((r) => [r.target, r]));
       for (const id of Array.from(m.verdicts.keys())) if (!m.results.has(id)) m.verdicts.delete(id);
+      if (!this.busy) {
+        for (const r of rows) {
+          if (r.verified) m.verdicts.set(r.target, verdictOf(r.verified.ok, r.verified.problems, r.verified.nginx, r.verified.at));
+          else m.verdicts.delete(r.target);
+        }
+      }
       this.paintResults();
     } catch (e) {
       if (build === this.buildId) say(this.f.prep, message(e), 'error');
@@ -297,7 +307,7 @@ class PublishSheet extends Dialog {
 <ul class="fp-pub-list" data-f="notes"></ul>
 <div class="fp-pub-sub" data-f="warnh">Warnings</div>
 <ul class="fp-pub-list" data-f="warns"></ul>
-<div class="fp-pkg-res" data-f="verdict" role="status"></div>
+<div class="fp-pub-vrow"><div class="fp-pkg-res" data-f="verdict" role="status"></div><span class="fp-pub-vtime" data-f="vtime" translate="no"></span></div>
 <div class="fp-pkg-res fp-pub-nginx" data-f="nginx" role="status"></div>
 <ul class="fp-pub-list" data-f="probs"></ul>
 </article>`);
@@ -338,6 +348,7 @@ class PublishSheet extends Dialog {
     });
     const v = this.memo()?.verdicts.get(r.target);
     say(field(node, 'verdict'), v?.text ?? '', v?.tone ?? '');
+    setText(field(node, 'vtime'), v?.at ? fmtDate(v.at) : '');
     setHidden(field(node, 'nginx'), r.target !== 'nginx');
     say(field(node, 'nginx'), v?.nginx?.text ?? '', v?.nginx?.tone ?? '');
     const probs = field(node, 'probs');
@@ -447,7 +458,7 @@ class PublishSheet extends Dialog {
       this.paintResults();
       try {
         const r = await publishApi.verify(build, target);
-        memo.verdicts.set(target, r.ok ? { text: 'Verified. Every file matches.', tone: 'ok', problems: [], nginx: nginxLine(r.nginx) } : { text: 'Verification failed.', tone: 'error', problems: r.problems, nginx: nginxLine(r.nginx) });
+        memo.verdicts.set(target, verdictOf(r.ok, r.problems, r.nginx, r.at));
       } catch (e) {
         memo.verdicts.set(target, { text: message(e), tone: 'error', problems: [] });
       }
