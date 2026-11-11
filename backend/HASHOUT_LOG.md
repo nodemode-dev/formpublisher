@@ -3,7 +3,7 @@
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
 Current build version: v0.2.3
-Last updated: 2026-11-11 · Phases 43 and 44: save a build as .fpub and open one, and the last verify result kept
+Last updated: 2026-11-11 · Phases 43 to 45: .fpub, the kept verify result and the Windows launchers run under Wine
 
 ---
 
@@ -434,3 +434,17 @@ The publish sheet forgot every verify verdict when it was closed and reloaded, s
 Checked: with two hosts failing and four passing, `GET /api/publish/BUILD` returned each result with its time; preparing one host cleared only that host's result; target folders stayed byte-identical across verifies and prepares; the selfcheck passes. The director's exit run: the kept results survived an engine restart and were cleared by the next prepare.
 
 Docs: `docs/MANUAL.md` (the Publish section), the wiki page Publishing, and the harness skill in both trees (`get_prepared` returns `verified`).
+
+## Phase 45: the Windows launchers run under Wine · v0.2.4 (2026-11-11)
+
+Two files changed, `formpublisher.bat` and `backend/boot_backend.bat` (commit b1baae1). Every `.bat` launcher was run under Wine 9.0 with stand-in tools in a CRLF clone under /tmp, and five defects came out. `build_app.bat` and `formpublisher_oc_install.bat` needed no change.
+
+- `formpublisher.bat` `run`, `cli`, `mcp`, `agents` and `vendor` used `shift &` on one line. cmd expands `%1` before `shift` runs, so the subcommand was passed on too, and `formpublisher.bat vendor --check` and `agents sync --check` printed their usage and exited 2. They now pass `%2` to `%9`, up to 8 arguments.
+- `boot` went on after a failed install; it now stops with exit code 1.
+- `desktop dev` ran into a missing `tauri.cmd`; it now prints "the desktop tools are missing: run formpublisher.bat install" and exits 1.
+- `backend/boot_backend.bat` went on without `py` and its venv; it now prints "Python 3.12 is needed", or that installing the engine requirements failed, and exits 1.
+- `doctor` printed the shell's error when node was missing; it now prints "missing".
+
+Checked: each launcher path above was run under Wine 9.0, before and after the fix. Real Windows has still not been run.
+
+Docs: `docs/MANUAL.md` (the Getting started passage on the Windows launchers).

@@ -279,3 +279,14 @@ The sheet used to keep verdicts in memory only (commit df07b7f).
 - No new strings: the verdict texts, problem rows and nginx lines were already keyed in parts 12 to 16.
 
 Checked: with two hosts failing and four passing, the verdicts, rows and times showed on first open, on reopening and after a reload; preparing a host cleared only its own result; CLS 0 on open with stored results at 1440 x 900 and 1100 x 800 at 4x CPU throttling; `npm run build`. The director's exit run: the kept results survived an engine restart and were cleared by the next prepare.
+
+## Phase 45: the sweep at two more sizes, and a toolbar that stays in view · v0.2.4 (2026-11-11)
+
+The window was swept in all 26 languages at 1100 x 800 and 760 x 640 and with a live switch in Preferences (English to German, English to Japanese, German to Japanese; the window reloads). No English word was left apart from names, file names and keycaps. The sweep found the open-site toolbar clipping its last controls in every language: Publish and Package at 1100 x 800, and up to eight controls plus the Problems bar's Run checks and Deep check at 760 x 640 (commit 778fa67).
+
+- `styles/shell.css`: `.fp-options` is a size container (`container-type: inline-size`); its overflow and nowrap are unchanged.
+- `styles/preview.css`: the route field's minimum is 96 px and the selects' 64 px. Below 1400 px of row the selects may shrink with an ellipsis; below 1240 px Publish and Package are icon-only, their label kept in the DOM as a visually clipped span so it stays the accessible name, beside the translated `title`; below 860 px the gap, the route field, the number inputs and the selects tighten.
+- `ui/panel.ts` and `styles/panel.css`: Run checks and Deep check gain an icon, a label span and a `title` with the existing keys; the Problems bar is a size container whose buttons turn icon-only at 520 px and whose selects compress at 300 px.
+- No new strings, no new z-index, the tab order is unchanged, and the 1440 x 900 row looks as before.
+
+Checked: English, German, Finnish and Russian at 1440 x 900, 1100 x 800 and 760 x 640, with CPU 4x: no control outside its row and the row's scroll width equal to its width in all 12 cases; CLS 0 opening a site and while resizing between the sizes; `npx tsc --noEmit`; `npm run build`. Known: at 760 px the selects show only the start of their value, with the full label in their title; the bottom panel's tab strip cuts "Network" at 760 px.
