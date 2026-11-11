@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.0
-Last updated: 2026-11-10 · Phase 32: verify rows, refusals and nginx notes keyed in all 26 languages
+Current build version: v0.2.1
+Last updated: 2026-11-10 · Phase 36: part17 keys the new nginx-check.sh note and the GitHub Pages scripts-off note in all 26 languages; the verify list was checked in German and Japanese with no change
 
 ---
 

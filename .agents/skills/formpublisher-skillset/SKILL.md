@@ -2,7 +2,7 @@
 name: formpublisher-skillset
 description: Use for any change to FormPublisher's own code, the Form family's site publisher. Covers the FastAPI engine in backend/app (routers, services, the site intake of FormWeb exports and publication folders, the read-only FormWeb connection, settings and the data folder), the vanilla TypeScript and Vite interface in frontend (the shell, Home, tabs, routes strip, inspector, status bar, tokens and the zero-flash rules), the command line and MCP server behind backend/formpublisher_engine.py, the Tauri 2 shell in src-tauri and its frozen engine sidecar, and the ./formpublisher scripts. Trigger on FormPublisher source files, a new route, a new tool, an engine or interface bug, ports 8280 or 5280, or HASHOUT_LOG. Not for driving FormPublisher to import and list sites (use formpublisher-harness).
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # formpublisher-skillset
@@ -42,7 +42,7 @@ backend/app/services (paths, settings, site intake, the FormWeb reader)
 - **Zero flash.** Every container exists in its final layout before the first paint and is filled in place. Every `z-index` is a layer token from `frontend/src/styles/tokens.css`. Icons are inline `currentColor` SVG; no icon libraries.
 - **Surgical edits.** Hand-made edits, one region at a time; no codemods or scripted text replacement. No emoji, no em dashes in Markdown, no commented-out code, near-zero comments: the reasoning goes in the HASHOUT logs.
 - **Read the logs first.** `backend/HASHOUT_LOG.md`, `frontend/HASHOUT_LOG.md`, `src-tauri/HASHOUT_LOG.md` and each module's own `HASHOUT_LOG.md`. Planning documents are in the sidecar, not in this tree.
-- **Keep the agents in step.** After changing a command, a tool or a skill, run `./formpublisher agents sync` (it mirrors `.claude/skills` to `.agents/skills` and checks the skill files; `--check` fails on drift).
+- **Keep the agents in step.** After changing a command, a tool or a skill, run `./formpublisher agents sync` (it mirrors `.claude/skills` to `.agents/skills` and checks the skill files; `--check` fails on drift). After touching `vendor/formweb-native`, stage it and run `./formpublisher vendor --check`.
 - **Versions** are `X.Y.Z`; `frontend/package.json`, `backend/app/__init__.py`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml` carry the same one.
 - **Dependencies** each get a row in `NOTICE.md`. GPL stays out of the distributed bundle.
 - **Commits** as `nodemode-ai <mackin@nodemode.ai>` only, no trailers of any kind (see `CLAUDE.md`).

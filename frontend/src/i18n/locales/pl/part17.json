@@ -1,0 +1,4 @@
+{
+  "nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, then again with each listen line on a loopback port (NGINX_CHECK_PORT sets the first one), so it needs no root, no IPv6 and no network and changes nothing in this folder.": "nginx-check.sh uruchamia nginx -t na tymczasowej kopii z gniazdami unix zamiast portów, a potem jeszcze raz z każdym wierszem listen na porcie loopback (NGINX_CHECK_PORT ustawia pierwszy z nich), więc nie potrzebuje roota, IPv6 ani sieci i niczego w tym folderze nie zmienia.",
+  "With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects.": "Przy wyłączonych skryptach odwiedzający na adresie splat zobaczy stronę 404, ponieważ te przekierowania obsługuje tylko skrypt."
+}

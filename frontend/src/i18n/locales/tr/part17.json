@@ -1,0 +1,4 @@
+{
+  "nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, then again with each listen line on a loopback port (NGINX_CHECK_PORT sets the first one), so it needs no root, no IPv6 and no network and changes nothing in this folder.": "nginx-check.sh, nginx -t komutunu bağlantı noktaları yerine unix soketleriyle geçici bir kopya üzerinde, ardından her listen satırı bir loopback bağlantı noktasında olacak şekilde bir kez daha çalıştırır (ilkini NGINX_CHECK_PORT belirler); bu yüzden root, IPv6 ve ağ gerektirmez ve bu klasörde hiçbir şeyi değiştirmez.",
+  "With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects.": "Betikler kapalıyken splat adresine gelen bir ziyaretçi 404 sayfasını görür, çünkü bu yönlendirmeleri yalnızca betik izler."
+}

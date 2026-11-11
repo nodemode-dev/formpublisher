@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.2.0" src="https://img.shields.io/badge/version-0.2.0-4f6bff?style=flat-square">
+  <img alt="version 0.2.1" src="https://img.shields.io/badge/version-0.2.1-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -256,6 +256,7 @@ Home's Demos row opens the bundled sample site, "Northwind Notes", and a quick t
 ./formpublisher agents status        # what is installed, which servers, how many skills, whether formMCP is found
 ./formpublisher agents sync          # mirror .claude/skills to .agents/skills
 ./formpublisher agents sync --check  # exits 1 on any drift, for CI
+./formpublisher vendor --check       # exits 1 when the vendored FormWeb crates are out of step, for CI
 ```
 
 Two MCP servers are registered: `formpublisher` and `formmcp`, the Form family hub that reaches every installed Form app's own tools. formMCP is a separate app: when it is not installed, `formmcp` shows as failed or unavailable in your agent and everything else works.

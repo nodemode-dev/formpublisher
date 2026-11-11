@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.0
-Last updated: 2026-11-10 · Phases 31 and 33: GitHub Pages redirect pages that keep the query and hash, an executable nginx-check.sh and the listen pass
+Current build version: v0.2.1
+Last updated: 2026-11-10 · Phases 34 to 36: the listen pass inside nginx-check.sh, ./formpublisher vendor --check and the GitHub Pages note for visitors without scripts
 
 ---
 
@@ -374,3 +374,13 @@ The executor spec is `TURN_K_SPEC.md` in the 0.2.0 planning sidecar (planned as 
 - `targets/nginx.py` `check()`: `_run_nginx` holds one `nginx -t` run. After the unix-socket pass passes, `_free_ports(n)` binds n loopback sockets to port 0, reads their ports and closes them, and `_loopback_listens` (with `LISTEN_RX`) points each listen line at `127.0.0.1:port`, keeping its other parameters, for a second run. A failure there fails the check with nginx's message; no free port, a bind race ("Address already in use") or a timeout skips it. The answer gains `listen {ran, ok, output}`. `annotate` writes "The config passed nginx -t with nginx X, and so did its listen lines on a loopback port." or that they were not checked; the director reworded P3's first text, which began "nginx -t passed with nginx X", because the window's translator matched it to part14's verify line `nginx -t passed with nginx {0}.` and would have left the rest in English.
 
 Checked: on a GitHub Pages stand-in under `/repo`, `/repo/old?q=1#h` landed on `/repo/docs?q=1#h` and on `/repo/docs` with scripts off; an external target with its own query, added by hand, went to `https://example.org/x?a=1#h`. `nginx-check.sh` was `-rwxr-xr-x` and `./nginx-check.sh` passed as root and as uid 65534; verify ran both passes; a hand-broken `listen 80 bogusparam;` failed only the listen pass with nginx's `invalid parameter` message; two prepares were byte-identical with the same modes; the selfcheck passes.
+
+## Phases 34 to 36 · v0.2.1 (2026-11-10)
+
+Three changes, none of which touch the engine's routes.
+
+- `targets/nginx.py`: `CHECK_SCRIPT` runs `nginx -t` a second time after the unix-socket pass, on a second scratch copy whose listen lines keep their parameters but point at `127.0.0.1` and one consecutive port per line, matched exactly as the engine's own listen pass. The first port is `NGINX_CHECK_PORT` when it is a number from 1024 to 60999, otherwise 20000 plus the process id modulo 41000. On "Address already in use" it tries the next base, at most five times, then says the listen lines were not checked and exits 0 on the first pass; any other listen-pass failure prints nginx's message and exits 1. It prints "nginx-check.sh: both passes passed (unix sockets, then the listen lines on loopback ports).", the not-checked line, or a line saying the listen lines were not checked because the config has none. Finding: nginx 1.24 here does not fail `nginx -t` on a busy loopback port, so the retry only matters on builds that report it. The Check the config note now says the script runs `nginx -t` on a scratch copy with unix sockets, then again with each listen line on a loopback port. nginx folders prepared by 0.2.0 differ from a fresh prepare until prepared again.
+- `setup/vendor_check.py`, run by `./formpublisher vendor --check` (and `formpublisher.bat`), `./setup/install_compiler` and the CI step "Vendored crates in step" before "Build formweb-core": it passes only when the Version row of `vendor/formweb-native/VENDOR.md` equals the vendored workspace version, the four crates resolve to it and `Cargo.lock` lists them at it. In a git checkout it compares each crate's tree row with the tree of the staged (index) state, computed from `git ls-files --stage` without writing to `.git`, and refuses unstaged changes and untracked files under `vendor/formweb-native` outside `target/`; outside git it skips those with one line. It prints "vendor: in step at VERSION" or each mismatch with what to do; `install_compiler` refuses with "the vendored crates are out of step (see above); nothing was built". The vendoring flow in `VENDOR.md` now stages the folder with `git add vendor/formweb-native` before building.
+- `targets/github_pages.py`: the prepare notes and `redirects/README.txt` add "With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects." Both new notes are translated in all 26 languages (`keys/part17.json`); verify rows were checked in the window in German and Japanese (FormPublisher has no right-to-left language).
+
+Docs: `docs/MANUAL.md`, the README command list, the wiki pages Publishing, Importing-Sites and Agents, and the harness and skillset skills in both trees carry the new behaviour.

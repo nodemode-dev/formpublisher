@@ -5,6 +5,8 @@ fp_rust_env
 command -v cargo >/dev/null 2>&1 || fp_die "cargo is missing. Install Rust stable from https://rustup.rs and run ./setup/install_compiler again"
 src="$FORMPUBLISHER_ROOT/vendor/formweb-native"
 [ -f "$src/Cargo.toml" ] || fp_die "vendor/formweb-native is missing"
+py="$(fp_python)" || fp_die "Python 3.12 or newer is missing, which the vendored crates check needs"
+"$py" "$FORMPUBLISHER_ROOT/setup/vendor_check.py" --check || fp_die "the vendored crates are out of step (see above); nothing was built"
 ext=""
 [ "$(fp_os)" = windows ] && ext=".exe"
 fp_say "building formweb-core (the first build takes a few minutes)"

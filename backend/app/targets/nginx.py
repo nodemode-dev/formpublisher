@@ -26,7 +26,45 @@ cd "$scratch" || exit 1
 nginx -t -p "$scratch/" -e "$scratch/error.log" -c "$scratch/conf/nginx-test.conf" > "$scratch/out.txt" 2>&1
 status=$?
 sed "s|$scratch/conf|$here|g" "$scratch/out.txt" >&2
-exit "$status"
+[ "$status" -eq 0 ] || exit "$status"
+count=$(awk '/^[[:space:]]*listen[[:space:]]+[^[:space:];]+[^;]*;/ { n++ } END { print n + 0 }' "$here/formpublisher.conf") || exit 1
+if [ "$count" -eq 0 ]; then
+  echo "nginx-check.sh: the unix-socket pass passed; the listen lines were not checked because the config has none."
+  exit 0
+fi
+mkdir "$scratch/loop" || exit 1
+cp "$here/nginx-test.conf" "$scratch/loop/nginx-test.conf" || exit 1
+seed=${NGINX_CHECK_PORT:-}
+case "$seed" in
+  ''|*[!0-9]*) seed=$((20000 + $$ % 41000)) ;;
+  *)
+    if [ "${#seed}" -gt 5 ]; then
+      seed=$((20000 + $$ % 41000))
+    else
+      seed=$(expr "$seed" + 0)
+      if [ "$seed" -lt 1024 ] || [ "$seed" -gt 60999 ]; then seed=$((20000 + $$ % 41000)); fi
+    fi
+    ;;
+esac
+tried=0
+while [ "$tried" -lt 5 ]; do
+  base=$((seed + tried))
+  awk -v base="$base" '{ if (match($0, /^[[:space:]]*listen[[:space:]]+[^[:space:];]+[^;]*;/)) { m = substr($0, RSTART, RLENGTH); rest = substr($0, RLENGTH + 1); ind = m; sub(/listen.*/, "", ind); par = m; sub(/^[[:space:]]*listen[[:space:]]+[^[:space:];]+/, "", par); sub(/;$/, "", par); n++; $0 = ind "listen 127.0.0.1:" (base + n - 1) par ";" rest } print }' "$here/formpublisher.conf" > "$scratch/loop/formpublisher.conf" || exit 1
+  nginx -t -p "$scratch/" -e "$scratch/error.log" -c "$scratch/loop/nginx-test.conf" > "$scratch/out2.txt" 2>&1
+  status=$?
+  if [ "$status" -eq 0 ]; then
+    echo "nginx-check.sh: both passes passed (unix sockets, then the listen lines on loopback ports)."
+    exit 0
+  fi
+  if grep -q "Address already in use" "$scratch/out2.txt"; then
+    tried=$((tried + 1))
+    continue
+  fi
+  sed "s|$scratch/loop|$here|g" "$scratch/out2.txt" >&2
+  exit 1
+done
+echo "nginx-check.sh: the unix-socket pass passed; the listen lines were not checked because no free loopback port was found after 5 tries."
+exit 0
 """
 
 GZIP_TYPES = "text/plain text/css text/xml text/javascript application/javascript application/json application/xml application/manifest+json image/svg+xml"
@@ -290,7 +328,7 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
         'docker run --rm -p 8080:80 -v "$PWD/site:/usr/share/nginx/html:ro" -v "$PWD/formpublisher.conf:/etc/nginx/conf.d/default.conf:ro" nginx:stable',
     )
     result.notes.append("formpublisher.conf is one server block for conf.d; nginx-test.conf wraps it so nginx -t can parse it alone.")
-    result.notes.append("nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, so it needs no root and no IPv6 and changes nothing in this folder.")
+    result.notes.append("nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, then again with each listen line on a loopback port (NGINX_CHECK_PORT sets the first one), so it needs no root, no IPv6 and no network and changes nothing in this folder.")
     result.notes.append("Unknown paths return 404 through try_files" + (" and show the site's 404.html." if inp.has_404 else "; the site has no 404.html, so nginx shows its own page."))
     if inp.fallback_404:
         result.notes.append("This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.")

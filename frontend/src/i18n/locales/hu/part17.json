@@ -1,0 +1,4 @@
+{
+  "nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, then again with each listen line on a loopback port (NGINX_CHECK_PORT sets the first one), so it needs no root, no IPv6 and no network and changes nothing in this folder.": "Az nginx-check.sh az nginx -t parancsot egy ideiglenes másolaton futtatja portok helyett unix socketekkel, majd újra úgy, hogy minden listen sor egy loopback porton van (az elsőt az NGINX_CHECK_PORT adja meg), így nem kell hozzá root, IPv6 és hálózat sem, és semmit sem módosít ebben a mappában.",
+  "With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects.": "Kikapcsolt szkriptek mellett a splat címre érkező látogató a 404-es oldalt látja, mert ezeket az átirányításokat csak a szkript követi."
+}
