@@ -27,7 +27,7 @@ These are the exact MCP tool names, with the command that does the same thing. I
 | --- | --- | --- | --- |
 | `formpublisher_status` | `status` | engine, data folder, site count, FormWeb reachability | yes |
 | `list_sites` | `sites` | imported sites | yes |
-| `import_site` (path) | `import PATH` | import a site export zip or publication folder as a new revision | no |
+| `import_site` (path) | `import PATH` | import a site export zip, a `.fweb` project, a `.fpub` package or a publication folder as a new revision (a `.fpub` also restores its build) | no |
 | `import_formweb_current` | `import-formweb` | import the site open in a running FormWeb | no |
 | `site_routes` (id) | `routes ID` | routes of the latest revision | yes |
 | `list_revisions` (id) | `revisions ID` | revisions newest first, with files, bytes, routes and what changed from the one before | yes |
@@ -36,6 +36,7 @@ These are the exact MCP tool names, with the command that does the same thing. I
 | `get_checks` (id, revision) | `check ID --last` | stored results, nothing runs | yes |
 | `build_package` (id, revision) | `build ID [--revision R]` | deterministic site.zip and publish.json | no |
 | `list_builds` | `builds` | builds, newest first | yes |
+| `save_fpub` (build, path) | `fpub BUILD [--out FILE] [--force]` | save a build as one `.fpub` file at an absolute path ending in `.fpub`; the same build gives the same bytes; the tool never replaces a file | no |
 | `sign_build` (build, key, passphrase) | `sign BUILD [--key K]` | detached Ed25519 signature | no |
 | `verify_build` (build) | `verify BUILD` | check the signature against the zip | yes |
 | `list_targets` | `targets` | the six hosts | yes |
@@ -74,7 +75,7 @@ FormPublisher prepares; it never uploads. Publishing is a chain, and each link n
 3. `sign_build` with the build id and a key the person named (a key id from `keys`). With one key in the data folder and no `key` argument it uses that one and says which; with none it fails and the person creates one with `./formpublisher run keys --create NAME`. Then `verify_build` and report `valid` as returned.
 4. `list_targets` for the six ids: `static-zip`, `netlify`, `cloudflare-pages`, `vercel`, `github-pages`, `nginx`.
 5. `prepare_publish` with the build id and the target ids the person wants. Each result has the prepared `folder`, its `files`, the `commands` (label, run, cwd) to run, `notes` and `warnings`. Show the commands exactly as returned and the warnings in full (for example GitHub Pages has no server redirects); do not run a deploy command yourself unless the person asks. Preparing again replaces the folder. Where nginx is installed, preparing the nginx target also runs `nginx -t` and adds a note or a warning, and a verify of a prepared folder answers `nginx` with `ran`, `ok`, `version` and `output` (a failure is a problem row; `ran: false` without nginx); `nginx` also carries `listen` with `ran`, `ok` and `output` for the second pass that points every listen line at a free loopback port, so a bad listen parameter fails; the nginx folder also carries `nginx-check.sh`, which the person can run with `sh nginx-check.sh` or `./nginx-check.sh` without root (it checks unix sockets, then each listen line on a loopback port, and `NGINX_CHECK_PORT` sets the first). GitHub Pages follows splat redirects through a script at the top of `404.html` under the site's base path, and with scripts off a splat address shows the 404 page, so report its note about the assumed path. The host folders leave out FormWeb's model files (`site.formweb.json`, `asset-access.json`), which no host needs, and each result lists them under `leftOut`; pass `includeModel` true only when the person wants them kept.
-6. `get_prepared` reads back what exists for a build without preparing anything.
+6. `get_prepared` reads back what exists for a build without preparing anything. For each host it returns `verified` when a verify has run: `verifiedAt`, `ok`, `checked`, `problems` and `nginx`. That result is kept until the next prepare or remove of that host, so read it before verifying again and say when it was taken.
 
 ```sh
 ./formpublisher run check SITE-ID
@@ -91,6 +92,8 @@ FormPublisher prepares; it never uploads. Publishing is a chain, and each link n
 A site sent from FormWeb's Send to FormPublisher arrives on its own: it is imported by the running window's engine, or dropped in the data folder's `inbox/` while FormPublisher is closed. Either way, a site sent again becomes a new revision of the same site, so `list_revisions` and `diff_revisions` show what changed between sends. It then shows in `list_sites` like any import. Two Preferences settings, off by default, run the static checks and a build on every arrival; when they are on, call `get_checks` and `list_builds` instead of running them again.
 
 Removing a site, build, key or prepared folder moves it to the trash, so `list_trash` shows it and `restore_from_trash` brings it back when the person asks, entries from before 0.1.4 included. Use the entry name `list_trash` returned. In the window one Restore from the trash dialog asks for a place, a passphrase or both, and a build-missing or site-missing notice offers Restore when one trash entry matches.
+
+A `.fpub` is one build in one file (fpub.json, publish.json, site.zip and, when signed, site.zip.sig). `save_fpub` writes it; `import_site` with its path opens it, and the answer's `build` says whether the id was kept (`remapped` true means the id was taken and a new one was used, `originalId` is the old one) and carries the signature check as `valid`, `key` and `known`. Opening refuses a file whose entries, format, version, checksum, size or signature do not hold, with the codes `fpub-invalid`, `fpub-tampered` and `fpub-signature`, and changes nothing. Report the refusal as returned; do not repair or rewrite the file. Ask the person for the output path, and never overwrite a file they did not name (the CLI needs `--force` for that).
 
 A `.fweb` project (envelope format `com.nodemode.formweb`, or FormWeb's version 2 zip of up to 512 MiB) imports the same way. It needs `formweb-core`; without it the import fails with 422 and the message says to run `./setup/install_compiler` (`setup\install_compiler.bat` on Windows; both check the vendored crates first). Tell the person; do not try to work around it.
 
@@ -137,6 +140,7 @@ curl -s 127.0.0.1:8280/api/builds/3f9a1c0b7d42        # build.json plus publish.
 curl -s 127.0.0.1:8280/api/builds/3f9a1c0b7d42/compare/OTHER-ID
 # {"added": [], "removed": [], "changed": [{"path": "index.html", "a": {"sha256": "...", "size": 1}, "b": {"sha256": "...", "size": 2}}], "same": 11}
 curl -s -o site.zip 127.0.0.1:8280/api/builds/3f9a1c0b7d42/download
+curl -s -o mysite.fpub 127.0.0.1:8280/api/builds/3f9a1c0b7d42/fpub   # the build as a .fpub
 ```
 
 Keys and signatures. A key is Ed25519; the private half never leaves `keys/` and is never returned.

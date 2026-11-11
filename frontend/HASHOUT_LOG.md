@@ -3,7 +3,7 @@
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
 Current build version: v0.2.3
-Last updated: 2026-11-11 · Phases 40 and 41: the language sweep of all 25 other languages, "Static zip" keyed in part19, and the publish sheet holding still while it fills
+Last updated: 2026-11-11 · Phases 43 and 44: Save as .fpub and Open takes .fpub, and the publish sheet shows the kept verify result
 
 ---
 
@@ -259,3 +259,23 @@ With three real builds and four prepared hosts at 4x CPU throttling, opening the
 The language sweep: the built window was opened in all 25 other languages over every main surface (Home, the open site and its panels, menus, the command palette, Preferences, shortcuts, the package sheet, the publish sheet with a failed verify, the trash page). "Static zip" was the only interface word left in English.
 
 Checked: at 1440x900 and 1100x800, dark and light, CLS 0 opening and filling, switching between builds (including one with nothing prepared), Prepare and two Verify runs; every part19.json loads as JSON with the key and a non-empty value; `npm run build`.
+
+## Phase 43: Save as .fpub and Open takes .fpub · v0.2.4 (2026-11-11)
+
+The window side of the .fpub format; the engine side is in `backend/HASHOUT_LOG.md` (commits c67ba28 and 2592b6f).
+
+- `ui/builds.ts`: each library row gains a Save as .fpub button, an `archive` icon link beside Download, with `href` from `buildsApi.fpubUrl` (`/api/builds/ID/fpub`) and `download` set to `ID.fpub`; the engine's own header names the file `SITE-BUILD.fpub`. `styles/package.css`: the actions column is 120 px instead of 92 and is reserved before data arrives, so the third button does not widen the row when the list fills. `api-builds.ts`: `fpubUrl`.
+- `app.ts` and `ui/chrome.ts`: Open (`Mod+O`), the file picker and the drop accept `.fpub` beside `.zip` and `.fweb` and send it through the existing import, with no new route; the drop refusal and the Open description name `.fpub`. `ui/home.ts`: the hero sentence names `.fpub`.
+- `i18n/keys/part20.json` (31 keys) in the 25 other languages (commit 2592b6f): Save as .fpub, the Home hero, drop refusal and Open description sentences, and the engine's refusals when a .fpub is opened or saved (the sentences in `services/fpub.py`, with `{0}` and `{1}` for the version numbers and the entry name, so the translator matches them whole).
+
+Checked: the builds library painted five builds with the link and download name in place, the actions cell unclipped and CLS 0 at 4x CPU throttling; `npm run build`. The director's exit run, in German: the builds library showed "Als .fpub speichern", the download started with a zip header, and Open took the .fpub.
+
+## Phase 44: the publish sheet shows the kept verify result · v0.2.4 (2026-11-11)
+
+The sheet used to keep verdicts in memory only (commit df07b7f).
+
+- `api-publish.ts`: a prepared row carries `verified` (`ok`, `problems`, `nginx`, `at`), mapped from the engine's `verifiedAt`, and the verify answer carries `at`.
+- `ui/publish-sheet.ts`: `verdictOf` builds a verdict from either a fresh verify or a kept one. When the prepared list loads and no prepare or verify is running, each host's verdict is set from `verified`, or deleted when there is none, so the verdict, its problem rows and the nginx line show again on opening, reopening and reload. The verdict row is now a `fp-pub-vrow` holding the verdict and a muted time (`fp-pub-vtime`, `translate="no"`, `fmtDate`); the time sits in the verdict row's existing 18 px slot, so nothing moves when a result appears. `styles/publish.css`: three lines for the row and the time.
+- No new strings: the verdict texts, problem rows and nginx lines were already keyed in parts 12 to 16.
+
+Checked: with two hosts failing and four passing, the verdicts, rows and times showed on first open, on reopening and after a reload; preparing a host cleared only its own result; CLS 0 on open with stored results at 1440 x 900 and 1100 x 800 at 4x CPU throttling; `npm run build`. The director's exit run: the kept results survived an engine restart and were cleared by the next prepare.

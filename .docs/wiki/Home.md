@@ -11,7 +11,7 @@ It also previews the site on device sizes from its own static host, runs static,
 ## Pages
 
 - [Getting Started](Getting-Started) · install, run, the first import
-- [Importing Sites](Importing-Sites) · the ways in, including .fweb projects, and what each reads
+- [Importing Sites](Importing-Sites) · the ways in, including .fweb projects and .fpub packages, and what each reads
 - [Preview](Preview) · the site host, device sizes, theme, motion and network
 - [Checks](Checks) · static, live and deep problems
 - [Packages and Signatures](Packages-and-Signatures) · site.zip, publish.json, keys and signing
