@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.8
+Current build version: v0.3.0
 Last updated: 2026-11-15 · Phases 58 to 65: the splash icon, the menubar, Preferences and Home rebuilt on the family's pattern, four demos, the review's fixes, the live checks no longer blame the preview, and the source name of a site sent from FormWeb
 
 ---

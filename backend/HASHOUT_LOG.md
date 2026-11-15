@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.8
+Current build version: v0.3.0
 Last updated: 2026-11-15 · Phases 61 to 66: a route per demo, the review's fixes, three bundled FormWeb demo sites, the probe's layout-shift and overflow rules, the vendored core at 0.21.0, and the hand-off with FormWeb 0.21.0
 
 ---
