@@ -16,6 +16,7 @@ import { isMacDesktop, MENUS_IN_WINDOW_KEY, menusInWindow, NativeMenus, wantsNat
 import { openPackageSheet } from './package-sheet';
 import { runChecks } from './panel';
 import { Preferences, type PrefsSection } from './preferences';
+import { reserveMenubar } from './reserve';
 import { ShortcutsDialog } from './shortcuts-dialog';
 import { applyDensity, nextToggleTheme, readChoice, readDensity, setTheme, THEMES, type Density } from './themes';
 import { toast } from './toast';
@@ -238,6 +239,7 @@ export function installChrome(app: App): Chrome {
   ];
 
   new MenuBar(app.mounts.menubar, commands, menus);
+  reserveMenubar(app.mounts.menubar);
   if (wantsNativeMenus()) {
     const native = new NativeMenus(commands, () => menus, 'app.preferences');
     void native.build().catch(() => undefined);

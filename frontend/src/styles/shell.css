@@ -4,7 +4,7 @@
 .fp-titlebar { display: grid; grid-template-columns: auto minmax(0, auto) minmax(0, 1fr) auto; align-items: center; column-gap: var(--space-3); min-width: 0; padding: 0 var(--space-3); background: linear-gradient(to bottom, var(--surface-2), var(--surface-1)); border-bottom: 1px solid var(--line-0); }
 .fp-brand { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--accent-color); }
 .fp-brand-name { color: var(--text-primary); font-size: var(--fp-13); font-weight: 600; letter-spacing: 0.2px; }
-.fp-menubar { display: flex; align-items: center; gap: 2px; min-width: 0; min-height: var(--ctl-md); margin: -3px; padding: 3px; overflow: hidden; }
+.fp-menubar { display: flex; align-items: center; gap: 2px; width: var(--fp-menubar-w, auto); min-width: 0; max-width: 100%; min-height: var(--ctl-md); margin: -3px; padding: 3px; overflow: hidden; }
 .fp-menu-btn { height: var(--ctl-md); padding: 0 var(--space-2); border: 0; border-radius: var(--radius); background: transparent; color: var(--text-secondary); font-size: var(--fp-12); cursor: default; }
 .fp-menu-btn:hover, .fp-menu-btn.is-open, .fp-menu-btn:focus-visible { background: var(--bg-tertiary); color: var(--text-primary); }
 .is-menu-mnemonics .fp-menu-btn::first-letter { text-decoration: underline; }

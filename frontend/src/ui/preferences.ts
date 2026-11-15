@@ -6,6 +6,7 @@ import { VERSION } from '../version';
 import { Dialog } from './dialogs';
 import { el, escapeHtml, q, setAttr, setClass, setDisabled, setText, setValue } from './dom';
 import { PrefsShell } from './prefs-shell';
+import { reservePrefs } from './reserve';
 import { applyDensity, applyTheme, readChoice, readDensity, saveChoice, setAccent, setTheme, THEMES, type Density } from './themes';
 
 export type PrefsSection = 'general' | 'interface' | 'formweb' | 'about';
@@ -145,6 +146,7 @@ export class Preferences extends Dialog {
     this.sync();
     setText(this.engineValue, this.app.state().engineVersion || '-');
     this.open(this.shell.tab());
+    reservePrefs(q(this.panel, '.fp-prefs-pages'), this.foot.querySelector<HTMLElement>('.fp-btn-primary'));
     if (section) this.shell.scrollTo(section, 'auto');
     this.shell.draw();
     void this.loadFormWeb();
