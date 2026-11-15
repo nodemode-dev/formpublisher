@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2 · 2026-11-15
+
+- Every FormPublisher icon is GPL-3.0-only, including the four copies of the mark in the offline demo, which `NOTICE.md` and `demo/MEDIA.md` listed as Apache-2.0.
+
 ## 0.3.1 · 2026-11-15
 
 - A new check, `forms.local-address` (a warning): a form whose action goes to this computer or the local network (`localhost`, a `.local` name, a private or loopback address) or into FormWeb's own `/api/forms/` route will not send once the site is published, because nothing answers there. The message names the page and the address and says how to fix it in FormWeb: give the form a scripted reply, or point its action at a form service on the web. Forms with no action, and forms that post to a service on the web, are not reported.

@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.3.1
+Current build version: v0.3.2
 Last updated: 2026-11-15 · Phase 66: the strings of the forms.local-address check and the Import notice that says a revision was added
 
 ---

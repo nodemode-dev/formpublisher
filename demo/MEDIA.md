@@ -17,7 +17,7 @@ Every picture below was drawn for this sample with a short Python script using P
 | `f4779dace2030ee2561c832d6d0a63d25ed90859a3ea52cc51f1003139f6b361.webp` | Same chart, light | Generated here with Pillow | Own work, Apache-2.0 |
 | `2c295d99e26dcf357d4d01bcf270fd6924b600c9a13dd8c363ef114f4c6976fa.woff2` | Inter 4 variable, latin subset (the site's text font, embedded by the formai-studio preset) | Bundled with FormWeb at `library/presets/fonts/inter-4-var-latin.woff2` | SIL OFL 1.1, Copyright (c) 2016 The Inter Project Authors |
 
-`demo/assets/formpublisher.webp`, `formpublisher@2x.webp`, `formpublisher-light.webp` and `formpublisher-light@2x.webp` (four files, used by the offline demo) are the FormPublisher app mark, copied unchanged from `frontend/src/assets/brand/`. Source: the owner's own art. As pictures shipped in the demo they are own work, Apache-2.0; the same art is also licensed GPL-3.0-only with this repository (see NOTICE.md, "Shipped in the app"), and the FormPublisher name and mark stay the owner's trademark.
+`demo/assets/formpublisher.webp`, `formpublisher@2x.webp`, `formpublisher-light.webp` and `formpublisher-light@2x.webp` (four files, used by the offline demo) are the FormPublisher app mark, copied unchanged from `frontend/src/assets/brand/`. Source: the owner's own art. Like every FormPublisher icon, they are GPL-3.0-only with this repository (see NOTICE.md, "Shipped in the app"), and the FormPublisher name and mark stay the owner's trademark.
 
 The offline demo (`index.html`, `demo.css`, `demo.js`) draws its own window with CSS and inline SVG and loads no image, font or script from outside this folder.
 

@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.3.1
-Last updated: 2026-11-15 · Phase 67: the forms.local-address check, one site per FormWeb project on Import, the demo credits and the community files
+Current build version: v0.3.2
+Last updated: 2026-11-15 · v0.3.2: no engine change (NOTICE.md and demo/MEDIA.md record the offline demo's four copies of the mark as GPL-3.0-only, like every FormPublisher icon, at the owner's decision); Phase 67: the forms.local-address check, one site per FormWeb project on Import, the demo credits and the community files
 
 ---
 
