@@ -10,7 +10,7 @@
 .fp-pv-size { flex: none; font-variant-numeric: tabular-nums; }
 .fp-pv-box { position: relative; flex: none; width: var(--pv-bw, 0px); height: var(--pv-bh, 0px); overflow: hidden; background: var(--fp-pasteboard); box-shadow: 0 0 0 1px var(--line-2), var(--shadow-md); }
 .fp-pv-device { position: absolute; left: 0; top: 0; width: var(--pv-w, 0px); height: var(--pv-h, 0px); transform: scale(var(--pv-s, 1)); transform-origin: 0 0; }
-.fp-pv-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; opacity: 0; z-index: var(--z-base); }
+.fp-pv-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; opacity: 0.01; z-index: var(--z-base); }
 .fp-pv-frame.is-under { opacity: 1; }
 .fp-pv-frame.is-front { opacity: 1; z-index: var(--z-raised); }
 .fp-pv-frame.is-idle { visibility: hidden; }

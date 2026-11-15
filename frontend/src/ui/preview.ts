@@ -55,6 +55,8 @@ export class Preview {
   private loadId = 0;
   private requested = '/';
   private buffer: MessageEvent[] = [];
+  private readonly docs = new WeakMap<HTMLIFrameElement, string>();
+  private staleDoc = '';
   private siteId: string | null = null;
   private frontSite: string | null = null;
   private lastRoute: string | null = null;
@@ -210,6 +212,7 @@ export class Preview {
       if (id !== this.loadId || site !== this.siteId) return;
       const target = this.frames.find((f) => f !== this.front) as HTMLIFrameElement;
       this.pending = target;
+      this.staleDoc = this.docs.get(target) ?? '';
       this.requested = path;
       this.buffer = [];
       setClass(target, 'is-idle', false);
@@ -274,8 +277,9 @@ export class Preview {
     if (this.siteId === null) return;
     if (this.front && e.source === this.front.contentWindow) {
       this.accept(e);
-    } else if (this.pending && e.source === this.pending.contentWindow && this.valid(e) && this.buffer.length < 200) {
-      this.buffer.push(e);
+    } else if (this.pending && e.source === this.pending.contentWindow && this.buffer.length < 200) {
+      const d = this.valid(e);
+      if (d && (this.staleDoc === '' || d.doc !== this.staleDoc)) this.buffer.push(e);
     }
   }
 
@@ -283,6 +287,7 @@ export class Preview {
     if (!this.front || e.source !== this.front.contentWindow || this.frontSite === null) return;
     const d = this.valid(e);
     if (!d) return;
+    if (typeof d.doc === 'string') this.docs.set(this.front, d.doc);
     emit('fp:probe', { ...d, siteId: this.frontSite } as ProbeMessage);
     if ((d.type === 'nav' || d.type === 'hello') && typeof d.path === 'string' && d.path !== '') this.onPath(d.path);
   }
@@ -306,6 +311,9 @@ export class Preview {
 
   private relayout(): void {
     const { width: w, height: h, zoom } = this.view;
+    const root = this.element;
+    setStyleVar(root, '--pv-w', `${w}px`);
+    setStyleVar(root, '--pv-h', `${h}px`);
     let scale: number;
     if (zoom === 'fit') {
       const labelH = this.labelRoute.parentElement?.offsetHeight ?? 0;
@@ -321,9 +329,6 @@ export class Preview {
     }
     scale = Math.max(0.05, scale);
     setClass(this.scroll, 'is-fit', zoom === 'fit');
-    const root = this.element;
-    setStyleVar(root, '--pv-w', `${w}px`);
-    setStyleVar(root, '--pv-h', `${h}px`);
     setStyleVar(root, '--pv-s', String(scale));
     setStyleVar(root, '--pv-bw', `${Math.round(w * scale)}px`);
     setStyleVar(root, '--pv-bh', `${Math.round(h * scale)}px`);
