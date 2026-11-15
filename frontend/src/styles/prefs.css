@@ -50,3 +50,7 @@
 .fp-prefs-group .fp-about-row:last-child { border-bottom: 0; }
 :where(.fp-prefs-railtab, .fp-prefs-fold, .fp-prefs-sechead):focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; }
 .fp-prefs-sechead:focus-visible { outline-offset: -2px; }
+@media (max-width: 719px) {
+  .fp-dialog.fp-dlg.fp-prefs-dlg { width: calc(100vw - 32px); margin-left: 0; }
+  .fp-prefs-rail, .fp-prefs-wire, .fp-prefs-port { display: none; }
+}

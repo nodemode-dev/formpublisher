@@ -74,7 +74,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>A window you know</h3>
-      Home with Start and Recent (under the title bar, with Recent keeping still when a site arrives), one tab per open site, a title bar, a status bar, a dark theme and a light one, built on the same layout as FormDeck.
+      Home with Start, Recent sites, Builds, Trash and a list of demos (under the title bar, with Recent keeping still when a site arrives), a menubar with File, Edit, View, Site, Window and Help (Home is the first item of File; on macOS the menus are in the system menu bar unless View > Menus in Window is on), a Preferences window with its categories on a rail, one tab per open site, a title bar, a status bar, a dark theme and a light one, built on the same layout as FormDeck.
     </td>
     <td width="50%" valign="top">
       <h3>26 interface languages</h3>
@@ -204,7 +204,7 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
 
 <table>
   <tr>
-    <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Trash · site tabs · routes strip · inspector · status bar · Preferences · Keyboard Shortcuts</td>
+    <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Builds · Trash · Demos · menubar · site tabs · routes strip · inspector · status bar · Preferences · Keyboard Shortcuts</td>
     <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · fpub · targets · prepare · prepared · trash · receive-status</td>
     <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · .fweb project · .fpub package · publication folder · the running FormWeb's current site · sent from FormWeb (endpoint or inbox) · the demo</td>
   </tr>

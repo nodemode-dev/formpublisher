@@ -107,7 +107,14 @@ bundle="$CARGO_TARGET_DIR/release/bundle"
 if [ "$os" = macos ]; then
   app="$bundle/macos/FormPublisher.app"
   [ -d "$app" ] || fp_die "the build finished but $app is missing"
-  codesign --verify --deep --strict "$app" 2>/dev/null || fp_say "codesign could not verify the app; it is ad-hoc signed, so macOS may ask once before it opens"
+  if [ -n "${APPLE_SIGNING_IDENTITY:-}" ]; then
+    codesign --verify --deep --strict "$app" || fp_die "codesign could not verify the signed app; nothing was packed"
+  else
+    codesign --verify --deep --strict "$app" 2>/dev/null || fp_say "codesign could not verify the app; it is ad-hoc signed, so macOS may ask once before it opens"
+  fi
+  step "checking the engine inside the app"
+  FORMPUBLISHER_HOME="$(mktemp -d)" "$app/Contents/MacOS/formpublisher-engine" --selfcheck >/dev/null \
+    || fp_die "the engine inside the app failed its self-check under the app's signature; run $app/Contents/MacOS/formpublisher-engine --selfcheck to see why. Nothing was packed"
   step "packing the disk image"
   mkdir -p "$bundle/dmg"
   dmg="$bundle/dmg/FormPublisher_${version}_$(uname -m).dmg"

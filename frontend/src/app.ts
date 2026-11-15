@@ -162,6 +162,9 @@ export async function startApp(): Promise<App> {
   };
 
   const docTitle = q<HTMLInputElement>(root, '.fp-doc-title');
+  if (document.documentElement.classList.contains('has-overlay-titlebar')) {
+    for (const part of [mounts.titlebar, mounts.menubar, mounts.titleTools, docTitle]) part.setAttribute('data-tauri-drag-region', '');
+  }
   const stripCount = q(root, '.fp-strip-count');
   const stripEmpty = q(root, '.fp-strip-empty');
   const stageEmpty = q(root, '.fp-stage-empty');
@@ -260,7 +263,7 @@ export async function startApp(): Promise<App> {
     routeList.setSite(st.activeId);
     routeList.render(st.routes, st.route);
     setText(stripCount, String(st.routes.length));
-    const message = st.activeId === null ? 'Open a site to list its routes.' : st.loading ? 'Loading routes' : st.routes.length === 0 ? 'This site has no routes.' : '';
+    const message = st.activeId === null ? 'Open a site to list its routes.' : st.routes.length > 0 ? '' : st.loading ? 'Loading routes' : 'This site has no routes.';
     setText(stripEmpty, message);
     setHidden(stripEmpty, message === '');
     setText(routesStatus, routeCountText(st.routes.length));
@@ -320,7 +323,7 @@ export async function startApp(): Promise<App> {
       if (seq !== loadSeq || st.activeId !== id) return;
       st.site = site;
       st.routes = routes;
-      st.route = routes.find((r) => r.path === '/')?.path ?? routes[0]?.path ?? null;
+      st.route = routes.find((r) => r.path === st.route)?.path ?? routes.find((r) => r.path === '/')?.path ?? routes[0]?.path ?? null;
       const tab = st.open.find((t) => t.id === id);
       if (tab && tab.name !== site.name) { tab.name = site.name; persist(); }
       st.loading = false;
@@ -345,10 +348,13 @@ export async function startApp(): Promise<App> {
   async function openSite(id: string): Promise<void> {
     const known = st.sites.find((s) => s.id === id);
     if (!st.open.some((t) => t.id === id)) st.open.push({ id, name: known?.name ?? id });
+    const same = st.activeId === id;
     st.activeId = id;
     st.site = known ?? null;
-    st.routes = [];
-    st.route = null;
+    if (!same) {
+      st.routes = [];
+      st.route = null;
+    }
     persist();
     showResult('info', '');
     paintAll();

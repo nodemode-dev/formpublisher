@@ -1,8 +1,6 @@
 {
   "Demos": "Demoer",
   "Demo": "Demo",
-  "FormPublisher demo": "FormPublisher-demo",
-  "Try it on a sample site": "Prøv det på et eksempelnettsted",
   "Bundled sample site": "Medfølgende eksempelnettsted",
   "The sample site could not be opened": "Eksempelnettstedet kunne ikke åpnes",
   "The bundled sample site is missing from this install": "Det medfølgende eksempelnettstedet mangler i denne installasjonen",

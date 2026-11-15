@@ -1,8 +1,6 @@
 {
   "Demos": "Demos",
   "Demo": "Demo",
-  "FormPublisher demo": "FormPublisher-Demo",
-  "Try it on a sample site": "Mit einer Beispiel-Website ausprobieren",
   "Bundled sample site": "Mitgelieferte Beispiel-Website",
   "The sample site could not be opened": "Die Beispiel-Website konnte nicht geöffnet werden",
   "The bundled sample site is missing from this install": "Die mitgelieferte Beispiel-Website fehlt in dieser Installation",

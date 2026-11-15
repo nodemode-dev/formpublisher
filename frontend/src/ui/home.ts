@@ -210,6 +210,7 @@ export class Home {
   private ask(text: string, okLabel: string): Promise<boolean> {
     this.askClose(false);
     setText(q(this.confirmRow, '.fp-home-confirm-text'), text);
+    setAttr(q(this.confirmRow, '.fp-home-confirm-text'), 'title', text);
     setText(q(this.confirmRow, '[data-a="confirm-yes"]'), okLabel);
     setHidden(this.confirmRow, false);
     q<HTMLButtonElement>(this.confirmRow, '[data-a="confirm-no"]').focus({ preventScroll: true });

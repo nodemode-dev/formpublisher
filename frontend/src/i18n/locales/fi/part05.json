@@ -1,8 +1,6 @@
 {
   "Demos": "Esittelyt",
   "Demo": "Esittely",
-  "FormPublisher demo": "FormPublisher-esittely",
-  "Try it on a sample site": "Kokeile esimerkkisivustolla",
   "Bundled sample site": "Mukana tuleva esimerkkisivusto",
   "The sample site could not be opened": "Esimerkkisivustoa ei voitu avata",
   "The bundled sample site is missing from this install": "Mukana tuleva esimerkkisivusto puuttuu tästä asennuksesta",

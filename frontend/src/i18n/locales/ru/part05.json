@@ -1,8 +1,6 @@
 {
   "Demos": "Демо",
   "Demo": "Демо",
-  "FormPublisher demo": "Демо FormPublisher",
-  "Try it on a sample site": "Попробуйте на примере сайта",
   "Bundled sample site": "Встроенный пример сайта",
   "The sample site could not be opened": "Не удалось открыть пример сайта",
   "The bundled sample site is missing from this install": "Встроенный пример сайта отсутствует в этой установке",

@@ -2,6 +2,7 @@
 
 mod files;
 mod reveal;
+mod traffic_lights;
 
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpListener, TcpStream};
@@ -190,8 +191,16 @@ fn open_main(handle: &tauri::AppHandle) {
         .disable_drag_drop_handler();
     #[cfg(target_os = "macos")]
     let builder = builder.title_bar_style(tauri::TitleBarStyle::Overlay).hidden_title(true);
+    let builder = builder.on_page_load(|window, payload| {
+        if matches!(payload.event(), tauri::webview::PageLoadEvent::Finished) {
+            traffic_lights::place(&window.as_ref().window());
+        }
+    });
     match builder.build() {
-        Ok(window) => reveal::conceal(&window),
+        Ok(window) => {
+            reveal::conceal(&window);
+            traffic_lights::place(&window.as_ref().window());
+        }
         Err(_) => reveal::close_splash(handle),
     }
 }
@@ -246,17 +255,26 @@ fn open_window(app: tauri::AppHandle, path: String, title: Option<String>) -> Re
             .map(|d| d.as_millis())
             .unwrap_or(0)
     );
-    let window = WebviewWindowBuilder::new(&app, label, WebviewUrl::External(url))
+    let builder = WebviewWindowBuilder::new(&app, label, WebviewUrl::External(url))
         .title(title.unwrap_or_else(|| "FormPublisher".to_string()))
         .visible(reveal::BUILD_VISIBLE)
         .background_color(reveal::BACKGROUND)
         .inner_size(MIN_SIZE.0, MIN_SIZE.1)
         .min_inner_size(MIN_SIZE.0, MIN_SIZE.1)
         .center()
-        .disable_drag_drop_handler()
+        .disable_drag_drop_handler();
+    #[cfg(target_os = "macos")]
+    let builder = builder.title_bar_style(tauri::TitleBarStyle::Overlay).hidden_title(true);
+    let window = builder
+        .on_page_load(|window, payload| {
+            if matches!(payload.event(), tauri::webview::PageLoadEvent::Finished) {
+                traffic_lights::place(&window.as_ref().window());
+            }
+        })
         .build()
         .map_err(|e| e.to_string())?;
     reveal::conceal_extra(&window);
+    traffic_lights::place(&window.as_ref().window());
     Ok(())
 }
 
@@ -270,6 +288,19 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(Backend(Mutex::new(None)))
+        .on_window_event(|window, event| {
+            if window.label() != "splash"
+                && matches!(
+                    event,
+                    tauri::WindowEvent::Resized(_)
+                        | tauri::WindowEvent::Focused(_)
+                        | tauri::WindowEvent::ThemeChanged(_)
+                        | tauri::WindowEvent::ScaleFactorChanged { .. }
+                )
+            {
+                traffic_lights::place(window);
+            }
+        })
         .invoke_handler(tauri::generate_handler![reveal::app_ready, open_window, files::reveal_path])
         .setup(|app| {
             let handle = app.handle().clone();

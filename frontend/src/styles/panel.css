@@ -29,6 +29,9 @@
 }
 .fp-bottom-head { container-type: inline-size; }
 .fp-bottom-tab > .icon { display: none; }
+@container (min-width: 520px) {
+  .fp-bottom-tab .fp-badge.fp-pn-count { min-width: 32px; }
+}
 @container (max-width: 460px) {
   .fp-bottom-tab { padding: 0 6px; }
   .fp-bottom-tab .fp-badge { margin-left: 4px; }
