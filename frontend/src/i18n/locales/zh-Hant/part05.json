@@ -1,8 +1,6 @@
 {
   "Demos": "示範",
   "Demo": "示範",
-  "FormPublisher demo": "FormPublisher 示範",
-  "Try it on a sample site": "用範例網站試試看",
   "Bundled sample site": "內建範例網站",
   "The sample site could not be opened": "無法開啟範例網站",
   "The bundled sample site is missing from this install": "此安裝中缺少內建範例網站",

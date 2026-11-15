@@ -104,8 +104,8 @@ def safe_unzip(archive: Path, dest: Path) -> None:
             target = (root / rel).resolve()
             if root not in target.parents:
                 raise IntakeError(f"the zip holds an unsafe path: {rel!r}")
-            target.parent.mkdir(parents=True, exist_ok=True)
             try:
+                target.parent.mkdir(parents=True, exist_ok=True)
                 with zf.open(info) as src, open(target, "wb") as out:
                     while True:
                         chunk = src.read(1024 * 1024)
@@ -116,7 +116,7 @@ def safe_unzip(archive: Path, dest: Path) -> None:
                             raise IntakeError("the zip expands to more than 1 GiB", 413)
                         out.write(chunk)
             except (zipfile.BadZipFile, RuntimeError, NotImplementedError, zlib.error, OSError) as exc:
-                raise IntakeError(f"cannot read {rel!r} from the zip: {exc}") from exc
+                raise IntakeError(f"cannot read {rel!r} from the zip: {getattr(exc, 'strerror', None) or exc}") from exc
 
 
 def copy_folder(source: Path, dest: Path) -> int:

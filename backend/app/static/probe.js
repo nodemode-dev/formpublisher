@@ -16,6 +16,7 @@
     var forcedMotion = motion === 'reduce' ? 'reduce' : '';
 
     var failed = {};
+    var doc = Date.now().toString(36) + Math.random().toString(36).slice(2);
 
     function send(type, data) {
       try {
@@ -24,9 +25,9 @@
           if (failed[data.url]) return;
           failed[data.url] = 1;
         }
-        var m = { source: 'fp-probe', gen: gen, type: type };
+        var m = { source: 'fp-probe', gen: gen, doc: doc, type: type };
         for (var k in data) {
-          if (k !== 'source' && k !== 'gen' && k !== 'type') m[k] = data[k];
+          if (k !== 'source' && k !== 'gen' && k !== 'doc' && k !== 'type') m[k] = data[k];
         }
         W.parent.postMessage(m, '*');
       } catch (e) {}
@@ -223,6 +224,22 @@
     var clsSent = -1;
     var clsTimer = 0;
     var clsLast = 0;
+    var clsQuiet = 0;
+    var clsQuietMax = 0;
+    var clsPaint = -1;
+    var clsHeld = [];
+    var viewW = W.innerWidth;
+    var viewH = W.innerHeight;
+
+    function viewResized() {
+      var w = W.innerWidth;
+      var h = W.innerHeight;
+      if (w === viewW && h === viewH) return;
+      viewW = w;
+      viewH = h;
+      clsQuiet = performance.now() + 500;
+      clsQuietMax = clsQuiet + 2500;
+    }
 
     function flushCls() {
       clsTimer = 0;
@@ -236,31 +253,66 @@
       } catch (e) {}
     }
 
+    function armCls() {
+      if (!clsTimer) {
+        var wait = Math.max(0, 500 - (Date.now() - clsLast));
+        clsTimer = setTimeout(flushCls, wait);
+      }
+    }
+
+    function countShift(entry) {
+      if (entry.startTime < clsPaint) return;
+      if (entry.startTime < clsQuiet) {
+        clsQuiet = Math.min(clsQuietMax, Math.max(clsQuiet, entry.startTime + 500));
+        return;
+      }
+      clsValue += entry.value;
+    }
+
     try {
       new PerformanceObserver(function (list) {
         try {
+          viewResized();
           list.getEntries().forEach(function (entry) {
-            if (!entry.hadRecentInput) clsValue += entry.value;
+            if (entry.hadRecentInput) return;
+            if (clsPaint < 0) {
+              if (clsHeld.length < 200) clsHeld.push(entry);
+              return;
+            }
+            countShift(entry);
           });
-          if (!clsTimer) {
-            var wait = Math.max(0, 500 - (Date.now() - clsLast));
-            clsTimer = setTimeout(flushCls, wait);
-          }
+          armCls();
         } catch (e) {}
       }).observe({ type: 'layout-shift', buffered: true });
+      new PerformanceObserver(function (list) {
+        try {
+          if (clsPaint >= 0) return;
+          list.getEntries().forEach(function (entry) {
+            if (clsPaint < 0 || entry.startTime < clsPaint) clsPaint = entry.startTime;
+          });
+          viewResized();
+          var held = clsHeld;
+          clsHeld = [];
+          held.forEach(countShift);
+          armCls();
+        } catch (e) {}
+      }).observe({ type: 'paint', buffered: true });
       document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'hidden') flushCls();
       });
     } catch (e) {}
 
     var lastOverflow = '';
+    var overflowTimer = 0;
 
     function checkOverflow() {
+      overflowTimer = 0;
       try {
         var el = document.documentElement;
         if (!el) return;
         var sw = el.scrollWidth;
         var cw = el.clientWidth;
+        if (cw <= 0 || W.innerWidth <= 0) return;
         if (sw > cw) {
           var key = sw + ':' + cw;
           if (key !== lastOverflow) {
@@ -273,6 +325,11 @@
       } catch (e) {}
     }
 
+    function queueOverflow() {
+      if (overflowTimer) clearTimeout(overflowTimer);
+      overflowTimer = setTimeout(checkOverflow, 300);
+    }
+
     function hello() {
       send('hello', { path: path(), title: document.title || '' });
     }
@@ -283,13 +340,14 @@
       hello();
     }
     if (document.readyState === 'complete') {
-      checkOverflow();
+      queueOverflow();
     } else {
-      W.addEventListener('load', function () {
-        checkOverflow();
-      });
+      W.addEventListener('load', queueOverflow);
     }
-    W.addEventListener('resize', checkOverflow);
+    W.addEventListener('resize', function () {
+      viewResized();
+      queueOverflow();
+    });
     W.addEventListener('pageshow', function () {
       send('nav', { path: path() });
     });

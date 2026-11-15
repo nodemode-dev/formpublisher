@@ -1,4 +1,4 @@
-.fp-main > .fp-hint { position: absolute; top: 0; left: 0; right: 0; z-index: var(--z-chrome); display: flex; align-items: center; gap: var(--space-3); height: 44px; padding: 0 var(--space-3); border-bottom: 1px solid var(--accent-line); background: linear-gradient(to bottom, var(--accent-soft), var(--surface-2)); color: var(--text-primary); box-shadow: var(--shadow-md); white-space: nowrap; }
+.fp-main > .fp-hint { position: absolute; grid-column: 3; grid-row: 1; top: 0; left: 0; right: 0; z-index: var(--z-chrome); display: flex; align-items: center; gap: var(--space-3); height: 44px; padding: 0 var(--space-3); border-bottom: 1px solid var(--accent-line); background: linear-gradient(to bottom, var(--accent-soft), var(--surface-2)); color: var(--text-primary); box-shadow: var(--shadow-md); white-space: nowrap; }
 .fp-hint[hidden] { display: none; }
 .fp-hint-count { flex: none; color: var(--text-muted); font-size: var(--fp-11); font-variant-numeric: tabular-nums; }
 .fp-hint-title { flex: none; font-size: var(--fp-13); font-weight: 600; }
@@ -6,5 +6,4 @@
 .fp-hint-actions { display: flex; flex: none; align-items: center; gap: var(--space-2); }
 .is-hinted { outline: 2px solid var(--accent-color); outline-offset: -2px; }
 .fp-stage.is-hinted { outline-offset: -3px; }
-.fp-demo-badge { position: absolute; top: 8px; left: 8px; }
 .fp-card-grid .fp-card[data-demo][aria-busy="true"] { cursor: progress; opacity: 0.7; }

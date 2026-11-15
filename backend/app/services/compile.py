@@ -26,6 +26,7 @@ REQUEST_SECONDS = 120
 MISSING = "Opening .fweb projects needs formweb-core. Run ./setup/install_compiler."
 ASSET_NAME = re.compile(r"^[0-9a-f]{64}\.(png|jpg|gif|webp|svg|mp4|webm|woff2)$")
 ASSET_REF = re.compile(r"/api/assets/([0-9a-f]{64}\.(?:png|jpg|gif|webp|svg|mp4|webm|woff2))")
+ROOT_404_PREFIX = re.compile(r'<script src="(/[^"]*)assets/runtime\.js" defer>')
 MIME_TYPES = {
     "png": "image/png",
     "jpg": "image/jpeg",
@@ -371,6 +372,9 @@ def bundle(files: list[dict], blobs: dict[str, bytes], licences: dict[str, dict]
         item = dict(original)
         if item.get("encoding") != "base64" and isinstance(item.get("content"), str):
             prefix = "../" * (len(PurePosixPath(item["path"]).parts) - 1)
+            if item["path"] == "404.html":
+                rooted = ROOT_404_PREFIX.search(item["content"])
+                prefix = rooted.group(1) if rooted else prefix
             for name in ASSET_REF.findall(item["content"]):
                 names.add(name)
                 target = "assets/" + name

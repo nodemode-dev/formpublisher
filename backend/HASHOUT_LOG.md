@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.8
-Last updated: 2026-11-11 · Phases 43 to 45: .fpub, the kept verify result and the Windows launchers run under Wine
+Current build version: v0.3.0
+Last updated: 2026-11-15 · Phases 61 to 66: a route per demo, the review's fixes, three bundled FormWeb demo sites, the probe's layout-shift and overflow rules, the vendored core at 0.21.0, and the hand-off with FormWeb 0.21.0
 
 ---
 
@@ -32,6 +32,7 @@ backend/
     │   ├── host.py           /api/host, mount and unmount
     │   ├── checks.py         /api/checks run, results, live, thumbs
     │   ├── builds.py         /api/builds build, reproduce, list, compare, sign, verify, download, delete
+    │   ├── demo.py           /api/demo sample and open/<id>, each demo imported once
     │   └── keys.py           /api/keys create, list, public, delete
     └── services/
         ├── paths.py          ports (engine and site host), origins, data folder, frontend dist
@@ -458,3 +459,51 @@ Three files changed: `app/host.py`, `app/services/paths.py` and `app/routers/hea
 - A free wanted port behaves as before: same port, no warning.
 
 Checked: two engines on 9012 and 9014 while 8281 was held by a third took different host ports, reported them in `/api/health` and `engine.json`, and each preview and its assets came from its own port, with no `live.request` errors on the second; `FORMPUBLISHER_HOST_PORT=9099` was taken exactly with no warning; `compileall`; engine `--selfcheck`.
+
+## Phase 61: every demo has its own route · v0.3.0 (2026-11-15)
+
+- `app/routers/demo.py`: `POST /api/demo/open/<id>` opens `demo/sites/<id>.zip` from the resource folder. `DEMO_ID` (`[a-z0-9][a-z0-9-]{0,40}`) is checked before the id becomes a file name, so the route cannot be made to read another path. `_open(key, archive, stem, missing)` is the one import path for every demo: a demo is imported once, under the source key `demo:<id>`, and opening it again answers the same site with `created: false`. `POST /api/demo/sample` keeps its address and its key for Northwind Notes, so a data folder from 0.2.8 finds its sample again.
+- `setup/freeze_backend`: the frozen engine carries `demo/sites` when the folder exists.
+
+## Phase 62: the engine's part of the full review · v0.3.0 (2026-11-15)
+
+- `app/services/intake.py`: a zip that holds a file and a folder of one name answered 500; the `mkdir` for an entry's parent now runs inside the guarded block and the message carries the system's own words (`strerror`), so it answers 400 with "cannot read ... from the zip".
+- `app/cli.py`: printing into a closed pipe (`./formpublisher run sites | head -1`) ended in a traceback. `BrokenPipeError` is caught and stdout is pointed at the null device, so Python's exit flush stays quiet.
+- `app/services/package.py`: `SOURCE_KINDS` maps `demo` to `formweb-export`; `publish.json` of a demo site's build had no known source kind.
+- `formpublisher_engine.py`: `--selfcheck` used to report `core: true` when the `formweb-core` file was present. `core_runs()` now runs `formweb-core --selfcheck` (60 s limit), so a frozen engine whose inner program cannot start, for example because a signature broke it, fails its self-check at build time and not at a user's first `.fweb`.
+- `build_app`: with `APPLE_SIGNING_IDENTITY` set, a failed `codesign --verify --deep --strict` stops the build (an ad hoc build still only warns). On macOS the engine inside the finished app runs its self-check, under the app's signature and with a temporary data folder, before the disk image is packed. `build_app` does not notarize; a build signed with a Developer ID and not notarized starts, and macOS asks once at first open (the manual's troubleshooting has the step).
+- `formpublisher.bat`: arguments after the command were passed as `%2` to `%9`, so the ninth and later were dropped. `:rest` shifts through all of them into `%REST%`.
+
+Checked: 22 odd or hostile archives and 68 bad requests against every route (no 500); `compileall`; engine `--selfcheck`. The macOS steps of `build_app` were read, not run: no Mac here.
+
+## Phase 63: three FormWeb demo sites are bundled · v0.3.0 (2026-11-15)
+
+- `demo/sites/lowlight.zip`, `looking-back.zip`, `harbour-ferries.zip`: FormWeb's plain exports of its three demo sites, repacked the same way every time (sorted names, dates 1980-01-01, deflate 9, mode 0600) so a rebuild of the zip does not change the file. They open through Phase 61's route.
+- `NOTICE.md`, `demo/MEDIA.md`: every picture in every demo site with its source and status, and the fonts with their copyright lines. `demo/licenses/OFL-*.txt`: the SIL Open Font License text of each of the seven font families the demo sites embed, because the licence asks for its text to travel with the font files.
+- `setup/freeze_backend`: the frozen engine carries `demo/licenses` beside `demo/sites`.
+
+## Phase 64: the probe measures the page, not the preview · v0.3.0 (2026-11-15)
+
+`app/static/probe.js`, the script the site host adds to previewed pages. The window's part is in `frontend/HASHOUT_LOG.md`, Phase 64.
+
+- Layout shift after a resize: the preview resizes the frame on a Device switch, and Chrome reports the reflow as a layout shift without `hadRecentInput`, within 0 to 7 ms of the resize event and sometimes just before it. `viewResized()` watches `innerWidth` and `innerHeight` and opens a quiet window of 500 ms; a shift that starts inside it is dropped and moves the window's end to 500 ms after that shift, up to 2500 ms after the resize in all. 500 ms is the window Chrome itself uses to excuse shifts after a visitor's input (`hadRecentInput`); the Device switch is such an input, but it happens in the window around the frame, so Chrome cannot know. The extension covers a reflow that arrives in several entries (media queries, pictures choosing another size), and the cap is there so a page that never stops moving is still reported.
+- Layout shift before first paint: a frame in the same process reports the move from unstyled to styled when its stylesheet arrives, which no visitor sees. Shifts are held in `clsHeld` until a `paint` observer gives the first-paint time; those that started before it are dropped.
+- Each document makes an id at start (`doc`) and sends it with every message, so the window can tell the document a frame is leaving from the one it is loading.
+- Overflow: `checkOverflow()` returns when the document or the window has no width, and runs 300 ms after load and after a resize (`queueOverflow()`), not in the same tick, so it measures the settled layout.
+- The other live checks (`console`, `error`, `request`, `nav`) were read for the same two mistakes: none depends on the frame's size or on timing against a resize.
+
+## Phase 65: the vendored FormWeb core is 0.21.0 · v0.3.0 (2026-11-15)
+
+`vendor/formweb-native` is FormWeb's `native/` workspace at its 0.21.0 release, copied unedited (`VENDOR.md` has the tree ids); `./formpublisher vendor --check` answers `in step at 0.21.0` and `formweb-core --selfcheck` answers version 0.21.0. It brings FormWeb's export and engine fixes to `.fweb` projects opened here. Project files written by FormWeb 0.20.8 still open and compile to the same files as the 0.21.0 ones.
+
+## Phase 66: the hand-off with FormWeb 0.21.0, both directions · v0.3.0 (2026-11-15)
+
+Both apps were run together and every path between them tried: Send to FormPublisher with FormPublisher running and stopped (inbox), Import from FormWeb, `.fweb` projects, `.fpub` packages opened in FormWeb, and a FormWeb publication folder. What reaches FormPublisher by send, inbox or import is byte for byte FormWeb's plain export. Two faults were on this side.
+
+- `app/services/compile.py`: `bundle()` rewrites `/api/assets/<name>` links to relative `assets/<name>` by the file's depth. FormWeb also writes a root `404.html`, a second copy of the page at `/404`, that hosts serve at any missing address, however deep; relative links break there. FormWeb 0.21.0's own bundling roots that one file's links at the prefix its runtime script already carries (`ROOT_404_PREFIX`), and `bundle()` now has the same rule. Before, a `.fweb` opened here differed from FormWeb's export in exactly that file, and its not-found page lost pictures and fonts below the top folder.
+- `app/services/host.py`: `base_path(root)` reads the folder a site is addressed under from the Sitemap line of its own `robots.txt` (`https://example.org/shop/sitemap.xml` gives `/shop/`; the root gives ""). `within(base, path)` takes it off a path. `robots.txt` is used, not the model's `baseUrl`, because it records what the export really wrote: a FormWeb publication folder is written for `/published/<slug>/<version>/` whatever the model says. The site host looks a request up as it is first and then with the base path taken off, so the root `404.html` of such a site, whose links start with the base path, loads its files in the preview as it will on its host. `Serving` carries `base`; `app/host.py` passes it for deep runs too.
+- `app/services/checks.py`: `SiteIndex.lookup()` does the same two-step lookup and `local()` maps a sitemap address to a route. Before, the Lowlight demo with the base address `https://example.org/shop/` got 11 `asset.missing` and 8 `link.broken` errors on `/404.html` and 5 `sitemap.missing` and 5 `sitemap.extra` warnings, all false; a site at the root is looked up exactly as before, and a link to a page that does not exist is still reported.
+
+Not changed, by decision: FormPublisher has no check for forms. A posting form in a site sent from FormWeb carries FormWeb's local address (`http://127.0.0.1:8240/api/forms/...`), which FormWeb's own audit warns about (`forms.local-address`); a `.fweb` compiled here gets `/api/forms/...` because `compile_fweb()` passes an empty `formsEndpoint`. Neither works on a static host and neither is reported here. Send to FormPublisher and Import from FormWeb give two sites for one FormWeb project, because the first is keyed by the project and the second by FormWeb's address. There is no version gate in the live hand-off: FormWeb looks for `app: formpublisher` in `/api/health`, and the engine does not read `X-FormWeb-Version`.
+
+Checked: the three demo `.fweb` files and a starter project compile to the same files as FormWeb's exports (the starter differs only in the form address above); three project files written by FormWeb 0.20.8 open and give the same files; a `.fpub` saved here, signed and unsigned, opens in FormWeb as a project and FormWeb's export after it is byte for byte the export before; the base-path site has 0 findings and a styled not-found page at a missing address; Northwind Notes still has its 1 error and 2 warnings; `compileall`; engine `--selfcheck`.

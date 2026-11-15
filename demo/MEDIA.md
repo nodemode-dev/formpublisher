@@ -20,3 +20,66 @@ Every picture below was drawn for this sample with a short Python script using P
 `assets/formpublisher*.webp` (four files) are the FormPublisher app mark, copied unchanged from `frontend/src/assets/brand/`. Source: the owner's own art, GPL-3.0-only with this repository (see NOTICE.md).
 
 The offline demo (`index.html`, `demo.css`, `demo.js`) draws its own window with CSS and inline SVG and loads no image, font or script from outside this folder.
+
+Home's card picture for the sample, `frontend/public/demos/northwind/cover.webp`, is the first picture of the table above (Notes window, dark) cropped to its middle 1600x900 and resized to 640x360. CC0 1.0.
+
+# Media in the three FormWeb demo sites
+
+`sites/lowlight.zip`, `sites/looking-back.zip` and `sites/harbour-ferries.zip` are the three demo sites FormWeb ships, as FormWeb's `GET /api/export` wrote them: "Lowlight" (a planetarium-show studio, fictional), "Looking Back" (a photo essay on pictures of Earth from far away) and "Harbour Ferries" (a ferry operator, fictional). Each zip holds the export at the archive root, written with sorted names and fixed dates so the same export gives the same bytes. Every asset's file name is the SHA-256 of its bytes. Nothing is AI generated and nothing was retouched.
+
+The NASA pictures were not downloaded for this repository: each file is byte for byte the file FormDeck (`frontend/public/demos/nasa/`) or Form.md (`demos/views/assets/media/`) already ships, resized and converted to WebP there. Their source pages carry a credit line and no licence text; NASA's media guidelines (https://www.nasa.gov/nasa-brand-center/images-and-media/) say NASA content "generally are not subject to copyright in the United States". "NASA content" below means that status. `NOTICE.md` lists the same pictures with their full file names, credit lines and the changes made; the two files are kept in step.
+
+Home's card pictures, `frontend/public/demos/<id>/cover.webp`, are the top 1440x810 of a 1440x900 screenshot of each site's home page, resized to 640x360 WebP with Pillow. The Looking Back card shows the Apollo 17 picture listed below; the other two show no photograph.
+
+## Lowlight (24 pictures, 4 fonts)
+
+| File in `assets/` (first 12 characters of the name) | What it shows | Source | License |
+| --- | --- | --- | --- |
+| `a9d3e2fbb94e` .webp | Earthrise, Apollo 8 (AS08-14-2383) | NASA/William Anders, https://www.nasa.gov/image-detail/moon-landing-l-7-months-10-apollo-8-earthrise-photo-as08-14-2383 | NASA content |
+| `07bd8a6730b2` .webp | A Breathtaking Earthset from Orion (art002e021278) | NASA, http://images-assets.nasa.gov/image/art002e021278/metadata.json | NASA content |
+| `e422ff4c83b9` .webp | Solar System Portrait, Earth as Pale Blue Dot (PIA00452) | NASA/JPL (Voyager 1), https://photojournal.jpl.nasa.gov/catalog/PIA00452 | NASA content |
+| `fde102acb7e7` .webp | The Day the Earth Smiled (PIA17172) | NASA/JPL-Caltech/SSI, https://science.nasa.gov/photojournal/the-day-the-earth-smiled/ | NASA content |
+| `955dcecd6515` .webp | The Greatest Saturn Portrait ...Yet (PIA06193) | NASA/JPL/Space Science Institute, https://science.nasa.gov/photojournal/the-greatest-saturn-portrait-yet/ | NASA content |
+| `68e6d0d35c06` .webp | The Edge of the Night (PIA17199) | NASA/JPL-Caltech/Space Science Institute, https://science.nasa.gov/photojournal/the-edge-of-the-night/ | NASA content |
+| `b03262099309` .webp | Cassini Jupiter Portrait (PIA04866) | NASA/JPL/Space Science Institute, https://science.nasa.gov/photojournal/cassini-jupiter-portrait/ | NASA content |
+| `3425fd92e0c6` .webp | Looking Up at Mars Rover Curiosity in 'Buckskin' Selfie (PIA19808) | NASA/JPL-Caltech/MSSS, https://science.nasa.gov/photojournal/looking-up-at-mars-rover-curiosity-in-buckskin-selfie/ | NASA content |
+| `87bbfdcfacff` .webp | Curiosity Self-Portrait at 'Mojave' Site on Mount Sharp (PIA19142) | NASA/JPL-Caltech/MSSS, https://science.nasa.gov/photojournal/curiosity-self-portrait-at-mojave-site-on-mount-sharp/ | NASA content |
+| `3b3a4b424570` .webp | Perseverance's Selfie with Ingenuity (PIA24542) | NASA/JPL-Caltech/MSSS, https://science.nasa.gov/photojournal/perseverances-selfie-with-ingenuity/ | NASA content |
+| `44acd0e9283f` .webp | The same picture cropped to 1245x1177 (columns 345 to 1590) and re-encoded as WebP at quality 86 with Pillow, for the tile-cut component | Same as the row above | NASA content |
+| `25038129e80f` .webp | Perseverance's Selfie With 'Cheyava Falls' (PIA26344) | NASA/JPL-Caltech/MSSS, https://science.nasa.gov/photojournal/perseverances-selfie-with-cheyava-falls/ | NASA content |
+| `1978facdbeee` .webp | Hubble Ultra Deep Field | NASA and the European Space Agency, https://commons.wikimedia.org/wiki/File:Hubble_ultra_deep_field.jpg | "This file is in the public domain because it was created by NASA and ESA." |
+| `adb1b774966e`, `86196b445b96` .webp | Poster of the starfield component, dark and light | A still of the site's own component | Original work made for the Form demos |
+| `cb033eaf2d91`, `fc4a5fbd93d5` .webp | Poster of the specks component, dark and light | A still of the site's own component | Original work made for the Form demos |
+| `f74dc7cc5be2`, `72e06ffd2ad5` .webp | Poster of the receipt-printer component, dark and light | A still of the site's own component | Original work made for the Form demos |
+| `996675ea94a8`, `d7aceb85e4e7` .webp | Poster of the orbit-constellation component, dark and light; it shows the NASA pictures above | A still of the site's own component | The still is original work; the pictures in it are NASA content |
+| `3c8bd2d2f376`, `56cca781ae81` .webp | Poster of the tile-cut component, dark and light; it shows PIA24542 cut into tiles | A still of the site's own component | The still is original work; the picture in it is NASA content |
+| `f9eed231b2a4` .png | Lowlight site icon, 256 px | Drawn with Pillow for the demo | Original work made for the Form demos |
+| `2c295d99e26d` .woff2 | Inter 4 variable, latin subset | Bundled with FormWeb at `library/presets/fonts/inter-4-var-latin.woff2` | SIL OFL 1.1, Copyright (c) 2016 The Inter Project Authors |
+| `65fd17fcbd2e`, `35f8aec56cfd` .woff2 | Space Grotesk 400 and 700, latin | The @fontsource package, as shipped by FormTxt | SIL OFL 1.1 |
+| `08949f728dc5` .woff2 | IBM Plex Mono 400 | As shipped by FormVis (`frontend/public/fonts/ibm-plex-mono/`) | SIL OFL 1.1, Copyright 2017 IBM Corp. |
+
+## Looking Back (10 pictures, 5 fonts)
+
+| File in `assets/` (first 12 characters of the name) | What it shows | Source | License |
+| --- | --- | --- | --- |
+| `a9d3e2fbb94e`, `07bd8a6730b2`, `e422ff4c83b9`, `fde102acb7e7` .webp | Earthrise, Earthset from Orion, Pale Blue Dot and The Day the Earth Smiled: the same four files as in Lowlight | As in the Lowlight table | NASA content |
+| `f8414ced3bf6` .webp | View of the Earth seen by the Apollo 17 crew (as17-148-22727), 1972-12-07 | NASA, https://images.nasa.gov/details/as17-148-22727 | NASA content |
+| `7fdaa80d0e06` .webp | Apollo 10 view of the Earth (as10-34-5013), 1969-05-18 | NASA, https://images.nasa.gov/details/as10-34-5013 | NASA content |
+| `aa973715ed51` .webp | Gulf Coast from Atchafalaya Bay to Apalachicola seen from Gemini 11 (s66-54563), 1966-09-14 | NASA, https://images.nasa.gov/details/s66-54563 | NASA content |
+| `703fbb02c672` .webp | GEMINI-TITAN (GT)-9 - EARTH-SKY - AUGMENTED TARGET DOCKING ADAPTER (ATDA) (s66-37923), 1966-06-06 | NASA, https://images.nasa.gov/details/s66-37923 | NASA content |
+| `7d6de2d25625` .webp | GEMINI-TITAN (GT)-10 - EARTH SKY - DOCKING - IN-SPACE (s66-46249), 1966-07-18 | NASA, https://images.nasa.gov/details/s66-46249 | NASA content |
+| `9702623b49c6` .png | Looking Back site icon, 256 px | Drawn with Pillow for the demo | Original work made for the Form demos |
+| `1fe9ad5d8b2e` .woff2 | Playfair Display 400 | As shipped by FormVis (`frontend/public/fonts/playfair-display/`) | SIL OFL 1.1, Copyright 2017 The Playfair Display Project Authors |
+| `02194deb92d3`, `882b7c150c29`, `7691c51bc286` .woff2 | Source Serif 4 400, 400 italic and 700, latin | The @fontsource package, as shipped by FormTxt | SIL OFL 1.1 |
+| `08949f728dc5` .woff2 | IBM Plex Mono 400 | As shipped by FormVis | SIL OFL 1.1, Copyright 2017 IBM Corp. |
+
+## Harbour Ferries (1 picture, 5 fonts)
+
+The site uses no photograph. Its harbour map and logo are inline SVG written for the demo.
+
+| File in `assets/` (first 12 characters of the name) | What it shows | Source | License |
+| --- | --- | --- | --- |
+| `4f9d2b2f49e0` .png | Harbour Ferries site icon, 256 px | Drawn with Pillow for the demo | Original work made for the Form demos |
+| `e902b779e439`, `aae665c75af8` .woff2 | Oswald 400 and 700 | As shipped by FormVis (`frontend/public/fonts/oswald/`) | SIL OFL 1.1, Copyright 2016 The Oswald Project Authors |
+| `418b06936717`, `c1e512679670` .woff2 | Work Sans 400 and 700, latin | The @fontsource package, as shipped by FormTxt | SIL OFL 1.1 |
+| `08949f728dc5` .woff2 | IBM Plex Mono 400 | As shipped by FormVis | SIL OFL 1.1, Copyright 2017 IBM Corp. |

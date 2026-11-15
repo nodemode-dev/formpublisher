@@ -5,7 +5,7 @@ import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import quote, unquote
+from urllib.parse import quote, unquote, urlsplit
 
 THROTTLES = {"none": (0.0, 0), "fast": (0.04, 1500 * 1024), "slow": (0.15, 200 * 1024)}
 THEMES = ("auto", "dark", "light")
@@ -50,6 +50,7 @@ DOCTYPE_RE = re.compile(rb"<!doctype[^>]*>", re.I)
 RANGE_RE = re.compile(r"^bytes=(\d*)-(\d*)$")
 REDIRECT_STATUSES = (200, 301, 302, 307, 308)
 LOCATION_SAFE = "/:?&=#%@+,;~!$'()*[]-._"
+SITEMAP_LINE = re.compile(r"^\s*sitemap\s*:\s*(\S+)", re.I | re.M)
 _redirect_cache: dict[str, tuple[int, list]] = {}
 _state: dict = {"mount": None, "generation": 0}
 
@@ -64,6 +65,7 @@ class Serving:
     motion: str
     throttle: str
     generation: int
+    base: str = ""
 
 
 def mount(root: Path, site: str | None, revision: str | None, probe: bool, theme: str, motion: str, throttle: str) -> Serving:
@@ -76,7 +78,7 @@ def mount(root: Path, site: str | None, revision: str | None, probe: bool, theme
     if not root.is_dir():
         raise ValueError("the revision folder is missing")
     _state["generation"] += 1
-    current = Serving(root.resolve(), site, revision, bool(probe), theme, motion, throttle, _state["generation"])
+    current = Serving(root.resolve(), site, revision, bool(probe), theme, motion, throttle, _state["generation"], base_path(root))
     _state["mount"] = current
     return current
 
@@ -145,6 +147,29 @@ def lookup(root: Path, decoded: str) -> Path | None:
         if found is not None:
             return found
     return None
+
+
+def base_path(root: Path) -> str:
+    """The folder the site is addressed under on its own host ("/shop/"), read from the Sitemap line of its robots.txt; "" at the root."""
+    try:
+        text = (root / "robots.txt").read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    for address in SITEMAP_LINE.findall(text):
+        parts = urlsplit(address)
+        path = unquote(parts.path)
+        if parts.scheme in ("http", "https") and parts.netloc and path.endswith("/sitemap.xml") and ".." not in path.split("/"):
+            base = path[: -len("sitemap.xml")]
+            return "" if base == "/" else base
+    return ""
+
+
+def within(base: str, decoded: str) -> str | None:
+    if not base:
+        return None
+    if decoded.startswith(base):
+        return "/" + decoded[len(base):]
+    return "/" if decoded + "/" == base else None
 
 
 def load_redirects(root: Path) -> list[tuple[str, str, int]]:
@@ -347,6 +372,9 @@ async def respond(scope, send, serving: Serving | None, probe_route: bool) -> No
         return
     request_headers = {k.decode("latin-1").lower(): v.decode("latin-1") for k, v in scope.get("headers", [])}
     found = lookup(serving.root, decoded)
+    if found is None:
+        inner = within(serving.base, decoded)
+        found = lookup(serving.root, inner) if inner is not None else None
     if found is not None:
         await serve_file(send, method, request_headers, serving, found)
         return

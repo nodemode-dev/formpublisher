@@ -3,6 +3,7 @@ setlocal
 cd /d "%~dp0"
 set "CMD=%~1"
 if "%CMD%"=="" set "CMD=boot"
+call :rest %*
 set "PYEXE=python"
 if exist backend\venv\Scripts\python.exe set "PYEXE=backend\venv\Scripts\python.exe"
 if "%FORMPUBLISHER_HOST%"=="" set "FORMPUBLISHER_HOST=127.0.0.1"
@@ -15,11 +16,11 @@ if /i "%CMD%"=="frontend" goto frontend
 if /i "%CMD%"=="build" goto build
 if /i "%CMD%"=="serve" goto serve
 if /i "%CMD%"=="desktop" goto desktop
-if /i "%CMD%"=="run" ( "%PYEXE%" backend\formpublisher_engine.py cli %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
-if /i "%CMD%"=="cli" ( "%PYEXE%" backend\formpublisher_engine.py cli %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
-if /i "%CMD%"=="mcp" ( "%PYEXE%" backend\formpublisher_engine.py mcp %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
-if /i "%CMD%"=="agents" ( "%PYEXE%" setup\agents.py %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
-if /i "%CMD%"=="vendor" ( "%PYEXE%" setup\vendor_check.py %2 %3 %4 %5 %6 %7 %8 %9 & goto :eof )
+if /i "%CMD%"=="run" ( "%PYEXE%" backend\formpublisher_engine.py cli %REST% & goto :eof )
+if /i "%CMD%"=="cli" ( "%PYEXE%" backend\formpublisher_engine.py cli %REST% & goto :eof )
+if /i "%CMD%"=="mcp" ( "%PYEXE%" backend\formpublisher_engine.py mcp %REST% & goto :eof )
+if /i "%CMD%"=="agents" ( "%PYEXE%" setup\agents.py %REST% & goto :eof )
+if /i "%CMD%"=="vendor" ( "%PYEXE%" setup\vendor_check.py %REST% & goto :eof )
 if /i "%CMD%"=="doctor" goto doctor
 if /i "%CMD%"=="version" ( "%PYEXE%" backend\formpublisher_engine.py --version & goto :eof )
 if /i "%CMD%"=="help" goto usage
@@ -70,6 +71,13 @@ goto :eof
 :vfirst
 if not defined VLINE_SET set "VLINE=%~1" & set "VLINE_SET=1"
 goto :eof
+:rest
+set "REST="
+:rest_next
+shift
+if "%~1"=="" exit /b 0
+set REST=%REST% %1
+goto rest_next
 :usage
 echo formpublisher.bat [command]
 echo   boot ^| install ^| backend ^| frontend ^| build ^| serve ^| desktop dev ^| desktop build

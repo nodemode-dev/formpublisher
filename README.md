@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.2.8" src="https://img.shields.io/badge/version-0.2.8-4f6bff?style=flat-square">
+  <img alt="version 0.3.0" src="https://img.shields.io/badge/version-0.3.0-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -74,7 +74,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>A window you know</h3>
-      Home with Start and Recent (under the title bar, with Recent keeping still when a site arrives), one tab per open site, a title bar, a status bar, a dark theme and a light one, built on the same layout as FormDeck.
+      Home with Start, Recent sites, Builds, Trash and a list of demos (under the title bar, with Recent keeping still when a site arrives), a menubar with File, Edit, View, Site, Window and Help (Home is the first item of File; on macOS the menus are in the system menu bar unless View > Menus in Window is on), a Preferences window with its categories on a rail, one tab per open site, a title bar, a status bar, a dark theme and a light one, built on the same layout as FormDeck.
     </td>
     <td width="50%" valign="top">
       <h3>26 interface languages</h3>
@@ -114,7 +114,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>Demo</h3>
-      Home's Demos row opens a bundled sample site, "Northwind Notes", with a short tour of Preview, Checks, Package and Publish. <a href="demo/index.html">demo/index.html</a> is the same walk-through offline: open it straight from disk, no network and no build.
+      Home's Demos row opens four bundled sites: "Lowlight", "Looking Back" and "Harbour Ferries", the three demo sites FormWeb ships, here as its exports, and "Northwind Notes", a sample with problems for the checks to find. A short tour walks Preview, Checks, Package and Publish. <a href="demo/index.html">demo/index.html</a> is the same walk-through offline: open it straight from disk, no network and no build.
     </td>
     <td width="50%" valign="top">
       <h3>Agent tools</h3>
@@ -172,7 +172,7 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
 
 <table>
   <tr>
-    <td width="50%" valign="top"><b>Home</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.webp"><img alt="Home with the Northwind Notes site in Recent and the demo card" src="docs/images/home-light.webp"></picture></td>
+    <td width="50%" valign="top"><b>Home</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.webp"><img alt="Home with the Northwind Notes site in Recent and the four demo cards" src="docs/images/home-light.webp"></picture></td>
     <td width="50%" valign="top"><b>Preview</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/preview-dark.webp"><img alt="The sample site in the preview stage with the routes strip and the inspector" src="docs/images/preview-light.webp"></picture></td>
   </tr>
   <tr>
@@ -204,7 +204,7 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
 
 <table>
   <tr>
-    <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Trash · site tabs · routes strip · inspector · status bar · Preferences · Keyboard Shortcuts</td>
+    <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Builds · Trash · Demos · menubar · site tabs · routes strip · inspector · status bar · Preferences · Keyboard Shortcuts</td>
     <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · fpub · targets · prepare · prepared · trash · receive-status</td>
     <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · .fweb project · .fpub package · publication folder · the running FormWeb's current site · sent from FormWeb (endpoint or inbox) · the demo</td>
   </tr>
@@ -258,7 +258,7 @@ Every command takes `--json`. The MCP server has 19 tools over the same routes:
 
 ## Demo
 
-Home's Demos row opens the bundled sample site, "Northwind Notes", and a quick tour walks Preview, Checks, Package and Publish. To see it without installing anything, open [`demo/index.html`](demo/index.html) from disk in a browser: it shows the FormPublisher window in both themes driving the sample site through the device widths, with the checks, the package manifest and the six prepared folders taken from real runs of the engine (`demo/data/`). The sample's pictures are CC0; `demo/MEDIA.md` lists their sources.
+Home's Demos row lists four bundled sites, and Help > Demos has the same four. Three are the demo sites FormWeb ships, bundled here as FormWeb exported them, so one site can be followed through the family: "Lowlight" (a planetarium-show studio with scroll effects and page components), "Looking Back" (a photo essay on pictures of Earth from far away) and "Harbour Ferries" (a ferry operator with a fare calculator, routes and search). The fourth, "Northwind Notes", is a small sample with deliberate problems, so the checks have something to find. Each opens as its own site, and a quick tour walks Preview, Checks, Package and Publish. The photographs in the FormWeb sites are NASA pictures and their fonts are under the SIL Open Font License; `NOTICE.md` lists every picture. To see the sample without installing anything, open [`demo/index.html`](demo/index.html) from disk in a browser: it shows the FormPublisher window in both themes driving the sample site through the device widths, with the checks, the package manifest and the six prepared folders taken from real runs of the engine (`demo/data/`). The sample's pictures are CC0; `demo/MEDIA.md` lists their sources.
 
 ### Agents
 
@@ -330,7 +330,7 @@ Ports and folders:
 | `src-tauri/` | the Tauri 2 shell |
 | `setup/` | install, build and agent scripts |
 | `docs/` | the manual and its screenshots |
-| `demo/` | the sample site and the offline demo (`index.html`) |
+| `demo/` | the sample site, the three FormWeb demo sites (`sites/`) and the offline demo (`index.html`) |
 | `.docs/wiki/` | the wiki pages |
 | `assets/` | the app icon used by this README |
 

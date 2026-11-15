@@ -5,7 +5,7 @@ import { LANGUAGES, language, setLanguage, storedLanguage } from '../i18n';
 import { VERSION } from '../version';
 import { Dialog } from './dialogs';
 import { el, escapeHtml, q, setAttr, setClass, setDisabled, setText, setValue } from './dom';
-import { icon } from './icons';
+import { PrefsShell } from './prefs-shell';
 import { applyDensity, applyTheme, readChoice, readDensity, saveChoice, setAccent, setTheme, THEMES, type Density } from './themes';
 
 export type PrefsSection = 'general' | 'interface' | 'formweb' | 'about';
@@ -27,8 +27,7 @@ const swatch = (id: string): string => {
 };
 
 export class Preferences extends Dialog {
-  private readonly tabs: HTMLElement[];
-  private readonly pages: HTMLElement[];
+  private readonly shell: PrefsShell;
   private readonly themeBtns: HTMLButtonElement[];
   private readonly accentBtns: HTMLButtonElement[];
   private readonly densityBtns: HTMLButtonElement[];
@@ -43,35 +42,44 @@ export class Preferences extends Dialog {
   private readonly autoCheck: HTMLInputElement;
   private readonly autoBuild: HTMLInputElement;
   private saved = '';
-  private section: PrefsSection = 'general';
 
   constructor(private readonly app: App) {
     super('Preferences', 760, 'fp-prefs-dlg');
     const langs = LANGUAGES.map(([code, name]) => `<option value="${code}" translate="no">${escapeHtml(name)}</option>`).join('');
     const root = el(`<div class="fp-prefs">
-<nav class="fp-prefs-nav" aria-label="Preferences sections">${SECTIONS.map(([id, label, ic]) => `<button class="fp-prefs-tab" type="button" data-sec="${id}">${icon(ic, 16)}<span>${label}</span></button>`).join('')}</nav>
 <div class="fp-prefs-pages">
-<section class="fp-prefs-page" data-sec="general">
-<h3 class="fp-prefs-h">General</h3>
+<section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="general"><div class="fp-prefs-secbody">
+<section class="fp-prefs-group"><h3 class="fp-prefs-label">Language</h3>
 <div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Language</div><div class="fp-pref-hint">The window changes to the language you choose.</div></div><select class="fp-select" data-ctl="language" aria-label="Language">${langs}</select></div>
 </section>
-<section class="fp-prefs-page" data-sec="interface" hidden>
-<h3 class="fp-prefs-h">Interface</h3>
-<div class="fp-pref-block"><div class="fp-pref-name">Theme</div><div class="fp-swatches">${Object.keys(THEMES).map(swatch).join('')}</div></div>
+</div></section>
+<section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="interface"><div class="fp-prefs-secbody">
+<section class="fp-prefs-group"><h3 class="fp-prefs-label">Theme</h3>
+<div class="fp-pref-block"><div class="fp-swatches" role="group" aria-label="Theme">${Object.keys(THEMES).map(swatch).join('')}</div></div>
+</section>
+<section class="fp-prefs-group"><h3 class="fp-prefs-label">Accent</h3>
+<div class="fp-prefs-cols">
 <div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Accent colour</div></div><div class="fp-accents">${ACCENTS.map((c) => `<button class="fp-accent" type="button" data-accent="${c}" style="--ac:${c}" aria-label="${c}" aria-pressed="false" translate="no"></button>`).join('')}<input class="fp-accent-input" type="color" data-ctl="accent" aria-label="Custom accent colour"></div></div>
 <div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Accent intensity</div></div><div class="fp-range"><input type="range" min="0" max="1.5" step="0.05" data-ctl="intensity" aria-label="Accent intensity"><span class="fp-range-out" translate="no"></span></div></div>
+</div>
+</section>
+<section class="fp-prefs-group"><h3 class="fp-prefs-label">Density</h3>
 <div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Density</div><div class="fp-pref-hint">How tall the bars and controls are.</div></div><div class="fp-seg fp-seg-wide" role="group" aria-label="Density">${DENSITIES.map(([id, label]) => `<button type="button" data-density="${id}" aria-pressed="false">${label}</button>`).join('')}</div></div>
 </section>
-<section class="fp-prefs-page" data-sec="formweb" hidden>
-<h3 class="fp-prefs-h">FormWeb</h3>
+</div></section>
+<section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="formweb"><div class="fp-prefs-secbody">
+<section class="fp-prefs-group"><h3 class="fp-prefs-label">Connection</h3>
 <div class="fp-pref-block"><label class="fp-pref-name" for="fp-fw-url">FormWeb address</label><div class="fp-pref-hint">FormWeb runs on this computer, for example http://127.0.0.1:8240. Test saves a changed address first.</div>
 <div class="fp-fw-row"><input id="fp-fw-url" class="fp-input is-mono" type="text" spellcheck="false" autocomplete="off" translate="no" placeholder="http://127.0.0.1:8240"><button class="fp-btn" type="button" data-act="fw-save">Save</button><button class="fp-btn" type="button" data-act="fw-test">Test</button></div>
 <div class="fp-fw-result" role="status" aria-live="polite"></div></div>
+</section>
+<section class="fp-prefs-group"><h3 class="fp-prefs-label">When a site arrives</h3>
 <div class="fp-pref-row"><div class="fp-pref-text"><label class="fp-pref-name" for="fp-auto-check">Check a site when it arrives</label><div class="fp-pref-hint">Runs the static checks on each site FormWeb sends, so the problems are ready when you open it. Off by default.</div></div><input id="fp-auto-check" class="fp-pref-check" type="checkbox" data-ctl="auto-check"></div>
 <div class="fp-pref-row"><div class="fp-pref-text"><label class="fp-pref-name" for="fp-auto-build">Build a site when it arrives</label><div class="fp-pref-hint">Builds the package as soon as a site arrives, after the checks when both are on. Off by default.</div></div><input id="fp-auto-build" class="fp-pref-check" type="checkbox" data-ctl="auto-build"></div>
 </section>
-<section class="fp-prefs-page" data-sec="about" hidden>
-<h3 class="fp-prefs-h">About</h3>
+</div></section>
+<section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="about"><div class="fp-prefs-secbody">
+<section class="fp-prefs-group">
 <div class="fp-about-name" translate="no">formpublisher</div>
 <div class="fp-about-by" translate="no">by nodemode.ai</div>
 <div class="fp-about-rows">
@@ -81,12 +89,12 @@ export class Preferences extends Dialog {
 <div class="fp-about-row"><span>Copyright</span><span translate="no">Copyright 2026 NodeAgentc, Inc.</span></div>
 </div>
 </section>
+</div></section>
 </div>
 </div>`);
     this.body.appendChild(root);
-    this.foot.hidden = true;
-    this.tabs = Array.from(root.querySelectorAll<HTMLElement>('.fp-prefs-tab'));
-    this.pages = Array.from(root.querySelectorAll<HTMLElement>('.fp-prefs-page'));
+    this.shell = new PrefsShell(this.panel, q(root, '.fp-prefs-pages'), SECTIONS);
+    this.button('Done', 'primary', () => this.close());
     this.themeBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('.fp-swatch'));
     this.accentBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('.fp-accent'));
     this.densityBtns = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-density]'));
@@ -107,8 +115,6 @@ export class Preferences extends Dialog {
 
     root.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
-      const tab = target.closest<HTMLElement>('.fp-prefs-tab');
-      if (tab?.dataset.sec) { this.select(tab.dataset.sec as PrefsSection); return; }
       const theme = target.closest<HTMLElement>('.fp-swatch')?.dataset.theme;
       if (theme) { setTheme(theme); return; }
       const accent = target.closest<HTMLElement>('.fp-accent')?.dataset.accent;
@@ -131,33 +137,17 @@ export class Preferences extends Dialog {
       emit('fp:ui-settings-changed', { key: 'intensity' });
     });
     this.fwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.saveFormWeb(); } });
-    this.tabs.forEach((tab, i) => tab.addEventListener('keydown', (e) => {
-      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-      e.preventDefault();
-      const next = this.tabs[(i + (e.key === 'ArrowDown' ? 1 : -1) + this.tabs.length) % this.tabs.length];
-      next.focus();
-      this.select(next.dataset.sec as PrefsSection);
-    }));
     on('fp:ui-settings-changed', () => { if (this.isOpen) this.sync(); });
-    this.select('general');
   }
 
   show(section?: PrefsSection): void {
-    if (section) this.select(section);
+    if (section) this.shell.mark(section);
     this.sync();
     setText(this.engineValue, this.app.state().engineVersion || '-');
-    this.open(this.tabs.find((t) => t.dataset.sec === this.section) ?? null);
+    this.open(this.shell.tab());
+    if (section) this.shell.scrollTo(section, 'auto');
+    this.shell.draw();
     void this.loadFormWeb();
-  }
-
-  private select(section: PrefsSection): void {
-    this.section = section;
-    for (const t of this.tabs) {
-      const on = t.dataset.sec === section;
-      setClass(t, 'is-on', on);
-      setAttr(t, 'aria-current', on ? 'page' : 'false');
-    }
-    for (const p of this.pages) p.hidden = p.dataset.sec !== section;
   }
 
   private sync(): void {

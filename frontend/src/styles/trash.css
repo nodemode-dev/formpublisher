@@ -1,5 +1,6 @@
-.fp-tr { display: grid; align-content: start; }
-.fp-tr-row { display: grid; grid-template-columns: 28px minmax(0, 1.6fr) 120px minmax(0, 1fr) 84px 72px; align-items: center; column-gap: var(--space-3); min-height: 40px; padding: 0 var(--space-3); border-bottom: 1px solid var(--line-0); color: var(--text-primary); font-size: var(--fp-13); transition: background-color var(--transition-fast); }
+.fp-tr { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; overflow-x: auto; }
+.fp-home-head [data-t="empty"] { min-width: 212px; }
+.fp-tr-row { min-width: 640px; display: grid; grid-template-columns: 28px minmax(0, 1.6fr) 120px minmax(0, 1fr) 84px 72px; align-items: center; column-gap: var(--space-3); min-height: 40px; padding: 0 var(--space-3); border-bottom: 1px solid var(--line-0); color: var(--text-primary); font-size: var(--fp-13); transition: background-color var(--transition-fast); }
 .fp-tr-row.is-head { min-height: 32px; background: var(--surface-1); color: var(--text-muted); font-size: var(--fp-11); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
 .fp-tr-row.is-skeleton { color: transparent; }
 .fp-tr-row.is-skeleton[hidden], .fp-tr-empty[hidden] { display: none; }

@@ -11,6 +11,16 @@ def resource_dir() -> str:
     return getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 
 
+def core_runs(binary: str) -> bool:
+    import subprocess
+
+    try:
+        done = subprocess.run([binary, "--selfcheck"], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return done.returncode == 0
+
+
 def selfcheck() -> int:
     info: dict = {"python": sys.version.split()[0]}
     failed = False
@@ -45,7 +55,8 @@ def selfcheck() -> int:
         info["demo"] = (paths.resource_dir() / "demo" / "sample-site.zip").is_file()
         from app.services import compile as compiler
 
-        info["core"] = bool(compiler.core_binary())
+        core = compiler.core_binary()
+        info["core"] = bool(core) and core_runs(str(core))
         if paths.frozen():
             failed = failed or not info["frontend"] or not info["demo"] or not info["core"]
         failed = failed or bool(info["routerErrors"])

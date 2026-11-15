@@ -1,0 +1,9 @@
+{
+  "Window": "창",
+  "Minimize": "최소화",
+  "Maximize": "최대화",
+  "Full Screen": "전체 화면",
+  "Menus in Window": "창에 메뉴 표시",
+  "The menus stay in the window from the next start.": "다음 시작부터 메뉴가 창 안에 표시됩니다.",
+  "The menus go to the menu bar from the next start.": "다음 시작부터 메뉴가 메뉴 막대에 표시됩니다."
+}

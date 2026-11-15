@@ -14,7 +14,7 @@ from app.services import intake, paths, trash
 from app.services.bus import bus
 
 ID_RE = re.compile(r"^[0-9a-f]{12}$")
-SOURCE_KINDS = {"formweb": "formweb-export", "zip": "formweb-export", "folder": "folder", "fweb": "fweb"}
+SOURCE_KINDS = {"formweb": "formweb-export", "zip": "formweb-export", "demo": "formweb-export", "folder": "folder", "fweb": "fweb"}
 HEADERS = [
     {"for": "/*", "values": {"X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin"}},
     {"for": "/assets/*", "values": {"Cache-Control": "public, max-age=3600"}},

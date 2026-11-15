@@ -1,0 +1,9 @@
+{
+  "Window": "Fenêtre",
+  "Minimize": "Réduire",
+  "Maximize": "Agrandir",
+  "Full Screen": "Plein écran",
+  "Menus in Window": "Menus dans la fenêtre",
+  "The menus stay in the window from the next start.": "Les menus resteront dans la fenêtre à partir du prochain démarrage.",
+  "The menus go to the menu bar from the next start.": "Les menus iront dans la barre des menus à partir du prochain démarrage."
+}

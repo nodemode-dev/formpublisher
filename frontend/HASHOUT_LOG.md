@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.2.8
-Last updated: 2026-11-11 · Phases 55 to 57: the first pick after a translated start moves nothing (the steady switch waits for the owner), the Linux desktop shell, and a shorter device select
+Current build version: v0.3.0
+Last updated: 2026-11-15 · Phases 58 to 65: the splash icon, the menubar, Preferences and Home rebuilt on the family's pattern, four demos, the review's fixes, the live checks no longer blame the preview, and the source name of a site sent from FormWeb
 
 ---
 
@@ -17,7 +17,8 @@ frontend/
 ├── vite.config.ts        port 5280, preview 5281, host false, /api proxy with ws to 8280
 ├── HASHOUT_LOG.md        this file
 ├── public/
-│   └── splash.html       startup splash, window.formpublisherSplashDone()
+│   ├── splash.html       startup splash, window.formpublisherSplashDone()
+│   └── demos/            one cover.webp per demo card (lowlight, looking-back, harbour-ferries, northwind)
 └── src/
     ├── main.ts           boot order: language, app, ready (capped), reveal
     ├── app.ts            SHELL template, state, App API, live wiring
@@ -393,3 +394,81 @@ At 760 px in German the device select kept the width of its widest option, "Benu
 - `i18n/keys/part23.json`: "Other", in all 25 other languages.
 
 Checked: English, German, Finnish and Russian at 1440 x 900, 1100 x 800 and 760 x 640 with CPU 4x and every option of every toolbar select: whole values, one row, no pick moving a control, CLS 0 opening a site; German at 760 from 125 to 96 px in Chrome and from 131 to 103 px in WebKitGTK; English at 1440 and 1100 unchanged; `npx tsc --noEmit`; `npm run build`. Known: Finnish and Russian gain nothing, because a preset name (Kannettava, Компьютер) is as wide as Custom. P3 also found that the first device pick in German at 1440 moved the toolbar once (0.2.7 behaviour), fixed under Phase 55.
+
+## Phase 58: the splash shows the app icon · v0.3.0 (2026-11-15)
+
+- `public/splash.html`: the picture is `favicon.png` (the app icon, as formvis's splash shows) instead of `mark-144.png` (the family mark). Same 72 x 72 box, same alt text, so nothing else on the splash moves. The hand-off to the window is unchanged: the shell reveals the main window after the interface's first frame.
+
+## Phase 59: the menubar is built like formvis's · v0.3.0 (2026-11-15)
+
+One list of menus now feeds the bar in the window and the macOS menu bar, so the two cannot drift apart.
+
+- `ui/chrome.ts`: `menus` is one `MenuDef[]`: File (Home first, then the imports, New Window, Close Tab, Package Site, Publish Site, Preferences), Edit, View, Site, Window (Minimize, Maximize, Full Screen), Help (Documentation, Keyboard Shortcuts, About). `view.home` moved from View to File and keeps `Alt+Mod+H`. `view.menus-in-window` exists only on the macOS desktop (`isMacDesktop`), writes `MENUS_IN_WINDOW_KEY` and says in a toast that it applies from the next start, because the native bar is built once at boot. `window.minimize` and `window.maximize` are enabled only in the desktop shell; `window.fullscreen` uses the page's own fullscreen so it also works in a browser. The window always builds the in-window `MenuBar`; `has-native-menus` hides it, so a failed native build no longer has to rebuild it.
+- `ui/menu.ts`: keyboard navigation. F10 opens the first menu; a lone Alt (not on macOS) focuses the bar and underlines first letters (`is-menu-mnemonics`); Alt plus a letter opens the menu that starts with it; on the bar Left, Right, Home and End move, Down, Up, Enter and Space open, Escape returns focus to where it was (`barBack`). In a menu: Up, Down, Home, End, Right into a submenu or to the next menu, Left out of a submenu or to the previous menu, Escape one level at a time, Tab closes, and typing letters within 700 ms (`TYPE_AHEAD_MS`) jumps to the row that starts with them. `MenuDef.items` may be a function, read through `itemsOf()` each time a menu opens. A submenu closes when its parent panel scrolls. Window blur closes everything. The bar is not usable while a dialog is open or the native menus are on.
+- `ui/native-menu.ts`: reads the same list. Window's three commands map to the system's predefined Minimize, Maximize and Fullscreen items, Bring All to Front is added, and the Window submenu is registered as the app's windows menu. Services, Hide Others and Show All left the app menu (formvis has none). `refresh()` runs on site, engine and settings events and when focus leaves a text field, so enabled and checked states follow the page.
+- `ui/commands.ts`: `Alt+Mod+H` is no longer reserved for the system on macOS, since Hide Others is gone and Home uses it.
+- `ui/shortcuts-dialog.ts`: the Window group is listed.
+- `styles/shell.css`: a focused bar button looks like a hovered one; the mnemonic underline; the brand is a button that opens Home.
+- `i18n/keys/part24.json`: 7 strings, in all 25 other languages.
+
+Checked: every menu by click and the whole keyboard path in English and German, dev and built window, CPU 4x: no layout shift at the moment a menu opens. The macOS menu tree was read from a faked desktop (`navigator.platform` and `__TAURI_INTERNALS__`), not on a Mac.
+
+## Phase 60: Preferences is formvis's window · v0.3.0 (2026-11-15)
+
+- `ui/prefs-shell.ts` (new): `PrefsShell` wraps the existing sections. A rail floats left of the dialog with one tab per section (General, Interface, FormWeb, About); a fold button collapses it to icons and the choice is kept in `formpublisher.prefsRailCollapsed`. Every section is a card with a head that folds it. All sections are in one scrolling page: a click on a tab scrolls to its card (and unfolds it), and a scroll spy marks the card at the top as current. The spy is muted for 700 ms after a click so a smooth scroll does not flicker through the tabs on its way. An SVG wire runs from the active tab to a port on the current card, with 10 px arcs (`ARC`), redrawn on scroll, resize and fold from one animation frame. Up and Down move between tabs.
+- `ui/preferences.ts`: builds its sections as before and hands them to the shell; the old tab strip and its paging are gone, so every control keeps its place in the DOM and its listeners.
+- `styles/prefs.css` (new): the rail, cards and wire. Below 720 px of window width there is no room beside the dialog, so the rail, the wire and the port are hidden and the dialog takes the window's width; every section is still reached by scrolling the one page (Phase 62).
+- `styles/overlays.css`: the old `.fp-prefs-nav`, `.fp-prefs-tab` and page rules are removed.
+- `i18n/keys/part25.json`: 5 strings, in all 25 other languages.
+
+Checked: opened by shortcut, gear, File menu and Help > About, every section, arrows, fold, collapse and reload, 1440 x 900, 1000 x 700 and 1000 x 280, English and German, dev and built: layout shifts only with recent input (fold, collapse, resize). One setting of each control type still saves and survives a reload.
+
+## Phase 61: Home has formdeck's structure and its cards hold still · v0.3.0 (2026-11-15)
+
+- `ui/home.ts`: the side panel lists Start, Recent sites, Builds and Trash (Builds and Trash with a count, refreshed on build and trash events), then Import (Open zip, Open folder, Import from FormWeb), Local only and Preferences. Below 720 px the panel gives way to one row of four (`.fp-home-narrow`: Start, Recent, Builds, Trash). Start has the drop zone with its three buttons and the ZIP, FWEB and FPUB format chips, the first row of Recent sites with See all, and Demos. A card's badge names where the site came from (Demo, FormWeb, Zip, Folder, FWEB, FPUB; the last three and FormWeb are never translated). While Home is open, a site that arrives does not push the cards: the order is frozen (`frozen`), a note row says how many arrived and its Show button repaints. The note row and its button are always in the DOM at their final size, so nothing moves when the text appears. Deleting a build or emptying the trash asks in a confirm row inside Home (`ask()`), not in a dialog over it; Escape answers no. `BuildsPage` and `TrashPage` take the confirm function as a constructor argument for that.
+- `ui/demos.ts` (new): `DEMOS` is the list of demo cards (id, title, one line, cover, how to open). Each demo is also a command, `demo-<id>`, so Help > Demos and the command palette list the same demos as Home. Only one demo opens at a time: a second request gets the toast "A demo is still opening." and the cards carry `aria-busy`.
+- `api-demo.ts`: `openBundled(id)` posts `/api/demo/open/<id>`; `openSample()` keeps `/api/demo/sample`.
+- `styles/overlays.css`, `styles/recent.css`, `styles/demo.css`: Home's grid, the reserved sizes and the confirm row. Reserved from measured widths in all 26 languages: the hero text has a fixed line count by its own width (2 lines from 680 px, 3 from 440, 4 from 330, 5 from 265, else 6; the longest translation is 1204 px in one line); the hero buttons share a 208 px column (widest label 200 px); See all is at least 140 px; the Demos title at least 76 px; Show is 104 px. The quick-tour strip sits over the stage column only.
+- `public/demos/northwind/cover.webp`: the card's cover, 640 x 360.
+- `i18n/keys/part26.json`: 6 strings, in all 25 other languages.
+
+Checked: 1440 x 900, 1000 x 700 and 390 px, English and German, dark and light, empty and with five sites; a language switch in place moves nothing inside Home vertically; a site arriving while Home is open moves no card.
+
+## Phase 62: fifteen fixes from the full review · v0.3.0 (2026-11-15)
+
+The frontend part of the review (the engine's part is in `backend/HASHOUT_LOG.md`, the shell's in `src-tauri/HASHOUT_LOG.md`).
+
+- `index.html`: sets `has-overlay-titlebar` on the macOS desktop before first paint, so the title row is already 38 px tall and indented when the window appears.
+- `styles/shell.css`: `:root.has-overlay-titlebar` sets `--fp-titlebar-h: 38px` and the title row gets `padding-left: 78px`, the room the close, minimize and zoom buttons need at the inset the shell gives them (14 px from the left, centred in 38 px). The menubar clips instead of running under the title tools: its grid is `auto minmax(0, auto) minmax(0, 1fr) auto` and the bar has `overflow: hidden` with a 3 px margin and padding trade so focus rings stay whole.
+- `app.ts`: the title row, the menubar, the title tools and the document title carry `data-tauri-drag-region`, so the empty parts of the row drag the window on macOS. `openSite()` keeps the routes it already shows when the same site is opened again or Reload Routes runs, keeps the selected route when it still exists, and shows "Loading routes" only when the strip is empty; before, importing the open site again emptied the strip until the engine answered.
+- `ui/home.ts`, `styles/overlays.css`: the confirm row stays on one line at the minimum width; a long question ends in an ellipsis and the whole text is in the title. Dialogs fit a narrow window: the grid column is `minmax(0, 1fr)` and the footer wraps.
+- `styles/package.css`, `styles/trash.css`: the head buttons of Builds and Trash have fixed minimum widths (144 and 212 px, the widest translations), so a language switch moves nothing; the tables scroll sideways below 640 px instead of hiding the delete button; Inspect and Compare reserve the file list (340 px) and two SHA lines.
+- `styles/prefs.css`: the narrow fallback named in Phase 60.
+- `styles/panel.css`: the count badge on a bottom tab reserves room for a second digit, but only when the panel is at least 520 px wide (a container query): a plain `min-width` wrapped the tabs at 1024 px in German.
+- `i18n/keys/part05.json`: two strings no code uses any more were removed from the key file and from all 25 languages.
+
+Not changed, on purpose: the preview frame keeps `allow-scripts allow-same-origin`. Without `allow-same-origin` the framed site has an opaque origin, its probe messages are dropped, its own storage throws and its web fonts are blocked. The frame is always served from the site host's port, never the window's origin, so it cannot remove its own sandbox; Chrome prints its warning for the two tokens whatever the origins are.
+
+Checked: a 36 step tour of the whole window at 1440 x 900, 1000 x 700 and 390 px with CPU 4x before and after, the fixed surfaces again in German and Finnish at 1024 x 680, and a faked macOS shell in Chrome for the title row geometry. Never run on a Mac.
+
+## Phase 63: four demos · v0.3.0 (2026-11-15)
+
+- `ui/demos.ts`: `DEMOS` lists Lowlight, Looking Back and Harbour Ferries, the three demo sites FormWeb ships, before Northwind Notes. The three open through `openBundled(id)`. Northwind Notes stays as the fourth because it is the one with findings: the three FormWeb sites pass the checks, so a first-time user who opens one and presses Check sees an empty list, and the quick tour, the offline demo (`demo/index.html`) and the screenshots all walk Northwind's 1 error and 2 warnings.
+- `public/demos/<id>/cover.webp`: one cover per demo, the top 16:9 of the home page at 640 x 360.
+- `i18n/keys/part27.json`: the three card lines, in all 25 other languages. The site names are not translated.
+
+Checked: each card, Help > Demos and the palette at 1440, 1000 and 390 px in English and German; every route of every demo on four devices.
+
+## Phase 64: the live layout-shift and overflow checks stop blaming the preview · v0.3.0 (2026-11-15)
+
+A finished site showed `live.cls` errors on every route after a Device switch, and `live.overflow` could say "41 px wide in a 0 px viewport". Both were the preview's own doing. The probe's part is in `backend/HASHOUT_LOG.md`.
+
+- `styles/preview.css`: a loading frame waits at `opacity: 0.01`, not 0. Measured in Chrome: a frame loaded at `opacity: 0` is not painted in the same process and never records its first layout shift, even after it is shown, so a real shift of a page went unseen; at 0.01 it is painted and records it. `visibility: hidden` is worse: a cross-site frame is render-throttled and applies a resize only seconds later, when it is shown.
+- `ui/preview.ts`: `relayout()` writes the device size (`--pv-w`, `--pv-h`) before it computes the fit, so the frame has its device size even when the stage has no room (Home open, a collapsed pane); a frame of width 0 was where the 0 px viewport came from. Each document now names itself in its messages (`doc`); `staleDoc` refuses a message from the document a reused frame is leaving, because such a message arrives with the same `contentWindow` as the new document and used to be credited to the next route.
+- `ui/panel.ts`: `live.cls` is reported from 0.001 up (smaller values are rounding noise from sub-pixel moves) and `live.overflow` only when the frame has a width.
+
+Checked: the four demos, every route, seven Device switches per route, English and German, 1440 x 900 and 1000 x 700, CPU 4x, built and dev window: no `live.cls` and no `live.overflow`. A deliberately broken site (a late banner, a 2600 px wide element, rows added on a timer) still gets both findings on the right routes.
+
+## Phase 65: a site sent from FormWeb names FormWeb as its source · v0.3.0 (2026-11-15)
+
+- `api.ts`: `sourceLabel()` shows "FormWeb" when a site's source address starts with `receive:`. A site sent from FormWeb is keyed by FormWeb's project id (`receive:site-...`), and the inspector's Source row showed that key. Found while testing the hand-off with FormWeb 0.21.0 in both directions; the engine's two fixes from the same test are in `backend/HASHOUT_LOG.md`, Phase 66.

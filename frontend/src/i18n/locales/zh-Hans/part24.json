@@ -1,0 +1,9 @@
+{
+  "Window": "窗口",
+  "Minimize": "最小化",
+  "Maximize": "最大化",
+  "Full Screen": "全屏",
+  "Menus in Window": "在窗口中显示菜单",
+  "The menus stay in the window from the next start.": "从下次启动起，菜单将保留在窗口中。",
+  "The menus go to the menu bar from the next start.": "从下次启动起，菜单将移至菜单栏。"
+}

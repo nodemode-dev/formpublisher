@@ -4,7 +4,7 @@ import { comboOf, formatKeys, rejectCombo, type Command, type Commands } from '.
 import { Dialog } from './dialogs';
 import { el, q, setAttr, setClass, setDisabled, setText } from './dom';
 
-const ORDER = ['File', 'Edit', 'View', 'Site', 'App', 'Help'];
+const ORDER = ['File', 'Edit', 'View', 'Site', 'Window', 'App', 'Help'];
 const MODIFIERS = new Set(['Shift', 'Control', 'Alt', 'Meta', 'AltGraph', 'CapsLock']);
 const HINT = 'Choose Change, then press the new keys.';
 const RECORD_HINT = 'Press the new keys. Escape cancels, Backspace clears.';

@@ -1,7 +1,7 @@
 import { onLanguage, t } from '../i18n';
 import type { Commands } from './commands';
 import { anyDialogOpen } from './dialogs';
-import type { MenuDef, MenuItem as MenuSpec } from './menu';
+import { itemsOf, type MenuDef, type MenuItem as MenuSpec } from './menu';
 
 export const MENUS_IN_WINDOW_KEY = 'formpublisher.menusInWindow';
 
@@ -34,6 +34,10 @@ const TEXT_EDIT: Record<string, 'Undo' | 'Redo' | 'Cut' | 'Copy' | 'Paste' | 'Se
   'edit.undo': 'Undo', 'edit.redo': 'Redo', 'edit.cut': 'Cut', 'edit.copy': 'Copy', 'edit.paste': 'Paste', 'edit.select-all': 'SelectAll',
 };
 
+const WINDOW_ITEMS: Record<string, 'Minimize' | 'Maximize' | 'Fullscreen'> = {
+  'window.minimize': 'Minimize', 'window.maximize': 'Maximize', 'window.fullscreen': 'Fullscreen',
+};
+
 function typing(): boolean {
   const a = document.activeElement;
   return a instanceof HTMLInputElement || a instanceof HTMLTextAreaElement || (a instanceof HTMLElement && a.isContentEditable);
@@ -52,7 +56,13 @@ export class NativeMenus {
 
   constructor(private readonly commands: Commands, private readonly menus: () => MenuDef[], private readonly preferencesId: string) {
     for (const ev of ['pointerup', 'keyup'] as const) window.addEventListener(ev, () => { if (this.items.length) this.refresh(); }, { passive: true });
-    const focus = (): void => { window.setTimeout(() => { if (this.items.length && typing() !== this.textMode) void this.build().catch(() => undefined); }, 0); };
+    const focus = (): void => {
+      window.setTimeout(() => {
+        if (!this.items.length) return;
+        if (typing() !== this.textMode) void this.build().catch(() => undefined);
+        else this.refresh();
+      }, 0);
+    };
     document.addEventListener('focusin', focus);
     document.addEventListener('focusout', focus);
     window.addEventListener('focus', () => { if (this.items.length) void this.build().catch(() => undefined); });
@@ -61,7 +71,7 @@ export class NativeMenus {
   }
 
   private signature(): string {
-    return JSON.stringify(this.menus());
+    return JSON.stringify(this.menus().map((d) => [d.label, itemsOf(d)]));
   }
 
   async build(): Promise<void> {
@@ -79,6 +89,7 @@ export class NativeMenus {
         if (!cmd) return null;
         const text = t(this.commands.label(cmd));
         if (textMode && TEXT_EDIT[spec]) return api.PredefinedMenuItem.new({ item: TEXT_EDIT[spec], text });
+        if (WINDOW_ITEMS[spec]) return api.PredefinedMenuItem.new({ item: WINDOW_ITEMS[spec] });
         const acc = accelerator(cmd.keys?.[0]);
         const opts = { text, enabled: !anyDialogOpen() && this.commands.enabled(cmd), action: () => { if (anyDialogOpen()) return; this.commands.run(spec); this.refresh(); } };
         let item: Live;
@@ -97,28 +108,15 @@ export class NativeMenus {
         await sep(),
         ...(this.commands.get(this.preferencesId) ? [await make(this.preferencesId)] : []),
         await sep(),
-        await api.PredefinedMenuItem.new({ item: 'Services' }),
-        await sep(),
         await api.PredefinedMenuItem.new({ item: 'Hide' }),
-        await api.PredefinedMenuItem.new({ item: 'HideOthers' }),
-        await api.PredefinedMenuItem.new({ item: 'ShowAll' }),
-        await sep(),
         await api.PredefinedMenuItem.new({ item: 'Quit' }),
       ] as never[] }));
       let help: { setAsHelpMenuForNSApp(): Promise<void> } | null = null;
       for (const def of this.menus()) {
-        if (def.label === 'Help') {
-          const win = await api.Submenu.new({ text: t('Window'), items: [
-            await api.PredefinedMenuItem.new({ item: 'Minimize' }),
-            await api.PredefinedMenuItem.new({ item: 'Maximize' }),
-            await api.PredefinedMenuItem.new({ item: 'Fullscreen' }),
-            await sep(),
-            await api.PredefinedMenuItem.new({ item: 'BringAllToFront' }),
-          ] as never[] });
-          top.push(win);
-          void win.setAsWindowsMenuForNSApp().catch(() => undefined);
-        }
-        const sub = await api.Submenu.new({ text: t(def.label), items: (await Promise.all(def.items.map(make))).filter(Boolean) as never[] });
+        const list = (await Promise.all(itemsOf(def).map(make))).filter(Boolean);
+        if (def.label === 'Window') list.push(await sep(), await api.PredefinedMenuItem.new({ item: 'BringAllToFront' }));
+        const sub = await api.Submenu.new({ text: t(def.label), items: list as never[] });
+        if (def.label === 'Window') void sub.setAsWindowsMenuForNSApp().catch(() => undefined);
         if (def.label === 'Help') help = sub;
         top.push(sub);
       }

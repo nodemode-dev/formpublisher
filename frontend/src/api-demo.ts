@@ -2,10 +2,14 @@ import { ApiError, toSite, type Site } from './api';
 
 export interface SampleResult { site: Site; created: boolean }
 
-export async function openSample(): Promise<SampleResult> {
+export const openSample = (): Promise<SampleResult> => openDemoRoute('/api/demo/sample');
+
+export const openBundled = (id: string): Promise<SampleResult> => openDemoRoute(`/api/demo/open/${encodeURIComponent(id)}`);
+
+async function openDemoRoute(route: string): Promise<SampleResult> {
   let res: Response;
   try {
-    res = await fetch('/api/demo/sample', { method: 'POST' });
+    res = await fetch(route, { method: 'POST' });
   } catch {
     throw new ApiError('The engine is not reachable', 0);
   }

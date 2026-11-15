@@ -1,8 +1,6 @@
 {
   "Demos": "Demók",
   "Demo": "Demó",
-  "FormPublisher demo": "FormPublisher demó",
-  "Try it on a sample site": "Próbálja ki egy mintawebhelyen",
   "Bundled sample site": "Mellékelt mintawebhely",
   "The sample site could not be opened": "A mintawebhelyet nem sikerült megnyitni",
   "The bundled sample site is missing from this install": "A mellékelt mintawebhely hiányzik ebből a telepítésből",

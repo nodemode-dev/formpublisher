@@ -385,11 +385,11 @@ class Panel {
       }
       case 'cls': {
         const v = n(m.value);
-        if (v > 0) this.addLive(m.siteId, d, 'cls', v >= 0.1 ? 'error' : 'warning', 'live.cls', `Layout shift of ${v.toFixed(3)} on this page.`, '');
+        if (v >= 0.001) this.addLive(m.siteId, d, 'cls', v >= 0.1 ? 'error' : 'warning', 'live.cls', `Layout shift of ${v.toFixed(3)} on this page.`, '');
         break;
       }
       case 'overflow':
-        this.addLive(m.siteId, d, 'overflow', 'error', 'live.overflow', `The page is ${n(m.scrollWidth)} px wide in a ${n(m.clientWidth)} px viewport.`, '');
+        if (n(m.clientWidth) > 0) this.addLive(m.siteId, d, 'overflow', 'error', 'live.overflow', `The page is ${n(m.scrollWidth)} px wide in a ${n(m.clientWidth)} px viewport.`, '');
         break;
       default:
         touched = false;

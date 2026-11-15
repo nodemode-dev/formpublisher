@@ -1,0 +1,9 @@
+{
+  "Window": "Ikkuna",
+  "Minimize": "Pienennä",
+  "Maximize": "Suurenna",
+  "Full Screen": "Koko näyttö",
+  "Menus in Window": "Valikot ikkunassa",
+  "The menus stay in the window from the next start.": "Valikot pysyvät ikkunassa seuraavasta käynnistyksestä alkaen.",
+  "The menus go to the menu bar from the next start.": "Valikot siirtyvät valikkoriville seuraavasta käynnistyksestä alkaen."
+}

@@ -42,7 +42,7 @@ Open http://localhost:5280. `./formpublisher build` then `./formpublisher serve`
 
 ## The desktop app
 
-`./build_app` (`build_app.bat` on Windows) builds the desktop app from this folder, start to finish, and logs to `build_app.log`. It freezes the engine with PyInstaller into one `formpublisher-engine` program (the built interface, the demo site and the `formweb-core` compiler go inside it), then builds the Tauri 2 shell around it. `formpublisher-engine --selfcheck` proves a frozen engine starts, and it takes the same commands as the command line (`formpublisher-engine cli ...`).
+`./build_app` (`build_app.bat` on Windows) builds the desktop app from this folder, start to finish, and logs to `build_app.log`. It freezes the engine with PyInstaller into one `formpublisher-engine` program (the built interface, the four demo sites with their font licences and the `formweb-core` compiler go inside it), then builds the Tauri 2 shell around it. `formpublisher-engine --selfcheck` proves a frozen engine starts, runs the `formweb-core` inside it once, and it takes the same commands as the command line (`formpublisher-engine cli ...`). The freeze step runs that self-check before the engine goes into the app, and on macOS `build_app` runs it again on the engine inside the finished app, under the app's signature, before it packs the disk image. With `APPLE_SIGNING_IDENTITY` set the app is signed with that identity and a failed `codesign --verify` stops the build; without it the app is signed ad hoc. `build_app` does not notarize; a downloaded copy of such a build is stopped by macOS once at its first open, and [When something goes wrong](#when-something-goes-wrong) has the step.
 
 When the app starts it shows a small splash with a gradient bar, starts the engine, and reveals the main window only once the interface has drawn its first frame, so there is no white flash. A second launch focuses the running window instead of opening another. Closing the last window ends the app and the engine it started; a terminate or interrupt signal does the same, engine and anything the engine started included.
 
@@ -50,13 +50,15 @@ The port rule: the app uses `FORMPUBLISHER_PORT` when that is set, else 8280 whe
 
 In the desktop app, Open Folder uses the system folder panel. Cancelling the panel imports nothing, and if the panel fails the app falls back to the typed path dialog, which is also what the browser always shows. Reveal Site Folder opens the site's folder in the system file manager through the app's `reveal_path` command, which only accepts a path inside the data folder (`FORMPUBLISHER_HOME`, or `~/FormPublisher`); anything outside it, or a path that does not exist, is refused.
 
-On Linux the app builds with WebKitGTK 4.1 installed: `setup/freeze_backend` makes the engine program, then `cargo build --release` in `src-tauri` builds the shell (about 8 minutes from cold). Linux and Windows use the menus inside the window; native menus are macOS only. The window's minimum size is 1024 x 680, and the window title stays "FormPublisher" in every language while the page shows the site name. A language change in Preferences changes the menus and the window at once, as in the browser.
+On Linux the app builds with WebKitGTK 4.1 installed: `setup/freeze_backend` makes the engine program, then `cargo build --release` in `src-tauri` builds the shell (about 8 minutes from cold). Linux and Windows use the menus inside the window. On macOS the menus are in the system menu bar, with Preferences in the app menu; View > Menus in Window keeps them in the window instead, from the next start. On macOS the title row of the page is the window's title bar: the close, minimize and zoom buttons sit at its left, and its empty parts and the site name drag the window. The window's minimum size is 1024 x 680, and the window title stays "FormPublisher" in every language while the page shows the site name. A language change in Preferences changes the menus and the window at once, as in the browser.
 
 ## Home
 
-Home is the start page. It offers a drop zone for a FormWeb export, the list of recent sites, and your open sites. Opening a site puts it in a tab. Home starts under the title bar, so the brand, the menubar, the theme button and Preferences stay usable while Home is open; only the content below the title bar is locked.
+Home is the start page. Its side panel lists Start, Recent sites, Builds and Trash, then your open sites, the three ways to import (Open zip, Open folder, Import from FormWeb), Local only and Preferences. Start offers a drop zone for a FormWeb export, the recent sites and the demos. Opening a site puts it in a tab. Home starts under the title bar, so the brand, the menubar, the theme button and Preferences stay usable while Home is open; only the content below the title bar is locked. File > Home (`Alt+Mod+H`), the brand in the title bar and the plus button of the tab strip all show Home; Escape, or a site under Open sites, goes back to the open site.
 
-![Home with the Northwind Notes site in Recent and the demo card](images/home-light.webp)
+The menubar has File (Home first, the imports, New Window, Close Tab, Package Site, Publish Site and Preferences), Edit, View (Builds, Find a Command, the theme, the density and the panes), Site (the checks, Reload Routes, Reveal Site Folder, Remove Site), Window (Minimize, Maximize and Full Screen; the first two work in the desktop app) and Help (Documentation, Keyboard Shortcuts, Demos and About). The menus in the window work from the keyboard: F10 opens File, and on Windows and Linux a lone Alt focuses the bar and Alt with a menu's first letter opens it; the arrow keys, Home and End move, Enter chooses, Escape goes back one level, and typing the start of an item's name jumps to it. Preferences (`Mod+,`, the title bar button, File > Preferences, or the app menu on macOS) is a window with its categories on a rail at the left, General, Interface, FormWeb and About; each category is a card that folds, and the rail can be folded to icons.
+
+![Home with the Northwind Notes site in Recent and the four demo cards](images/home-light.webp)
 
 Recent sites keep still while they are on screen. When a site arrives (for example from FormWeb's Send to FormPublisher) while Start or Recent sites is showing, the cards do not move. A row above each list says how many new sites arrived, and Show re-sorts the list with the new sites in place. The row is always there, empty when nothing arrived, so the cards never shift. When Recent is not on screen the lists update as before.
 
@@ -107,6 +109,8 @@ Some combinations are refused with a reason: ones without a modifier, ones the b
 
 A `.fweb` file is a FormWeb project: a JSON envelope with the format `com.nodemode.formweb`. Import it like a zip or a folder, from Home or the file dialog. FormPublisher hands it to `formweb-core`, the compiler built from the FormWeb crates vendored in `vendor/formweb-native/`. The compiler loads the project and exports every locale with the site's default locale as the base, and FormPublisher writes the files and the referenced assets (`/api/assets/[sha].[ext]` references become real files, as FormWeb's own bundling does). The import is recorded with source kind `fweb`; importing the same project again adds a revision.
 
+The files are the ones FormWeb's own export of the same project gives, the root `404.html` included (its links start at the site's base folder, so the not-found page keeps its pictures and fonts at any missing address). One thing differs: a form that posts and has no script of its own gets the address `/api/forms/[site]/[form]` here, where FormWeb's export writes its own address on this computer (`http://127.0.0.1:8240/...`). Neither answers on a static host, and FormPublisher has no check for forms; FormWeb's audit warns about such a form (`forms.local-address`) and says how to give it a scripted reply.
+
 Version 2 projects import too. When a project is too big for the JSON envelope, FormWeb 0.19.4 writes a zip `.fweb` instead: `project.json` first, then each asset stored as `assets/[id]`. FormPublisher applies FormWeb's own checks to it: `project.json` comes first and is at most 64 MiB, the format and version are right, at most 500 assets are listed once each, every member is exactly `assets/[listed id]`, and each asset matches its digest, size limit and mime type. The file is capped at 512 MiB and assets stream from the zip in 1 MiB chunks. A bad file is refused with the reason. A version 2 zip is recognised by its contents, so it imports as a project even without the `.fweb` extension, and ordinary site zips are unaffected. A version 1 project and its version 2 twin build to the same files and hashes.
 
 `formweb-core` is not part of the Python install. Build it once with `./setup/install_compiler` (`setup\install_compiler.bat` on Windows), which runs `cargo build --release --locked` and copies the binary to `backend/bin/formweb-core`. `./formpublisher_oc_install` runs it when Rust is installed and says how to get Rust when it is not. `FORMPUBLISHER_FORMWEB_CORE` points to a binary elsewhere. The script first runs `./formpublisher vendor --check` and stops before cargo when the vendored crates are out of step; `setup\install_compiler.bat` does the same with `setup\vendor_check.py --check` and `formpublisher.bat doctor` prints the same vendor row (the Windows scripts were run under Wine 9.0, where doctor printed the vendor row in step and out of step and `install_compiler.bat` refused before cargo when out of step; real Windows has not been run). Without the binary an import answers: "Opening .fweb projects needs formweb-core. Run ./setup/install_compiler."
@@ -153,6 +157,8 @@ Checks produce problems. Each problem has an id (stable for the same finding, an
 
 Runs offline on the revision's files, in the Python standard library. HTML is parsed, paths resolve the way the host resolves them, and results are sorted by route, code and line.
 
+A site whose address has a folder in it (a base URL such as `https://example.org/shop/`, a GitHub project page, or a FormWeb publication folder) carries that folder in its root `404.html` and its sitemap. FormPublisher reads the folder from the `Sitemap:` line of the site's `robots.txt` and looks such a path up inside the site, in the checks and in the preview, so those links and sitemap entries are not reported as missing and the not-found page keeps its styles. A path is always tried as written first.
+
 | Code | Severity | Rule |
 | --- | --- | --- |
 | `link.broken` | error | an internal `href` resolves to no file, route or redirect |
@@ -178,7 +184,7 @@ Runs offline on the revision's files, in the Python standard library. HTML is pa
 
 ### Live tier
 
-While you preview, the probe reports what the page does and the window turns it into problems at once: `console.error` and page errors are errors, `console.warn` is a warning, a failed request (network error or status 400 and up) is an error, layout shift above 0 is a warning and 0.1 or more an error, and horizontal overflow is an error. The window accepts probe messages only from the visible frame, from the host origin and for the current mount. Live problems are sent to the engine at most once a second so the Problems list holds all tiers. The Console and Network tabs show the raw messages.
+While you preview, the probe reports what the page does and the window turns it into problems at once: `console.error` and page errors are errors, `console.warn` is a warning, a failed request (network error or status 400 and up) is an error, layout shift of 0.001 or more is a warning and 0.1 or more an error, and horizontal overflow is an error. The live tier measures the page, not the preview: a shift that starts within 500 ms of the preview frame changing size (a Device switch, a dragged pane) is not counted, nor is one before the page's first paint, and overflow is measured 300 ms after the page loads or the frame changes size. The window accepts probe messages only from the visible frame, from the host origin, for the current mount and from the document the frame is showing now. Live problems are sent to the engine at most once a second so the Problems list holds all tiers. The Console and Network tabs show the raw messages.
 
 ### Deep tier
 
@@ -219,7 +225,7 @@ Each build lives in `builds/[site]/[id]/`:
 
 ```json
 {
-  "builtWith": "FormPublisher 0.2.8",
+  "builtWith": "FormPublisher 0.3.0",
   "checks": { "errors": 0, "infos": 0, "tiers": ["static"], "warnings": 0 },
   "files": [ { "path": "index.html", "sha256": "...", "size": 1024 } ],
   "format": "formpublisher-site",
@@ -312,7 +318,7 @@ UTF-8 JSON, indented two spaces, with a trailing newline:
   "site": { "id": "northwind-notes", "name": "Northwind Notes" },
   "build": "a1b2c3d4e5f6",
   "revision": "20261111T010203Z",
-  "builtWith": "FormPublisher 0.2.8",
+  "builtWith": "FormPublisher 0.3.0",
   "createdAt": "2026-11-11T01:02:03Z",
   "package": { "file": "site.zip", "sha256": "64 lowercase hex digits", "size": 12345 },
   "signature": null
@@ -387,7 +393,7 @@ The same lists come from `GET /api/sites/{id}/revisions` and `GET /api/sites/{id
 
 ## The demo
 
-Home has a Demos row with a FormPublisher demo card. It imports the bundled sample site, "Northwind Notes", once (opening it again finds the same site) and opens it. A quick tour strip then walks the toolbar through Preview, Checks, Package and Publish. It can be skipped, it is remembered, and it moves nothing on screen. The sample is a three-page product site exported from FormWeb, with only CC0 pictures drawn for it (`demo/MEDIA.md` lists each file's source).
+Home's Demos section lists the bundled demos, each a card with a cover picture, its name and one line about it; Help > Demos has the same list as commands. There are four. "Lowlight" (a planetarium-show studio with scroll effects and page components, 5 routes), "Looking Back" (a photo essay on pictures of Earth from far away, 4 routes) and "Harbour Ferries" (a ferry operator with a fare calculator, a page per route and site search, 12 routes) are the three demo sites FormWeb ships, bundled here as FormWeb exported them (`demo/sites/<id>.zip`), so one site can be followed from FormWeb into FormPublisher. "Northwind Notes" is a small product site exported from FormWeb with deliberate problems, a broken link and two pages with two main headings, so the checks have something to find. Opening a demo imports its bundled site once, as its own site (opening it again finds the same site), and opens it; no other site is changed. A quick tour strip then walks the toolbar through Preview, Checks, Package and Publish. It can be skipped, it is remembered, and it moves nothing on screen. The photographs in Lowlight and Looking Back are NASA pictures, the fonts are under the SIL Open Font License, and Northwind Notes has only CC0 pictures drawn for it: `NOTICE.md` lists every picture and `demo/MEDIA.md` every file's source.
 
 `demo/index.html` is an offline version that runs straight from disk, with no network and no build step. It shows the FormPublisher window in both themes driving the sample site in a frame through the device widths, the checks list from a real run, the package manifest from a real build and the six prepared folders with their files and commands. The three data files in `demo/data/` come from real runs of the engine, never written by hand; `demo/data/data.js` bundles them so the page opens from `file://`.
 
@@ -529,4 +535,6 @@ Specific codes:
 - A `.fweb` import answers 422: run `./setup/install_compiler`.
 - A `.fpub` is refused: the message names the check that failed (see [The .fpub format](#the-fpub-format)). The data folder is unchanged. Save it again from the source build rather than editing the file.
 - The deep check reports `deep.unavailable`: run `./formpublisher_oc_install` and make sure Chrome is installed, or set `checks.chromePath`.
+- macOS says FormPublisher cannot be opened, or that Apple cannot check it: a build that is signed but not notarized (signed with a Developer ID only, or ad hoc) is stopped by macOS the first time it is opened after a download. Move FormPublisher to Applications, open it once and dismiss the message, then open System Settings, Privacy and Security, scroll to the line about FormPublisher and choose Open Anyway. On macOS 14 and older, right-click (or Control-click) FormPublisher in Applications and choose Open, then Open again in the dialog. macOS asks only this once. A build you made on the same Mac with `./build_app` was not downloaded and opens without the question.
+- A form in a site from FormWeb posts to `http://127.0.0.1:8240`: that is FormWeb's address on this computer, written by its plain export, and it will not answer on a host. Give the form a scripted reply in FormWeb (its audit says how) and send the site again. FormPublisher does not check forms.
 - Anything else: open an issue with `./formpublisher version` and your platform.

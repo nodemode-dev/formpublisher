@@ -2,6 +2,7 @@ export interface Site {
   id: string;
   name: string;
   source: string;
+  kind: string;
   importedAt: string;
   routeCount: number | null;
   size: number | null;
@@ -63,6 +64,7 @@ const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFi
 
 function sourceLabel(v: unknown): string {
   if (typeof v === 'string') return v;
+  if (isObj(v) && str(v.url).startsWith('receive:')) return 'FormWeb';
   if (isObj(v)) return str(v.path) || str(v.url) || str(v.name) || str(v.kind) || str(v.type);
   return '';
 }
@@ -76,6 +78,7 @@ export function toSite(raw: unknown): Site | null {
     id,
     name: str(raw.name) || str(raw.title) || str(raw.slug) || id,
     source: sourceLabel(raw.source),
+    kind: isObj(raw.source) ? (isObj(raw.source.fpub) ? 'fpub' : str(raw.source.kind)) : '',
     importedAt: str(raw.imported_at) || str(raw.importedAt) || str(raw.created_at) || str(raw.createdAt),
     routeCount: Array.isArray(routes) ? routes.length : num(routes),
     size: num(raw.size) ?? num(raw.size_bytes) ?? num(raw.bytes) ?? num(raw.sizeBytes),

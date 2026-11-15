@@ -676,7 +676,11 @@ def main(argv: list[str] | None = None) -> int:
     except OpError as exc:
         print(exc.label(), file=sys.stderr)
         return exc.code
-    print(json.dumps(data, indent=2) if args.json else say(data))
+    try:
+        print(json.dumps(data, indent=2) if args.json else say(data))
+        sys.stdout.flush()
+    except BrokenPipeError:
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
     return 1 if args.command == "verify" and not data.get("valid") else 0
 
 

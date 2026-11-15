@@ -1,8 +1,6 @@
 {
   "Demos": "เดโม",
   "Demo": "เดโม",
-  "FormPublisher demo": "เดโม FormPublisher",
-  "Try it on a sample site": "ลองกับไซต์ตัวอย่าง",
   "Bundled sample site": "ไซต์ตัวอย่างที่มาพร้อมกัน",
   "The sample site could not be opened": "เปิดไซต์ตัวอย่างไม่ได้",
   "The bundled sample site is missing from this install": "ไม่พบไซต์ตัวอย่างที่มาพร้อมกันในการติดตั้งนี้",

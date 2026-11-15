@@ -1,14 +1,16 @@
 import '../styles/recent.css';
 import { api, type Site } from '../api';
-import { openSample } from '../api-demo';
+import { buildsApi } from '../api-builds';
+import { trashApi } from '../api-trash';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
 import { locale, onLanguage } from '../i18n';
 import { brandMark } from './brand';
 import { BuildsPage } from './builds';
 import type { Commands } from './commands';
+import { DEMOS, onDemoOpening, openDemo } from './demos';
 import { anyDialogOpen } from './dialogs';
-import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
+import { el, escapeHtml, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
 import { RevisionsDialog, revisionsText } from './revisions';
 import { TrashPage } from './trash';
@@ -18,14 +20,21 @@ type View = HomeView;
 
 const NAV_W_KEY = 'formpublisher.homeNav';
 const NAV_HIDDEN_KEY = 'formpublisher.homeNavHidden';
-const START_CARDS = 6;
+const START_CARDS = 5;
 const FW_POLL_MS = 15000;
 
-function kindOf(source: string): string {
+const KIND_BADGE: Record<string, string> = { demo: 'Demo', formweb: 'FormWeb', zip: 'Zip', folder: 'Folder', fweb: 'FWEB', fpub: 'FPUB' };
+const KIND_FIXED = new Set(['FormWeb', 'FWEB', 'FPUB']);
+
+function kindOf(site: Site): string {
+  if (KIND_BADGE[site.kind]) return KIND_BADGE[site.kind];
+  const source = site.source;
   if (!source) return 'Site';
   if (source === 'Bundled sample site') return 'Demo';
-  if (/^https?:\/\//i.test(source)) return 'FormWeb';
+  if (/^(https?|receive):/i.test(source)) return 'FormWeb';
   if (/\.zip$/i.test(source)) return 'Zip';
+  if (/\.fweb$/i.test(source)) return 'FWEB';
+  if (/\.fpub$/i.test(source)) return 'FPUB';
   return 'Folder';
 }
 
@@ -47,10 +56,11 @@ const routeText = (n: number): string => (n === 1 ? '1 route' : `${n} routes`);
 
 const arrivedText = (n: number): string => (n === 1 ? '1 new site arrived' : `${n} new sites arrived`);
 
-const CARD_GRID = (cls: string, withEmpty: boolean): string => `<div class="fp-recent-note" data-note="${cls}"><button class="fp-btn fp-btn-sm" type="button" data-show disabled>Show</button><span class="fp-recent-note-text" role="status" aria-live="polite"></span></div>
-<div class="fp-card-grid ${cls}">
+const NOTE = (cls: string): string => `<div class="fp-recent-note" data-note="${cls}"><button class="fp-btn fp-btn-sm" type="button" data-show disabled>Show</button><span class="fp-recent-note-text" role="status" aria-live="polite"></span></div>`;
+
+const CARD_GRID = (cls: string, withEmpty: boolean): string => `<div class="fp-card-grid ${cls}">
 <div class="fp-card is-skeleton" aria-hidden="true"><span class="fp-card-preview"></span><span class="fp-card-body"><span class="fp-card-name">&nbsp;</span><span class="fp-card-meta">&nbsp;</span><span class="fp-card-revs">&nbsp;</span></span></div>
-${withEmpty ? `<div class="fp-card is-empty" hidden><span class="fp-card-preview is-blank">${icon('globe', 28)}</span><span class="fp-card-body"><span class="fp-card-name">No sites yet</span><span class="fp-card-meta">Open a zip, a folder or a site from FormWeb</span></span></div>` : ''}
+${withEmpty ? `<div class="fp-card is-empty" hidden><span class="fp-card-preview is-blank">${icon('globe', 28)}</span><span class="fp-card-body"><span class="fp-card-name">No sites yet</span><span class="fp-card-meta" title="Open a zip, a folder or a site from FormWeb">Open a zip, a folder or a site from FormWeb</span></span></div>` : ''}
 <div class="fp-card-list"></div>
 </div>`;
 
@@ -61,6 +71,10 @@ export class Home {
   private fwTimer = 0;
   private readonly hero: HTMLElement;
   private readonly counts: HTMLElement[];
+  private readonly buildCounts: HTMLElement[];
+  private readonly trashCounts: HTMLElement[];
+  private readonly confirmRow: HTMLElement;
+  private asked: ((v: boolean) => void) | null = null;
   private readonly grids: Array<{ list: HTMLElement; skeleton: HTMLElement; empty: HTMLElement | null; note: HTMLElement; limit: number }>;
   private frozen: string[] | null = null;
   private readonly openBox: HTMLElement;
@@ -79,9 +93,14 @@ export class Home {
 <div class="fp-home-brand">${brandMark(26)}<span class="fp-home-brand-text"><span class="fp-home-brand-name" translate="no">formpublisher</span><span class="fp-home-brand-by" translate="no">by nodemode.ai</span></span></div>
 <button class="fp-home-nav-item is-active" type="button" data-v="start">${icon('home', 16)}<span>Start</span></button>
 <button class="fp-home-nav-item" type="button" data-v="recent">${icon('globe', 16)}<span>Recent sites</span><span class="fp-badge is-count" data-count="sites">0</span></button>
-<button class="fp-home-nav-item" type="button" data-v="builds">${icon('package', 16)}<span>Builds</span></button>
-<button class="fp-home-nav-item" type="button" data-v="trash">${icon('trash', 16)}<span>Trash</span></button>
+<button class="fp-home-nav-item" type="button" data-v="builds">${icon('package', 16)}<span>Builds</span><span class="fp-badge is-count" data-count="builds">0</span></button>
+<button class="fp-home-nav-item" type="button" data-v="trash">${icon('trash', 16)}<span>Trash</span><span class="fp-badge is-count" data-count="trash">0</span></button>
 <div class="fp-home-open" hidden><div class="fp-home-nav-sep"></div><div class="fp-home-nav-title">Open sites</div><div class="fp-home-open-list"></div></div>
+<div class="fp-home-nav-sep"></div>
+<div class="fp-home-nav-title">Import</div>
+<button class="fp-home-nav-item" type="button" data-cmd="file.open-zip">${icon('archive', 16)}<span>Open zip</span></button>
+<button class="fp-home-nav-item" type="button" data-cmd="file.open-folder">${icon('folder', 16)}<span>Open folder</span></button>
+<button class="fp-home-nav-item" type="button" data-cmd="file.import-formweb">${icon('download', 16)}<span>Import from FormWeb</span></button>
 <div class="fp-home-nav-foot">
 <button class="fp-home-nav-item" type="button" data-a="local" title="Your sites stay on this computer">${icon('cloudOff', 16)}<span>Local only</span></button>
 <button class="fp-home-nav-item" type="button" data-a="prefs">${icon('settings', 16)}<span>Preferences</span></button>
@@ -91,13 +110,16 @@ export class Home {
 <button class="fp-home-nav-hide" type="button" title="Hide the side panel" aria-label="Hide the side panel">${icon('chevronLeft', 14)}</button>
 <button class="fp-home-nav-show" type="button" title="Show the side panel" aria-label="Show the side panel">${icon('chevronRight', 14)}</button>
 <div class="fp-home-main">
+<div class="fp-home-narrow"><button class="fp-home-nav-item" type="button" data-v="start">${icon('home', 16)}<span>Start</span></button><button class="fp-home-nav-item" type="button" data-v="recent">${icon('globe', 16)}<span>Recent</span></button><button class="fp-home-nav-item" type="button" data-v="builds">${icon('package', 16)}<span>Builds</span></button><button class="fp-home-nav-item" type="button" data-v="trash">${icon('trash', 16)}<span>Trash</span></button></div>
+<div class="fp-home-confirm" role="alertdialog" aria-live="assertive" hidden><span class="fp-home-confirm-text"></span><button class="fp-btn fp-btn-sm" type="button" data-a="confirm-no">Cancel</button><button class="fp-btn fp-btn-sm fp-btn-danger" type="button" data-a="confirm-yes"></button></div>
 <div data-page="start">
 <div class="fp-home-head"><div><h1 class="fp-home-title">Start</h1><p class="fp-home-sub">Open a FormWeb site to preview, check and package it.</p></div></div>
 <div class="fp-home-hero" data-drop>
 <span class="fp-home-hero-icon">${icon('archive', 26)}</span>
 <div class="fp-home-hero-text">
 <div class="fp-home-hero-title">Drop a site zip here</div>
-<div class="fp-home-hero-sub">Drop a FormWeb site export (.zip), project (.fweb) or package (.fpub) anywhere on this box to import it. FormPublisher reads it and never changes it.</div>
+<div class="fp-home-hero-sub" title="Drop a FormWeb site export (.zip), project (.fweb) or package (.fpub) anywhere on this box to import it. FormPublisher reads it and never changes it.">Drop a FormWeb site export (.zip), project (.fweb) or package (.fpub) anywhere on this box to import it. FormPublisher reads it and never changes it.</div>
+<div class="fp-home-formats" translate="no"><span class="fp-home-format">ZIP</span><span class="fp-home-format">FWEB</span><span class="fp-home-format">FPUB</span></div>
 <div class="fp-home-fw"><span class="fp-st-dot"></span><span class="fp-home-fw-text"></span></div>
 </div>
 <div class="fp-home-hero-actions">
@@ -106,16 +128,19 @@ export class Home {
 <button class="fp-btn" type="button" data-cmd="file.import-formweb">${icon('download', 14)}<span>Import from FormWeb</span></button>
 </div>
 </div>
-<section class="fp-home-section"><div class="fp-home-section-head"><h2 class="fp-home-section-title">Recent sites</h2><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-v="recent">See all</button></div>${CARD_GRID('fp-recent-grid', true)}</section>
-<section class="fp-home-section"><div class="fp-home-section-head"><h2 class="fp-home-section-title">Demos</h2></div><div class="fp-card-grid"><button class="fp-card" type="button" data-demo="sample"><span class="fp-card-preview">${icon('publish', 28)}<span class="fp-badge fp-demo-badge">Demo</span></span><span class="fp-card-body"><span class="fp-card-name">FormPublisher demo</span><span class="fp-card-meta">Try it on a sample site</span></span></button></div></section>
+<section class="fp-home-section"><div class="fp-home-section-head"><h2 class="fp-home-section-title">Recent sites</h2><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-v="recent">See all</button>${NOTE('fp-recent-grid')}</div>${CARD_GRID('fp-recent-grid', true)}</section>
+<section class="fp-home-section" data-section="demos"><div class="fp-home-section-head"><h2 class="fp-home-section-title">Demos</h2><span class="fp-card-meta" title="Each opens as its own site. Nothing of yours is changed.">Each opens as its own site. Nothing of yours is changed.</span></div><div class="fp-card-grid fp-demo-grid">${DEMOS.map((d) => `<button class="fp-card" type="button" data-demo="${d.id}" aria-busy="false"><span class="fp-card-preview" aria-hidden="true"><img alt="" width="320" height="180" decoding="async" draggable="false" src="${d.picture}"></span><span class="fp-card-body"><span class="fp-card-name" translate="no">${escapeHtml(d.title)}</span><span class="fp-card-meta" title="${escapeHtml(d.line)}">${escapeHtml(d.line)}</span></span></button>`).join('')}</div></section>
 </div>
-<div data-page="recent" hidden><div class="fp-home-head"><div><h1 class="fp-home-title">Recent sites</h1><p class="fp-home-sub">Every site you have imported, newest first.</p></div></div>${CARD_GRID('fp-recent-full', true)}</div>
+<div data-page="recent" hidden><div class="fp-home-head"><div><h1 class="fp-home-title">Recent sites</h1><p class="fp-home-sub">Every site you have imported, newest first.</p></div><div class="fp-home-head-actions">${NOTE('fp-recent-full')}</div></div>${CARD_GRID('fp-recent-full', true)}</div>
 <div data-page="builds" hidden></div>
 <div data-page="trash" hidden></div>
 </div>
 </section>`);
     this.hero = q(this.root, '.fp-home-hero');
     this.counts = Array.from(this.root.querySelectorAll<HTMLElement>('[data-count="sites"]'));
+    this.buildCounts = Array.from(this.root.querySelectorAll<HTMLElement>('[data-count="builds"]'));
+    this.trashCounts = Array.from(this.root.querySelectorAll<HTMLElement>('[data-count="trash"]'));
+    this.confirmRow = q(this.root, '.fp-home-confirm');
     this.grids = [
       { list: q(this.root, '.fp-recent-grid .fp-card-list'), skeleton: q(this.root, '.fp-recent-grid .is-skeleton'), empty: q(this.root, '.fp-recent-grid .is-empty'), note: q(this.root, '[data-note="fp-recent-grid"]'), limit: START_CARDS },
       { list: q(this.root, '.fp-recent-full .fp-card-list'), skeleton: q(this.root, '.fp-recent-full .is-skeleton'), empty: q(this.root, '.fp-recent-full .is-empty'), note: q(this.root, '[data-note="fp-recent-full"]'), limit: Infinity },
@@ -127,8 +152,12 @@ export class Home {
     this.navItems = Array.from(this.root.querySelectorAll<HTMLElement>('.fp-home-nav-item[data-v]'));
     this.pages = Array.from(this.root.querySelectorAll<HTMLElement>('[data-page]'));
     setText(this.fwText, 'Checking FormWeb');
-    this.builds = new BuildsPage(this.app, q(this.root, '[data-page="builds"]'));
-    this.trash = new TrashPage(this.app, q(this.root, '[data-page="trash"]'));
+    const confirm = (_title: string, text: string, okLabel?: string): Promise<boolean> => this.ask(text, okLabel ?? 'OK');
+    this.builds = new BuildsPage(this.app, q(this.root, '[data-page="builds"]'), confirm);
+    this.trash = new TrashPage(this.app, q(this.root, '[data-page="trash"]'), confirm);
+    onDemoOpening((id) => {
+      for (const card of Array.from(this.root.querySelectorAll<HTMLElement>('[data-demo]'))) setAttr(card, 'aria-busy', card.dataset.demo === id ? 'true' : 'false');
+    });
     document.getElementById('app')?.appendChild(this.root);
     this.restoreNav();
     this.wire();
@@ -136,6 +165,7 @@ export class Home {
     this.paint();
     onLanguage(() => this.paint());
     if (visible) {
+      document.body.classList.add('nm-home');
       this.lock(true);
       this.startPolling();
     }
@@ -147,16 +177,19 @@ export class Home {
     if (view) this.select(view);
     if (!this.isOpen) {
       this.root.hidden = false;
+      document.body.classList.add('nm-home');
       this.lock(true);
       this.startPolling();
     }
     this.paint(true);
-    this.navItems.find((n) => n.classList.contains('is-active'))?.focus({ preventScroll: true });
+    this.navItems.find((n) => n.classList.contains('is-active') && n.offsetParent !== null)?.focus({ preventScroll: true });
   }
 
   hide(): void {
     if (!this.isOpen) return;
+    this.askClose(false);
     this.root.hidden = true;
+    document.body.classList.remove('nm-home');
     this.lock(false);
     window.clearInterval(this.fwTimer);
     this.fwTimer = 0;
@@ -174,7 +207,31 @@ export class Home {
     return target instanceof Node && this.isOpen && this.view === 'start' && this.hero.contains(target);
   }
 
+  private ask(text: string, okLabel: string): Promise<boolean> {
+    this.askClose(false);
+    setText(q(this.confirmRow, '.fp-home-confirm-text'), text);
+    setAttr(q(this.confirmRow, '.fp-home-confirm-text'), 'title', text);
+    setText(q(this.confirmRow, '[data-a="confirm-yes"]'), okLabel);
+    setHidden(this.confirmRow, false);
+    q<HTMLButtonElement>(this.confirmRow, '[data-a="confirm-no"]').focus({ preventScroll: true });
+    return new Promise((resolve) => { this.asked = resolve; });
+  }
+
+  private askClose(answer: boolean): void {
+    const done = this.asked;
+    this.asked = null;
+    setHidden(this.confirmRow, true);
+    done?.(answer);
+  }
+
+  private async refreshCounts(): Promise<void> {
+    const [builds, trash] = await Promise.allSettled([buildsApi.list(), trashApi.list()]);
+    if (builds.status === 'fulfilled') for (const c of this.buildCounts) setText(c, String(builds.value.length));
+    if (trash.status === 'fulfilled') for (const c of this.trashCounts) setText(c, String(trash.value.length));
+  }
+
   private select(view: View): void {
+    this.askClose(false);
     this.view = view;
     for (const p of this.pages) setHidden(p, p.dataset.page !== view);
     for (const n of this.navItems) setClass(n, 'is-active', n.dataset.v === view);
@@ -189,6 +246,7 @@ export class Home {
   }
 
   private startPolling(): void {
+    void this.refreshCounts();
     void this.refreshFormWeb();
     window.clearInterval(this.fwTimer);
     this.fwTimer = window.setInterval(() => { void this.refreshFormWeb(); }, FW_POLL_MS);
@@ -222,7 +280,7 @@ export class Home {
     const sorted = [...state.sites].sort((a, b) => (Date.parse(b.importedAt) || 0) - (Date.parse(a.importedAt) || 0));
     for (const c of this.counts) setText(c, String(sorted.length));
     const on = this.recentOnScreen();
-    if (!on || resort) this.frozen = null;
+    if (!on || resort || this.frozen?.length === 0) this.frozen = null;
     if (on) this.frozen ??= sorted.map((s) => s.id);
     const held = this.frozen;
     const byId = new Map(sorted.map((s) => [s.id, s]));
@@ -262,10 +320,10 @@ export class Home {
   }
 
   private fillCard(node: HTMLElement, site: Site): void {
-    const kind = kindOf(site.source);
+    const kind = kindOf(site);
     const badge = q(node, '.fp-badge');
     setText(badge, kind);
-    setAttr(badge, 'translate', kind === 'FormWeb' ? 'no' : 'yes');
+    setAttr(badge, 'translate', KIND_FIXED.has(kind) ? 'no' : 'yes');
     setText(q(node, '.fp-card-name'), site.name);
     setText(q(node, '.fp-card-routes'), site.routeCount === null ? '-' : routeText(site.routeCount));
     setText(q(node, '.fp-card-time'), relative(site.importedAt));
@@ -277,20 +335,6 @@ export class Home {
     const site = this.app.state().sites.find((s) => s.id === siteId);
     this.revisions ??= new RevisionsDialog();
     this.revisions.show(siteId, site?.name ?? siteId);
-  }
-
-  private async openDemo(card: HTMLElement): Promise<void> {
-    if (card.getAttribute('aria-busy') === 'true') return;
-    setAttr(card, 'aria-busy', 'true');
-    try {
-      const { site } = await openSample();
-      await this.app.refreshSites();
-      await this.app.openSite(site.id);
-    } catch (e) {
-      emit('fp:notice', { kind: 'error', text: e instanceof Error ? e.message : 'The sample site could not be opened' });
-    } finally {
-      setAttr(card, 'aria-busy', 'false');
-    }
   }
 
   private restoreNav(): void {
@@ -345,8 +389,11 @@ export class Home {
         if (owner) this.showRevisions(owner);
         return;
       }
-      const demo = t.closest<HTMLElement>('[data-demo]');
-      if (demo) { void this.openDemo(demo); return; }
+      const demo = t.closest<HTMLElement>('[data-demo]')?.dataset.demo;
+      if (demo) { void openDemo(this.app, demo); return; }
+      const act = t.closest<HTMLElement>('[data-a]')?.dataset.a;
+      if (act === 'confirm-no' || act === 'confirm-yes') { this.askClose(act === 'confirm-yes'); return; }
+      if (act === 'local') { emit('fp:notice', { kind: 'info', text: 'Your sites stay on this computer' }); return; }
       const cmd = t.closest<HTMLElement>('[data-cmd]')?.dataset.cmd;
       if (cmd) { this.commands.run(cmd); return; }
       const site = t.closest<HTMLElement>('[data-site]')?.dataset.site;
@@ -364,7 +411,9 @@ export class Home {
       if (owner) this.showRevisions(owner);
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.isOpen && !anyDialogOpen() && this.app.state().activeId !== null) { e.preventDefault(); this.hide(); }
+      if (e.key !== 'Escape' || !this.isOpen || anyDialogOpen()) return;
+      if (this.asked) { e.preventDefault(); this.askClose(false); return; }
+      if (this.app.state().activeId !== null) { e.preventDefault(); this.hide(); }
     });
     on('fp:sites-changed', () => { this.loaded = true; this.paint(); });
     on('fp:engine-state', ({ state }) => {
@@ -374,7 +423,10 @@ export class Home {
     on('fp:settings-changed', () => { if (this.isOpen) void this.refreshFormWeb(); });
     on('fp:site-opened', () => { this.paint(); this.hide(); });
     on('fp:site-loaded', () => this.paint());
-    on('fp:live', (ev) => { if (ev.type === 'sites.received') void this.app.refreshSites(); });
+    on('fp:live', (ev) => {
+      if (ev.type === 'sites.received') void this.app.refreshSites();
+      if (this.isOpen && (ev.type.startsWith('builds.') || ev.type.startsWith('trash.') || ev.type.endsWith('.removed'))) void this.refreshCounts();
+    });
     on('fp:site-closed', () => {
       this.paint();
       queueMicrotask(() => { if (this.app.state().activeId === null) this.show(); });

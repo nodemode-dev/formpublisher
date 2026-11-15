@@ -59,6 +59,7 @@ fn show_extra<R: Runtime>(window: &WebviewWindow<R>) {
     set_seen(window, true);
     let _ = window.show();
     let _ = window.set_focus();
+    crate::traffic_lights::place(&window.as_ref().window());
 }
 
 #[tauri::command(async)]
@@ -92,6 +93,7 @@ fn show_main<R: Runtime>(app: &tauri::AppHandle<R>) {
         set_seen(&main, true);
         let _ = main.show();
         let _ = main.set_focus();
+        crate::traffic_lights::place(&main.as_ref().window());
     }
     close_splash(app);
 }

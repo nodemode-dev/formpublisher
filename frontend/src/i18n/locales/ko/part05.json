@@ -1,8 +1,6 @@
 {
   "Demos": "데모",
   "Demo": "데모",
-  "FormPublisher demo": "FormPublisher 데모",
-  "Try it on a sample site": "샘플 사이트로 체험하기",
   "Bundled sample site": "기본 포함 샘플 사이트",
   "The sample site could not be opened": "샘플 사이트를 열 수 없습니다",
   "The bundled sample site is missing from this install": "이 설치본에 기본 포함 샘플 사이트가 없습니다",
