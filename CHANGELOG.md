@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.1 · 2026-11-15
+
+- A new check, `forms.local-address` (a warning): a form whose action goes to this computer or the local network (`localhost`, a `.local` name, a private or loopback address) or into FormWeb's own `/api/forms/` route will not send once the site is published, because nothing answers there. The message names the page and the address and says how to fix it in FormWeb: give the form a scripted reply, or point its action at a form service on the web. Forms with no action, and forms that post to a service on the web, are not reported.
+- Import from FormWeb lands on the same site as Send to FormPublisher. One FormWeb project is now one site here, in any order: Send then Import, Import then Send, or a site that arrived through the inbox and is then imported. A second arrival adds a revision, and the notice says "Added a revision to" the site's name instead of "Imported". Sites you imported with 0.3.0 or earlier keep working as they are and are not merged; the next Import of the same project makes its own site, and you can remove the old one from Home.
+- The credits shown inside the Lowlight and Looking Back demo sites match the records: the Hubble Ultra Deep Field carries its CC BY 4.0 credit, and Looking Back's picture credits read as their sources state them.
+- `NOTICE.md` and `demo/MEDIA.md` record every demo picture at its source. The Hubble Ultra Deep Field is now listed under CC BY 4.0 with the credit "NASA, ESA, and S. Beckwith (STScI) and the HUDF Team" (it was listed as public domain); the NASA pictures carry the credit line their source pages state; the sample's own pictures are recorded as the owner's work under Apache-2.0.
+- `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` and `SECURITY.md` are in the shape the other Form apps use, and the README links them.
+- The FormWeb engine crates stay vendored at 0.21.0.
+- The new and changed labels are in all 26 languages.
+
 ## 0.3.0 · 2026-11-15
 
 - Home has a new layout: a side panel with Start, Recent sites, Builds and Trash (the last two with a count) and the three ways to import, and a Demos row on Start. A site that arrives while Home is open no longer pushes the cards around: a note says that it arrived and Show brings it in. Deleting a build or emptying the trash asks in a row inside Home instead of a dialog over it.
