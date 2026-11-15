@@ -114,7 +114,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>Demo</h3>
-      Home's Demos row opens a bundled sample site, "Northwind Notes", with a short tour of Preview, Checks, Package and Publish. <a href="demo/index.html">demo/index.html</a> is the same walk-through offline: open it straight from disk, no network and no build.
+      Home's Demos row opens four bundled sites: "Lowlight", "Looking Back" and "Harbour Ferries", the three demo sites FormWeb ships, here as its exports, and "Northwind Notes", a sample with problems for the checks to find. A short tour walks Preview, Checks, Package and Publish. <a href="demo/index.html">demo/index.html</a> is the same walk-through offline: open it straight from disk, no network and no build.
     </td>
     <td width="50%" valign="top">
       <h3>Agent tools</h3>
@@ -258,7 +258,7 @@ Every command takes `--json`. The MCP server has 19 tools over the same routes:
 
 ## Demo
 
-Home's Demos row opens the bundled sample site, "Northwind Notes", and a quick tour walks Preview, Checks, Package and Publish. To see it without installing anything, open [`demo/index.html`](demo/index.html) from disk in a browser: it shows the FormPublisher window in both themes driving the sample site through the device widths, with the checks, the package manifest and the six prepared folders taken from real runs of the engine (`demo/data/`). The sample's pictures are CC0; `demo/MEDIA.md` lists their sources.
+Home's Demos row lists four bundled sites, and Help > Demos has the same four. Three are the demo sites FormWeb ships, bundled here as FormWeb exported them, so one site can be followed through the family: "Lowlight" (a planetarium-show studio with scroll effects and page components), "Looking Back" (a photo essay on pictures of Earth from far away) and "Harbour Ferries" (a ferry operator with a fare calculator, routes and search). The fourth, "Northwind Notes", is a small sample with deliberate problems, so the checks have something to find. Each opens as its own site, and a quick tour walks Preview, Checks, Package and Publish. The photographs in the FormWeb sites are NASA pictures and their fonts are under the SIL Open Font License; `NOTICE.md` lists every picture. To see the sample without installing anything, open [`demo/index.html`](demo/index.html) from disk in a browser: it shows the FormPublisher window in both themes driving the sample site through the device widths, with the checks, the package manifest and the six prepared folders taken from real runs of the engine (`demo/data/`). The sample's pictures are CC0; `demo/MEDIA.md` lists their sources.
 
 ### Agents
 
@@ -330,7 +330,7 @@ Ports and folders:
 | `src-tauri/` | the Tauri 2 shell |
 | `setup/` | install, build and agent scripts |
 | `docs/` | the manual and its screenshots |
-| `demo/` | the sample site and the offline demo (`index.html`) |
+| `demo/` | the sample site, the three FormWeb demo sites (`sites/`) and the offline demo (`index.html`) |
 | `.docs/wiki/` | the wiki pages |
 | `assets/` | the app icon used by this README |
 

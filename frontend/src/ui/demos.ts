@@ -1,4 +1,4 @@
-import { openSample, type SampleResult } from '../api-demo';
+import { openBundled, openSample, type SampleResult } from '../api-demo';
 import type { App } from '../app-api';
 import { emit } from '../events';
 import type { Command } from './commands';
@@ -14,6 +14,9 @@ export interface DemoInfo {
 const BASE = `${import.meta.env.BASE_URL}demos/`;
 
 export const DEMOS: readonly DemoInfo[] = [
+  { id: 'lowlight', title: 'Lowlight', line: 'A planetarium studio with scroll effects and page components.', picture: `${BASE}lowlight/cover.webp`, open: () => openBundled('lowlight') },
+  { id: 'looking-back', title: 'Looking Back', line: 'A photo essay on pictures of Earth from far away.', picture: `${BASE}looking-back/cover.webp`, open: () => openBundled('looking-back') },
+  { id: 'harbour-ferries', title: 'Harbour Ferries', line: 'A ferry operator with a fare calculator, routes and search.', picture: `${BASE}harbour-ferries/cover.webp`, open: () => openBundled('harbour-ferries') },
   { id: 'northwind', title: 'Northwind Notes', line: 'A four page product site with problems for the checks to find.', picture: `${BASE}northwind/cover.webp`, open: openSample },
 ];
 

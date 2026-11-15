@@ -39,6 +39,7 @@ data=(--add-data "$ROOT/frontend/dist${sep}frontend_dist" --add-data "$ROOT/back
 [ -d "$ROOT/docs" ] && data+=(--add-data "$ROOT/docs${sep}docs")
 data+=(--add-data "$ROOT/demo/sample-site.zip${sep}demo" --add-binary "$core${sep}bin")
 [ -d "$ROOT/demo/sites" ] && data+=(--add-data "$ROOT/demo/sites${sep}demo/sites")
+[ -d "$ROOT/demo/licenses" ] && data+=(--add-data "$ROOT/demo/licenses${sep}demo/licenses")
 cd "$ROOT/backend"
 rm -rf build/pyinstaller dist-engine
 "$py" -m PyInstaller --noconfirm --clean --onefile --name formpublisher-engine \
