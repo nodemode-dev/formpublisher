@@ -4,6 +4,7 @@ import type { App } from '../app-api';
 import { emit, on } from '../events';
 import { CommandPalette } from './command-palette';
 import { Commands, installShortcuts } from './commands';
+import { DEMOS, demoCommand, demoCommands } from './demos';
 import { confirmAction } from './dialogs';
 import { inTauri } from './dom';
 import { setLibraryOpener } from './builds';
@@ -223,6 +224,8 @@ export function installChrome(app: App): Chrome {
     { id: 'help.docs', label: 'Documentation', icon: 'book', group: 'Help', menu: 'Help', description: 'Open the manual on GitHub', run: () => openExternal(DOCS_URL) },
   );
 
+  commands.add(...demoCommands(app, engineUp));
+
   commands.onError = (_cmd, error) => notice('error', error instanceof Error && error.message ? error.message : 'Request failed');
 
   const menus: MenuDef[] = [
@@ -231,7 +234,7 @@ export function installChrome(app: App): Chrome {
     { label: 'View', items: ['view.builds', 'view.palette', '-', 'view.theme', { label: 'Density', items: ['view.density-compact', 'view.density-regular', 'view.density-comfortable'] }, ...(isMacDesktop() ? ['view.menus-in-window'] : []), '-', 'view.toggle-routes', 'view.toggle-inspector', 'view.toggle-bottom', '-', 'view.problems', 'view.console', 'view.network'] },
     { label: 'Site', items: ['site.check', 'site.check-deep', '-', 'site.reload-routes', 'site.reveal-folder', '-', 'site.remove'] },
     { label: 'Window', items: ['window.minimize', 'window.maximize', 'window.fullscreen'] },
-    { label: 'Help', items: ['help.docs', 'help.shortcuts', '-', 'help.about'] },
+    { label: 'Help', items: ['help.docs', 'help.shortcuts', { label: 'Demos', items: DEMOS.map(demoCommand) }, '-', 'help.about'] },
   ];
 
   new MenuBar(app.mounts.menubar, commands, menus);

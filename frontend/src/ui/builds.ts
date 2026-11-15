@@ -191,9 +191,9 @@ export class BuildsPage {
   private inspect: InspectDialog | null = null;
   private compare: CompareDialog | null = null;
 
-  constructor(private readonly app: App, private readonly host: HTMLElement) {
+  constructor(private readonly app: App, private readonly host: HTMLElement, private readonly confirm: typeof confirmAction = confirmAction) {
     host.appendChild(el(`<div class="fp-home-head"><div><h1 class="fp-home-title">Builds</h1><p class="fp-home-sub">Packages you have built, newest first.</p></div>
-<div class="fp-bl-tools"><span class="fp-bl-hint">Choose two builds to compare</span><button class="fp-btn" type="button" data-b="compare" disabled>${icon('compare', 14)}<span>Compare</span></button></div></div>`));
+<div class="fp-home-head-actions fp-bl-tools"><span class="fp-bl-hint">Choose two builds to compare</span><button class="fp-btn" type="button" data-b="compare" disabled>${icon('compare', 14)}<span>Compare</span></button></div></div>`));
     host.appendChild(el(`<div class="fp-bl">
 <div class="fp-bl-row is-head"><span></span><span>Site</span><span>Build</span><span>Built</span><span>Size</span><span>Signed</span><span></span></div>
 <div class="fp-bl-row is-skeleton" aria-hidden="true"><span></span><span>&nbsp;</span><span></span><span></span><span></span><span></span><span></span></div>
@@ -310,7 +310,7 @@ export class BuildsPage {
   }
 
   private async remove(b: BuildSummary): Promise<void> {
-    if (!(await confirmAction('Delete build', `Move build ${b.id} to the trash? Its zip, record and signature stay in the trash folder of the data folder.`, 'Move to Trash', true))) return;
+    if (!(await this.confirm('Delete build',`Move build ${b.id} to the trash? Its zip, record and signature stay in the trash folder of the data folder.`, 'Move to Trash', true))) return;
     try {
       await buildsApi.remove(b.id);
       emit('fp:notice', { kind: 'ok', text: `Moved build ${b.id} to the trash` });

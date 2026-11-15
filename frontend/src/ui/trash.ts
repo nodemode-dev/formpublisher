@@ -141,9 +141,9 @@ export class TrashPage {
   private busy = false;
   private restoreDialog: RestoreDialog | null = null;
 
-  constructor(private readonly app: App, private readonly host: HTMLElement) {
+  constructor(private readonly app: App, private readonly host: HTMLElement, private readonly confirm: typeof confirmAction = confirmAction) {
     host.appendChild(el(`<div class="fp-home-head"><div><h1 class="fp-home-title">Trash</h1><p class="fp-home-sub">Removed sites, builds, keys and prepared folders stay here until you delete them for good.</p></div>
-<div class="fp-bl-tools"><button class="fp-btn" type="button" data-t="empty" disabled>${icon('trash', 14)}<span>Empty Trash</span></button></div></div>`));
+<div class="fp-home-head-actions fp-bl-tools"><button class="fp-btn" type="button" data-t="empty" disabled>${icon('trash', 14)}<span>Empty Trash</span></button></div></div>`));
     host.appendChild(el(`<div class="fp-tr">
 <div class="fp-tr-row is-head"><span></span><span>Item</span><span>Kind</span><span>Moved</span><span>Size</span><span></span></div>
 <div class="fp-tr-skel" aria-hidden="true"><div class="fp-tr-row is-skeleton"><span></span><span>&nbsp;</span><span></span><span></span><span></span><span></span></div><div class="fp-tr-row is-skeleton"><span></span><span>&nbsp;</span><span></span><span></span><span></span><span></span></div><div class="fp-tr-row is-skeleton"><span></span><span>&nbsp;</span><span></span><span></span><span></span><span></span></div></div>
@@ -251,7 +251,7 @@ export class TrashPage {
   }
 
   private async remove(item: TrashEntry, row: HTMLElement): Promise<void> {
-    if (!(await confirmAction('Delete for good', `Delete ${item.label} for good? This cannot be undone.`, 'Delete', true))) return;
+    if (!(await this.confirm('Delete for good',`Delete ${item.label} for good? This cannot be undone.`, 'Delete', true))) return;
     this.setBusy(true, row);
     try {
       await trashApi.remove(item.entry);
@@ -264,7 +264,7 @@ export class TrashPage {
   }
 
   private async emptyAll(): Promise<void> {
-    if (!(await confirmAction('Empty Trash', 'Delete everything in the trash for good? This cannot be undone.', 'Empty Trash', true))) return;
+    if (!(await this.confirm('Empty Trash','Delete everything in the trash for good? This cannot be undone.', 'Empty Trash', true))) return;
     this.setBusy(true);
     try {
       await trashApi.empty();

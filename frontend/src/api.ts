@@ -2,6 +2,7 @@ export interface Site {
   id: string;
   name: string;
   source: string;
+  kind: string;
   importedAt: string;
   routeCount: number | null;
   size: number | null;
@@ -76,6 +77,7 @@ export function toSite(raw: unknown): Site | null {
     id,
     name: str(raw.name) || str(raw.title) || str(raw.slug) || id,
     source: sourceLabel(raw.source),
+    kind: isObj(raw.source) ? (isObj(raw.source.fpub) ? 'fpub' : str(raw.source.kind)) : '',
     importedAt: str(raw.imported_at) || str(raw.importedAt) || str(raw.created_at) || str(raw.createdAt),
     routeCount: Array.isArray(routes) ? routes.length : num(routes),
     size: num(raw.size) ?? num(raw.size_bytes) ?? num(raw.bytes) ?? num(raw.sizeBytes),
