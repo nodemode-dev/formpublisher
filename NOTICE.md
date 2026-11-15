@@ -45,7 +45,7 @@ Tauri links its own dependencies unedited (no `[patch]`, no vendored copy), some
 
 ## Media
 
-The icon art is FormPublisher's own. The only third-party pictures in the repository are inside the bundled demo sites. Every image file the demos ship is listed below, each under its own status; `demo/MEDIA.md` has the same rows with the fonts. Counts: the three site zips hold 35 image files (24, 10 and 1), 22 of them outside pictures (18 different files, because four are in two sites: 17 NASA files, one of them a crop, and the Hubble Ultra Deep Field); Northwind Notes holds 9; there are four card pictures and four copies of the app mark. Everything that is not an outside picture is own work, Apache-2.0.
+The icon art is FormPublisher's own. The only third-party pictures in the repository are inside the bundled demo sites. Every image file the demos ship is listed below, each under its own status; `demo/MEDIA.md` has the same rows with the fonts. Counts: the three site zips hold 35 image files (24, 10 and 1), 22 of them outside pictures (18 different files, because four are in two sites: 17 NASA files, one of them a crop, and the Hubble Ultra Deep Field); Northwind Notes holds 9; there are four card pictures and four copies of the app mark. The copies of the app mark are GPL-3.0-only, like every FormPublisher icon; everything else that is not an outside picture is own work, Apache-2.0.
 
 ### Demo images
 
@@ -120,6 +120,6 @@ Northwind Notes (`demo/sample-site.zip`, unpacked in `demo/sample-site/`): 9 ima
 | `f4779dace2030ee2561c832d6d0a63d25ed90859a3ea52cc51f1003139f6b361.webp` | Same chart, light | FormPublisher project | None, generated here with Pillow | Own work, Apache-2.0 | None |
 | `frontend/public/demos/northwind/cover.webp` | The card picture: the Notes window, dark | FormPublisher project | None, made from the first row's file | Own work, Apache-2.0 | The 1600x1000 drawing cropped to its middle 1600x900 and resized to 640x360 WebP |
 
-The offline demo in `demo/` also holds four copies of the FormPublisher mark (`demo/assets/formpublisher.webp`, `formpublisher@2x.webp`, `formpublisher-light.webp` and `formpublisher-light@2x.webp`), the owner's own art listed under "Shipped in the app". As pictures shipped in the demo they are own work, Apache-2.0; the same art is also licensed GPL-3.0-only with this repository, as the "Shipped in the app" row says.
+The offline demo in `demo/` also holds four copies of the FormPublisher mark (`demo/assets/formpublisher.webp`, `formpublisher@2x.webp`, `formpublisher-light.webp` and `formpublisher-light@2x.webp`), the owner's own art listed under "Shipped in the app". Like every FormPublisher icon, they are GPL-3.0-only with this repository, as the "Shipped in the app" row says.
 
 Trademarks: Form app names belong to nodemode. Other product names mentioned in the docs belong to their owners.
