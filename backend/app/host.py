@@ -117,7 +117,7 @@ async def serve_revision(root: Path) -> tuple[str, Callable[[], Awaitable[None]]
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(("127.0.0.1", 0))
     port = sock.getsockname()[1]
-    serving = rules.Serving(folder, None, None, False, "auto", "auto", "none", 0)
+    serving = rules.Serving(folder, None, None, False, "auto", "auto", "none", 0, rules.base_path(folder))
     site = HostApp(lambda: serving, lambda: port, False)
     config = uvicorn.Config(site, log_level="warning", lifespan="off", access_log=False)
     server = HostServer(config)

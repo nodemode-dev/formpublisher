@@ -64,6 +64,7 @@ const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFi
 
 function sourceLabel(v: unknown): string {
   if (typeof v === 'string') return v;
+  if (isObj(v) && str(v.url).startsWith('receive:')) return 'FormWeb';
   if (isObj(v)) return str(v.path) || str(v.url) || str(v.name) || str(v.kind) || str(v.type);
   return '';
 }

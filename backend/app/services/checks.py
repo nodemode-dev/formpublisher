@@ -10,7 +10,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urljoin, urlsplit
 
-from app.services import intake, paths
+from app.services import host, intake, paths
 
 TIERS = ("static", "live", "deep")
 SEVERITIES = ("error", "warning", "info")
@@ -110,8 +110,16 @@ class SiteIndex:
                     continue
                 self.files[full.relative_to(self.root).as_posix()] = size
         self.rules = parse_rules(self.root)
+        self.base = host.base_path(self.root)
+
+    def local(self, path: str) -> str:
+        inner = host.within(self.base, path if path.startswith("/") else "/" + path)
+        return path if inner is None else inner
 
     def lookup(self, path: str) -> str | None:
+        return self.find(path) or self.find(self.local(path))
+
+    def find(self, path: str) -> str | None:
         rel = "/".join(s for s in path.split("/") if s)
         if path.endswith("/") or not rel:
             candidates = [f"{rel}/index.html" if rel else "index.html"]
@@ -602,7 +610,7 @@ class Runner:
         sitemap_present = "sitemap.xml" in self.index.files
         if sitemap_present:
             locs = [html.unescape(x) for x in SITEMAP_LOC.findall(_read_text(self.root / "sitemap.xml"))]
-            listed = {_route_key(urlsplit(loc).path) for loc in locs}
+            listed = {_route_key(self.index.local(urlsplit(loc).path or "/")) for loc in locs}
             for route in routes:
                 page = self.page(self.route_file[route])
                 if page is not None and page.noindex:
