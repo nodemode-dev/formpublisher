@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "サイトは別のホストから {0} を読み込んでいます（{2} で {1} 件の参照）。",
+  "Choose the FormWeb project to import.": "インポートする FormWeb プロジェクトを選んでください。",
+  "Unsaved site": "未保存のサイト",
+  "Open in FormWeb": "FormWeb で開いています",
+  "Saved {0}": "保存日時 {0}"
+}

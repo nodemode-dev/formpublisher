@@ -58,11 +58,20 @@ def build(client: Client | None = None) -> MCPServer:
 
     @server.tool(
         name="import_formweb_current",
-        description="Download the site currently open in FormWeb (its read-only export) and import it as a new revision. Needs FormWeb running; only reads from it.",
+        description="Download the site currently open in FormWeb (its read-only export), or with project one of FormWeb's saved projects (its saved .fweb file, compiled here), and import it as a new revision of that project's site. Needs FormWeb running; only reads from it.",
         annotations=ToolAnnotations(title="Import the current FormWeb site", readOnlyHint=False, destructiveHint=False, idempotentHint=False, openWorldHint=False),
     )
-    async def import_formweb_current() -> dict:
-        return await run(link.import_formweb)
+    async def import_formweb_current(project: str | None = None) -> dict:
+        """project: a saved project id from list_formweb_projects; leave it out for the site open in FormWeb."""
+        return await run(link.import_formweb, project)
+
+    @server.tool(
+        name="list_formweb_projects",
+        description="List the running FormWeb's saved projects through its read-only GET /api/projects: id, name, saved time, and which one is open (always first; an open site that was never saved has saved false). Read only.",
+        annotations=ToolAnnotations(title="FormWeb projects", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def list_formweb_projects() -> dict:
+        return await run(link.formweb_projects)
 
     @server.tool(
         name="site_routes",

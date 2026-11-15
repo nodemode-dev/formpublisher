@@ -110,7 +110,7 @@ def _redirect_rows(root: Path) -> list[dict]:
     return out
 
 
-def _check_summary(site_id: str, revision: str) -> dict:
+def _check_summary(site_id: str, revision: str) -> dict | None:
     data = _read_json(paths.home() / "checks" / site_id / revision / "results.json")
     counts = {"error": 0, "warning": 0, "info": 0}
     tiers = []
@@ -123,6 +123,8 @@ def _check_summary(site_id: str, revision: str) -> dict:
             severity = problem.get("severity") if isinstance(problem, dict) else None
             if severity in counts:
                 counts[severity] += 1
+    if not tiers:
+        return None
     return {"errors": counts["error"], "warnings": counts["warning"], "infos": counts["info"], "tiers": tiers}
 
 

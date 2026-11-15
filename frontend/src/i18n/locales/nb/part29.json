@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "Nettstedet laster {0} fra en annen vert: {1} henvisninger på {2}.",
+  "Choose the FormWeb project to import.": "Velg FormWeb-prosjektet som skal importeres.",
+  "Unsaved site": "Ulagret nettsted",
+  "Open in FormWeb": "Åpen i FormWeb",
+  "Saved {0}": "Lagret {0}"
+}

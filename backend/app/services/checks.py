@@ -312,6 +312,7 @@ class Runner:
         self.route_file: dict[str, str] = {}
         self.file_route: dict[str, str] = {}
         self.own_hosts: set[str] = {"localhost", "127.0.0.1"}
+        self.remote: dict[str, list[tuple]] = {}
 
     def add(self, code, severity, route, message, fix, file=None, line=None, selector=None, url=None, key=None):
         short = route.lstrip("/") or "/"
@@ -437,12 +438,24 @@ class Runner:
                 )
 
     def external(self, rel: str, route: str, ref: dict, url: str) -> None:
-        self.add(
-            "external.request", "warning", route,
-            f"The page loads {url} from another host.",
-            "Copy the file into the site and link to the local copy.",
-            file=rel, line=ref.get("line"), selector=ref.get("selector"), url=url, key=url,
-        )
+        self.remote.setdefault(url, []).append((route, rel, ref.get("line"), ref.get("selector")))
+
+    def report_external(self) -> None:
+        for url, refs in self.remote.items():
+            refs = sorted(refs, key=lambda r: (r[0], r[2] or 0))
+            route, rel, line, selector = refs[0]
+            pages = sorted({r[0] for r in refs})
+            if len(refs) == 1:
+                message = f"The page loads {url} from another host."
+            else:
+                message = f"The site loads {url} from another host: {len(refs)} references on {', '.join(pages)}."
+            self.add(
+                "external.request", "warning", route, message,
+                "Copy the file into the site and link to the local copy.",
+                file=rel, line=line, selector=selector, url=url, key=url,
+            )
+            self.problems[-1]["count"] = len(refs)
+            self.problems[-1]["pages"] = pages
 
     def check_html(self, rel: str) -> None:
         page = self.page(rel)
@@ -761,6 +774,7 @@ class Runner:
                 self.check_css(rel)
             elif ext in (".js", ".mjs"):
                 self.check_js(rel)
+        self.report_external()
         self.check_redirects()
         self.check_seo(routes)
         self.check_budgets(routes)

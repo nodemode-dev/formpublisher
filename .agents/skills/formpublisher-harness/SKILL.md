@@ -15,7 +15,7 @@ When the FormPublisher window is open, the tools talk to its engine on 127.0.0.1
 
 - A FormWeb site export, `site-export.zip` (from FormWeb's export).
 - A FormWeb publication folder, `publications/[slug]/[version]/`.
-- The site currently open in a running FormWeb, read through FormWeb's read-only `/api/export` on loopback.
+- The site currently open in a running FormWeb, read through FormWeb's read-only `/api/export` on loopback, or one of its saved projects, read through `GET /api/projects` and `GET /api/projects/{id}/file`.
 
 FormPublisher only reads FormWeb. It never calls FormWeb's `/api/load`, which would replace the document FormWeb has open, and it never changes a site. Edits go back to FormWeb.
 
@@ -28,7 +28,8 @@ These are the exact MCP tool names, with the command that does the same thing. I
 | `formpublisher_status` | `status` | engine, data folder, site count, FormWeb reachability | yes |
 | `list_sites` | `sites` | imported sites | yes |
 | `import_site` (path) | `import PATH` | import a site export zip, a `.fweb` project, a `.fpub` package or a publication folder as a new revision (a `.fpub` also restores its build) | no |
-| `import_formweb_current` | `import-formweb` | import the site open in a running FormWeb | no |
+| `list_formweb_projects` | `formweb-projects` | the running FormWeb's saved projects, the open one first | yes |
+| `import_formweb_current` (project) | `import-formweb [--project ID]` | import the site open in a running FormWeb, or one of its saved projects | no |
 | `site_routes` (id) | `routes ID` | routes of the latest revision | yes |
 | `list_revisions` (id) | `revisions ID` | revisions newest first, with files, bytes, routes and what changed from the one before | yes |
 | `diff_revisions` (id, from_revision, to_revision) | `diff ID [--from R] [--to R]` | files added, removed and changed (path, size, SHA-256) and routes added and removed between two revisions; default the latest against the one before | yes |

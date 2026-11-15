@@ -317,21 +317,36 @@ def project_site(title: str, source_key: str) -> str:
         source = record.get("source")
         if isinstance(source, dict) and f"{source.get('kind')}:{source.get('url')}" == source_key and ID_RE.match(str(record.get("id", ""))):
             return str(record["id"])
-    return sid
+    return _address_site(title) or sid
+
+
+def _address_site(title: str) -> str | None:
+    wanted = title.strip().casefold()
+    found = []
+    for record in list_sites():
+        source = record.get("source")
+        if not isinstance(source, dict) or source.get("kind") != "formweb":
+            continue
+        url = source.get("url")
+        if not isinstance(url, str) or not url.startswith(("http://", "https://")):
+            continue
+        if str(record.get("name", "")).strip().casefold() == wanted and ID_RE.match(str(record.get("id", ""))):
+            found.append(str(record["id"]))
+    return found[0] if len(found) == 1 else None
 
 
 def _staging() -> Path:
     return Path(tempfile.mkdtemp(prefix=".staging-", dir=paths.sites_dir()))
 
 
-def import_zip_file(archive: Path, kind: str, source: dict, source_key: str, name: str | None = None, stem: str | None = None) -> dict:
+def import_zip_file(archive: Path, kind: str, source: dict, source_key: str, name: str | None = None, stem: str | None = None, site_id: str | None = None) -> dict:
     staging = _staging()
     try:
         safe_unzip(archive, staging)
     except BaseException:
         shutil.rmtree(staging, ignore_errors=True)
         raise
-    return _finish(staging, kind, source, source_key, stem or "site", name)
+    return _finish(staging, kind, source, source_key, stem or "site", name, site_id=site_id)
 
 
 def is_fweb(path: Path, filename: str | None = None) -> bool:

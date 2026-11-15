@@ -4,7 +4,7 @@ Checks produce problems with a stable id (a deep problem's id does not depend on
 
 ## Static
 
-Runs offline on the revision's files. Codes: `link.broken`, `link.anchor`, `asset.missing`, `redirect.loop`, `redirect.chain`, `redirect.target`, `sitemap.missing`, `sitemap.extra`, `robots.sitemap`, `robots.blocks`, `meta.title`, `meta.description`, `meta.lang`, `img.size`, `img.alt`, `heading.h1`, `heading.order`, `external.request`, `forms.local-address`, `budget.file` and `budget.page`. `forms.local-address` is a warning for a form that posts to this computer, the local network or FormWeb's `/api/forms/` route, none of which answers once the site is published. Each code's rule and severity is a table in the manual.
+Runs offline on the revision's files. Codes: `link.broken`, `link.anchor`, `asset.missing`, `redirect.loop`, `redirect.chain`, `redirect.target`, `sitemap.missing`, `sitemap.extra`, `robots.sitemap`, `robots.blocks`, `meta.title`, `meta.description`, `meta.lang`, `img.size`, `img.alt`, `heading.h1`, `heading.order`, `external.request`, `forms.local-address`, `budget.file` and `budget.page`. `forms.local-address` is a warning for a form that posts to this computer, the local network or FormWeb's `/api/forms/` route, none of which answers once the site is published. `external.request` is one warning per distinct remote URL, with the number of references and the pages that use it. Each code's rule and severity is a table in the manual.
 
 ## Live
 

@@ -68,6 +68,10 @@ function lookup(en: string): string | null {
   if (hit !== undefined) return hit;
   cache.set(en, null);
   let out = exact.get(en) ?? null;
+  if (out === null && en.includes(' · ')) {
+    const parts = en.split(' · ').map((p) => lookup(p));
+    if (parts.some((p) => p !== null)) out = en.split(' · ').map((p, i) => parts[i] ?? p).join(' · ');
+  }
   if (out === null) {
     for (const [re, tr] of patterns) {
       const m = re.exec(en);
@@ -91,10 +95,6 @@ function lookup(en: string): string | null {
   if (keyed && /^((Alt|Shift|Ctrl|Cmd|Mod|Option)\+)*(\S{1,9}|Left|Right|Up|Down|Space|Enter|Esc|Tab|Backspace|Delete)$/.test(keyed[2])) {
     const base = lookup(keyed[1]);
     if (base !== null) out = `${base} (${keyed[2]})`;
-  }
-  if (out === null && en.includes(' · ')) {
-    const parts = en.split(' · ').map((p) => lookup(p));
-    if (parts.some((p) => p !== null)) out = en.split(' · ').map((p, i) => parts[i] ?? p).join(' · ');
   }
   if (cache.size > 20000) cache.clear();
   cache.set(en, out);

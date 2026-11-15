@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "Trang web tải {0} từ máy chủ khác: {1} lượt tham chiếu trên {2}.",
+  "Choose the FormWeb project to import.": "Chọn dự án FormWeb cần nhập.",
+  "Unsaved site": "Trang web chưa lưu",
+  "Open in FormWeb": "Đang mở trong FormWeb",
+  "Saved {0}": "Đã lưu {0}"
+}

@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "Sivusto lataa kohteen {0} toiselta isännältä: {1} viittausta sivuilla {2}.",
+  "Choose the FormWeb project to import.": "Valitse tuotava FormWeb-projekti.",
+  "Unsaved site": "Tallentamaton sivusto",
+  "Open in FormWeb": "Avoinna FormWebissä",
+  "Saved {0}": "Tallennettu {0}"
+}

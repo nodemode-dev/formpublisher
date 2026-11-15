@@ -24,10 +24,19 @@ async def publications():
         return _failure(exc)
 
 
+@router.get("/projects")
+async def projects():
+    try:
+        return await run_in_threadpool(formweb.projects)
+    except formweb.FormwebError as exc:
+        return _failure(exc)
+
+
 @router.post("/import-current")
 async def import_current(body: dict | None = Body(default=None)):
     name = (body or {}).get("name")
+    project = (body or {}).get("project")
     try:
-        return await run_in_threadpool(formweb.import_current, name if isinstance(name, str) else None)
+        return await run_in_threadpool(formweb.import_project, project if isinstance(project, str) and project else None, name if isinstance(name, str) else None)
     except formweb.FormwebError as exc:
         return _failure(exc)

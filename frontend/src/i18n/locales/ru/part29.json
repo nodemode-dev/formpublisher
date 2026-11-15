@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "Сайт загружает {0} с другого хоста: {1} {1:one=ссылка;few=ссылки;many=ссылок;other=ссылки} на {2}.",
+  "Choose the FormWeb project to import.": "Выберите проект FormWeb для импорта.",
+  "Unsaved site": "Несохранённый сайт",
+  "Open in FormWeb": "Открыт в FormWeb",
+  "Saved {0}": "Сохранён {0}"
+}
