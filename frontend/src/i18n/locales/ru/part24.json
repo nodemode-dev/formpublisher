@@ -1,0 +1,9 @@
+{
+  "Window": "Окно",
+  "Minimize": "Свернуть",
+  "Maximize": "Развернуть",
+  "Full Screen": "Полный экран",
+  "Menus in Window": "Меню в окне",
+  "The menus stay in the window from the next start.": "Со следующего запуска меню останутся в окне.",
+  "The menus go to the menu bar from the next start.": "Со следующего запуска меню перейдут в строку меню."
+}

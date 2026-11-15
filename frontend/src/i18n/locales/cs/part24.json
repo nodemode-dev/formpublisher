@@ -1,0 +1,9 @@
+{
+  "Window": "Okno",
+  "Minimize": "Minimalizovat",
+  "Maximize": "Maximalizovat",
+  "Full Screen": "Celá obrazovka",
+  "Menus in Window": "Nabídky v okně",
+  "The menus stay in the window from the next start.": "Nabídky zůstanou od příštího spuštění v okně.",
+  "The menus go to the menu bar from the next start.": "Nabídky se od příštího spuštění přesunou do řádku nabídek."
+}

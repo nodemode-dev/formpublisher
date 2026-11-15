@@ -1,0 +1,9 @@
+{
+  "Window": "Ablak",
+  "Minimize": "Kis méret",
+  "Maximize": "Teljes méret",
+  "Full Screen": "Teljes képernyő",
+  "Menus in Window": "Menük az ablakban",
+  "The menus stay in the window from the next start.": "A menük a következő indítástól az ablakban maradnak.",
+  "The menus go to the menu bar from the next start.": "A menük a következő indítástól a menüsorba kerülnek."
+}

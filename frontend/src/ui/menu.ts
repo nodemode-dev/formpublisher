@@ -1,13 +1,17 @@
 import type { Commands } from './commands';
-import { el, q, setClass, setDisabled, setText } from './dom';
+import { anyDialogOpen } from './dialogs';
+import { el, isMac, q, setClass, setDisabled, setText } from './dom';
 import { icon } from './icons';
 
 export type MenuItem = string | SubMenu;
 export interface SubMenu { label: string; items: MenuItem[] }
-export interface MenuDef { label: string; items: MenuItem[] }
+export interface MenuDef { label: string; items: MenuItem[] | (() => MenuItem[]) }
+
+export const itemsOf = (def: MenuDef): MenuItem[] => (typeof def.items === 'function' ? def.items() : def.items);
 
 const isSub = (i: MenuItem): i is SubMenu => typeof i === 'object';
 const MIN_DROP = 160;
+const TYPE_AHEAD_MS = 700;
 
 export class PopupMenu {
   readonly panel: HTMLElement;
@@ -16,6 +20,7 @@ export class PopupMenu {
   private key = '';
   private openSub: PopupMenu | null = null;
   private openRow: HTMLElement | null = null;
+  private subTop = 0;
   onClose: (() => void) | null = null;
   onPick: ((id: string) => void) | null = null;
 
@@ -24,6 +29,7 @@ export class PopupMenu {
     document.getElementById('overlay-root')?.appendChild(this.panel);
     this.panel.addEventListener('contextmenu', (e) => e.preventDefault());
     this.panel.addEventListener('pointerdown', (e) => e.preventDefault());
+    this.panel.addEventListener('scroll', () => { if (this.panel.scrollTop !== this.subTop) this.closeSub(); }, { passive: true });
   }
 
   get isOpen(): boolean { return !this.panel.hidden; }
@@ -100,6 +106,7 @@ export class PopupMenu {
     this.closeSub();
     this.openSub = menu;
     this.openRow = row;
+    this.subTop = this.panel.scrollTop;
     setClass(row, 'is-open', true);
     menu.onClose = () => setClass(row, 'is-open', false);
     menu.openBeside(row.getBoundingClientRect());
@@ -168,6 +175,10 @@ export class MenuBar {
   private readonly menus: Array<{ btn: HTMLButtonElement; menu: PopupMenu; def: MenuDef }> = [];
   private openIndex = -1;
   private prior: HTMLElement | null = null;
+  private barBack: HTMLElement | null = null;
+  private altLone = false;
+  private typed = '';
+  private typedAt = 0;
 
   constructor(host: HTMLElement, private readonly commands: Commands, defs: MenuDef[]) {
     defs.forEach((def, i) => {
@@ -176,70 +187,148 @@ export class MenuBar {
       btn.dataset.menu = def.label.toLowerCase();
       host.appendChild(btn);
       const menu = new PopupMenu(commands);
-      menu.setItems(def.items);
+      menu.setItems(itemsOf(def));
       menu.onClose = () => { if (this.openIndex === i) { this.openIndex = -1; setClass(btn, 'is-open', false); btn.setAttribute('aria-expanded', 'false'); } };
       menu.onPick = (id) => this.pick(id);
       btn.addEventListener('pointerdown', (e) => { if (e.button !== 0) return; e.preventDefault(); if (this.openIndex === i) this.close(); else this.open(i); });
       btn.addEventListener('pointerenter', () => { if (this.openIndex >= 0 && this.openIndex !== i) this.open(i); });
-      btn.addEventListener('keydown', (e) => this.onButtonKey(e, i));
       this.menus.push({ btn, menu, def });
     });
     document.addEventListener('pointerdown', (e) => {
+      this.altLone = false;
       if (this.openIndex < 0) return;
       const m = this.menus[this.openIndex];
       const t = e.target as Node;
       if (!m.menu.contains(t) && !m.btn.contains(t)) this.close();
     }, true);
     document.addEventListener('keydown', (e) => this.onKey(e), true);
-    window.addEventListener('blur', () => this.close());
+    document.addEventListener('keyup', (e) => this.altUp(e), true);
+    window.addEventListener('blur', () => { this.altLone = false; setClass(document.documentElement, 'is-menu-mnemonics', false); this.close(); });
     window.addEventListener('resize', () => this.close());
   }
 
   get isOpen(): boolean { return this.openIndex >= 0; }
 
+  private usable(): boolean {
+    return this.menus.length > 0 && !anyDialogOpen() && !document.documentElement.classList.contains('has-native-menus');
+  }
+
+  private initial(btn: HTMLElement): string {
+    return (btn.textContent ?? '').trim().charAt(0).toLowerCase();
+  }
+
   private pick(id: string): void {
-    const back = this.prior;
+    const back = this.prior ?? this.barBack;
+    this.barBack = null;
     this.close();
     if (back && back.isConnected) back.focus();
     this.commands.run(id);
   }
 
-  private onButtonKey(e: KeyboardEvent, i: number): void {
-    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.open(i, true); }
-    else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-      e.preventDefault();
-      const next = (i + (e.key === 'ArrowRight' ? 1 : -1) + this.menus.length) % this.menus.length;
-      this.menus[next].btn.focus();
-    }
+  private altUp(e: KeyboardEvent): void {
+    if (e.key !== 'Alt') return;
+    setClass(document.documentElement, 'is-menu-mnemonics', false);
+    if (!this.altLone) return;
+    this.altLone = false;
+    if (this.openIndex >= 0 || !this.usable()) return;
+    e.preventDefault();
+    const from = document.activeElement;
+    if (from instanceof HTMLElement && !this.menus.some((m) => m.btn === from)) this.barBack = from;
+    this.menus[0].btn.focus();
+  }
+
+  private leaveBar(): void {
+    const back = this.barBack;
+    this.barBack = null;
+    if (back && back.isConnected && back !== document.body) back.focus();
+    else (document.activeElement as HTMLElement | null)?.blur();
+  }
+
+  private leave(leaf: PopupMenu): boolean {
+    const up = leaf.parentMenu();
+    if (!up) return false;
+    const row = up.focusRow();
+    up.closeSub();
+    row?.focus();
+    return true;
   }
 
   private onKey(e: KeyboardEvent): void {
-    if (this.openIndex < 0) return;
-    const m = this.menus[this.openIndex];
-    const leaf = m.menu.deepest();
     const stop = (): void => { e.preventDefault(); e.stopPropagation(); };
-    switch (e.key) {
-      case 'Escape': stop(); this.close(true); break;
-      case 'Tab': this.close(); break;
-      case 'ArrowDown': stop(); leaf.focusAt('next'); break;
-      case 'ArrowUp': stop(); leaf.focusAt('prev'); break;
-      case 'Home': stop(); leaf.focusAt('first'); break;
-      case 'End': stop(); leaf.focusAt('last'); break;
-      case 'ArrowRight': {
-        stop();
-        const sub = leaf.focusedSub();
-        if (sub) { leaf.showSubFor(sub); sub.focusAt('first'); }
-        else this.open((this.openIndex + 1) % this.menus.length, true);
-        break;
+    const count = this.menus.length;
+    if (e.key === 'Alt') {
+      if (!e.repeat && !isMac && this.openIndex < 0 && this.usable() && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        this.altLone = true;
+        setClass(document.documentElement, 'is-menu-mnemonics', true);
       }
-      case 'ArrowLeft': {
-        stop();
-        const up = leaf.parentMenu();
-        if (up) { const row = up.focusRow(); up.closeSub(); row?.focus(); }
-        else this.open((this.openIndex - 1 + this.menus.length) % this.menus.length, true);
-        break;
+      return;
+    }
+    this.altLone = false;
+    if (this.openIndex < 0) {
+      if (!this.usable() || e.ctrlKey || e.metaKey) return;
+      const at = this.menus.findIndex((m) => m.btn === document.activeElement);
+      if (at >= 0 && !e.altKey && !e.shiftKey) {
+        const focus = (i: number): void => this.menus[(i + count) % count].btn.focus();
+        if (e.key === 'ArrowRight') { stop(); focus(at + 1); return; }
+        if (e.key === 'ArrowLeft') { stop(); focus(at - 1); return; }
+        if (e.key === 'Home') { stop(); focus(0); return; }
+        if (e.key === 'End') { stop(); focus(-1); return; }
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') { stop(); this.open(at, true); return; }
+        if (e.key === 'Escape') { stop(); this.leaveBar(); return; }
+        if (e.key.length === 1 && /\S/.test(e.key)) {
+          const hit = this.menus.findIndex((m) => this.initial(m.btn) === e.key.toLowerCase());
+          if (hit >= 0) { stop(); this.open(hit, true); }
+          return;
+        }
       }
-      default: break;
+      if (e.key === 'F10' && !e.altKey && !e.shiftKey) { stop(); this.open(0, true); return; }
+      if (!e.altKey || e.shiftKey || isMac || !/^Key[A-Z]$/.test(e.code)) return;
+      const letter = e.code.slice(3).toLowerCase();
+      const hit = this.menus.findIndex((m) => this.initial(m.btn) === letter);
+      if (hit < 0) return;
+      stop();
+      this.open(hit, true);
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const leaf = this.menus[this.openIndex].menu.deepest();
+    const rows = leaf.focusables();
+    const at = rows.indexOf(document.activeElement as HTMLButtonElement);
+    if (e.key === 'ArrowDown') { stop(); leaf.focusAt('next'); }
+    else if (e.key === 'ArrowUp') { stop(); leaf.focusAt('prev'); }
+    else if (e.key === 'Home') { stop(); leaf.focusAt('first'); }
+    else if (e.key === 'End') { stop(); leaf.focusAt('last'); }
+    else if (e.key === 'ArrowRight') {
+      stop();
+      const sub = leaf.focusedSub();
+      if (sub) { leaf.showSubFor(sub); sub.focusAt('first'); }
+      else this.open((this.openIndex + 1) % count, true);
+    } else if (e.key === 'ArrowLeft') {
+      stop();
+      if (!this.leave(leaf)) this.open((this.openIndex - 1 + count) % count, true);
+    } else if ((e.key === 'Enter' || e.key === ' ') && at >= 0) {
+      stop();
+      const sub = leaf.focusedSub();
+      if (sub) { leaf.showSubFor(sub); sub.focusAt('first'); }
+      else rows[at].click();
+    } else if (e.key === 'Escape') {
+      stop();
+      if (!this.leave(leaf)) this.close(true);
+    } else if (e.key === 'Tab') {
+      stop();
+      this.close(true);
+    } else if (e.key.length === 1 && /\S/.test(e.key) && !e.shiftKey) {
+      stop();
+      const now = performance.now();
+      const word = now - this.typedAt < TYPE_AHEAD_MS ? this.typed + e.key.toLowerCase() : e.key.toLowerCase();
+      this.typed = word;
+      this.typedAt = now;
+      const starts = (n: HTMLElement): boolean => (n.querySelector('.fp-menu-label')?.textContent ?? '').trim().toLowerCase().startsWith(word);
+      const from = word.length === 1 ? at + 1 : Math.max(0, at);
+      for (let k = 0; k < rows.length; k++) {
+        const n = rows[(from + k) % rows.length];
+        if (starts(n)) { n.focus(); break; }
+      }
     }
   }
 
@@ -252,7 +341,7 @@ export class MenuBar {
       this.prior = a && !a.classList.contains('fp-menu-btn') ? a : null;
     } else this.prior = back;
     const m = this.menus[i];
-    m.menu.setItems(m.def.items);
+    m.menu.setItems(itemsOf(m.def));
     const b = m.btn.getBoundingClientRect();
     this.openIndex = i;
     setClass(m.btn, 'is-open', true);

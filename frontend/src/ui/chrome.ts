@@ -11,7 +11,7 @@ import { Home } from './home';
 import './icons-extra';
 import { MenuBar, type MenuDef } from './menu';
 import { stepFor, type StepHost } from './notice-step';
-import { NativeMenus, wantsNativeMenus } from './native-menu';
+import { isMacDesktop, MENUS_IN_WINDOW_KEY, menusInWindow, NativeMenus, wantsNativeMenus } from './native-menu';
 import { openPackageSheet } from './package-sheet';
 import { runChecks } from './panel';
 import { Preferences, type PrefsSection } from './preferences';
@@ -45,6 +45,8 @@ async function openExternal(target: string): Promise<void> {
   }
   window.open(target, '_blank', 'noopener');
 }
+
+const desktopWindow = async () => (await import('@tauri-apps/api/window')).getCurrentWindow();
 
 export function installChrome(app: App): Chrome {
   const commands = new Commands();
@@ -133,7 +135,7 @@ export function installChrome(app: App): Chrome {
       },
     },
 
-    { id: 'view.home', label: 'Home', keys: ['Alt+Mod+H'], icon: 'home', group: 'View', menu: 'View', description: 'Show the Home page', run: () => home.show('start') },
+    { id: 'view.home', label: 'Home', keys: ['Alt+Mod+H'], icon: 'home', group: 'File', menu: 'File', description: 'Show the Home page', run: () => home.show('start') },
     { id: 'view.builds', label: 'Builds', icon: 'package', group: 'View', menu: 'View', description: 'Show the library of builds on the Home page', run: () => home.show('builds') },
     { id: 'view.palette', label: 'Find a Command...', keys: ['Shift+Mod+P'], icon: 'commandPalette', group: 'View', menu: 'View', description: 'Search every command', run: () => { palette ??= new CommandPalette(commands); palette.show(); } },
     { id: 'view.theme', label: 'Toggle Theme', icon: 'sun', group: 'View', menu: 'View', description: 'Switch between the dark and light theme',
@@ -150,6 +152,24 @@ export function installChrome(app: App): Chrome {
     tab('view.problems', 'Problems', 'alert', 'problems'),
     tab('view.console', 'Console', 'terminal', 'console'),
     tab('view.network', 'Network', 'globe', 'network'),
+    {
+      id: 'view.menus-in-window', label: 'Menus in Window', group: 'View', menu: 'View', description: 'Keep the menus in the window instead of the macOS menu bar, from the next start', enabled: isMacDesktop, checked: menusInWindow,
+      run: () => {
+        const next = !menusInWindow();
+        try { localStorage.setItem(MENUS_IN_WINDOW_KEY, next ? '1' : '0'); } catch { return; }
+        notice('info', next ? 'The menus stay in the window from the next start.' : 'The menus go to the menu bar from the next start.');
+      },
+    },
+
+    { id: 'window.minimize', label: 'Minimize', group: 'Window', menu: 'Window', description: 'Minimize the window', enabled: inTauri, run: async () => { await (await desktopWindow()).minimize(); } },
+    { id: 'window.maximize', label: 'Maximize', group: 'Window', menu: 'Window', description: 'Maximize the window or restore its size', enabled: inTauri, run: async () => { await (await desktopWindow()).toggleMaximize(); } },
+    {
+      id: 'window.fullscreen', label: 'Full Screen', group: 'Window', menu: 'Window', description: 'Fill the screen with the window, or leave full screen', enabled: () => document.fullscreenEnabled, checked: () => document.fullscreenElement !== null,
+      run: async () => {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      },
+    },
 
     { id: 'site.package', label: 'Package Site...', keys: ['Shift+Mod+B'], icon: 'package', group: 'Site', menu: 'File', description: 'Build, sign and verify a package of the open site', enabled: () => hasSite() && engineUp(), run: () => openPackageSheet(app) },
     { id: 'publish.open', label: 'Publish Site...', icon: 'publish', group: 'Site', menu: 'File', description: 'Prepare a folder and the commands for each host', enabled: () => hasSite() && engineUp(), run: () => { emit('fp:publish', { source: 'palette' }); } },
@@ -205,22 +225,20 @@ export function installChrome(app: App): Chrome {
 
   commands.onError = (_cmd, error) => notice('error', error instanceof Error && error.message ? error.message : 'Request failed');
 
-  const menuDefs = (native: boolean): MenuDef[] => [
-    { label: 'File', items: ['file.open-zip', 'file.open-folder', 'file.import-formweb', '-', 'file.new-window', 'file.close-tab', '-', 'site.package', 'publish.open', ...(native ? [] : ['-', 'app.preferences'])] },
+  const menus: MenuDef[] = [
+    { label: 'File', items: ['view.home', 'file.open-zip', 'file.open-folder', 'file.import-formweb', '-', 'file.new-window', 'file.close-tab', '-', 'site.package', 'publish.open', '-', 'app.preferences'] },
     { label: 'Edit', items: ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.select-all'] },
-    { label: 'View', items: ['view.home', 'view.builds', 'view.palette', '-', 'view.theme', { label: 'Density', items: ['view.density-compact', 'view.density-regular', 'view.density-comfortable'] }, '-', 'view.toggle-routes', 'view.toggle-inspector', 'view.toggle-bottom', '-', 'view.problems', 'view.console', 'view.network'] },
+    { label: 'View', items: ['view.builds', 'view.palette', '-', 'view.theme', { label: 'Density', items: ['view.density-compact', 'view.density-regular', 'view.density-comfortable'] }, ...(isMacDesktop() ? ['view.menus-in-window'] : []), '-', 'view.toggle-routes', 'view.toggle-inspector', 'view.toggle-bottom', '-', 'view.problems', 'view.console', 'view.network'] },
     { label: 'Site', items: ['site.check', 'site.check-deep', '-', 'site.reload-routes', 'site.reveal-folder', '-', 'site.remove'] },
-    { label: 'Help', items: ['help.shortcuts', 'help.docs', '-', 'help.about'] },
+    { label: 'Window', items: ['window.minimize', 'window.maximize', 'window.fullscreen'] },
+    { label: 'Help', items: ['help.docs', 'help.shortcuts', '-', 'help.about'] },
   ];
 
-  const inWindow = (): void => { new MenuBar(app.mounts.menubar, commands, menuDefs(false)); };
+  new MenuBar(app.mounts.menubar, commands, menus);
   if (wantsNativeMenus()) {
-    new NativeMenus(commands, () => menuDefs(true), 'app.preferences').build().catch(() => {
-      document.documentElement.classList.remove('has-native-menus');
-      inWindow();
-    });
-  } else {
-    inWindow();
+    const native = new NativeMenus(commands, () => menus, 'app.preferences');
+    void native.build().catch(() => undefined);
+    for (const ev of ['fp:site-opened', 'fp:site-closed', 'fp:site-loaded', 'fp:sites-changed', 'fp:engine-state', 'fp:ui-settings-changed'] as const) on(ev, () => native.refresh());
   }
 
   installShortcuts(commands);

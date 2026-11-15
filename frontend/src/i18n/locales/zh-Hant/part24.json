@@ -1,0 +1,9 @@
+{
+  "Window": "視窗",
+  "Minimize": "最小化",
+  "Maximize": "最大化",
+  "Full Screen": "全螢幕",
+  "Menus in Window": "在視窗中顯示選單",
+  "The menus stay in the window from the next start.": "從下次啟動起，選單會保留在視窗中。",
+  "The menus go to the menu bar from the next start.": "從下次啟動起，選單會移至選單列。"
+}

@@ -1,0 +1,9 @@
+{
+  "Window": "ウィンドウ",
+  "Minimize": "最小化",
+  "Maximize": "最大化",
+  "Full Screen": "フルスクリーン",
+  "Menus in Window": "メニューをウィンドウ内に表示",
+  "The menus stay in the window from the next start.": "次回の起動から、メニューはウィンドウ内に表示されます。",
+  "The menus go to the menu bar from the next start.": "次回の起動から、メニューはメニューバーに表示されます。"
+}

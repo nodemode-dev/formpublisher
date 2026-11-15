@@ -50,7 +50,7 @@ const OWNED_COMBOS = new Set([
   'Mod+Q', 'Shift+Mod+Q', 'Mod+W', 'Shift+Mod+W', 'Mod+T', 'Shift+Mod+T', 'Mod+N', 'Shift+Mod+N',
   'Mod+Tab', 'Shift+Mod+Tab', 'Alt+Tab', 'Alt+F4', 'Mod+Space', 'Mod+PageUp', 'Mod+PageDown', 'F11', 'F12',
   ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `Mod+${n}`),
-  ...(isMac ? ['Mod+H', 'Alt+Mod+H', 'Mod+M', 'Alt+Mod+Space'] : ['Mod+Escape']),
+  ...(isMac ? ['Mod+H', 'Mod+M', 'Alt+Mod+Space'] : ['Mod+Escape']),
 ]);
 
 export function rejectCombo(combo: string): string | null {

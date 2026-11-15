@@ -1,0 +1,9 @@
+{
+  "Window": "Vindu",
+  "Minimize": "Minimer",
+  "Maximize": "Maksimer",
+  "Full Screen": "Fullskjerm",
+  "Menus in Window": "Menyer i vinduet",
+  "The menus stay in the window from the next start.": "Menyene blir i vinduet fra neste oppstart.",
+  "The menus go to the menu bar from the next start.": "Menyene flyttes til menylinjen fra neste oppstart."
+}

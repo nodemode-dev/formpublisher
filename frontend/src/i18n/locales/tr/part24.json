@@ -1,0 +1,9 @@
+{
+  "Window": "Pencere",
+  "Minimize": "Simge durumuna küçült",
+  "Maximize": "Ekranı kapla",
+  "Full Screen": "Tam ekran",
+  "Menus in Window": "Menüler pencerede",
+  "The menus stay in the window from the next start.": "Menüler bir sonraki açılıştan itibaren pencerede kalır.",
+  "The menus go to the menu bar from the next start.": "Menüler bir sonraki açılıştan itibaren menü çubuğuna taşınır."
+}

@@ -6,7 +6,9 @@
 .fp-brand-name { color: var(--text-primary); font-size: var(--fp-13); font-weight: 600; letter-spacing: 0.2px; }
 .fp-menubar { display: flex; align-items: center; gap: 2px; min-width: 0; min-height: var(--ctl-md); }
 .fp-menu-btn { height: var(--ctl-md); padding: 0 var(--space-2); border: 0; border-radius: var(--radius); background: transparent; color: var(--text-secondary); font-size: var(--fp-12); cursor: default; }
-.fp-menu-btn:hover, .fp-menu-btn.is-open { background: var(--bg-tertiary); color: var(--text-primary); }
+.fp-menu-btn:hover, .fp-menu-btn.is-open, .fp-menu-btn:focus-visible { background: var(--bg-tertiary); color: var(--text-primary); }
+.is-menu-mnemonics .fp-menu-btn::first-letter { text-decoration: underline; }
+.fp-brand[role="button"] { cursor: pointer; }
 .has-native-menus .fp-menubar { display: none; }
 .has-native-menus .fp-titlebar { grid-template-columns: auto minmax(0, 1fr) auto; }
 .fp-doc-title { justify-self: center; width: min(360px, 100%); min-width: 0; height: var(--ctl-md); padding: 0 var(--space-3); border: 1px solid transparent; border-radius: var(--radius-md); background: transparent; color: var(--text-secondary); font: inherit; font-size: var(--fp-13); font-weight: 500; text-align: center; text-overflow: ellipsis; outline: 0; cursor: default; }
