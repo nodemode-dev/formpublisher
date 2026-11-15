@@ -4,7 +4,7 @@ The scripts that made the Northwind Notes sample site and the data the offline d
 
 | Script | What it does | Needs |
 | --- | --- | --- |
-| `gen_images.py OUT_DIR` | Draws the nine `notes-*.webp` pictures (CC0, see `../MEDIA.md`). The output is byte for byte the same on every run. | Pillow, DejaVu Sans fonts |
+| `gen_images.py OUT_DIR` | Draws the nine `notes-*.webp` pictures (own work, Apache-2.0, see `../MEDIA.md`). The output is byte for byte the same on every run. | Pillow, DejaVu Sans fonts |
 | `build_site.py --formweb URL --images DIR --out ZIP` | Builds the site in a running FormWeb backend (library sections re-cast with new text, a few native sections, redirects, SEO) and writes the `GET /api/export` zip. | A FormWeb backend |
 | `run_demo.py --engine URL --out DIR (--zip ZIP or --bundled) [--name N] [--include-model]` | Imports the site into a FormPublisher engine, runs the static checks, builds the package and prepares all six hosts. Writes `checks.json`, `publish.json`, `prepared.json` and `data.js`. | A FormPublisher engine |
 | `install_demo.py --demo DIR [--zip ZIP] [--data DIR]` | Copies the zip to `sample-site.zip`, unpacks it into `sample-site/` and copies the data files into `data/`. The only script that writes into `demo/`. | Nothing |

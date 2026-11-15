@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "{0} 上的表單會提交到 {1}，網站發布後該位址不會回應，因此表單無法送出。",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "請在 FormWeb 中為表單設定指令碼回覆（動態 > 指令碼，觸發條件選「提交」），或將它的提交位址指向網路上的表單服務。",
+  "Added a revision to {0}": "已為 {0} 新增一個修訂版本"
+}

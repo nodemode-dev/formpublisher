@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "ฟอร์มในหน้า {0} ส่งข้อมูลไปที่ {1} ซึ่งจะไม่ตอบสนองเมื่อเผยแพร่เว็บไซต์แล้ว ฟอร์มจึงส่งข้อมูลไม่ได้",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "ใน FormWeb ให้กำหนดการตอบกลับด้วยสคริปต์ให้ฟอร์ม (การเคลื่อนไหว > สคริปต์ ทริกเกอร์ ส่ง) หรือเปลี่ยนปลายทางของฟอร์มเป็นบริการฟอร์มบนเว็บ",
+  "Added a revision to {0}": "เพิ่มการแก้ไขให้ {0} แล้ว"
+}

@@ -269,7 +269,7 @@ def _finish(staging: Path, kind: str, source: dict, source_key: str, stem: str, 
         if not rows:
             raise IntakeError("no site found: the source has no routes.json and no index.html", 400, "not-a-site")
         title = (name or "").strip() or site_name_from(root) or stem
-        sid = site_id or make_id(title, source_key)
+        sid = site_id or project_site(title, source_key)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         files, size = _tree_stats(root)
         redirects = redirects_of(root)
@@ -307,6 +307,17 @@ def _finish(staging: Path, kind: str, source: dict, source_key: str, stem: str, 
         shutil.rmtree(staging, ignore_errors=True)
     bus.emit("site.imported", id=sid, name=title, revision=revision, routes=len(rows), kind=kind)
     return record
+
+
+def project_site(title: str, source_key: str) -> str:
+    sid = make_id(title, source_key)
+    if not source_key.startswith("formweb:receive:") or source_key == "formweb:receive:formweb" or (paths.sites_dir() / sid / "site.json").is_file():
+        return sid
+    for record in list_sites():
+        source = record.get("source")
+        if isinstance(source, dict) and f"{source.get('kind')}:{source.get('url')}" == source_key and ID_RE.match(str(record.get("id", ""))):
+            return str(record["id"])
+    return sid
 
 
 def _staging() -> Path:

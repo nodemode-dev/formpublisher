@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "Il modulo in {0} invia a {1}, che non risponderà più una volta pubblicato il sito, quindi il modulo non invierà nulla.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "In FormWeb, dai al modulo una risposta con script (Movimento > Script, trigger Invio) oppure fai puntare la sua azione a un servizio di moduli sul web.",
+  "Added a revision to {0}": "Aggiunta una revisione a {0}"
+}

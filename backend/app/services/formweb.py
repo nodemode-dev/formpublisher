@@ -86,9 +86,21 @@ def download_export() -> tuple[Path, str]:
     return target, url
 
 
+def project_id() -> str | None:
+    try:
+        with _client(PROBE_TIMEOUT) as client:
+            res = client.get(f"{base_url()}/api/access")
+        data = res.json() if res.status_code == 200 else None
+    except (httpx2.HTTPError, ValueError):
+        return None
+    value = data.get("projectId") if isinstance(data, dict) else None
+    return value.strip()[:200] if isinstance(value, str) and value.strip() else None
+
+
 def import_current(name: str | None = None) -> dict:
+    project = project_id()
     archive, url = download_export()
     try:
-        return intake.import_formweb_zip(archive, url, name)
+        return intake.import_formweb_zip(archive, f"receive:{project}" if project else url, name)
     finally:
         archive.unlink(missing_ok=True)

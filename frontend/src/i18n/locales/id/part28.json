@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "Formulir di {0} mengirim ke {1}, yang tidak akan menjawab setelah situs diterbitkan, sehingga formulir tidak akan mengirim apa pun.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "Di FormWeb, beri formulir itu balasan berskrip (Gerak > Skrip, pemicu Kirim), atau arahkan tujuan kirimnya ke layanan formulir di web.",
+  "Added a revision to {0}": "Revisi ditambahkan ke {0}"
+}

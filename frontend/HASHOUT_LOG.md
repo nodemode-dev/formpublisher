@@ -2,8 +2,8 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.3.0
-Last updated: 2026-11-15 · Phases 58 to 65: the splash icon, the menubar, Preferences and Home rebuilt on the family's pattern, four demos, the review's fixes, the live checks no longer blame the preview, and the source name of a site sent from FormWeb
+Current build version: v0.3.1
+Last updated: 2026-11-15 · Phase 66: the strings of the forms.local-address check and the Import notice that says a revision was added
 
 ---
 
@@ -472,3 +472,11 @@ Checked: the four demos, every route, seven Device switches per route, English a
 ## Phase 65: a site sent from FormWeb names FormWeb as its source · v0.3.0 (2026-11-15)
 
 - `api.ts`: `sourceLabel()` shows "FormWeb" when a site's source address starts with `receive:`. A site sent from FormWeb is keyed by FormWeb's project id (`receive:site-...`), and the inspector's Source row showed that key. Found while testing the hand-off with FormWeb 0.21.0 in both directions; the engine's two fixes from the same test are in `backend/HASHOUT_LOG.md`, Phase 66.
+
+## Phase 66: the strings of the forms.local-address check and the revision notice · v0.3.1 (2026-11-15)
+
+The engine's part (the check, the project id on Import, `project_site()`) is in `backend/HASHOUT_LOG.md`, Phase 67. The window changes in two places.
+
+- `i18n/keys/part28.json` (new), in all 25 other languages: the message of `forms.local-address` ("The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send."), its fix ("In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.") and the toast "Added a revision to {0}". The two check strings are the engine's own text with the page and the address as `{0}` and `{1}`, the form every translated problem message already takes, so the Problems panel shows them in the window's language. The row's tooltip still shows the engine's English message and fix for every check, as before; this was not changed here.
+- `app.ts`, `flow()`: after an import it said "Imported [name]" whatever happened. Import from FormWeb now files a site under the FormWeb project it came from, so the same project imported again, or sent before, gains a revision of its site and no new site appears; a notice that says "Imported" would be false then. The wrapper reads the record's `revisions` count: more than one gives "Added a revision to [name]", one gives "Imported [name]" as before. The count is the one `toSite()` already makes from the record. The wrapper serves every import path (zip, folder, FormWeb), so opening a zip again, which also adds a revision, says the same.
+- `api.ts` is unchanged: a site imported from the open FormWeb project is keyed `receive:<project id>`, so `sourceLabel()` (Phase 65) already shows "FormWeb" as its source, the same as a site that was sent.

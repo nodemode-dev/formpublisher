@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "Форма на сторінці {0} надсилає дані на {1}, а ця адреса перестане відповідати після публікації сайту, тому форма нічого не надішле.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "У FormWeb задайте формі відповідь за сценарієм (Рух > Сценарій, тригер Надсилання) або вкажіть у її дії адресу сервісу форм в інтернеті.",
+  "Added a revision to {0}": "Додано ревізію сайту {0}"
+}

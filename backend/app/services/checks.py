@@ -1,5 +1,6 @@
 import hashlib
 import html
+import ipaddress
 import json
 import os
 import posixpath
@@ -29,6 +30,7 @@ CSS_IMPORT = re.compile(r"""@import\s+(['"])(.*?)\1""", re.I)
 CSS_COMMENT = re.compile(r"/\*.*?\*/", re.S)
 JS_EXTERNAL = re.compile(r"""(?:\bfetch|\bimport|\bnew\s+URL)\s*\(\s*(["'`])(https?://[^"'`\s]+)\1""")
 SITEMAP_LOC = re.compile(r"<loc>\s*(.*?)\s*</loc>", re.I | re.S)
+FORMS_PATH = "/api/forms/"
 _lock = threading.RLock()
 _live: dict[tuple[str, str], dict[str, dict]] = {}
 
@@ -173,6 +175,7 @@ class Page(HTMLParser):
         self.links: list[tuple[str, int]] = []
         self.assets: list[dict] = []
         self.images: list[tuple[int, dict]] = []
+        self.forms: list[tuple[int, dict]] = []
         self.headings: list[tuple[int, int]] = []
         self.styles: list[tuple[int, str]] = []
         self.title_buf: list[str] | None = None
@@ -236,6 +239,8 @@ class Page(HTMLParser):
             self._asset(tag, "src", a.get("src"), line)
         elif tag == "input" and a.get("type", "").lower() == "image":
             self._asset(tag, "src", a.get("src"), line)
+        elif tag == "form":
+            self.forms.append((line, a))
         elif len(tag) == 2 and tag[0] == "h" and tag[1] in "123456":
             self.headings.append((int(tag[1]), line))
 
@@ -283,6 +288,18 @@ def _route_key(path: str) -> str:
     if value.endswith(".html"):
         value = value[:-5]
     return _norm(value if value.startswith("/") else "/" + value)
+
+
+def local_host(host: str) -> bool:
+    host = (host or "").lower()
+    if host == "localhost" or host.endswith((".localhost", ".local")) or ("." not in host and ":" not in host):
+        return True
+    try:
+        address = ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    address = getattr(address, "ipv4_mapped", None) or address
+    return address.is_loopback or address.is_private or address.is_link_local or address.is_unspecified
 
 
 class Runner:
@@ -497,6 +514,7 @@ class Runner:
                     "Describe the image in alt text, or use an empty alt for decoration.",
                     file=rel, line=line, selector=selector, url=src or None, key=src,
                 )
+        self.check_forms(rel, route, page)
         if not routed:
             return
         if page.title is None or not page.title:
@@ -542,6 +560,24 @@ class Runner:
                     "Use heading levels in order without skipping.", file=rel, line=line,
                 )
             previous = level
+
+    def check_forms(self, rel: str, route: str, page: Page) -> None:
+        for line, attrs in page.forms:
+            action = attrs.get("action", "").strip()
+            target = self.target_path(rel, page, action) if action and not action.startswith("#") else None
+            if target is None or target[0] == "self":
+                continue
+            if target[0] == "int":
+                if not self.index.local(target[1]).startswith(FORMS_PATH):
+                    continue
+            elif not local_host(urlsplit("http:" + action if action.startswith("//") else action).hostname or ""):
+                continue
+            self.add(
+                "forms.local-address", "warning", route,
+                f"The form on {route} sends to {action}, which will not answer once the site is published, so the form will not send.",
+                "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.",
+                file=rel, line=line, selector=f'form[action="{action}"]', url=action, key=action,
+            )
 
     def check_css(self, rel: str) -> None:
         text = _read_text(self.root / rel)

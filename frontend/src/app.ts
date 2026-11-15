@@ -416,7 +416,7 @@ export async function startApp(): Promise<App> {
       await refreshSites();
       if (site) {
         await openSite(site.id);
-        notice('ok', `Imported ${site.name}`);
+        notice('ok', site.revisions > 1 ? `Added a revision to ${site.name}` : `Imported ${site.name}`);
       } else {
         showResult('ok', fallback);
         notice('ok', fallback);

@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "Formuläret på {0} skickar till {1}, som inte svarar när webbplatsen är publicerad, så formuläret skickar ingenting.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "Ge formuläret ett skriptat svar i FormWeb (Rörelse > Skript, utlösare Skicka), eller låt dess åtgärd peka på en formulärtjänst på webben.",
+  "Added a revision to {0}": "Lade till en revision i {0}"
+}

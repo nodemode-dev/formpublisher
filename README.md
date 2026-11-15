@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.3.0" src="https://img.shields.io/badge/version-0.3.0-4f6bff?style=flat-square">
+  <img alt="version 0.3.1" src="https://img.shields.io/badge/version-0.3.1-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -88,7 +88,7 @@
     </td>
     <td width="50%" valign="top">
       <h3>Checks</h3>
-      Static checks run offline on the files: links, assets, redirects, sitemap, robots, metadata, images, headings, external requests and size budgets. Live checks report the console, failed requests and layout shift from the preview. A deep check drives the Chrome you already have, at two widths on a slow network and CPU.
+      Static checks run offline on the files: links, assets, redirects, sitemap, robots, metadata, images, headings, external requests, forms that post to a local address and size budgets. Live checks report the console, failed requests and layout shift from the preview. A deep check drives the Chrome you already have, at two widths on a slow network and CPU.
     </td>
   </tr>
   <tr>
@@ -258,7 +258,7 @@ Every command takes `--json`. The MCP server has 19 tools over the same routes:
 
 ## Demo
 
-Home's Demos row lists four bundled sites, and Help > Demos has the same four. Three are the demo sites FormWeb ships, bundled here as FormWeb exported them, so one site can be followed through the family: "Lowlight" (a planetarium-show studio with scroll effects and page components), "Looking Back" (a photo essay on pictures of Earth from far away) and "Harbour Ferries" (a ferry operator with a fare calculator, routes and search). The fourth, "Northwind Notes", is a small sample with deliberate problems, so the checks have something to find. Each opens as its own site, and a quick tour walks Preview, Checks, Package and Publish. The photographs in the FormWeb sites are NASA pictures and their fonts are under the SIL Open Font License; `NOTICE.md` lists every picture. To see the sample without installing anything, open [`demo/index.html`](demo/index.html) from disk in a browser: it shows the FormPublisher window in both themes driving the sample site through the device widths, with the checks, the package manifest and the six prepared folders taken from real runs of the engine (`demo/data/`). The sample's pictures are CC0; `demo/MEDIA.md` lists their sources.
+Home's Demos row lists four bundled sites, and Help > Demos has the same four. Three are the demo sites FormWeb ships, bundled here as FormWeb exported them, so one site can be followed through the family: "Lowlight" (a planetarium-show studio with scroll effects and page components), "Looking Back" (a photo essay on pictures of Earth from far away) and "Harbour Ferries" (a ferry operator with a fare calculator, routes and search). The fourth, "Northwind Notes", is a small sample with deliberate problems, so the checks have something to find. Each opens as its own site, and a quick tour walks Preview, Checks, Package and Publish. The photographs in the FormWeb sites are NASA pictures, except the Hubble Ultra Deep Field, which is ESA/Hubble's under CC BY 4.0 with its credit, and their fonts are under the SIL Open Font License; `NOTICE.md` lists every picture with the credit and terms its source states. To see the sample without installing anything, open [`demo/index.html`](demo/index.html) from disk in a browser: it shows the FormPublisher window in both themes driving the sample site through the device widths, with the checks, the package manifest and the six prepared folders taken from real runs of the engine (`demo/data/`). The sample's pictures are the owner's own work, Apache-2.0; `demo/MEDIA.md` lists their sources.
 
 ### Agents
 

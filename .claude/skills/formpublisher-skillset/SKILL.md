@@ -2,7 +2,7 @@
 name: formpublisher-skillset
 description: Use for any change to FormPublisher's own code, the Form family's site publisher. Covers the FastAPI engine in backend/app (routers, services, the site intake of FormWeb exports and publication folders, the read-only FormWeb connection, settings and the data folder), the vanilla TypeScript and Vite interface in frontend (the shell, Home, tabs, routes strip, inspector, status bar, tokens and the zero-flash rules), the command line and MCP server behind backend/formpublisher_engine.py, the Tauri 2 shell in src-tauri and its frozen engine sidecar, and the ./formpublisher scripts. Trigger on FormPublisher source files, a new route, a new tool, an engine or interface bug, ports 8280 or 5280, or HASHOUT_LOG. Not for driving FormPublisher to import and list sites (use formpublisher-harness).
 metadata:
-  version: "0.3.0"
+  version: "0.3.1"
 ---
 
 # formpublisher-skillset
@@ -37,7 +37,7 @@ backend/app/services (paths, settings, site intake, the FormWeb reader)
 ## The laws
 
 - **The engine does the work.** Every capability is a route; the window, the command line and the MCP server are surfaces over it. A capability one surface has and another lacks is a bug: add the route, then the command and tool, then the pane.
-- **FormWeb is read, never written.** Import zips and folders, and call only a running FormWeb's read-only routes (`/api/export`, `/api/publications`, `/api/releases`). Never `/api/load`.
+- **FormWeb is read, never written.** Import zips and folders, and call only a running FormWeb's read-only routes (`/api/export`, `/api/publications`, `/api/releases`, `/api/access`). Never `/api/load`.
 - **The engine stays on loopback.** 127.0.0.1:8280, exact Host check, no other origin drives it.
 - **Zero flash.** Every container exists in its final layout before the first paint and is filled in place. Every `z-index` is a layer token from `frontend/src/styles/tokens.css`. Icons are inline `currentColor` SVG; no icon libraries.
 - **Surgical edits.** Hand-made edits, one region at a time; no codemods or scripted text replacement. No emoji, no em dashes in Markdown, no commented-out code, near-zero comments: the reasoning goes in the HASHOUT logs.

@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "{0} のフォームは {1} に送信しますが、サイトを公開するとこのアドレスは応答しないため、フォームは送信できません。",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "FormWeb でフォームにスクリプトによる応答を設定するか（モーション > スクリプト、トリガーは「送信」）、送信先をウェブ上のフォームサービスに変更してください。",
+  "Added a revision to {0}": "{0} にリビジョンを追加しました"
+}

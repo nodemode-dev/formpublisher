@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "A(z) {0} oldalon lévő űrlap ide küld: {1}. Ez a cím a webhely közzététele után nem válaszol, így az űrlap semmit sem küld el.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "A FormWebben adjon az űrlapnak szkriptelt választ (Mozgás > Szkript, eseményindító: Küldés), vagy irányítsa a műveletét egy webes űrlapszolgáltatásra.",
+  "Added a revision to {0}": "Új revízió hozzáadva: {0}"
+}
