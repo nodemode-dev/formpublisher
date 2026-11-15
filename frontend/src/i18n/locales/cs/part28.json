@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "Formulář na stránce {0} odesílá data na {1}. Tato adresa po zveřejnění webu nebude odpovídat, takže formulář nic neodešle.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "Ve FormWeb dejte formuláři skriptovanou odpověď (Pohyb > Skript, spouštěč Odeslání), nebo nasměrujte jeho akci na formulářovou službu na webu.",
+  "Added a revision to {0}": "Přidána revize webu {0}"
+}

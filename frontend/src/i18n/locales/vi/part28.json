@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "Biểu mẫu trên {0} gửi đến {1}, địa chỉ này sẽ không phản hồi khi trang web đã được xuất bản, nên biểu mẫu sẽ không gửi được.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "Trong FormWeb, hãy cho biểu mẫu một phản hồi bằng tập lệnh (Chuyển động > Tập lệnh, trình kích hoạt Gửi), hoặc trỏ hành động của nó tới một dịch vụ biểu mẫu trên web.",
+  "Added a revision to {0}": "Đã thêm một bản sửa đổi cho {0}"
+}

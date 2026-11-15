@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "Sivun {0} lomake lähettää osoitteeseen {1}, joka ei enää vastaa, kun sivusto on julkaistu, joten lomake ei lähetä mitään.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "Anna lomakkeelle FormWebissä skriptattu vastaus (Liike > Skripti, laukaisin Lähetä) tai ohjaa sen toiminto verkossa toimivaan lomakepalveluun.",
+  "Added a revision to {0}": "Uusi versio lisätty sivustoon {0}"
+}

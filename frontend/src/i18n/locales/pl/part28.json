@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "Formularz na stronie {0} wysyła dane do {1}, a ten adres przestanie odpowiadać po opublikowaniu witryny, więc formularz niczego nie wyśle.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "W FormWeb nadaj formularzowi odpowiedź ze skryptu (Ruch > Skrypt, wyzwalacz Wysłanie) albo skieruj jego akcję do usługi formularzy w sieci.",
+  "Added a revision to {0}": "Dodano wersję witryny {0}"
+}

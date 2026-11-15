@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "Форма на странице {0} отправляет данные на {1}, а этот адрес перестанет отвечать после публикации сайта, поэтому форма ничего не отправит.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "В FormWeb задайте форме ответ по сценарию (Движение > Сценарий, триггер Отправка) или укажите в её действии адрес сервиса форм в интернете.",
+  "Added a revision to {0}": "Добавлена ревизия сайта {0}"
+}

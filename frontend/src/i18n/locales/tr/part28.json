@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "{0} sayfasındaki form {1} adresine gönderir; bu adres site yayımlandıktan sonra yanıt vermez, bu yüzden form hiçbir şey göndermez.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "FormWeb'de forma betikli bir yanıt verin (Hareket > Betik, tetikleyici Gönderme) veya eylemini web'deki bir form hizmetine yönlendirin.",
+  "Added a revision to {0}": "{0} sitesine bir revizyon eklendi"
+}

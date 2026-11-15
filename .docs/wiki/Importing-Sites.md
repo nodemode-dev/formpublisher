@@ -12,7 +12,7 @@ A FormWeb publication lives in a folder shaped `publications/[slug]/[version]/`.
 
 ## The site open in FormWeb
 
-With FormWeb running on the same computer, FormPublisher can import the site FormWeb currently has open. It asks FormWeb's engine for `GET /api/export` over loopback and imports the zip it gets back. FormWeb's read-only routes are the only ones FormPublisher uses; it never calls `/api/load`, which would replace the document FormWeb has open.
+With FormWeb running on the same computer, FormPublisher can import the site FormWeb currently has open. It asks FormWeb's engine for `GET /api/export` over loopback and imports the zip it gets back. It first reads the open project's id from `GET /api/access` (`projectId`), so the site lands on the same FormPublisher site as FormWeb's Send to FormPublisher of that project, as a new revision; without an answer it files the site under FormWeb's address, as 0.3.0 did. FormWeb's read-only routes are the only ones FormPublisher uses; it never calls `/api/load`, which would replace the document FormWeb has open.
 
 ## A .fweb project
 

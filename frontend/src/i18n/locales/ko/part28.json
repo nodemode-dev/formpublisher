@@ -1,0 +1,5 @@
+{
+  "The form on {0} sends to {1}, which will not answer once the site is published, so the form will not send.": "{0}의 양식은 {1}(으)로 전송하지만, 사이트를 게시하면 이 주소가 응답하지 않으므로 양식이 전송되지 않습니다.",
+  "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.": "FormWeb에서 양식에 스크립트 응답을 지정하거나(모션 > 스크립트, 트리거 제출) 양식의 전송 주소를 웹의 양식 서비스로 바꾸세요.",
+  "Added a revision to {0}": "{0}에 리비전을 추가했습니다"
+}
