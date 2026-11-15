@@ -8,7 +8,7 @@ Runs offline on the revision's files. Codes: `link.broken`, `link.anchor`, `asse
 
 ## Live
 
-From the preview probe: console errors, page errors and failed requests are errors; console warnings are warnings; layout shift above 0 is a warning and 0.1 or more an error; overflow is an error. Live problems reach the engine at most once a second.
+From the preview probe: console errors, page errors and failed requests are errors; console warnings are warnings; layout shift of 0.001 or more is a warning and 0.1 or more an error; overflow is an error. A shift within 500 ms of the preview frame changing size, or before the page's first paint, is the preview's doing and is not counted. Live problems reach the engine at most once a second.
 
 ## Deep
 

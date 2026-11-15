@@ -17,7 +17,7 @@ Node 22.12 or newer and Python 3.12. The desktop app also needs Rust and the Tau
 
 ## The desktop app
 
-`./build_app` freezes the engine with PyInstaller into `formpublisher-engine` (the built interface, the demo site and the `formweb-core` compiler go inside; `formpublisher-engine --selfcheck` proves it starts) and builds the Tauri 2 shell around it. The app shows a small splash, starts the engine, and reveals the window when the interface has drawn, with no white flash. A second launch focuses the running window. Closing the last window, or a terminate or interrupt signal, stops the engine and anything it started.
+`./build_app` freezes the engine with PyInstaller into `formpublisher-engine` (the built interface, the four demo sites and the `formweb-core` compiler go inside; `formpublisher-engine --selfcheck` proves it starts) and builds the Tauri 2 shell around it. The app shows a small splash, starts the engine, and reveals the window when the interface has drawn, with no white flash. A second launch focuses the running window. Closing the last window, or a terminate or interrupt signal, stops the engine and anything it started.
 
 The port rule: `FORMPUBLISHER_PORT` when set, else 8280 when free, else any free port. An engine already answering on that port is reused. The engine writes `engine.json` (`app`, `port`, `pid`, `version`, `started`) in the data folder once it is up, so FormWeb's Send to FormPublisher finds the app on any port; when the app is closed FormWeb leaves the site in the inbox and the engine imports it from there. In the desktop app, Open Folder uses the system folder panel and Reveal Site Folder opens only paths inside the data folder. See the manual's "The desktop app".
 

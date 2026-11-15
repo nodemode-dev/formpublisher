@@ -172,7 +172,7 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
 
 <table>
   <tr>
-    <td width="50%" valign="top"><b>Home</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.webp"><img alt="Home with the Northwind Notes site in Recent and the demo card" src="docs/images/home-light.webp"></picture></td>
+    <td width="50%" valign="top"><b>Home</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/home-dark.webp"><img alt="Home with the Northwind Notes site in Recent and the four demo cards" src="docs/images/home-light.webp"></picture></td>
     <td width="50%" valign="top"><b>Preview</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/preview-dark.webp"><img alt="The sample site in the preview stage with the routes strip and the inspector" src="docs/images/preview-light.webp"></picture></td>
   </tr>
   <tr>

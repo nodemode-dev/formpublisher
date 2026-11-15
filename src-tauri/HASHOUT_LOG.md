@@ -3,7 +3,7 @@
 Living log for the desktop shell (Tauri 2). Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.2.8
-Last updated: 2026-11-11 · v0.2.3 no shell changes; Cargo.toml, Cargo.lock and tauri.conf.json carry 0.2.3.
+Last updated: 2026-11-15 · v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
 
 ---
 
@@ -11,7 +11,7 @@ Last updated: 2026-11-11 · v0.2.3 no shell changes; Cargo.toml, Cargo.lock and 
 
 ```
 src-tauri/
-├── Cargo.toml          package formpublisher, its own [workspace]; tauri 2 (macos-private-api), shell, dialog, single-instance, serde_json; gtk on Linux, objc2 on macOS (reveal only)
+├── Cargo.toml          package formpublisher, its own [workspace]; tauri 2 (macos-private-api), shell, dialog, single-instance, serde_json; gtk on Linux, objc2 on macOS (reveal and traffic lights)
 ├── Cargo.lock          resolved by cargo check on Linux (466 packages)
 ├── build.rs            the app commands with generated allow permissions (app_ready, open_window, reveal_path)
 ├── tauri.conf.json     splash window, macOSPrivateApi, externalBin, resources, bundle metadata
@@ -22,7 +22,8 @@ src-tauri/
 └── src/
     ├── files.rs        reveal_path, limited to the data folder
     ├── main.rs         port choice, engine health check and start in its own process group, signals, main window, open_window, exit
-    └── reveal.rs       splash minimum, bar finish, fallback, rounded splash, hidden-until-ready main window
+    ├── reveal.rs       splash minimum, bar finish, fallback, rounded splash, hidden-until-ready main window
+    └── traffic_lights.rs  macOS: the inset of the close, minimize and zoom buttons in the overlay title bar
 ```
 
 ---
@@ -45,7 +46,7 @@ The Linux `set_seen` imports `gtk::prelude::{GtkWindowExt, WidgetExt}` and so Ca
 
 The engine address is fixed at http://127.0.0.1:8280. `healthy` makes a plain TCP request for `GET /api/health` and accepts a 200, so no HTTP client crate is needed. If it answers, the main window opens on it and no process is owned. If not, the shell starts either `formpublisher-engine` beside the executable (where Tauri puts externalBin, `Contents/MacOS` on macOS) or, in a source checkout, `formpublisher serve` from `FORMPUBLISHER_ROOT` (default the folder above src-tauri in debug builds), with `FORMPUBLISHER_PORT=8280`. It polls every 250 ms for up to 60 s, then shows an error dialog and exits. On exit an owned child gets SIGTERM, up to 1.5 s to leave, then a kill. The work runs on a thread; the window is built on the main thread through `run_on_main_thread`.
 
-Main window: 90% of the primary screen, at least 1024 by 680, centred, system title bar (the form.ext traffic-light port is not taken), drag-drop handler off so the page receives dropped files. `open_window(path, title)` opens a further window on the engine origin only (the path is appended to the fixed origin), label `extra-<millis>`, concealed the same way and revealed by that page's `app_ready`. A second launch focuses the main window.
+Main window: 90% of the primary screen, at least 1024 by 680, centred, an overlay title bar on macOS (see [Overlay title bar and traffic lights](#traffic-lights)) and the system title bar elsewhere, drag-drop handler off so the page receives dropped files. `open_window(path, title)` opens a further window on the engine origin only (the path is appended to the fixed origin), label `extra-<millis>`, concealed the same way and revealed by that page's `app_ready`. A second launch focuses the main window.
 
 ---
 
@@ -119,3 +120,18 @@ Checked on Linux: `cargo build --release` with no warnings; under xvfb `reveal_p
 - logged: v0.2.8 · 2026-11-11
 
 Built on Linux with WebKitGTK 2.52.6 (already installed): `setup/freeze_backend` (44 s, it installs PyInstaller into the venv itself) wrote `binaries/formpublisher-engine-x86_64-unknown-linux-gnu`, ignored by git; `CARGO_TARGET_DIR=/tmp/... cargo build --release` took 8 minutes cold with no warnings, and Tauri copied the engine beside the executable, so `sidecar_path` used it. Under Xvfb with `FORMPUBLISHER_PORT=9012` and `FORMPUBLISHER_HOME` under /tmp the window opened at 90% of the screen, an imported `.fpub` opened, the in-window menus (native menus are macOS only) followed a live language switch in English, German and Russian, and the window title stayed "FormPublisher" (the brand is not translated; the page shows the site name). The toolbar, bottom tab strip, Problems bar and compact filter matched Chrome on the same engine at 1024 x 680 and 1440 x 900; WebKitGTK selects are about 6 px wider, so the Problems filters fall back to "All" a little earlier, as `fitBar()` measures. Without a window manager the 1024 x 680 minimum is only a size hint (`xprop` shows it). With `WEBKIT_DISABLE_DMABUF_RENDERER=1` WebKitGTK draws no `backdrop-filter`, so glass menus show what is behind them; without that variable the blur is drawn, so visual checks of glass surfaces should leave it unset. SIGTERM stopped the engine and freed the port within 4 s. The run also exposed the shared preview host port, fixed in the engine (see `backend/HASHOUT_LOG.md`, Phase 56). Not run: `tauri build` bundles, macOS native menus, Windows. No shell source changed.
+
+---
+
+## Overlay title bar and traffic lights {#traffic-lights}
+- refers-to: src/traffic_lights.rs :: place, inset · src/main.rs :: open_main, open_window, on_page_load, on_window_event · src/reveal.rs :: conceal, reveal · capabilities/default.json · Cargo.toml :: objc2-app-kit
+- kind: decision
+- logged: v0.3.0 · 2026-11-15
+
+On macOS the main window has `TitleBarStyle::Overlay` with a hidden title, so the page's title row is the window's title bar. Until 0.3.0 the page did nothing for it: no part of the row dragged the window, and the close, minimize and zoom buttons sat at the system's default place over the brand. The page's half is in `frontend/HASHOUT_LOG.md`, Phase 62 (a 38 px row, 78 px of left padding, `data-tauri-drag-region` on the row's empty parts).
+
+`traffic_lights::place` gives the three buttons their own inset: the title bar container becomes `ROW` 38 pt tall, the buttons are centred in it and start `LEFT` 14 pt from the edge, keeping the system's own spacing (`step` is measured from the close and minimize buttons, so it follows the macOS version). AppKit lays the title bar out again, back to its defaults, whenever the window is resized, gains or loses focus, changes theme or scale factor, and after a page load, so `place` runs on those window events, after `conceal`, after the reveal and when a page finishes loading. It runs twice each time, at once and 120 ms later, because some of those layouts happen after the event is delivered. The splash is skipped. On Linux and Windows `place` is an empty function.
+
+Windows opened by `open_window` now get the same overlay style; they had the system title bar while the page drew its row for the overlay. The capability gains `core:window:allow-start-dragging`, which `data-tauri-drag-region` needs when the page comes from a remote origin (the engine). `objc2-app-kit` gains the `NSButton` and `NSControl` features for `standardWindowButton` and the buttons' frames.
+
+Checked: `cargo check` for Linux and for the macOS target, both exit 0 (the frozen engine replaced by a placeholder file). The page's geometry was measured in Chrome with a faked macOS shell. Not run: any of this on a Mac; whether the 120 ms second pass is enough on a slow machine is not known.

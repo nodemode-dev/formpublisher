@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.0 · 2026-11-15
+
+- Home has a new layout: a side panel with Start, Recent sites, Builds and Trash (the last two with a count) and the three ways to import, and a Demos row on Start. A site that arrives while Home is open no longer pushes the cards around: a note says that it arrived and Show brings it in. Deleting a build or emptying the trash asks in a row inside Home instead of a dialog over it.
+- Four demo sites open from Home, from Help > Demos and from the command palette: Lowlight, Looking Back and Harbour Ferries, the three demo sites FormWeb ships, and Northwind Notes, the sample with problems for the checks to find. `NOTICE.md` and `demo/MEDIA.md` list every picture and font in them with its source and licence.
+- The menubar has a Window menu (Minimize, Maximize, Full Screen), Home is the first item of File, and every menu works from the keyboard: F10 or Alt, the arrow keys, Home and End, Escape, and typing the start of an item's name. On macOS, View > Menus in Window keeps the menus in the window from the next start.
+- Preferences is one scrolling page with a rail of its sections beside it. Each section folds, and the rail collapses to icons.
+- macOS: the title row drags the window, and the close, minimize and zoom buttons sit in that row with room of their own.
+- The live checks no longer report a layout shift or a sideways overflow that the preview itself caused. Switching Device on a finished site used to mark every route with `live.cls`. A page's own shifts and overflow are still found.
+- With FormWeb 0.21.0: a `.fweb` project opened here gives the same not-found page as FormWeb's own export, so its pictures and fonts load at any missing address. A site whose address has a folder in it (`https://example.org/shop/`, a GitHub project page, a FormWeb publication folder) no longer gets false missing-file, broken-link and sitemap findings, and its not-found page is styled in the preview. The inspector names FormWeb as the source of a site sent from FormWeb.
+- Fifteen fixes from a review of the whole app. Among them: a zip with a file and a folder of one name is refused with a clear message instead of an error 500; importing the open site again, or Reload Routes, no longer empties the routes strip; Builds and Trash hold still on a language switch and their tables scroll in a narrow window; dialogs and Preferences fit a narrow window; `formpublisher.bat` passes every argument; the command line survives a closed pipe; the desktop build checks the engine inside the finished macOS app.
+- The splash shows the app icon.
+- The manual says how to open a macOS build that is signed but not notarized.
+- The FormWeb engine crates are vendored at 0.21.0.
+- The new and changed labels are in all 26 languages.
+
 ## 0.2.8 · 2026-11-11
 
 - The toolbar's dropdowns start at their final width in every language, so the first pick after starting in German, for example, no longer moves the toolbar.
