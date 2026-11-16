@@ -133,11 +133,17 @@ class Client:
             return self.call("POST", "/api/sites/import", {"path": absolute, "name": name})
         return self._local(intake.import_path, absolute, name)
 
-    def import_formweb(self) -> dict:
+    def import_formweb(self, project: str | None = None) -> dict:
         self.connect()
         if self.url:
-            return self.call("POST", "/api/formweb/import-current", {})
-        return self._local(formweb.import_current)
+            return self.call("POST", "/api/formweb/import-current", {"project": project} if project else {})
+        return self._local(formweb.import_project, project)
+
+    def formweb_projects(self) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", "/api/formweb/projects")
+        return self._local(formweb.projects)
 
     def routes(self, site_id: str) -> dict:
         self.connect()
@@ -408,6 +414,16 @@ def say_import(data: dict) -> str:
     return f"{line}\nbuild {built['id']}{moved}  {state}"
 
 
+def say_formweb_projects(data: dict) -> str:
+    lines = []
+    for row in data.get("projects", []):
+        state = "open" if row.get("open") else "saved"
+        if row.get("open") and not row.get("saved"):
+            state = "open, not saved"
+        lines.append(f"{row.get('id') or '-':<40} {state:<16} {row.get('updatedAt') or '':<22} {row.get('name') or ''}")
+    return "\n".join(lines) or "FormWeb has no projects"
+
+
 def say_fpub(data: dict) -> str:
     return f"saved build {data['build']} as {data['file']}  {data['size']} bytes  sha256 {data['sha256']}"
 
@@ -560,7 +576,9 @@ def build_parser() -> argparse.ArgumentParser:
     imp = sub.add_parser("import", parents=[common], help="import a FormWeb export zip, .fweb project, .fpub package or publication folder")
     imp.add_argument("path")
     imp.add_argument("--name", help="site name, overriding site.formweb.json")
-    sub.add_parser("import-formweb", parents=[common], help="download the current FormWeb export and import it")
+    ifw = sub.add_parser("import-formweb", parents=[common], help="download the current FormWeb export (or a saved project with --project) and import it")
+    ifw.add_argument("--project", metavar="ID", help="a saved FormWeb project id from formweb-projects (default: the site open in FormWeb)")
+    sub.add_parser("formweb-projects", parents=[common], help="list the running FormWeb's saved projects, the open one first")
     rt = sub.add_parser("routes", parents=[common], help="list the routes of a site")
     rt.add_argument("id")
     rv = sub.add_parser("revisions", parents=[common], help="list the revisions of a site, newest first, with what changed from the one before")
@@ -624,7 +642,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "import":
             data, say = client.import_path(args.path, args.name), say_import
         elif args.command == "import-formweb":
-            data, say = client.import_formweb(), say_import
+            data, say = client.import_formweb(args.project), say_import
+        elif args.command == "formweb-projects":
+            data, say = client.formweb_projects(), say_formweb_projects
         elif args.command == "revisions":
             data, say = client.revisions(args.id), say_revisions
         elif args.command == "diff":

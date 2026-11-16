@@ -617,7 +617,7 @@ class Panel {
     setText(q(node, '.fp-pn-route'), p.route);
     setText(q(node, '.fp-pn-tier'), p.tier);
     setAttr(node, 'data-route', p.route);
-    setAttr(node, 'title', p.fix ? `${p.message} ${p.fix}` : p.message);
+    setAttr(node, 'title', p.fix ? `${p.message} · ${p.fix}` : p.message);
   }
 
   private routeFor(route: string): string {

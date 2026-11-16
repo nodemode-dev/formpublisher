@@ -14,7 +14,7 @@ FormPublisher is the Form family's site publisher. It opens what FormWeb makes (
 
 ## FormWeb
 
-FormPublisher only reads FormWeb. It imports exports and publication folders and may call a running FormWeb's read-only routes (`GET /api/export`, `GET /api/publications`, `GET /api/releases`, `GET /api/access`). It never calls FormWeb's `/api/load`, which replaces the document FormWeb has open, and it never writes to FormWeb's data.
+FormPublisher only reads FormWeb. It imports exports and publication folders and may call a running FormWeb's read-only routes (`GET /api/export`, `GET /api/publications`, `GET /api/releases`, `GET /api/access`, `GET /api/projects`, `GET /api/projects/{id}/file`). It never calls FormWeb's `/api/load`, which replaces the document FormWeb has open, and it never writes to FormWeb's data.
 
 ## Rules
 

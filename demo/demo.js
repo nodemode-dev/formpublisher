@@ -225,7 +225,7 @@
     ['Build', build.id, true],
     ['SHA-256', manifest.package.sha256, true],
     ['Size', bytes(manifest.package.size) + ', ' + plural(manifest.files.length, 'file', 'files')],
-    ['Checks', plural(manifest.checks.errors, 'error', 'errors') + ', ' + plural(manifest.checks.warnings, 'warning', 'warnings') + ' (static)'],
+    ['Checks', manifest.checks && manifest.checks.tiers && manifest.checks.tiers.length ? plural(manifest.checks.errors, 'error', 'errors') + ', ' + plural(manifest.checks.warnings, 'warning', 'warnings') + ' (' + manifest.checks.tiers.join(', ') + ')' : 'Not run'],
     ['Signed', build.signed ? 'Yes' : 'Not signed yet'],
     ['Built with', manifest.builtWith],
   ]));

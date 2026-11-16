@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "El sitio carga {0} desde otro host: {1} referencias en {2}.",
+  "Choose the FormWeb project to import.": "Elige el proyecto de FormWeb que quieres importar.",
+  "Unsaved site": "Sitio sin guardar",
+  "Open in FormWeb": "Abierto en FormWeb",
+  "Saved {0}": "Guardado el {0}"
+}

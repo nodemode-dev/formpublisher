@@ -120,7 +120,7 @@ export function toDetail(raw: unknown): BuildDetail | null {
   if (!base || !isObj(raw)) return null;
   const pub = isObj(raw.publish) ? raw.publish : isObj(raw.publishJson) ? raw.publishJson : {};
   const siteInfo = isObj(pub.site) ? pub.site : {};
-  const checks = isObj(pub.checks) ? pub.checks : null;
+  const checks = isObj(pub.checks) && !(Array.isArray(pub.checks.tiers) && pub.checks.tiers.length === 0) ? pub.checks : null;
   return {
     ...base,
     siteName: str(siteInfo.name) || base.site,

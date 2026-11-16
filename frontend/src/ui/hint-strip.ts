@@ -4,6 +4,7 @@ import { on } from '../events';
 import { anyDialogOpen } from './dialogs';
 import { el, q, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
+import { reserveHint } from './reserve';
 
 const KEY = 'formpublisher.hints';
 
@@ -66,6 +67,7 @@ class HintStrip {
     if (this.open || read() || anyDialogOpen()) return;
     this.open = true;
     setHidden(this.root, false);
+    reserveHint(this.root);
     this.go(0);
   }
 

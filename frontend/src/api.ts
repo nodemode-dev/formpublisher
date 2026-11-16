@@ -34,6 +34,14 @@ export interface FormWebImport {
   message: string;
 }
 
+export interface FormWebProject {
+  id: string | null;
+  name: string;
+  updatedAt: string;
+  open: boolean;
+  saved: boolean;
+}
+
 const STATUS_CODES: Record<number, string> = {
   0: 'unreachable',
   400: 'invalid',
@@ -166,8 +174,17 @@ export const api = {
   },
   removeSite: (id: string): Promise<void> => request<void>(`/api/sites/${encodeURIComponent(id)}`, { method: 'DELETE' }),
   formwebStatus: (): Promise<Json> => request<Json>('/api/formweb/status'),
-  async formwebImportCurrent(): Promise<FormWebImport> {
-    const raw = await request<unknown>('/api/formweb/import-current', { method: 'POST' });
+  async formwebProjects(): Promise<FormWebProject[]> {
+    return listOf(await request<unknown>('/api/formweb/projects'), 'projects').filter(isObj).map((p) => ({
+      id: str(p.id) || null,
+      name: str(p.name),
+      updatedAt: str(p.updatedAt),
+      open: p.open === true,
+      saved: p.saved === true,
+    }));
+  },
+  async formwebImportCurrent(project: string | null = null): Promise<FormWebImport> {
+    const raw = await request<unknown>('/api/formweb/import-current', project ? json('POST', { project }) : { method: 'POST' });
     const site = toSite(isObj(raw) && isObj(raw.site) ? raw.site : raw);
     const message = isObj(raw) ? str(raw.message) : '';
     return { site, message };

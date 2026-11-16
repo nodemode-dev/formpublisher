@@ -3,6 +3,7 @@ import type { App, AppState, BottomTab, EngineState, Mounts, OpenTab, Pane } fro
 import { emit, type NoticeKind } from './events';
 import { locale, onLanguage } from './i18n';
 import { brandMark } from './ui/brand';
+import { pickFormWebProject } from './ui/formweb-picker';
 import { inTauri, mountOnce, q,setAttr, setClass, setDisabled, setHidden, setText, setTitle, setValue } from './ui/dom';
 import { installHints } from './ui/hint-strip';
 import { icon } from './ui/icons';
@@ -446,7 +447,17 @@ export async function startApp(): Promise<App> {
     return site;
   };
 
-  const importFromFormWeb = (): Promise<Site | null> => flow(async () => (await api.formwebImportCurrent()).site, 'FormWeb import finished.');
+  const importFromFormWeb = async (): Promise<Site | null> => {
+    if (busy) return null;
+    let project: string | null = null;
+    const projects = await api.formwebProjects().catch(() => []);
+    if (projects.length > 1) {
+      const picked = await pickFormWebProject(projects);
+      if (picked === undefined) return null;
+      project = picked;
+    }
+    return flow(async () => (await api.formwebImportCurrent(project)).site, 'FormWeb import finished.');
+  };
 
   const nativeFolder = async (): Promise<string | null | undefined> => {
     try {

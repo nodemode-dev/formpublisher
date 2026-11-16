@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import APIRouter
 from starlette.concurrency import run_in_threadpool
 
-from app.services import intake, paths
+from app.services import demo_refresh, intake, paths
 
 router = APIRouter(prefix="/api/demo", tags=["demo"])
 
@@ -27,7 +27,8 @@ def _open(key: str, archive: Path, stem: str, missing: str) -> dict:
     with _lock:
         found = _existing(key)
         if found is not None:
-            return {"site": found, "created": False}
+            updated = demo_refresh.refresh(found, archive, key, stem)
+            return {"site": updated or found, "created": False, "updated": updated is not None}
         if not archive.is_file():
             raise intake.IntakeError(missing, 404)
         record = intake.import_zip_file(archive, "demo", {"kind": "demo", "key": key, "path": DEMO_SOURCE}, key, None, stem)

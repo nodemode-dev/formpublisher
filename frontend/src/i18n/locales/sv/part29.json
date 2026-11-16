@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "Webbplatsen läser in {0} från en annan värd: {1} hänvisningar på {2}.",
+  "Choose the FormWeb project to import.": "Välj det FormWeb-projekt som ska importeras.",
+  "Unsaved site": "Osparad webbplats",
+  "Open in FormWeb": "Öppen i FormWeb",
+  "Saved {0}": "Sparad {0}"
+}

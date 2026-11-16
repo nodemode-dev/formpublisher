@@ -1,0 +1,8 @@
+.fp-fw-list { display: grid; gap: var(--space-1); max-height: 320px; overflow-y: auto; overscroll-behavior: contain; }
+.fp-fw-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--space-2); min-height: 48px; padding: 6px var(--space-2); border: 1px solid var(--line-2); border-radius: var(--radius); cursor: pointer; }
+.fp-fw-row:hover { border-color: var(--line-3); }
+.fp-fw-row:has(input:checked) { border-color: var(--accent-color); }
+.fp-fw-row input { margin: 0; accent-color: var(--accent-color); }
+.fp-fw-text { display: grid; min-width: 0; }
+.fp-fw-name { overflow: hidden; color: var(--text-primary); font-size: var(--fp-13); text-overflow: ellipsis; white-space: nowrap; }
+.fp-fw-meta { overflow: hidden; color: var(--text-muted); font-size: var(--fp-12); text-overflow: ellipsis; white-space: nowrap; }

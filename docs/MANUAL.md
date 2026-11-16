@@ -71,7 +71,7 @@ There are four ways in, and all of them only read:
 - **A site export.** Drop FormWeb's `site-export.zip` on Home, or choose it. A `.fweb` project (see [.fweb projects](#fweb-projects)) and a `.fpub` package go in the same way: Open, the file picker and the drop take `.zip`, `.fweb` and `.fpub`.
 - **A .fpub package.** One build saved from another FormPublisher. See [The .fpub format](#the-fpub-format).
 - **A publication folder.** Choose a FormWeb publication folder, `publications/[slug]/[version]/`.
-- **The site open in FormWeb.** With FormWeb running on the same computer, import its current site. FormPublisher asks FormWeb's `GET /api/export` over loopback. It never calls `/api/load` and never changes what FormWeb has open.
+- **The site open in FormWeb, or one of its saved projects.** With FormWeb running on the same computer, import its current site, or pick one of its saved projects from a short list. FormPublisher asks FormWeb's `GET /api/export` (or `GET /api/projects` and `GET /api/projects/[id]/file`) over loopback. It never calls `/api/load` and never changes what FormWeb has open.
 
 ## Routes
 
@@ -143,7 +143,7 @@ The options toolbar above the stage controls the preview:
 
 Theme, motion and network remount the site with the new options and reload the frame. Size and zoom never reload it. Navigating loads a hidden second frame and swaps it in once it has loaded, so the page never blanks. The choices are remembered per window.
 
-In a narrow window the toolbar keeps every control in its row and steps down in stages. Below 1400 px of row each select is as wide as its longest option, so every value shows whole and choosing another option never moves anything. Below 1240 px Publish and Package show only their icon (the label stays as the accessible name and the tooltip). If the row still overflows, the separators go and the route field becomes an icon: focus it and it opens as a 300 px field over the row without moving the row; Enter navigates, and Escape or leaving the field collapses it. If that is not enough, the selects show short labels: the value after "Theme:" and similar prefixes, and the device name without its size; the device select is then as wide as its widest preset name, and Custom shows a short word ("Andere" in German) where its full name would be wider, with the full device name in the tooltip. Only the display is shortened; the options and their keys are unchanged. A last step tightens the row's padding, hides the "x" between width and height and narrows the two number fields. The sizing also starts above 1400 px whenever the row would otherwise overflow, which happens in the Linux desktop shell (WebKitGTK draws selects a few pixels wider than Chrome) with long labels such as German. The Problems bar does the same with its two filters: when it would wrap, "All severities" and "All tiers" show "All" (the full name stays in the tooltip), and if that is still too wide in your language both filters give way to one funnel button. Its tooltip reads "Filter problems" with the current severity and tier, a dot marks it while either filter is not All, and it opens a menu with both groups (by mouse, or with Enter, Space or Down, the arrows, Home, End and Escape). Picking there filters the list exactly as the selects do. The bar stays one row at every width.
+In a narrow window the toolbar keeps every control in its row and steps down in stages. Below 1400 px of row each select is as wide as its longest option, so every value shows whole and choosing another option never moves anything. Below 1240 px Publish and Package show only their icon (the label stays as the accessible name and the tooltip). If the row still overflows, the separators go and the route field becomes an icon: focus it and it opens as a 300 px field over the row without moving the row; Enter navigates, and Escape or leaving the field collapses it. If that is not enough, the selects show short labels: the value after "Theme:" and similar prefixes, and the device name without its size; the device select is then as wide as its widest preset name, and Custom shows a short word ("Andere" in German) where its full name would be wider, with the full device name in the tooltip. Only the display is shortened; the options and their keys are unchanged. A last step tightens the row's padding, hides the "x" between width and height and narrows the two number fields. Each width follows the labels of the language shown, so choosing a new language in Preferences moves the toolbar's controls sideways once, at the moment of the switch. The sizing also starts above 1400 px whenever the row would otherwise overflow, which happens in the Linux desktop shell (WebKitGTK draws selects a few pixels wider than Chrome) with long labels such as German. The Problems bar does the same with its two filters: when it would wrap, "All severities" and "All tiers" show "All" (the full name stays in the tooltip), and if that is still too wide in your language both filters give way to one funnel button. Its tooltip reads "Filter problems" with the current severity and tier, a dot marks it while either filter is not All, and it opens a menu with both groups (by mouse, or with Enter, Space or Down, the arrows, Home, End and Escape). Picking there filters the list exactly as the selects do. The bar stays one row at every width.
 
 Theme and motion are emulated by a probe script that the host injects into HTML responses right after `<head>` (only while previewing, never in a package). It makes `prefers-color-scheme` and `prefers-reduced-motion` answer as chosen, and makes `fw-theme-*` storage keys return the forced theme. The same probe reports the console, errors, requests, layout shift and horizontal overflow to the window for the live checks.
 
@@ -178,7 +178,7 @@ A site whose address has a folder in it (a base URL such as `https://example.org
 | `img.alt` | warning | an `img` has no `alt` (an empty `alt` is fine) |
 | `heading.h1` | warning | a page has no `h1`, or more than one |
 | `heading.order` | info | a heading level is skipped going down |
-| `external.request` | warning | an `http(s)` URL in a resource position (`src`, `srcset`, `poster`, stylesheet `href`, CSS `url()`, `@import`, and string literals passed to `fetch(`, `import(` or `new URL(` in `.js` files) that is not on the site's own host |
+| `external.request` | warning | an `http(s)` URL in a resource position (`src`, `srcset`, `poster`, stylesheet `href`, CSS `url()`, `@import`, and string literals passed to `fetch(`, `import(` or `new URL(` in `.js` files) that is not on the site's own host. One warning per distinct URL, on the first page that uses it; when the URL is used more than once, the message gives the number of references and every page, and the problem carries `count` and `pages` |
 | `forms.local-address` | warning | a `form` whose `action` goes to this computer or the local network (`localhost`, a `.local` name, a host name without a dot, or a loopback, private, link-local or unspecified address), or into `/api/forms/` on the site itself (FormWeb's own form route, which no static host serves). The message names the page and the address. A form with no `action` (FormWeb writes a form with a scripted reply that way) and a form that posts to a service on the web are not reported. The rest of the page still works, so this is a warning |
 | `budget.file` | warning over 1 MiB, error over 5 MiB | HTML, CSS and JS files; media (images, video, audio, fonts) warn over 20 MiB |
 | `budget.page` | warning | a route's HTML plus the CSS and JS it references directly totals over 500 KiB |
@@ -226,7 +226,7 @@ Each build lives in `builds/[site]/[id]/`:
 
 ```json
 {
-  "builtWith": "FormPublisher 0.3.2",
+  "builtWith": "FormPublisher 0.3.3",
   "checks": { "errors": 0, "infos": 0, "tiers": ["static"], "warnings": 0 },
   "files": [ { "path": "index.html", "sha256": "...", "size": 1024 } ],
   "format": "formpublisher-site",
@@ -243,6 +243,8 @@ Each build lives in `builds/[site]/[id]/`:
 ```
 
 `source.kind` is `formweb-export`, `publication`, `fweb` or `folder`.
+
+`checks` counts the problems of the revision's stored check results, and `tiers` lists the tiers that ran (`static`, `deep`). A build made before any check ran on that revision has `"checks": null`: no check ran, which is not the same as a clean result. A `publish.json` written by 0.3.2 or earlier has `"checks": { "errors": 0, "infos": 0, "tiers": [], "warnings": 0 }` in that case; read an empty `tiers` the same way as `null`.
 
 Reproduce rebuilds the revision in a temporary folder and compares the SHA-256 with the stored one: it answers `same`, the new hash and the expected hash.
 
@@ -319,7 +321,7 @@ UTF-8 JSON, indented two spaces, with a trailing newline:
   "site": { "id": "northwind-notes", "name": "Northwind Notes" },
   "build": "a1b2c3d4e5f6",
   "revision": "20261111T010203Z",
-  "builtWith": "FormPublisher 0.3.2",
+  "builtWith": "FormPublisher 0.3.3",
   "createdAt": "2026-11-11T01:02:03Z",
   "package": { "file": "site.zip", "sha256": "64 lowercase hex digits", "size": 12345 },
   "signature": null
@@ -382,7 +384,11 @@ FormWeb's Send to FormPublisher hands a site over without a file dialog. There a
 
 Inbox metadata. FormWeb writes a small `NAME.zip.json` beside the zip it leaves in the inbox, with `siteName`, `project` and `version` (the same three things the endpoint takes as headers). The import reads it, so a site that arrives through the inbox gets its name and its project, and a later arrival of the same project adds a revision to the same site instead of making a new one. The file moves with the zip to `imported/` or `failed/`. Without it the site arrives with no name and no project.
 
-Import from FormWeb lands on the same site. Before it reads the export, Import asks the running FormWeb which project is open (`GET /api/access`, field `projectId`, the same value FormWeb sends as `X-FormWeb-Project`), so a project that was sent, sent through the inbox or imported before gains a revision, and a new site is made only for a project that has never arrived. The toast then says "Added a revision to [name]" instead of "Imported [name]". A project that arrives under another name than before (renamed in FormWeb) still goes to its site. When FormWeb does not answer that question (an older FormWeb, or one that asks for a sign-in), Import files the site under FormWeb's address as before. Sites imported that way by 0.3.0 and earlier stay as they are, keyed by FormWeb's address: they open, check and build as before, nothing is merged or moved, and later imports go to the project's own site. Remove the old one from Home when you no longer need it.
+Import from FormWeb lands on the same site. Before it reads the export, Import asks the running FormWeb which project is open (`GET /api/access`, field `projectId`, the same value FormWeb sends as `X-FormWeb-Project`), so a project that was sent, sent through the inbox or imported before gains a revision, and a new site is made only for a project that has never arrived. The toast then says "Added a revision to [name]" instead of "Imported [name]". A project that arrives under another name than before (renamed in FormWeb) still goes to its site. When FormWeb does not answer that question (an older FormWeb, or one that asks for a sign-in), Import files the site under FormWeb's address as before.
+
+A site imported by 0.3.0 or earlier is keyed by FormWeb's address, not by project. The first time a project arrives (Import, Send or the inbox) and no site of that project exists yet, FormPublisher looks for such an old site with the same name. When exactly one matches, it adopts it: the project's revision is added to that site, which keeps its id, its revisions, its checks and its builds, and from then on is the project's site. When none matches, a new site is made. When more than one matches (for example two old imports of a project with the same name from FormWeb at two addresses), none is adopted: a new site is made and the old ones stay as they are, keyed by FormWeb's address; remove them from Home when you no longer need them.
+
+Import from FormWeb can also take one of FormWeb's saved projects. When the running FormWeb lists saved projects (`GET /api/projects`), Import from FormWeb first shows them in a short list, the project open in FormWeb first and chosen; with only the open site to offer it imports at once, as before. The open project is read from FormWeb's export, so unsaved changes come along. Any other project is read from its last save (`GET /api/projects/[id]/file`, a `.fweb` that FormPublisher compiles with `formweb-core`), so it lands on the same site as that project's Send and Import, keyed by its project id. FormWeb is not asked to open anything and nothing in FormWeb changes. The same choice is `./formpublisher run formweb-projects` and `import-formweb --project ID`, and the MCP tools `list_formweb_projects` and `import_formweb_current` with `project`.
 
 Auto-check and auto-build. Two switches in Preferences, FormWeb section, both off by default: Check a site when it arrives, and Build a site when it arrives (settings `receive.autoCheck` and `receive.autoBuild`). When on, each site that arrives from FormWeb, by the endpoint or the inbox, gets the static checks run and then the package built, in that order, on a background thread so the receive answer never waits. They emit the same events as the manual actions (`checks.done`, then the build's own) and a `receive.pipeline` event with the outcome, so a window that is open updates by itself and the problems are ready when you open the site. A failure is reported in that event and never breaks the import.
 
@@ -396,7 +402,7 @@ The same lists come from `GET /api/sites/{id}/revisions` and `GET /api/sites/{id
 
 ## The demo
 
-Home's Demos section lists the bundled demos, each a card with a cover picture, its name and one line about it; Help > Demos has the same list as commands. There are four. "Lowlight" (a planetarium-show studio with scroll effects and page components, 5 routes), "Looking Back" (a photo essay on pictures of Earth from far away, 4 routes) and "Harbour Ferries" (a ferry operator with a fare calculator, a page per route and site search, 12 routes) are the three demo sites FormWeb ships, bundled here as FormWeb exported them (`demo/sites/<id>.zip`), so one site can be followed from FormWeb into FormPublisher. "Northwind Notes" is a small product site exported from FormWeb with deliberate problems, a broken link and two pages with two main headings, so the checks have something to find. Opening a demo imports its bundled site once, as its own site (opening it again finds the same site), and opens it; no other site is changed. A quick tour strip then walks the toolbar through Preview, Checks, Package and Publish. It can be skipped, it is remembered, and it moves nothing on screen. The photographs in Lowlight and Looking Back are NASA pictures, except the Hubble Ultra Deep Field, which is ESA/Hubble's under CC BY 4.0 with its credit line; the fonts are under the SIL Open Font License, and Northwind Notes has only pictures drawn for it, the owner's own work under Apache-2.0: `NOTICE.md` lists every picture with the credit and terms its source states, and `demo/MEDIA.md` every file's source.
+Home's Demos section lists the bundled demos, each a card with a cover picture, its name and one line about it; Help > Demos has the same list as commands. There are four. "Lowlight" (a planetarium-show studio with scroll effects and page components, 5 routes), "Looking Back" (a photo essay on pictures of Earth from far away, 4 routes) and "Harbour Ferries" (a ferry operator with a fare calculator, a page per route and site search, 12 routes) are the three demo sites FormWeb ships, bundled here as FormWeb exported them (`demo/sites/<id>.zip`), so one site can be followed from FormWeb into FormPublisher. "Northwind Notes" is a small product site exported from FormWeb with deliberate problems, a broken link and two pages with two main headings, so the checks have something to find. Opening a demo imports its bundled site as its own site and opens it; opening it again finds the same site, and no other site is changed. When the bundled site has changed since the demo was first opened (a new FormPublisher release), opening the demo again adds the new version as a new revision of that same site, so its earlier revisions stay; a demo you have built or prepared a host folder for is left as it is. A quick tour strip then walks the toolbar through Preview, Checks, Package and Publish. It can be skipped, it is remembered, and it moves nothing on screen. The photographs in Lowlight and Looking Back are NASA pictures, except the Hubble Ultra Deep Field, which is ESA/Hubble's under CC BY 4.0 with its credit line; the fonts are under the SIL Open Font License, and Northwind Notes has only pictures drawn for it, the owner's own work under Apache-2.0: `NOTICE.md` lists every picture with the credit and terms its source states, and `demo/MEDIA.md` every file's source.
 
 `demo/index.html` is an offline version that runs straight from disk, with no network and no build step. It shows the FormPublisher window in both themes driving the sample site in a frame through the device widths, the checks list from a real run, the package manifest from a real build and the six prepared folders with their files and commands. The three data files in `demo/data/` come from real runs of the engine, never written by hand; `demo/data/data.js` bundles them so the page opens from `file://`.
 
@@ -417,7 +423,8 @@ The loop is: import a site, list its routes (and, for a site that arrived again,
 | `status` | the engine, the data folder, the site count and whether FormWeb answers |
 | `sites` | lists the imported sites |
 | `import PATH [--name N]` | imports a FormWeb export zip, a `.fweb` project, a `.fpub` package or a publication folder |
-| `import-formweb` | imports the site open in a running FormWeb, read-only |
+| `import-formweb [--project ID]` | imports the site open in a running FormWeb, or one of its saved projects, read-only |
+| `formweb-projects` | lists the running FormWeb's saved projects, the open one first |
 | `routes ID` | lists the routes of a site |
 | `check ID [--revision R] [--deep] [--widths 390,1440] [--last]` | runs the checks and prints the problems; `--last` prints the stored result |
 | `build ID [--revision R]` | builds the deterministic `site.zip` and `publish.json` |
@@ -449,14 +456,15 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 
 ## The MCP server
 
-`./formpublisher mcp` serves MCP on stdio with 19 tools over the same routes. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor. `./formpublisher agents install` sets Claude Code, Codex and Cursor up for your account.
+`./formpublisher mcp` serves MCP on stdio with 20 tools over the same routes. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor. `./formpublisher agents install` sets Claude Code, Codex and Cursor up for your account.
 
 | Tool | Does |
 | --- | --- |
 | `formpublisher_status` | the engine, the data folder, the site count, FormWeb reachability (read only) |
 | `list_sites` | the imported sites (read only) |
 | `import_site` | imports a FormWeb export, a `.fweb` project, a `.fpub` package or a publication folder from an absolute path; a `.fpub` also restores its build |
-| `import_formweb_current` | imports the site open in a running FormWeb |
+| `import_formweb_current` | imports the site open in a running FormWeb, or with `project` one of its saved projects |
+| `list_formweb_projects` | the running FormWeb's saved projects, the open one first (read only) |
 | `site_routes` | the routes of a site (read only) |
 | `list_revisions` | the revisions of a site, newest first, with what changed from the one before (read only) |
 | `diff_revisions` | the files and routes added, removed and changed between two revisions (read only) |
@@ -522,6 +530,7 @@ Specific codes:
 | `passphrase-required`, `passphrase-wrong` | signing with a locked key, or a trash restore of a locked key whose record is rebuilt from its `.pem` (409) |
 | `check-running` | a check is already running for the site (409) |
 | `formweb-unreachable`, `formweb-refused` | FormWeb did not answer, or answered with an error (502) |
+| `project-missing` | FormWeb has no saved project with the id given to Import from FormWeb (404) |
 | `origin-unknown` | a trash restore needs a place (409) |
 | `place-invalid` | the restore place has the wrong shape or folder |
 | `place-taken` | something already sits there, or a key with that id exists |

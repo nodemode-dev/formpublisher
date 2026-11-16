@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "A webhely másik gazdagépről tölti be a(z) {0} fájlt: {1} hivatkozás itt: {2}.",
+  "Choose the FormWeb project to import.": "Válassza ki az importálandó FormWeb-projektet.",
+  "Unsaved site": "Nem mentett webhely",
+  "Open in FormWeb": "Megnyitva a FormWebben",
+  "Saved {0}": "Mentve: {0}"
+}

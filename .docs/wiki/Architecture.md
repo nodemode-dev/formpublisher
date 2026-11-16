@@ -8,7 +8,7 @@ engine (Python 3.12, FastAPI, 127.0.0.1:8280)
   routers: one file each under backend/app/routers, auto-included
   services: paths and the data folder, settings, site intake, the read-only FormWeb connection
     -> data folder (FORMPUBLISHER_HOME): sites, settings
-    -> a running FormWeb on loopback: GET /api/export only
+    -> a running FormWeb on loopback: read-only GETs only (export, publications, releases, access, projects)
 site host (ASGI app.host, 127.0.0.1:8281): the mounted revision, probe script, no /api
   services: host, checks, deep (Chrome via Playwright, served through the host), package, keys, compile (formweb-core), trash
   -> data folder: checks/, builds/, keys/, trash/, engine.json
@@ -26,7 +26,7 @@ The shell builds every container in its final layout before the first paint, and
 
 ## FormWeb
 
-FormPublisher reads FormWeb and never writes to it. It imports a `site-export.zip` or a publication folder, and may call a running FormWeb's read-only `GET /api/export`. It never calls `/api/load`.
+FormPublisher reads FormWeb and never writes to it. It imports a `site-export.zip` or a publication folder, and may call a running FormWeb's read-only `GET /api/export`, `/api/publications`, `/api/releases`, `/api/access`, `/api/projects` and `/api/projects/[id]/file`. It never calls `/api/load`.
 
 ## Desktop
 

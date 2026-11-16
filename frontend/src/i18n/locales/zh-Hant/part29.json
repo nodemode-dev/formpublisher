@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "網站從其他主機載入 {0}：在 {2} 中參照了 {1} 次。",
+  "Choose the FormWeb project to import.": "選擇要匯入的 FormWeb 專案。",
+  "Unsaved site": "未儲存的網站",
+  "Open in FormWeb": "已在 FormWeb 中開啟",
+  "Saved {0}": "儲存於 {0}"
+}

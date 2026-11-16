@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "Site {0} dosyasını başka bir ana bilgisayardan yüklüyor: {2} üzerinde {1} başvuru.",
+  "Choose the FormWeb project to import.": "İçe aktarılacak FormWeb projesini seçin.",
+  "Unsaved site": "Kaydedilmemiş site",
+  "Open in FormWeb": "FormWeb'de açık",
+  "Saved {0}": "Kaydedildi: {0}"
+}

@@ -2,7 +2,7 @@
 name: formpublisher-harness
 description: Drives FormPublisher, the Form family's site publisher, through its formpublisher MCP server or the ./formpublisher run command line. Use whenever the person wants a FormWeb site exported as site-export.zip imported, a FormWeb publication folder opened, the site currently open in a running FormWeb brought in, the imported sites listed, a site's routes listed, its revisions listed or compared, a .fweb project opened, a site mounted for preview, checked (static or deep), built into a deterministic site.zip, or signed and verified with an Ed25519 key, or prepared for a host (Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx or a plain zip); or when formpublisher tools such as list_sites, import_site, run_checks, build_package or prepare_publish are available or fail. Not for editing a site (that is FormWeb), not for changing FormPublisher's own source code (use formpublisher-skillset), and not for uploading to a host, which FormPublisher never does.
 metadata:
-  version: "0.3.2"
+  version: "0.3.3"
 ---
 
 # formpublisher harness
@@ -15,7 +15,7 @@ When the FormPublisher window is open, the tools talk to its engine on 127.0.0.1
 
 - A FormWeb site export, `site-export.zip` (from FormWeb's export).
 - A FormWeb publication folder, `publications/[slug]/[version]/`.
-- The site currently open in a running FormWeb, read through FormWeb's read-only `/api/export` on loopback.
+- The site currently open in a running FormWeb, read through FormWeb's read-only `/api/export` on loopback, or one of its saved projects, read through `GET /api/projects` and `GET /api/projects/{id}/file`.
 
 FormPublisher only reads FormWeb. It never calls FormWeb's `/api/load`, which would replace the document FormWeb has open, and it never changes a site. Edits go back to FormWeb.
 
@@ -28,7 +28,8 @@ These are the exact MCP tool names, with the command that does the same thing. I
 | `formpublisher_status` | `status` | engine, data folder, site count, FormWeb reachability | yes |
 | `list_sites` | `sites` | imported sites | yes |
 | `import_site` (path) | `import PATH` | import a site export zip, a `.fweb` project, a `.fpub` package or a publication folder as a new revision (a `.fpub` also restores its build) | no |
-| `import_formweb_current` | `import-formweb` | import the site open in a running FormWeb | no |
+| `list_formweb_projects` | `formweb-projects` | the running FormWeb's saved projects, the open one first | yes |
+| `import_formweb_current` (project) | `import-formweb [--project ID]` | import the site open in a running FormWeb, or one of its saved projects | no |
 | `site_routes` (id) | `routes ID` | routes of the latest revision | yes |
 | `list_revisions` (id) | `revisions ID` | revisions newest first, with files, bytes, routes and what changed from the one before | yes |
 | `diff_revisions` (id, from_revision, to_revision) | `diff ID [--from R] [--to R]` | files added, removed and changed (path, size, SHA-256) and routes added and removed between two revisions; default the latest against the one before | yes |

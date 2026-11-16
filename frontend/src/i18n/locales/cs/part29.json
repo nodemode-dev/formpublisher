@@ -1,0 +1,7 @@
+{
+  "The site loads {0} from another host: {1} references on {2}.": "Web načítá {0} z jiného hostitele: {1} {1:one=odkaz;few=odkazy;many=odkazu;other=odkazů} na {2}.",
+  "Choose the FormWeb project to import.": "Vyberte projekt FormWeb, který chcete importovat.",
+  "Unsaved site": "Neuložený web",
+  "Open in FormWeb": "Otevřeno ve FormWeb",
+  "Saved {0}": "Uloženo {0}"
+}
