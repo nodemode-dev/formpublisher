@@ -5,12 +5,12 @@ FormPublisher builds `formweb-core` from these crates to open `.fweb` projects. 
 | Field | Value |
 | --- | --- |
 | Source | `nodemode-dev/formweb`, the `native/` workspace |
-| Version | 0.21.0 |
-| Branch | `release/0.21.0` (the 0.21.0 release commit) |
-| Tree of `native/` | `300cd1f1d32adbf893ecc224d50c45484a87efb1` |
-| `crates/formweb-model` | `09910f36785387a642c839b5bafbf01f6318cf6e` |
-| `crates/formweb-engine` | `cfdc5638bd26f84615d89f9246c511796dd59ee5` |
-| `crates/formweb-export` | `f1c38ad884d013cccd6395b81c86acd8d79f5d41` |
+| Version | 0.21.2 |
+| Branch | `release/0.21.2` (the 0.21.2 release commit) |
+| Tree of `native/` | `c8ed36ee583e9b095e3e171a4d0b31a9efc67142` |
+| `crates/formweb-model` | `54605f901cdefb3b69a9c413760e59e65ea648fd` |
+| `crates/formweb-engine` | `e0bc7316e6038f7264c47dca3773e03f5de8a045` |
+| `crates/formweb-export` | `44091cb16e0211fb7b2322d68727b6c58a813484` |
 | `crates/formweb-core` | `9a192034c2f2de1d5739855370dbd910062b1550` |
 | Left out | `crates/formweb-render` (its own workspace, a GPU renderer FormPublisher does not use) and `target/` |
 

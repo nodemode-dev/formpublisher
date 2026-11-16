@@ -21,7 +21,7 @@ FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, 
 | mcp 2.3.0 (the official MCP Python SDK) | the MCP server on stdio | MIT |
 | httpx2 2.16.0 | the engine's read-only calls to a running FormWeb | BSD-3-Clause |
 | cryptography 50.0.2 | Ed25519 keys, signatures and passphrase encryption of private keys | Apache-2.0 OR BSD-3-Clause |
-| FormWeb engine crates 0.21.0 (formweb-model, formweb-engine, formweb-export, formweb-core), vendored unedited in `vendor/formweb-native` with FormWeb's `LICENSE`, Copyright 2026 NodeAgentc, Inc. | `formweb-core`, built by `setup/install_compiler`, opens `.fweb` projects | Apache-2.0, compatible with GPL-3.0-only |
+| FormWeb engine crates 0.21.2 (formweb-model, formweb-engine, formweb-export, formweb-core), vendored unedited in `vendor/formweb-native` with FormWeb's `LICENSE`, Copyright 2026 NodeAgentc, Inc. | `formweb-core`, built by `setup/install_compiler`, opens `.fweb` projects | Apache-2.0, compatible with GPL-3.0-only |
 | serde, serde_json, sha2 and their dependencies, pinned in `vendor/formweb-native/Cargo.lock` | `formweb-core` | Apache-2.0 OR MIT |
 | pydantic, pydantic-core, annotated-types, typing-extensions, anyio, idna | request models and async I/O, brought in by the packages above | MIT, BSD-3-Clause (typing-extensions PSF-2.0) |
 | CPython 3.12, embedded by PyInstaller in the one-file engine sidecar | runs the engine | PSF-2.0 |
