@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.3 · 2026-11-15
+
+- The demos update in place. Opening a demo whose bundled site changed since you first opened it adds the new version as a revision of the same site, so the corrected credits in Lowlight and Looking Back reach a data folder written by 0.3.0 without removing anything. A demo you have built or prepared a host folder for is left as it is, and opening a demo that has not changed adds nothing.
+- An old FormWeb site is adopted. A site imported by 0.3.0 or earlier is keyed by FormWeb's address; the first time its project arrives (Import, Send or the inbox), the project's revision is added to that site, which keeps its revisions, checks and builds. This happens only when exactly one old site has the project's name; with two or more, or none, a new site is made and nothing is moved.
+- Import from FormWeb offers FormWeb's saved projects. When FormWeb has saved projects, a short list shows them, the open site first, and each lands on the same site as that project's Send. FormPublisher only reads FormWeb (`GET /api/projects` and `GET /api/projects/[id]/file`), never opens anything in it and never calls `/api/load`. The command line (`formweb-projects`, `import-formweb --project ID`) and the MCP server (`list_formweb_projects`, and `project` on `import_formweb_current`) do the same.
+- The tooltip of a row in Problems shows the translated message and fix, as the panel does, in all 26 languages.
+- A build made before any check ran says so: `publish.json` records `"checks": null` instead of a clean "0 errors, 0 warnings", and the offline demo's package manifest shows "Not run". Builds written by 0.3.2 or earlier, with an empty list of tiers, are read the same way.
+- `external.request` gives one warning per remote address instead of one per reference, on the first page that uses it, with the number of references and the pages that use it. FormWeb's product-site starter went from 129 warnings to 84 and no reference is lost.
+- Changing the language no longer moves Preferences (each row keeps the height of its longest hint, and Done keeps its width), the hint strip of the quick tour (its counter, title and buttons keep their widths) or the width of the menubar, so the title row stays still. Still open, by decision: the toolbar above the preview shifts sideways once at the moment you pick a new language, because every control takes the width of the labels in the language shown. Keeping it still needs every control sized for the widest of the 26 languages, which narrows the English route field from 294 to 177 px and widens Zoom, Publish and Package; the same approach was tried in 0.2.8 and not kept, and a version of it is saved in case the owner chooses it. The menu buttons in the title bar still move slightly at a switch (reserving each slot would make the English menubar about 1.8 times wider), and the bottom Checks panel and the count in the routes strip shift a little.
+- The three FormWeb demo sites are exported with FormWeb 0.21.2's site runtime, and the vendored FormWeb core is the 0.21.2 release: orbit-style components keep a poster for each instance, a chosen tab or filter chip can have its own look, counters keep their width while counting, and a site search starts from `?q=`. A site that uses none of these exports as before.
+- The documentation pictures that showed the old menubar (Checks, Preview and the notice action, in dark and light) are retaken.
+- The new and changed labels are in all 26 languages.
+
 ## 0.3.2 · 2026-11-15
 
 - Every FormPublisher icon is GPL-3.0-only, including the four copies of the mark in the offline demo, which `NOTICE.md` and `demo/MEDIA.md` listed as Apache-2.0.

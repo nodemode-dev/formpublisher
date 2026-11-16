@@ -39,7 +39,7 @@
 
 <table>
   <tr>
-    <td width="25%" valign="top"><h3>Reads FormWeb</h3>Opens a <code>site-export.zip</code>, a publication folder, or the site currently open in a running FormWeb, and never changes it.</td>
+    <td width="25%" valign="top"><h3>Reads FormWeb</h3>Opens a <code>site-export.zip</code>, a publication folder, or the site currently open in a running FormWeb or one of its saved projects, and never changes it.</td>
     <td width="25%" valign="top"><h3>Every route</h3>Lists the site's routes from its <code>routes.json</code>: path, page, locale, item and stylesheet.</td>
     <td width="25%" valign="top"><h3>FormDeck's window</h3>Home, tabs, a routes strip, an inspector and a status bar, in the Form family's look, with 26 interface languages.</td>
     <td width="25%" valign="top"><h3>Agent-ready</h3>The window, a command line and an MCP server share one engine, so Claude Code, Codex and Cursor import and list sites the way a person does.</td>
@@ -64,7 +64,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>The site open in FormWeb</h3>
-      With FormWeb running on the same computer, import the site it has open through FormWeb's read-only <code>/api/export</code>. FormPublisher only reads; it never replaces or edits what FormWeb has open.
+      With FormWeb running on the same computer, import the site it has open through FormWeb's read-only <code>/api/export</code>, or pick one of its saved projects from a short list (<code>/api/projects</code>). FormPublisher only reads; it never replaces or edits what FormWeb has open.
     </td>
     <td width="50%" valign="top">
       <h3>Routes at a glance</h3>
@@ -118,7 +118,7 @@
     </td>
     <td width="50%" valign="top">
       <h3>Agent tools</h3>
-      22 command line commands and 19 MCP tools cover the whole path from import to a prepared folder, and the trash, so Claude Code, Codex and Cursor do what a person does in the window. Deleting for good stays a person's action.
+      23 command line commands and 20 MCP tools cover the whole path from import to a prepared folder, and the trash, so Claude Code, Codex and Cursor do what a person does in the window. Deleting for good stays a person's action.
     </td>
   </tr>
   <tr>
@@ -206,7 +206,7 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
   <tr>
     <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Builds · Trash · Demos · menubar · site tabs · routes strip · inspector · status bar · Preferences · Keyboard Shortcuts</td>
     <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · fpub · targets · prepare · prepared · trash · receive-status</td>
-    <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · .fweb project · .fpub package · publication folder · the running FormWeb's current site · sent from FormWeb (endpoint or inbox) · the demo</td>
+    <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · .fweb project · .fpub package · publication folder · the running FormWeb's current site or a saved project · sent from FormWeb (endpoint or inbox) · the demo</td>
   </tr>
 </table>
 
@@ -218,7 +218,7 @@ The window, the command line and the MCP server call one engine, so an agent and
 ./formpublisher run status                     # the engine, the data folder, whether FormWeb is reachable
 ./formpublisher run sites                      # the sites already imported
 ./formpublisher run import site-export.zip     # import a FormWeb export (or a publication folder)
-./formpublisher run import-formweb             # import the site open in a running FormWeb, read-only
+./formpublisher run import-formweb             # import the site open in a running FormWeb, read-only (--project ID for a saved one; formweb-projects lists them)
 ./formpublisher run routes SITE-ID             # the routes of one site
 ./formpublisher run revisions SITE-ID          # its revisions; diff SITE-ID shows what changed between two
 ./formpublisher run check SITE-ID              # the static checks (--deep for the browser run, --last for the stored result)
@@ -233,7 +233,8 @@ The window, the command line and the MCP server call one engine, so an agent and
 | --- | --- |
 | `status`, `sites`, `routes ID` | the engine, the imported sites, one site's routes |
 | `revisions ID`, `diff ID [--from R] [--to R]` | a site's revisions, and the files and routes that changed between two |
-| `import PATH`, `import-formweb` | import an export, a `.fweb` project, a `.fpub` package, a folder or the site open in FormWeb |
+| `import PATH`, `import-formweb [--project ID]` | import an export, a `.fweb` project, a `.fpub` package, a folder, the site open in FormWeb or one of its saved projects |
+| `formweb-projects` | list the running FormWeb's saved projects, the open one first |
 | `check ID`, `build ID`, `builds` | run the checks, build the package, list builds |
 | `fpub BUILD [--out FILE] [--force]` | save a build as a `.fpub` (the same bytes every time; `--force` replaces a file) |
 | `sign BUILD`, `verify BUILD`, `keys` | sign, verify (exits 1 when invalid), list or create (`--create NAME`) keys |
@@ -241,13 +242,14 @@ The window, the command line and the MCP server call one engine, so an agent and
 | `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back (`--to PATH` names the place when it is unknown; `--passphrase-stdin` reads one line for a locked key rebuilt from its `.pem`), delete one for good, empty it (refuses without `--yes`) |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
 
-Every command takes `--json`. The MCP server has 19 tools over the same routes:
+Every command takes `--json`. The MCP server has 20 tools over the same routes:
 
 | MCP tool | Does |
 | --- | --- |
 | `formpublisher_status`, `list_sites`, `site_routes` | read the engine, the sites and the routes |
 | `list_revisions`, `diff_revisions` | read a site's revisions and what changed between two |
-| `import_site`, `import_formweb_current` | import an export, a `.fweb`, a `.fpub` or a folder, or the site open in FormWeb |
+| `import_site`, `import_formweb_current` | import an export, a `.fweb`, a `.fpub` or a folder, or the site open in FormWeb (or, with `project`, one of its saved projects) |
+| `list_formweb_projects` | read the running FormWeb's saved projects, the open one first |
 | `run_checks`, `get_checks` | run the checks, read the stored result |
 | `build_package`, `list_builds`, `save_fpub` | build the package, list builds, save a build as a `.fpub` (never replaces a file) |
 | `sign_build`, `verify_build` | sign with a named key, verify a signature |
@@ -258,7 +260,7 @@ Every command takes `--json`. The MCP server has 19 tools over the same routes:
 
 ## Demo
 
-Home's Demos row lists four bundled sites, and Help > Demos has the same four. Three are the demo sites FormWeb ships, bundled here as FormWeb exported them, so one site can be followed through the family: "Lowlight" (a planetarium-show studio with scroll effects and page components), "Looking Back" (a photo essay on pictures of Earth from far away) and "Harbour Ferries" (a ferry operator with a fare calculator, routes and search). The fourth, "Northwind Notes", is a small sample with deliberate problems, so the checks have something to find. Each opens as its own site, and a quick tour walks Preview, Checks, Package and Publish. The photographs in the FormWeb sites are NASA pictures, except the Hubble Ultra Deep Field, which is ESA/Hubble's under CC BY 4.0 with its credit, and their fonts are under the SIL Open Font License; `NOTICE.md` lists every picture with the credit and terms its source states. To see the sample without installing anything, open [`demo/index.html`](demo/index.html) from disk in a browser: it shows the FormPublisher window in both themes driving the sample site through the device widths, with the checks, the package manifest and the six prepared folders taken from real runs of the engine (`demo/data/`). The sample's pictures are the owner's own work, Apache-2.0; `demo/MEDIA.md` lists their sources.
+Home's Demos row lists four bundled sites, and Help > Demos has the same four. Three are the demo sites FormWeb ships, bundled here as FormWeb exported them, so one site can be followed through the family: "Lowlight" (a planetarium-show studio with scroll effects and page components), "Looking Back" (a photo essay on pictures of Earth from far away) and "Harbour Ferries" (a ferry operator with a fare calculator, routes and search). The fourth, "Northwind Notes", is a small sample with deliberate problems, so the checks have something to find. Each opens as its own site; when a release bundles a changed demo, opening it again adds the new version as a revision of the same site unless you built or prepared it. A quick tour walks Preview, Checks, Package and Publish. The photographs in the FormWeb sites are NASA pictures, except the Hubble Ultra Deep Field, which is ESA/Hubble's under CC BY 4.0 with its credit, and their fonts are under the SIL Open Font License; `NOTICE.md` lists every picture with the credit and terms its source states. To see the sample without installing anything, open [`demo/index.html`](demo/index.html) from disk in a browser: it shows the FormPublisher window in both themes driving the sample site through the device widths, with the checks, the package manifest and the six prepared folders taken from real runs of the engine (`demo/data/`). The sample's pictures are the owner's own work, Apache-2.0; `demo/MEDIA.md` lists their sources.
 
 ### Agents
 
@@ -275,7 +277,7 @@ Two MCP servers are registered: `formpublisher` and `formmcp`, the Form family h
 ## Under the hood
 
 - **One engine:** a FastAPI engine on 127.0.0.1:8280 owns the imported sites and the data folder; the interface, the command line and the MCP server are thin layers over its routes.
-- **Read-only toward FormWeb:** FormPublisher imports exports and folders and may read a running FormWeb's `/api/export`; it never calls FormWeb's `/api/load` and never writes to FormWeb.
+- **Read-only toward FormWeb:** FormPublisher imports exports and folders and may read a running FormWeb's `/api/export`, `/api/access` and `/api/projects`; it never calls FormWeb's `/api/load` and never writes to FormWeb.
 - **Loopback only:** the engine answers on 127.0.0.1 and refuses any other Host or Origin.
 - **Zero flash:** every container exists in its final layout before the first paint, and the window is revealed once it is ready.
 - **Inline icons, no libraries:** icons are inline `currentColor` SVG; colours, sizes and every `z-index` come from tokens.
