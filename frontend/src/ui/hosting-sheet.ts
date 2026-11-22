@@ -1,0 +1,113 @@
+import '../styles/hosting.css';
+import guide from '../../../docs/HOSTING.md?raw';
+import { Dialog } from './dialogs';
+import { escapeHtml, q } from './dom';
+
+export const HOSTING_PART: Record<string, string> = {
+  'static-zip': 'static-zip',
+  netlify: 'netlify',
+  'cloudflare-pages': 'cloudflare-pages',
+  vercel: 'vercel',
+  'github-pages': 'github-pages',
+  nginx: 'nginx-on-your-own-server',
+};
+
+const slug = (text: string): string => text.toLowerCase().replace(/[^a-z0-9 -]/g, '').trim().replace(/\s+/g, '-');
+
+function inline(text: string): string {
+  return escapeHtml(text)
+    .replace(/`([^`]+)`/g, '<code translate="no">$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(#([a-z0-9-]+)\)/g, '<a href="#$2" data-part="$2">$1</a>');
+}
+
+function table(rows: string[]): string {
+  const cells = (row: string): string[] => row.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+  const head = cells(rows[0]).map((c) => `<th>${inline(c)}</th>`).join('');
+  const body = rows.slice(2).map((r) => `<tr>${cells(r).map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('');
+  return `<div class="fp-host-table"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+export function renderGuide(markdown: string): string {
+  const lines = markdown.replace(/\r/g, '').split('\n');
+  const out: string[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) { i += 1; continue; }
+    if (line.startsWith('```')) {
+      const code: string[] = [];
+      for (i += 1; i < lines.length && !lines[i].startsWith('```'); i += 1) code.push(lines[i]);
+      out.push(`<pre class="fp-host-code" translate="no">${escapeHtml(code.join('\n'))}</pre>`);
+      i += 1;
+      continue;
+    }
+    const heading = /^(#{1,3}) (.+)$/.exec(line);
+    if (heading) {
+      const level = heading[1].length;
+      out.push(level === 1 ? '' : `<h${level} id="fp-host-${slug(heading[2])}" class="fp-host-h${level}">${inline(heading[2])}</h${level}>`);
+      i += 1;
+      continue;
+    }
+    if (line.startsWith('|')) {
+      const rows: string[] = [];
+      for (; i < lines.length && lines[i].startsWith('|'); i += 1) rows.push(lines[i]);
+      out.push(table(rows));
+      continue;
+    }
+    const listed = /^(\d+\.|-) /.exec(line);
+    if (listed) {
+      const ordered = listed[1] !== '-';
+      const items: string[] = [];
+      for (; i < lines.length && /^(\d+\.|-) /.test(lines[i]); i += 1) {
+        let item = inline(lines[i].replace(/^(\d+\.|-) /, ''));
+        const sub: string[] = [];
+        for (; i + 1 < lines.length && /^ {2,}- /.test(lines[i + 1]); i += 1) sub.push(`<li>${inline(lines[i + 1].replace(/^ +- /, ''))}</li>`);
+        if (sub.length) item += `<ul>${sub.join('')}</ul>`;
+        items.push(`<li>${item}</li>`);
+      }
+      out.push(ordered ? `<ol>${items.join('')}</ol>` : `<ul>${items.join('')}</ul>`);
+      continue;
+    }
+    const para: string[] = [];
+    for (; i < lines.length && lines[i].trim() && !/^(#|\||```|\d+\. |- )/.test(lines[i]); i += 1) para.push(lines[i]);
+    out.push(`<p>${inline(para.join(' '))}</p>`);
+  }
+  return out.join('');
+}
+
+export class HostingSheet extends Dialog {
+  private readonly page: HTMLElement;
+
+  constructor() {
+    super('Host it yourself', 760, 'fp-host-dlg');
+    this.page = document.createElement('article');
+    this.page.className = 'fp-host-page';
+    this.page.innerHTML = renderGuide(guide);
+    this.body.appendChild(this.page);
+    this.page.addEventListener('click', (e) => {
+      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[data-part]');
+      if (!link) return;
+      e.preventDefault();
+      this.jump(link.dataset.part ?? '');
+    });
+    this.button('Close', 'primary', () => this.close());
+  }
+
+  show(part?: string): void {
+    this.open(q(this.foot, '.fp-btn-primary'));
+    this.jump(part ?? '');
+  }
+
+  private jump(part: string): void {
+    const target = part ? this.page.querySelector<HTMLElement>(`#fp-host-${part}`) : null;
+    this.body.scrollTop = target ? this.body.scrollTop + target.getBoundingClientRect().top - this.body.getBoundingClientRect().top : 0;
+  }
+}
+
+let sheet: HostingSheet | null = null;
+
+export function openHosting(part?: string): void {
+  sheet ??= new HostingSheet();
+  sheet.show(part);
+}
