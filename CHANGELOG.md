@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0 · 2026-11-22
+
+- Agents can do everything the window does. Seven new MCP tools and commands: `list_keys`, `receive_status`, `inspect_build`, `compare_builds`, `reproduce_build`, `verify_prepared` and `preview_site`. On the command line they are `keys`, `receive-status`, `inspect`, `compare`, `reproduce`, `verify-prepared` and `preview`.
+- Each tool says what it may change. It either reads only, writes only in FormPublisher's own data folder, or writes to a path you name. Each tool now also describes its parameters to agents.
+- The list of tools and commands is generated into `docs/mcp-tools.json`, and the documents take their counts from it: 29 tools and 27 commands.
+- An installed FormPublisher can add itself to your agents. Run its engine program with `agents install` (the manual gives the path on each system) and Claude Code, Codex, Cursor and Antigravity get its tools.
+- Antigravity joins Claude Code, Codex and Cursor in `agents install` and `agents status`.
+- The repository's agent settings start FormPublisher's MCP server on Windows too.
+- The server follows MCP revision 2026-07-28 and still answers older clients.
+
 ## 0.7.0 · 2026-11-22
 
 - FormPublisher looks like the rest of the FormAI family. Its accent is green; if you picked your own accent, it is kept. Orange is still offered. Text on the accent and accent-coloured text on the light themes are drawn in an ink that stays readable.

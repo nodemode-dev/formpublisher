@@ -163,7 +163,7 @@ Version 2 projects import too. When a project is too big for the JSON envelope, 
 
 ## Preview
 
-Opening a site mounts a revision on the site host, a second listener at 127.0.0.1:8281 (`FORMPUBLISHER_HOST_PORT`) that serves the files the way a production static host does. When that port is already taken, for example by a second engine, the engine takes a free port instead, logs a warning naming both, and reports the port it uses as `hostPort` in `/api/health` and `engine.json`, so its preview and live checks always reach its own site. It is a separate origin from the interface, so the site gets its own storage and cannot call the engine's `/api` routes. One site is mounted at a time; mounting another replaces it.
+Opening a site mounts a revision on the site host, a second listener at 127.0.0.1:8281 (`FORMPUBLISHER_HOST_PORT`) that serves the files the way a production static host does. When that port is already taken, for example by a second engine, the engine takes a free port instead, logs a warning naming both, and reports the port it uses as `hostPort` in `/api/health` and `engine.json`, so its preview and live checks always reach its own site. It is a separate origin from the interface, so the site gets its own storage and cannot call the engine's `/api` routes. One site is mounted at a time; mounting another replaces it. An agent mounts one with the MCP tool `preview_site`, and a person from a terminal with `./formpublisher run preview SITE-ID [--revision R]`; both need the running engine, answer the addresses of the home page and each route, and open nothing, and the mount replaces what the window's Preview showed.
 
 A site that references fonts, scripts, images or embeds on other hosts makes your computer request them when you preview it; FormPublisher itself sends nothing to those hosts.
 
@@ -500,7 +500,7 @@ The agent dock is a panel of terminal tabs inside the window, where a shell and 
 
 **Where a tab works.** An agent tab works in its own folder in the data folder, `agent-tabs/[tab id]/`, which only you can read and which is removed when the tab closes. A shell works in your home folder.
 
-**How an agent reaches the tools.** Each agent tab is started with an MCP entry named `formpublisher_tab`, which runs FormPublisher's own MCP server (the 22 tools in [The MCP server](#the-mcp-server)) with `--tab-key-file`, naming `tab.key` in that tab's folder. The key in that file is made for that tab alone. The engine accepts it for changes as it accepts the window's key (see [Who may change things](#who-may-change-things)), except on the dock's own routes, and it ends when the tab's program ends or its tab closes (Restart this tab makes a new one). It is never put on a command line. Each program gets the entry the way it reads one: Claude Code from `mcp.json` in the tab's folder, Cursor from `.cursor/mcp.json` there, Antigravity from `.agents/mcp_config.json` there, and Codex from `-c` settings on its command line. A plain shell tab gets no key and no entry: it is your own shell.
+**How an agent reaches the tools.** Each agent tab is started with an MCP entry named `formpublisher_tab`, which runs FormPublisher's own MCP server (every tool in [The MCP server](#the-mcp-server)) with `--tab-key-file`, naming `tab.key` in that tab's folder. The key in that file is made for that tab alone. The engine accepts it for changes as it accepts the window's key (see [Who may change things](#who-may-change-things)), except on the dock's own routes, and it ends when the tab's program ends or its tab closes (Restart this tab makes a new one). It is never put on a command line. Each program gets the entry the way it reads one: Claude Code from `mcp.json` in the tab's folder, Cursor from `.cursor/mcp.json` there, Antigravity from `.agents/mcp_config.json` there, and Codex from `-c` settings on its command line. A plain shell tab gets no key and no entry: it is your own shell.
 
 **The tab's environment.** A tab keeps your own variables and drops the engine's own `FORMPUBLISHER_` ones, so a program started from the window does not inherit the engine's settings. It gets `FORMPUBLISHER_PORT` and `FORMPUBLISHER_HOME`, so the command line and the MCP server find this engine and this data folder, and `FORMPUBLISHER_TERMINAL=1`.
 
@@ -534,9 +534,30 @@ The dock was checked with stand-in programs only. No real Claude Code, Codex, Cu
 
 An agent does every step a person does. The command line and the MCP server are thin layers over the same engine routes as the window, so what an agent does appears in the open window at once. They use a running engine that has the same data folder, or run the routes in-process when none runs. From the window, [the agent dock](#the-agent-dock) starts Claude Code, Codex, Cursor or Antigravity with these same tools already connected, as the MCP entry `formpublisher_tab`.
 
-The loop is: import a site, list its routes (and, for a site that arrived again, its revisions and what changed), run the checks, build, sign, verify, list the targets, prepare, read what is prepared. A build can also be saved as a `.fpub` (`fpub`, `save_fpub`) and a `.fpub` imported again (`import`, `import_site`). Asking the person comes first for anything that reads from a running FormWeb, for creating or choosing a signing key and for any passphrase. Preparing writes only inside the data folder. A signing key can be exported and imported by the person only, in the window or with `keys --export` and `keys --import`: no MCP tool does either. When `verify_build` answers `valid` true with `known` false, the agent reports it as a warning ("signed by a key you do not have") and does not call the package verified.
+The loop is: start from a template or import a site, list its routes (and, for a site that arrived again, its revisions and what changed), preview it, run the checks, build (and inspect, compare or reproduce the build), list the keys, sign, verify, list the targets, prepare, read what is prepared and verify a prepared folder after it was changed. A build can also be saved as a `.fpub` (`fpub`, `save_fpub`) and a `.fpub` imported again (`import`, `import_site`). Asking the person comes first for anything that reads from a running FormWeb, for creating or choosing a signing key and for any passphrase. Preparing writes only inside the data folder. A signing key can be exported and imported by the person only, in the window or with `keys --export` and `keys --import`: no MCP tool does either. When `verify_build` answers `valid` true with `known` false, the agent reports it as a warning ("signed by a key you do not have") and does not call the package verified.
 
-`./formpublisher agents sync` mirrors `.claude/skills` to `.agents/skills`, checks the skill files and checks that the shared finder, `backend/app/services/agent_lookup.py`, still has the bytes whose hash is recorded for its version; `--check` exits 1 on drift or a mismatch. `./formpublisher vendor --check` (also in `formpublisher.bat`) passes only when the Version row of `vendor/formweb-native/VENDOR.md` equals the vendored workspace version, the four crates resolve to it and `Cargo.lock` lists them at it; in a git checkout it also compares each crate's tree with the staged state (computed without writing to `.git`) and refuses unstaged changes and untracked files under `vendor/formweb-native` outside `target/`, and outside git it skips those with one line. It prints `vendor: in step at VERSION` or each mismatch with what to do, and `./setup/install_compiler` runs it first and refuses with "the vendored crates are out of step (see above); nothing was built". `./formpublisher agents install` registers the MCP servers and copies the skills for your account in Claude Code, Codex and Cursor. The repository's kits (`.claude/skills/formpublisher-harness`, `.claude/skills/formpublisher-skillset`, `AGENTS.md`, `CLAUDE.md`) name the tools and commands below.
+`./formpublisher agents sync` writes [`docs/mcp-tools.json`](mcp-tools.json) (every MCP tool with its class and annotations, the command line's top-level commands and the MCP revisions, generated from `backend/app/mcp.py` and `backend/app/cli.py`), mirrors `.claude/skills` to `.agents/skills`, checks the skill files, checks every tool or command count that the README, the wiki, this manual, `AGENTS.md`, `CLAUDE.md` and the skills state against that list, and checks that the shared finder, `backend/app/services/agent_lookup.py`, still has the bytes whose hash is recorded for its version; `--check` exits 1 on drift or a mismatch. `./formpublisher vendor --check` (also in `formpublisher.bat`) passes only when the Version row of `vendor/formweb-native/VENDOR.md` equals the vendored workspace version, the four crates resolve to it and `Cargo.lock` lists them at it; in a git checkout it also compares each crate's tree with the staged state (computed without writing to `.git`) and refuses unstaged changes and untracked files under `vendor/formweb-native` outside `target/`, and outside git it skips those with one line. It prints `vendor: in step at VERSION` or each mismatch with what to do, and `./setup/install_compiler` runs it first and refuses with "the vendored crates are out of step (see above); nothing was built". `./formpublisher agents install` registers the MCP servers and copies the skills for your account in Claude Code, Codex, Cursor and Antigravity (Antigravity gets the MCP servers only, in `~/.gemini/config/mcp_config.json`); `agents install claude` (or `codex`, `cursor`, `antigravity`) sets up one, and `agents status` reports what each of the four has. The repository's kits (`.claude/skills/formpublisher-harness`, `.claude/skills/formpublisher-skillset`, `AGENTS.md`, `CLAUDE.md`) name the tools and commands below.
+
+### Registering the MCP server
+
+From a checkout, `./formpublisher agents install` works as before, and the repository's own `.mcp.json`, `.cursor/mcp.json` and `.codex/config.toml` run `node setup/mcp_launch.mjs`, which starts `formpublisher mcp` on macOS and Linux and `formpublisher.bat mcp` on Windows, so they work on Windows too.
+
+An installed app registers its own MCP server: run the engine program inside it with `agents install` (all four clients) or `agents install claude` (or `codex`, `cursor`, `antigravity`), and `agents status`. It uses the setup and skills frozen into it, with itself as the program each client starts (`{"command": [the engine program], "args": ["mcp"]}`).
+
+| Installed copy | Engine program |
+| --- | --- |
+| macOS | `/Applications/FormPublisher.app/Contents/Resources/engine/formpublisher-engine` |
+| Windows, the default per-user install | `%LOCALAPPDATA%\FormPublisher\engine\formpublisher-engine.exe` |
+| Windows, MSI | under Program Files; the exact folder was not checked, so look for `engine\formpublisher-engine.exe` there |
+| Linux, deb or rpm | `/usr/lib/FormPublisher/engine/formpublisher-engine` |
+
+```sh
+/usr/lib/FormPublisher/engine/formpublisher-engine agents install
+/usr/lib/FormPublisher/engine/formpublisher-engine agents install claude
+/usr/lib/FormPublisher/engine/formpublisher-engine agents status
+```
+
+An AppImage cannot be registered by path: it runs from a mount whose path changes on every start, and `agents install` refuses with what to do. Extract it once with `--appimage-extract` and run `squashfs-root/usr/lib/FormPublisher/engine/formpublisher-engine agents install` from there, or install the deb or rpm. On Windows, a build without a console attaches to the terminal it was started from, so the output shows there. Registering from an installed copy has not been run on Windows or macOS.
 
 ## The command line
 
@@ -553,6 +574,9 @@ The loop is: import a site, list its routes (and, for a site that arrived again,
 | `check ID [--revision R] [--deep] [--widths 390,1440] [--last]` | runs the checks and prints the problems; `--last` prints the stored result |
 | `build ID [--revision R]` | builds the deterministic `site.zip` and `publish.json` |
 | `builds` | lists builds, newest first |
+| `inspect BUILD` | shows a build's `publish.json`: its files with sizes and SHA-256, the checks summary and the signature state |
+| `compare A B` | the files added, removed and changed from build A to build B |
+| `reproduce BUILD` | rebuilds a build from its revision and says whether the bytes match; exits 1 when they do not |
 | `fpub BUILD [--out FILE] [--force]` | saves a build as a `.fpub` (default `SITE-BUILD.fpub` in the current folder); the name must end in `.fpub`; an existing file is replaced only with `--force` |
 | `sign BUILD [--key K] [--passphrase P]` | signs a build with an Ed25519 key |
 | `verify BUILD [--allow-unknown]` | verifies a signature against your own keys; exits 1 when it is not valid, and also when the key that signed it is not one of yours, unless `--allow-unknown` is given |
@@ -564,6 +588,8 @@ The loop is: import a site, list its routes (and, for a site that arrived again,
 | `diff ID [--from R] [--to R]` | the files and routes added, removed and changed between two revisions |
 | `prepare BUILD --target T [--target T] [--include-model]` | prepares a folder per target, with the commands to run; FormWeb's model files are left out unless `--include-model` |
 | `prepared BUILD` | lists what is prepared for a build |
+| `verify-prepared BUILD TARGET` | checks that a prepared folder still matches its build; exits 1 when it does not |
+| `preview ID [--revision R]` | shows a site revision on the running engine's local preview host and prints the addresses to open |
 | `trash` | lists the trash, newest first, with each entry's kind, label, time and size |
 | `trash restore ENTRY [--to PATH] [--passphrase-stdin]` | moves an entry back to where it came from; fails with the reason when the place is taken. `--to` names the place for an entry whose origin is unknown, inside the kind's own folder. `--passphrase-stdin` reads one line from standard input for a locked key that is rebuilt from its `.pem` |
 | `trash delete ENTRY` | deletes one entry for good |
@@ -584,32 +610,45 @@ Answers are short text, or JSON with `--json`. A failure exits non-zero with the
 
 ## The MCP server
 
-`./formpublisher mcp` serves MCP on stdio with 22 tools over the same routes. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor. `./formpublisher agents install` sets Claude Code, Codex and Cursor up for your account. `mcp --tab-key-file FILE` serves the same tools with the key in FILE in place of `engine.key`; the agent dock writes that command into each agent tab's entry, so it is not needed by hand (see [The agent dock](#the-agent-dock)).
+`./formpublisher mcp` serves MCP on stdio with the tools below, over the same routes; [`docs/mcp-tools.json`](mcp-tools.json) is the list generated from the code, with the counts. The server follows MCP revision 2026-07-28 (it answers `server/discover`) and still answers the `initialize` handshake for revisions 2024-11-05 to 2025-11-25, with the `mcp` package 2.3.0. `.mcp.json` registers it for Claude Code in this repository, `.codex/config.toml` for Codex and `.cursor/mcp.json` for Cursor, each through `node setup/mcp_launch.mjs`. `./formpublisher agents install` sets Claude Code, Codex, Cursor and Antigravity up for your account, and an installed app registers itself (see [Registering the MCP server](#registering-the-mcp-server)). `mcp --tab-key-file FILE` serves the same tools with the key in FILE in place of `engine.key`; the agent dock writes that command into each agent tab's entry, so it is not needed by hand (see [The agent dock](#the-agent-dock)).
 
-| Tool | Does |
-| --- | --- |
-| `formpublisher_status` | the engine, the data folder, the site count, FormWeb reachability (read only) |
-| `list_sites` | the imported sites (read only) |
-| `import_site` | imports a FormWeb export, a `.fweb` project, a `.fpub` package or a publication folder from an absolute path; a `.fpub` also restores its build |
-| `import_formweb_current` | imports the site open in a running FormWeb, or with `project` one of its saved projects |
-| `list_formweb_projects` | the running FormWeb's saved projects, the open one first (read only) |
-| `site_routes` | the routes of a site (read only) |
-| `list_revisions` | the revisions of a site, newest first, with what changed from the one before (read only) |
-| `diff_revisions` | the files and routes added, removed and changed between two revisions (read only) |
-| `run_checks` | runs the static tier, or the deep tier too, and stores the result |
-| `get_checks` | the stored check results (read only) |
-| `build_package` | builds `site.zip` and `publish.json` |
-| `list_builds` | the builds, newest first (read only) |
-| `save_fpub` | saves a build as a `.fpub` at an absolute path ending in `.fpub`; never replaces a file; answers the file, size and SHA-256 |
-| `sign_build` | signs a build with a named key |
-| `verify_build` | verifies a build's signature against the person's own keys (read only). It answers `valid`, `known` (the signer's key is one of the person's own), `trusted` (both), `signer`, `message` and, when not valid, `reason`; `valid` true with `known` false is reported as a warning |
-| `list_targets` | the six hosts a build can be prepared for (read only) |
-| `prepare_publish` | prepares a folder per host for a build, with commands, notes and warnings; `includeModel: true` keeps FormWeb's model files, and `leftOut` lists what was left out |
-| `get_prepared` | what is prepared for a build (read only) |
-| `list_templates` | the kept template list, with when it was fetched; fetches nothing (read only) |
-| `start_from_template` | makes a FormWeb project from a kept template in a folder the person named; never replaces a file |
-| `list_trash` | the trash entries, newest first (read only) |
-| `restore_from_trash` | moves an entry back to where it came from; only a recorded or inferred origin, with no way to name a place. It takes `passphrase` for a locked key rebuilt from its `.pem` |
+Every tool has a class, carried in its `_meta` as `formpublisher/class` and listed in `docs/mcp-tools.json`:
+
+- `read`: reads only (the read-only hint is set).
+- `data`: writes only inside FormPublisher's data folder or the engine's state (such as what the preview host shows).
+- `path`: writes to a path the person named (`save_fpub` and `start_from_template`; the second also uses the network).
+
+| Tool | Class | Does |
+| --- | --- | --- |
+| `formpublisher_status` | read | the engine, the data folder, the site count, FormWeb reachability |
+| `list_sites` | read | the imported sites |
+| `import_site` | data | imports a FormWeb export, a `.fweb` project, a `.fpub` package or a publication folder from an absolute path; a `.fpub` also restores its build |
+| `import_formweb_current` | data | imports the site open in a running FormWeb, or with `project` one of its saved projects |
+| `list_formweb_projects` | read | the running FormWeb's saved projects, the open one first |
+| `receive_status` | read | FormWeb's Send to FormPublisher inbox: the receive endpoint, the inbox folder and whether it is watched, the files waiting, the auto-check and auto-build settings and the last five receipts |
+| `site_routes` | read | the routes of a site |
+| `list_revisions` | read | the revisions of a site, newest first, with what changed from the one before |
+| `diff_revisions` | read | the files and routes added, removed and changed between two revisions |
+| `preview_site` | data | shows a revision on the local preview host (127.0.0.1, the host the window's Preview uses) and returns the address of its home page and of each route; it opens nothing and writes no file, replaces what the preview host showed (the window's included) and needs the running engine |
+| `run_checks` | data | runs the static tier, or the deep tier too, and stores the result |
+| `get_checks` | read | the stored check results |
+| `build_package` | data | builds `site.zip` and `publish.json` |
+| `list_builds` | read | the builds, newest first |
+| `inspect_build` | read | one build: its record, its `publish.json` (every file with path, size and SHA-256, the routes, redirects, headers and the checks summary) and the same signature verdict as `verify_build` |
+| `compare_builds` | read | the files added, removed and changed from build `a` to build `b`, and how many are the same |
+| `reproduce_build` | data | rebuilds a build's `site.zip` from its revision in a scratch folder in the data folder, removed afterwards, and answers `same`, `sha256` and `expected`; the build is not changed |
+| `save_fpub` | path | saves a build as a `.fpub` at an absolute path ending in `.fpub`; never replaces a file; answers the file, size and SHA-256 |
+| `list_keys` | read | the signing keys: id (the one to pass to `sign_build`), name, fingerprint, created, `encrypted`, `secret` (store, file or none) and `canSign` |
+| `sign_build` | data | signs a build with a named key; marked destructive, because it replaces the build's earlier signature |
+| `verify_build` | read | verifies a build's signature against the person's own keys. It answers `valid`, `known` (the signer's key is one of the person's own), `trusted` (both), `signer`, `message` and, when not valid, `reason`; `valid` true with `known` false is reported as a warning |
+| `list_targets` | read | the six hosts a build can be prepared for |
+| `prepare_publish` | data | prepares a folder per host for a build, with commands, notes and warnings; `includeModel: true` keeps FormWeb's model files, and `leftOut` lists what was left out; marked destructive, because preparing again deletes the target's previous folder and makes it afresh, so anything added to it since (such as a host tool's link files) is gone |
+| `get_prepared` | read | what is prepared for a build, with the last `verify_prepared` verdict |
+| `verify_prepared` | data | checks that a prepared folder still matches its build (every site file against `publish.json`, the whole folder against a fresh prepare made in a scratch folder) and answers `ok`, the files checked and the problems; it changes nothing in the prepared folder and keeps its verdict beside it, in the data folder, for `get_prepared` and the window |
+| `list_templates` | read | the kept template list, with when it was fetched; fetches nothing |
+| `start_from_template` | path | downloads one kept template (the network), keeps it only when its size and SHA-256 match the index, and makes a FormWeb project from it in a folder the person named; never replaces a file |
+| `list_trash` | read | the trash entries, newest first |
+| `restore_from_trash` | data | moves an entry back to where it came from; only a recorded or inferred origin, with no way to name a place. It takes `passphrase` for a locked key rebuilt from its `.pem` |
 
 There is no tool that deletes. Deleting an entry for good or emptying the trash is for a person, in the window or with `trash delete` and `trash empty --yes`. Nor is there a tool that exports or imports a signing key: that is for a person, in Preferences, Signing keys, or with `keys --export` and `keys --import`.
 
