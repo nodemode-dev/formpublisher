@@ -198,5 +198,6 @@ def status() -> dict:
         "watching": _thread is not None and _thread.is_alive(),
         "pending": len(pending()),
         "intervalSeconds": POLL_SECONDS,
+        "auto": pipeline.wanted(),
         "receipts": receipts(),
     }
