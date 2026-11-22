@@ -271,5 +271,6 @@
   "the engine returned no content for {0}": "エンジンが {0} の内容を返しませんでした",
   "the engine returned invalid base64 for {0}": "エンジンが {0} に対して無効な base64 を返しました",
   "formweb-core returned no files": "formweb-core がファイルを返しませんでした",
-  "formweb-core returned an invalid file entry": "formweb-core が無効なファイルエントリを返しました"
+  "formweb-core returned an invalid file entry": "formweb-core が無効なファイルエントリを返しました",
+  "The deep check could not finish: {0}": "詳細チェックを完了できませんでした: {0}"
 }

@@ -271,5 +271,6 @@
   "the engine returned no content for {0}": "a motor nem adott vissza tartalmat ehhez: {0}",
   "the engine returned invalid base64 for {0}": "a motor érvénytelen base64-et adott vissza ehhez: {0}",
   "formweb-core returned no files": "a formweb-core nem adott vissza fájlokat",
-  "formweb-core returned an invalid file entry": "a formweb-core érvénytelen fájlbejegyzést adott vissza"
+  "formweb-core returned an invalid file entry": "a formweb-core érvénytelen fájlbejegyzést adott vissza",
+  "The deep check could not finish: {0}": "A mély ellenőrzés nem fejeződhetett be: {0}"
 }

@@ -16,6 +16,7 @@ interface SiteData {
   net: NetEntry[];
   live: Map<string, Problem>;
   remote: Problem[];
+  failed: Problem | null;
   thumbs: Record<string, string>;
   ran: boolean;
   revision: string | null;
@@ -305,7 +306,7 @@ class Panel {
   private get(id: string): SiteData {
     let d = this.data.get(id);
     if (!d) {
-      d = { con: [], net: [], live: new Map(), remote: [], thumbs: {}, ran: false, revision: null, path: '/', seq: 0, token: 0, signature: '' };
+      d = { con: [], net: [], live: new Map(), remote: [], failed: null, thumbs: {}, ran: false, revision: null, path: '/', seq: 0, token: 0, signature: '' };
       this.data.set(id, d);
     }
     return d;
@@ -445,7 +446,19 @@ class Panel {
       const done = n(ev.done);
       const total = n(ev.total);
       const width = n(ev.width);
+      const prior = this.data.get(s(ev.site));
+      if (prior?.failed) { prior.failed = null; this.schedule(); }
       setText(this.progress, `Checking ${done} of ${total}${ev.route ? ` ${s(ev.route)}` : ''}${width ? ` at ${width} px` : ''}`);
+      return;
+    }
+    if (ev.type === 'checks.failed') {
+      const site = s(ev.site);
+      if (s(ev.run) === this.deepRun || (this.deepRun === 'pending' && site === this.id())) this.endDeep();
+      const d = site ? this.data.get(site) : undefined;
+      const why = s(ev.reason);
+      if (d) d.failed = { id: 'deep:deep.failed:run', tier: 'deep', severity: 'error', code: 'deep.failed', route: '', message: why ? `The deep check could not finish: ${why}` : 'The check failed.' };
+      if (!site || site === this.id()) setText(this.progress, 'The check failed.');
+      this.schedule();
       return;
     }
     if (ev.type === 'checks.done') {
@@ -466,6 +479,7 @@ class Panel {
         const d = this.get(id);
         d.revision = null;
         d.live.clear();
+        d.failed = null;
         void this.load(id, null);
       }
     }
@@ -492,12 +506,13 @@ class Panel {
       this.app.showBottomTab('problems');
       setText(this.progress, deep ? 'Starting the deep check' : 'Checking');
       if (deep) {
+        d.failed = null;
         this.deepRun = 'pending';
         this.deepTimer = window.setTimeout(() => { this.endDeep(); setText(this.progress, ''); }, 15 * 60 * 1000);
         this.schedule();
       }
       const run = await startRun(id, d.revision, deep);
-      if (deep) this.deepRun = run || 'pending';
+      if (deep && this.deepRun === 'pending') this.deepRun = run || 'pending';
       if (!deep) {
         await this.load(id, d.revision);
         setText(this.progress, '');
@@ -518,6 +533,7 @@ class Panel {
     const map = new Map<string, Problem>();
     for (const p of d.remote) map.set(p.id, p);
     for (const p of d.live.values()) map.set(p.id, p);
+    if (d.failed) map.set(d.failed.id, d.failed);
     return Array.from(map.values()).sort((a, b) => SEV_RANK[a.severity] - SEV_RANK[b.severity] || a.route.localeCompare(b.route) || a.code.localeCompare(b.code) || a.id.localeCompare(b.id));
   }
 
@@ -631,6 +647,7 @@ class Panel {
     const status: Record<string, RouteStatus> = {};
     if (d.ran) for (const r of this.app.state().routes) status[r.path] = 'ok';
     for (const p of all) {
+      if (p === d.failed) continue;
       const at = this.routeFor(p.route);
       if (p.severity === 'error') status[at] = 'error';
       else if (p.severity === 'warning' && status[at] !== 'error') status[at] = 'warn';

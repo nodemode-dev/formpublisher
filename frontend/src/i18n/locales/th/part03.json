@@ -271,5 +271,6 @@
 "the engine returned no content for {0}": "เอนจินไม่ส่งเนื้อหาของ {0} กลับมา",
 "the engine returned invalid base64 for {0}": "เอนจินส่ง base64 ที่ไม่ถูกต้องสำหรับ {0} กลับมา",
 "formweb-core returned no files": "formweb-core ไม่ส่งไฟล์ใดกลับมา",
-"formweb-core returned an invalid file entry": "formweb-core ส่งรายการไฟล์ที่ไม่ถูกต้องกลับมา"
+"formweb-core returned an invalid file entry": "formweb-core ส่งรายการไฟล์ที่ไม่ถูกต้องกลับมา",
+"The deep check could not finish: {0}": "ไม่สามารถตรวจสอบเชิงลึกให้เสร็จสิ้นได้: {0}"
 }

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import uuid
 from typing import Literal
 
@@ -10,6 +11,7 @@ from starlette.concurrency import run_in_threadpool
 from app.services import checks, deep, intake
 from app.services.bus import bus
 
+log = logging.getLogger("formpublisher")
 router = APIRouter(prefix="/api/checks", tags=["checks"])
 _running: dict[str, str] = {}
 _tasks: set[asyncio.Task] = set()
@@ -69,13 +71,18 @@ def _deep(run: str, site: str, revision: str, root, widths: list[int], motion: s
 
 
 async def _background(run: str, site: str, revision: str, root, widths: list[int], motion: str) -> None:
+    failure = ""
     try:
         await run_in_threadpool(_deep, run, site, revision, root, widths, motion)
-    except Exception:
-        pass
+    except Exception as exc:
+        log.exception("deep checks failed for %s revision %s", site, revision)
+        failure = (str(exc).strip().splitlines() or [""])[0][:200] or type(exc).__name__
     finally:
         _running.pop(site, None)
-        bus.emit("checks.done", run=run, site=site, revision=revision, summary=checks.summarize(site, revision))
+        if failure:
+            bus.emit("checks.failed", run=run, site=site, revision=revision, tier="deep", reason=failure)
+        else:
+            bus.emit("checks.done", run=run, site=site, revision=revision, summary=checks.summarize(site, revision))
 
 
 @router.post("/run")

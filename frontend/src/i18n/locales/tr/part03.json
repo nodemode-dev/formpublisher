@@ -271,5 +271,6 @@
 "the engine returned no content for {0}": "motor {0} için içerik döndürmedi",
 "the engine returned invalid base64 for {0}": "motor {0} için geçersiz base64 döndürdü",
 "formweb-core returned no files": "formweb-core hiç dosya döndürmedi",
-"formweb-core returned an invalid file entry": "formweb-core geçersiz bir dosya girdisi döndürdü"
+"formweb-core returned an invalid file entry": "formweb-core geçersiz bir dosya girdisi döndürdü",
+"The deep check could not finish: {0}": "Derin denetim tamamlanamadı: {0}"
 }

@@ -271,5 +271,6 @@
 "the engine returned no content for {0}": "движок не вернул содержимое для {0}",
 "the engine returned invalid base64 for {0}": "движок вернул некорректный base64 для {0}",
 "formweb-core returned no files": "formweb-core не вернул файлов",
-"formweb-core returned an invalid file entry": "formweb-core вернул недопустимую запись файла"
+"formweb-core returned an invalid file entry": "formweb-core вернул недопустимую запись файла",
+"The deep check could not finish: {0}": "Глубокую проверку не удалось завершить: {0}"
 }

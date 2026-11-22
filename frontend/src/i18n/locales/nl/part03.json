@@ -271,5 +271,6 @@
   "the engine returned no content for {0}": "de engine gaf geen inhoud terug voor {0}",
   "the engine returned invalid base64 for {0}": "de engine gaf ongeldige base64 terug voor {0}",
   "formweb-core returned no files": "formweb-core gaf geen bestanden terug",
-  "formweb-core returned an invalid file entry": "formweb-core gaf een ongeldig bestandsitem terug"
+  "formweb-core returned an invalid file entry": "formweb-core gaf een ongeldig bestandsitem terug",
+  "The deep check could not finish: {0}": "De diepgaande controle kon niet worden voltooid: {0}"
 }

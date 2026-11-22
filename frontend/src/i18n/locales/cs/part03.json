@@ -271,5 +271,6 @@
   "the engine returned no content for {0}": "modul nevrátil žádný obsah pro {0}",
   "the engine returned invalid base64 for {0}": "modul vrátil neplatný base64 pro {0}",
   "formweb-core returned no files": "formweb-core nevrátil žádné soubory",
-  "formweb-core returned an invalid file entry": "formweb-core vrátil neplatnou položku souboru"
+  "formweb-core returned an invalid file entry": "formweb-core vrátil neplatnou položku souboru",
+  "The deep check could not finish: {0}": "Hlubokou kontrolu se nepodařilo dokončit: {0}"
 }
