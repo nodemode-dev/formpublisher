@@ -113,8 +113,9 @@ def serve() -> int:
     import uvicorn
 
     from app.main import app as fastapi_app
-    from app.services import enginelog, paths
+    from app.services import enginelog, paths, window_key
 
+    window_key.announce()
     host = os.environ.get("FORMPUBLISHER_HOST", "127.0.0.1")
     server = uvicorn.Server(uvicorn.Config(fastapi_app, host=host, port=paths.port(), log_level="info"))
     kept = enginelog.attach()

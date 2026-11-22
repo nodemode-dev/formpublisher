@@ -11,7 +11,7 @@ from typing import Any
 
 from app import __version__
 from app.services.codes import default_code
-from app.services import checks, formweb, fpub, intake, keys, package, paths, settings
+from app.services import checks, formweb, fpub, intake, keys, package, paths, settings, window_key
 
 DEEP_WAIT_SECONDS = 900
 
@@ -61,6 +61,10 @@ class Client:
         headers = {"Accept": "application/json", "User-Agent": f"formpublisher-cli/{__version__}"}
         if data is not None:
             headers["Content-Type"] = "application/json"
+        if method not in window_key.READS:
+            key = window_key.read_key_file()
+            if key:
+                headers[window_key.HEADER] = key
         req = urllib.request.Request(f"{self.url}{path}", data=data, method=method, headers=headers)
         try:
             with self.opener.open(req, timeout=timeout) as res:

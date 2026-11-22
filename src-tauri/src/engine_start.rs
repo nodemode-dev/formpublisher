@@ -20,10 +20,43 @@ const TAIL_LINES: usize = 12;
 const LINE_CHARS: usize = 300;
 const LEFTOVER_WAIT: Duration = Duration::from_secs(5);
 const BODY_LIMIT: u64 = 65_536;
+pub const KEY_WAIT: Duration = Duration::from_secs(10);
+const KEY_LINE: &str = "formpublisher-window-key: ";
+const KEY_MIN: usize = 32;
+pub const WINDOW_PERMISSIONS: &[&str] = &[
+    "core:default",
+    "core:window:allow-set-title",
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-start-dragging",
+    "shell:allow-open",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "dialog:allow-message",
+    "dialog:allow-ask",
+    "allow-app-ready",
+    "allow-open-window",
+    "allow-reveal-path",
+];
+
+pub fn window_key(line: &str) -> Option<String> {
+    let value = line.trim().strip_prefix(KEY_LINE)?.trim();
+    let sound = value.len() >= KEY_MIN && value.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
+    sound.then(|| value.to_string())
+}
+
+pub fn key_script(origin: &str, key: &str) -> String {
+    if key.is_empty() {
+        return String::new();
+    }
+    format!("if (window.location.origin === {origin:?} && window.top === window) {{ window.__FORMPUBLISHER_WINDOW_KEY = {key:?}; }}")
+}
 
 #[derive(Debug, PartialEq)]
 pub enum Failure {
     Missing,
+    NoKey,
     NotStarted(String),
     Stopped(Option<i32>),
     TimedOut,
@@ -63,6 +96,7 @@ pub fn sentence(failure: &Failure) -> String {
         Failure::Stopped(None) => format!("{APP} could not start: its engine stopped before the window could open."),
         Failure::TimedOut => format!("{APP} could not start: it waited {} seconds for its engine to answer and that did not happen.", HEALTH_WAIT.as_secs()),
         Failure::WrongVersion(found) => format!("{APP} could not start: the engine that answered is version {found}, not this app's {}.", env!("CARGO_PKG_VERSION")),
+        Failure::NoKey => format!("{APP} could not start: it waited {} seconds for its engine to hand over the key for the window and that did not happen.", KEY_WAIT.as_secs()),
         Failure::Window => format!("{APP} could not open its window."),
     }
 }
