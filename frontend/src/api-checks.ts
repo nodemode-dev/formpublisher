@@ -24,10 +24,28 @@ export interface CheckSummary {
   ran: boolean;
 }
 
+export interface ContrastCount {
+  checked: number;
+  failing: number;
+  unmeasured: number;
+  truncated: boolean;
+}
+
+export interface Measure {
+  route: string;
+  width: number;
+  cls: number | null;
+  lcp: number | null;
+  lcpElement: string;
+  contrast: ContrastCount | null;
+  notes: string[];
+}
+
 export interface CheckResults {
   problems: Problem[];
   summary: CheckSummary;
   thumbs: Record<string, string>;
+  measures: Measure[];
 }
 
 type Json = Record<string, unknown>;
@@ -91,6 +109,25 @@ export function toProblem(raw: unknown): Problem | null {
   return p;
 }
 
+const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null);
+
+export function toMeasure(raw: unknown): Measure | null {
+  if (!isObj(raw)) return null;
+  const route = str(raw.route);
+  const width = num(raw.width);
+  if (!route || width === null || width <= 0) return null;
+  const c = isObj(raw.contrast) ? raw.contrast : null;
+  return {
+    route,
+    width: Math.round(width),
+    cls: num(raw.cls),
+    lcp: num(raw.lcp),
+    lcpElement: str(raw.lcpElement),
+    contrast: c ? { checked: count(c.checked), failing: count(c.failing), unmeasured: count(c.unmeasured), truncated: c.truncated === true } : null,
+    notes: Array.isArray(raw.notes) ? raw.notes.map(str).filter(Boolean) : [],
+  };
+}
+
 function ranOf(v: unknown): boolean {
   if (Array.isArray(v)) return v.length > 0;
   if (isObj(v)) return Object.keys(v).length > 0;
@@ -114,7 +151,8 @@ export async function fetchResults(site: string, revision: string): Promise<Chec
   const s = isObj(o.summary) ? o.summary : {};
   const thumbs: Record<string, string> = {};
   if (isObj(o.thumbs)) for (const [k, v] of Object.entries(o.thumbs)) if (typeof v === 'string') thumbs[k] = v;
-  return { problems, summary: { errors: count(s.errors), warnings: count(s.warnings), infos: count(s.infos), ran: ranOf(s.ran) }, thumbs };
+  const measures = (Array.isArray(o.measures) ? o.measures : []).map(toMeasure).filter((m): m is Measure => m !== null);
+  return { problems, summary: { errors: count(s.errors), warnings: count(s.warnings), infos: count(s.infos), ran: ranOf(s.ran) }, thumbs, measures };
 }
 
 export async function startRun(site: string, revision: string, deep: boolean): Promise<string> {

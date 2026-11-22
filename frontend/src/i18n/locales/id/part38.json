@@ -1,0 +1,8 @@
+{
+  "Speed": "Kecepatan",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "Nilai lab dari komputer ini, dengan CPU dan jaringan diperlambat. Baik berarti LCP 2,5 dtk atau kurang dan tanpa pergeseran tata letak (CLS 0). INP memerlukan pengunjung sungguhan dan tidak diukur.",
+  "Largest element: {0}": "Elemen terbesar: {0}",
+  "Not measured": "Tidak diukur",
+  "Warning": "Peringatan",
+  "Error": "Kesalahan"
+}

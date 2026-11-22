@@ -1,0 +1,8 @@
+{
+  "Speed": "Hastighet",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "Labbvärden från den här datorn, med processor och nätverk nedsaktade. Bra är LCP på 2,5 s eller mindre och ingen layoutförskjutning (CLS 0). INP kräver en riktig besökare och mäts inte.",
+  "Largest element: {0}": "Största element: {0}",
+  "Not measured": "Inte uppmätt",
+  "Warning": "Varning",
+  "Error": "Fel"
+}

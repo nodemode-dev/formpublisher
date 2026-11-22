@@ -1,0 +1,8 @@
+[
+"Speed",
+"Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.",
+"Largest element: {0}",
+"Not measured",
+"Warning",
+"Error"
+]

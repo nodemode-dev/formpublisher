@@ -1,0 +1,8 @@
+{
+  "Speed": "Nopeus",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "Laboratorioarvoja tältä tietokoneelta, suoritin ja verkko hidastettuina. Hyvä on LCP enintään 2,5 s eikä asettelun siirtymiä (CLS 0). INP vaatii todellisen kävijän, eikä sitä mitata.",
+  "Largest element: {0}": "Suurin elementti: {0}",
+  "Not measured": "Ei mitattu",
+  "Warning": "Varoitus",
+  "Error": "Virhe"
+}

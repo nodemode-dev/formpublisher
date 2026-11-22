@@ -1,0 +1,8 @@
+{
+  "Speed": "Sebesség",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "Laborértékek erről a számítógépről, lelassított processzorral és hálózattal. Jó a legfeljebb 2,5 s-os LCP és az, ha az elrendezés nem mozdul el (CLS 0). Az INP-hez valódi látogató kell, ezért nem mérjük.",
+  "Largest element: {0}": "Legnagyobb elem: {0}",
+  "Not measured": "Nem mért",
+  "Warning": "Figyelmeztetés",
+  "Error": "Hiba"
+}

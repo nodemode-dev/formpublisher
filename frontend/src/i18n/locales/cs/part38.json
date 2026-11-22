@@ -1,0 +1,8 @@
+{
+  "Speed": "Rychlost",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "Laboratorní hodnoty z tohoto počítače se zpomaleným procesorem a sítí. Dobré je LCP nejvýše 2,5 s a žádný posun rozvržení (CLS 0). INP vyžaduje skutečného návštěvníka a neměří se.",
+  "Largest element: {0}": "Největší prvek: {0}",
+  "Not measured": "Neměřeno",
+  "Warning": "Varování",
+  "Error": "Chyba"
+}

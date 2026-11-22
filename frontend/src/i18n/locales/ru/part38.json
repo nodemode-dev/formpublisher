@@ -1,0 +1,8 @@
+{
+  "Speed": "Скорость",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "Лабораторные значения с этого компьютера при замедленных процессоре и сети. Хорошо: LCP не более 2,5 с и никаких сдвигов макета (CLS 0). INP требует настоящего посетителя и не измеряется.",
+  "Largest element: {0}": "Крупнейший элемент: {0}",
+  "Not measured": "Не измерено",
+  "Warning": "Предупреждение",
+  "Error": "Ошибка"
+}

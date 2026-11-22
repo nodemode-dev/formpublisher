@@ -1,0 +1,8 @@
+{
+  "Speed": "Szybkość",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "Wartości laboratoryjne z tego komputera, przy spowolnionym procesorze i sieci. Dobrze to LCP do 2,5 s i brak przesunięć układu (CLS 0). INP wymaga prawdziwego odwiedzającego i nie jest mierzony.",
+  "Largest element: {0}": "Największy element: {0}",
+  "Not measured": "Nie zmierzono",
+  "Warning": "Ostrzeżenie",
+  "Error": "Błąd"
+}
