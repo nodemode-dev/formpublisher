@@ -1,0 +1,4 @@
+{
+  "Previewing loads whatever the site itself loads from other hosts.": "Náhled načítá vše, co si web sám načítá z jiných hostitelů.",
+  "The deep check loads the site as a browser would, including what it loads from other hosts.": "Hluboká kontrola načítá web jako prohlížeč, včetně toho, co si načítá z jiných hostitelů."
+}

@@ -1,0 +1,4 @@
+{
+  "Previewing loads whatever the site itself loads from other hosts.": "Het voorbeeld laadt alles wat de site zelf van andere hosts laadt.",
+  "The deep check loads the site as a browser would, including what it loads from other hosts.": "De diepgaande controle laadt de site zoals een browser dat zou doen, inclusief wat de site van andere hosts laadt."
+}

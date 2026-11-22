@@ -87,7 +87,7 @@ rm -rf build/pyinstaller dist-engine
   "${data[@]}" \
   --paths "$ROOT/backend" \
   --collect-submodules app --collect-submodules uvicorn --collect-submodules websockets --collect-data mcp \
-  --collect-all playwright \
+  --collect-all playwright --collect-submodules keyring --copy-metadata keyring \
   --exclude-module mcp.cli --exclude-module tkinter \
   "${extra[@]}" \
   "$ROOT/backend/formpublisher_engine.py"

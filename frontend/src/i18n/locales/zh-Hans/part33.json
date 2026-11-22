@@ -1,0 +1,4 @@
+{
+  "Previewing loads whatever the site itself loads from other hosts.": "预览会加载网站自身从其他主机加载的所有内容。",
+  "The deep check loads the site as a browser would, including what it loads from other hosts.": "深度检查会像浏览器一样加载网站，包括网站从其他主机加载的内容。"
+}

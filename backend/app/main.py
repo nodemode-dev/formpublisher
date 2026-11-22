@@ -15,7 +15,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app import __version__, routers
 from app import host as site_host
-from app.services import enginelog, paths
+from app.services import enginelog, paths, window_key
 from app.services.bus import bus
 from app.services.codes import default_code
 from app.services.compile import CompileError
@@ -76,9 +76,11 @@ async def lifespan(app: FastAPI):
     host_server, host_task = await site_host.start()
     inbox.start()
     paths.write_engine_file(__version__)
+    window_key.write_key_file()
     try:
         yield
     finally:
+        window_key.remove_key_file()
         paths.remove_engine_file()
         inbox.stop()
         deep.attach(None)
@@ -86,6 +88,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="FormPublisher", version=__version__, lifespan=lifespan)
+app.add_middleware(window_key.WindowKeyGuard)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=paths.origins(),
@@ -174,4 +177,5 @@ def frontend(rel: str):
     if rel and root in target.parents and target.is_file():
         cache = "public, max-age=31536000, immutable" if rel.startswith("assets/") else "no-cache"
         return FileResponse(target, headers={"Cache-Control": cache})
-    return FileResponse(root / "index.html", headers={"Cache-Control": "no-cache"})
+    index = root / "index.html"
+    return FileResponse(index, headers={"Cache-Control": "no-cache", "Content-Security-Policy": window_key.content_policy(index)})

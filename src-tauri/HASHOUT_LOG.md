@@ -2,8 +2,8 @@
 
 Living log for the desktop shell (Tauri 2). Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.5.0
-Last updated: 2026-11-22 · v0.5.0 the engine is held in a Windows job object, a leftover engine is replaced, a failed start shows the engine's last lines and its log, the engine ships as a folder resource, Rust is pinned at 1.97.0 and the Intel Mac build declares macOS 14; v0.4.1, no shell change (the window text is in the 26 languages; see frontend/HASHOUT_LOG.md); v0.4.0, no shell change (the window gains Templates and the hosting guide; see frontend/HASHOUT_LOG.md); v0.3.4 the desktop build runs a pinned Tauri command line from frontend/node_modules, and build_app.bat stops when the install fails; v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
+Current build version: v0.6.0
+Last updated: 2026-11-22 · v0.6.0 the shell hands the engine's window key to the page, only the engine's own origin may use Tauri, and the splash has a content policy; v0.5.0 the engine is held in a Windows job object, a leftover engine is replaced, a failed start shows the engine's last lines and its log, the engine ships as a folder resource, Rust is pinned at 1.97.0 and the Intel Mac build declares macOS 14; v0.4.1, no shell change (the window text is in the 26 languages; see frontend/HASHOUT_LOG.md); v0.4.0, no shell change (the window gains Templates and the hosting guide; see frontend/HASHOUT_LOG.md); v0.3.4 the desktop build runs a pinned Tauri command line from frontend/node_modules, and build_app.bat stops when the install fails; v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
 
 ---
 
@@ -17,7 +17,7 @@ src-tauri/
 ├── rust-toolchain.toml the pinned Rust version (1.97.0, minimal profile)
 ├── tauri.conf.json     splash window, macOSPrivateApi, resources (the engine folder among them), bundle metadata
 ├── entitlements.plist  hardened runtime exceptions for the frozen Python engine
-├── capabilities/       default.json: the engine origin http://127.0.0.1:*/* as a remote URL (8280 or the port the shell picked)
+├── capabilities/       default.json: the engine origin http://127.0.0.1:8280/* as the only remote URL (another port is granted at run time)
 ├── icons/              32x32, 128x128, 128x128@2x, icon.png, icon.icns, icon.ico
 ├── engine/             .gitkeep; setup/freeze_backend places the frozen engine folder here at build time
 └── src/
@@ -184,3 +184,14 @@ Checked here: `cargo check --locked --target x86_64-pc-windows-msvc` passes with
 - logged: v0.5.0 · 2026-11-22
 
 `tauri.conf.json` says 13.0, which is what the Apple silicon build needs. The Intel build installs a `cryptography` wheel built for macOS 14 (PyPI has none for Intel at this version; the family's release build supplies one), so `build_app` adds `--config '{"bundle":{"macOS":{"minimumSystemVersion":"14.0"}}}'` when the target is `x86_64-*`. One file cannot hold two values, and saying 14 for both would turn away Apple silicon Macs on 13 that run it. formcompiler's registry entry (`catalog.minimum_os.macos`) says "macOS 13" and needs the same split; that is a change in formcompiler.
+
+## The window key reaches the page from the shell, and only the engine's origin may use Tauri {#window-key}
+- refers-to: src/main.rs :: WindowKey, key_script, grant_engine_origin, follow, start_engine, open_main, open_window · src/engine_start.rs :: window_key, key_script, WINDOW_PERMISSIONS, KEY_WAIT, Failure::NoKey · capabilities/default.json · tauri.conf.json :: app.security.csp
+- kind: decision
+- logged: v0.6.0 · 2026-11-22
+
+The engine prints one line, `formpublisher-window-key: ` and 43 URL-safe characters, on its standard output when the shell started it (`FORMPUBLISHER_DESKTOP=1`). `follow` takes that line out of the stream before the tail sees it (the tail would refuse it anyway) and keeps the value in `WindowKey`. After health answers, `start_engine` waits up to 10 s for the key (`Failure::NoKey` otherwise). `key_script` is an initialization script on the main window and on every extra window: it sets `window.__FORMPUBLISHER_WINDOW_KEY` only when the page's origin is the engine's own and the frame is the top one, so the previewed site in its iframe on the host port never sees it. The page reads the value once and deletes it (frontend log, Phase 71). The shape is FormDeck's (`src-tauri/src/main.rs` there); the key is found with a plain prefix test rather than the `regex` crate, which this shell does not carry.
+
+The capability file granted Tauri's commands to `http://127.0.0.1:*/*`: every loopback port, the preview host's among them. It now names `http://127.0.0.1:8280/*` only. When 8280 was taken and the shell picked another port, `grant_engine_origin` adds one run-time capability, `engine-origin`, for exactly that origin with the same 14 permissions (`WINDOW_PERMISSIONS`, which must stay in step with the file) on `main` and `extra-*`; if that fails the start fails with a dialog rather than opening a window whose buttons do nothing. `app.security.csp` was null; it is now a policy for the one page Tauri itself serves, the splash (own scripts and styles, inline styles, the IPC endpoints, nothing else). The window proper is served by the engine and gets its policy from the engine's response header (backend log, Phase 73).
+
+Checked here: `cargo check --locked --target x86_64-pc-windows-msvc`, clean. Not run: the run-time capability on a second port, the splash under its policy, an iframe on the preview port calling `window.__TAURI_INTERNALS__` (all steps in TEST_PLAN.md, 2A and 2B).

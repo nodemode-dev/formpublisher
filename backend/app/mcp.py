@@ -50,7 +50,7 @@ def build(client: Client | None = None) -> MCPServer:
 
     @server.tool(
         name="import_site",
-        description="Import a FormWeb site export (a zip with routes.json, sitemap.xml, robots.txt and assets/), a .fweb project, a FormPublisher .fpub package or a FormWeb publication folder from an absolute local path. It is unzipped safely into FormPublisher's data folder as a new revision and returns the site record. A .fpub also restores its build (publish.json, site.zip and signature, checked against the key it carries) and the record says so under build. Importing the same source again adds a revision.",
+        description="Import a FormWeb site export (a zip with routes.json, sitemap.xml, robots.txt and assets/), a .fweb project, a FormPublisher .fpub package or a FormWeb publication folder from an absolute local path. It is unzipped safely into FormPublisher's data folder as a new revision and returns the site record. A .fpub also restores its build (publish.json, site.zip and signature, checked against the key it carries) and the record says so under build; build.signature.known is true only when that key is one of the person's own. Importing the same source again adds a revision.",
         annotations=ToolAnnotations(title="Import a site", readOnlyHint=False, destructiveHint=False, idempotentHint=False, openWorldHint=False),
     )
     async def import_site(path: str) -> dict:
@@ -158,7 +158,7 @@ def build(client: Client | None = None) -> MCPServer:
 
     @server.tool(
         name="verify_build",
-        description="Verify a build's detached signature against its site.zip bytes. Returns valid true with the key fingerprint, or valid false with the reason (not signed, malformed, or the package does not match). Read only.",
+        description="Verify a build's detached signature against its site.zip bytes and the person's own keys. Returns valid (the signature matches the content with the public key inside the signature file), known (true only when that public key is one of the person's own signing keys or a key they kept as known; anyone can re-sign a changed package with a key of their own, so valid without known is not proof of origin), trusted (valid and known), signer (the fingerprint and, when known, the key's id and name) and a plain message; when valid is false, reason says why (not signed, malformed, or the package does not match). Report valid true with known false to the person as a warning: signed by a key they do not have. Read only.",
         annotations=ToolAnnotations(title="Verify a build", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
     )
     async def verify_build(build: str) -> dict:

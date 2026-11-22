@@ -11,7 +11,7 @@ from typing import Any
 
 from app import __version__
 from app.services.codes import default_code
-from app.services import checks, formweb, fpub, intake, keys, package, paths, settings
+from app.services import checks, formweb, fpub, intake, keys, package, paths, settings, window_key
 
 DEEP_WAIT_SECONDS = 900
 
@@ -61,6 +61,10 @@ class Client:
         headers = {"Accept": "application/json", "User-Agent": f"formpublisher-cli/{__version__}"}
         if data is not None:
             headers["Content-Type"] = "application/json"
+        if method not in window_key.READS:
+            key = window_key.read_key_file()
+            if key:
+                headers[window_key.HEADER] = key
         req = urllib.request.Request(f"{self.url}{path}", data=data, method=method, headers=headers)
         try:
             with self.opener.open(req, timeout=timeout) as res:
@@ -274,10 +278,37 @@ class Client:
             return self.call("POST", "/api/keys", {"name": name, "passphrase": passphrase})
         return self._local(keys.create_key, name, passphrase)
 
+    def export_key(self, key_id: str, to: str, passphrase: str, current: str | None = None, force: bool = False) -> dict:
+        self.connect()
+        target = Path(to).expanduser().resolve()
+        if target.suffix.lower() != ".pem":
+            raise OpError("the file name must end in .pem")
+        if target.exists() and not force:
+            raise OpError(f"{target} already exists; use --force to replace it")
+        if self.url:
+            pem = self.call("POST", f"/api/keys/{_q(key_id)}/export", {"passphrase": passphrase, "current": current})["pem"].encode("ascii")
+        else:
+            pem = self._local(keys.export_pem, key_id, passphrase, current)
+        self._local(keys.write_export, target, pem, force)
+        return {"id": key_id, "file": str(target), "encrypted": True}
+
+    def import_key(self, path: str, passphrase: str | None = None, name: str | None = None) -> dict:
+        self.connect()
+        source = Path(path).expanduser()
+        try:
+            if source.stat().st_size > keys.MAX_PEM:
+                raise OpError(f"{source} is too large to be a PEM private key")
+            text = source.read_text(encoding="utf-8", errors="replace")
+        except OSError as exc:
+            raise OpError(f"cannot read {source}: {exc.strerror or exc}") from exc
+        if self.url:
+            return self.call("POST", "/api/keys/import", {"pem": text, "passphrase": passphrase, "name": name})
+        return self._local(keys.import_pem, text, passphrase, name)
+
     def sign(self, build_id: str, key: str | None = None, passphrase: str | None = None) -> dict:
         self.connect()
         if not key:
-            rows = self.keys()["keys"]
+            rows = [r for r in self.keys()["keys"] if r.get("canSign", True)]
             if not rows:
                 raise OpError("there is no signing key yet; create one with: keys --create NAME")
             if len(rows) > 1:
@@ -449,7 +480,7 @@ def say_import(data: dict) -> str:
     if not isinstance(built, dict):
         return line
     sig = built.get("signature")
-    state = "not signed" if not sig else f"signature valid, key {sig.get('key')}" + ("" if sig.get("known") else " (not one of your keys)")
+    state = "not signed" if not sig else _signed_by(sig)
     moved = f" (was {built['originalId']})" if built.get("remapped") else ""
     return f"{line}\nbuild {built['id']}{moved}  {state}"
 
@@ -527,7 +558,8 @@ def say_builds(data: dict) -> str:
 def say_keys(data: dict) -> str:
     if not data["keys"]:
         return "no keys yet; create one with: keys --create NAME"
-    return "\n".join(f"{k['id']:<14} {k.get('name', ''):<24} {k.get('fingerprint', '')}" + ("  passphrase" if k.get("encrypted") else "") for k in data["keys"])
+    kept = {"store": "password store", "file": "private file", "none": "verify only"}
+    return "\n".join(f"{k['id']:<14} {k.get('name', ''):<24} {k.get('fingerprint', ''):<52} {kept.get(k.get('secret'), 'private file'):<14}" + ("  passphrase" if k.get("encrypted") else "") for k in data["keys"])
 
 
 def say_key(data: dict) -> str:
@@ -538,10 +570,18 @@ def say_sign(data: dict) -> str:
     return f"signed build {data['id']} with key {data['keyId']}  {data['key']}"
 
 
+def _signed_by(data: dict) -> str:
+    signer = data.get("signer") if isinstance(data.get("signer"), dict) else {}
+    fingerprint = signer.get("fingerprint") or data.get("key")
+    if data.get("known"):
+        return f"verified  signed by your key {signer.get('name') or signer.get('id')}  {fingerprint}"
+    return f"warning: signed by a key you do not have  {fingerprint}  (the signature matches the content, but the key is not one of yours)"
+
+
 def say_verify(data: dict) -> str:
     if data.get("valid"):
-        return f"valid  signed by {data.get('key')}"
-    return f"not valid: {data.get('reason', 'unknown')}"
+        return _signed_by(data)
+    return f"not valid: {data.get('reason') or data.get('message') or 'unknown'}"
 
 
 def say_targets(data: dict) -> str:
@@ -645,11 +685,17 @@ def build_parser() -> argparse.ArgumentParser:
     sg.add_argument("build")
     sg.add_argument("--key", help="key id (default: the only key, when there is exactly one)")
     sg.add_argument("--passphrase", help="the key's passphrase, when it has one")
-    vf = sub.add_parser("verify", parents=[common], help="verify a build's signature; exits 1 when it is not valid")
+    vf = sub.add_parser("verify", parents=[common], help="verify a build's signature against your own keys; exits 1 when it is not valid or the key is not one of yours")
     vf.add_argument("build")
+    vf.add_argument("--allow-unknown", action="store_true", help="exit 0 for a valid signature made by a key you do not have")
     ky = sub.add_parser("keys", parents=[common], help="list signing keys; --create NAME makes a new Ed25519 key")
     ky.add_argument("--create", metavar="NAME", help="create a key with this name")
     ky.add_argument("--passphrase", help="encrypt the new key with this passphrase")
+    ky.add_argument("--export", metavar="ID", help="write this key's private key to --to FILE as a PEM encrypted with a passphrase you are asked for (or FORMPUBLISHER_KEY_PASSPHRASE)")
+    ky.add_argument("--to", metavar="FILE", help="where --export writes the PEM (created readable only by you)")
+    ky.add_argument("--force", action="store_true", help="let --export replace an existing file")
+    ky.add_argument("--import", dest="import_file", metavar="FILE", help="add a signing key from a PEM file; an encrypted one asks for its passphrase (or FORMPUBLISHER_KEY_PASSPHRASE)")
+    ky.add_argument("--name", help="name for the key --import adds")
     sub.add_parser("targets", parents=[common], help="list the host targets a build can be prepared for")
     pp = sub.add_parser("prepare", parents=[common], help="prepare a folder per target for a build, with the exact commands to run")
     pp.add_argument("build")
@@ -675,6 +721,61 @@ def build_parser() -> argparse.ArgumentParser:
     st.add_argument("--to", required=True, help="the folder the new .fweb project is written into")
     st.add_argument("--name", help="the project's file name, default the template's name")
     return parser
+
+
+PASSPHRASE_ENV = "FORMPUBLISHER_KEY_PASSPHRASE"
+
+
+def _ask_secret(prompt: str, confirm: bool = False) -> str:
+    import getpass
+
+    given = os.environ.get(PASSPHRASE_ENV)
+    if given:
+        return given
+    try:
+        first = getpass.getpass(prompt)
+        if confirm and getpass.getpass("Type it again: ") != first:
+            raise OpError("the two passphrases differ")
+    except (EOFError, KeyboardInterrupt) as exc:
+        raise OpError("no passphrase was given") from exc
+    return first
+
+
+def _export_key(client: Client, args) -> dict:
+    if not args.to:
+        raise OpError("give the file to write with --to FILE")
+    row = next((r for r in client.keys()["keys"] if r.get("id") == args.export), None)
+    if row is None:
+        raise OpError("key not found", 1, "key-missing")
+    current = None
+    if row.get("encrypted"):
+        import getpass
+
+        try:
+            current = getpass.getpass(f"Passphrase of key {args.export}: ")
+        except (EOFError, KeyboardInterrupt) as exc:
+            raise OpError("no passphrase was given") from exc
+    secret = _ask_secret("Passphrase for the exported file (at least 8 characters): ", confirm=True)
+    if len(secret) < keys.MIN_EXPORT_PASSPHRASE:
+        raise OpError(f"the passphrase must be at least {keys.MIN_EXPORT_PASSPHRASE} characters", 1, "passphrase-short")
+    return client.export_key(args.export, args.to, secret, current, args.force)
+
+
+def _import_key(client: Client, args) -> dict:
+    try:
+        head = Path(args.import_file).expanduser().read_text(encoding="utf-8", errors="replace")[:200]
+    except OSError as exc:
+        raise OpError(f"cannot read {args.import_file}: {exc.strerror or exc}") from exc
+    secret = _ask_secret("Passphrase of the PEM file: ") if "ENCRYPTED" in head else None
+    return client.import_key(args.import_file, secret, args.name)
+
+
+def say_exported(data: dict) -> str:
+    return f"exported key {data['id']} to {data['file']}  (PEM, encrypted with your passphrase, readable only by you)"
+
+
+def say_imported_key(data: dict) -> str:
+    return ("upgraded" if data.get("upgraded") else "imported") + f" key {data['id']}  {data.get('name', '')}  {data.get('fingerprint', '')}  kept in the " + ("password store" if data.get("secret") == "store" else "private file")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -716,6 +817,10 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "keys":
             if args.create:
                 data, say = client.create_key(args.create, args.passphrase), say_key
+            elif args.export:
+                data, say = _export_key(client, args), say_exported
+            elif args.import_file:
+                data, say = _import_key(client, args), say_imported_key
             else:
                 data, say = client.keys(), say_keys
         elif args.command == "targets":
@@ -751,7 +856,9 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.flush()
     except BrokenPipeError:
         os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
-    return 1 if args.command == "verify" and not data.get("valid") else 0
+    if args.command == "verify" and not (data.get("valid") and (data.get("known") or args.allow_unknown)):
+        return 1
+    return 0
 
 
 if __name__ == "__main__":

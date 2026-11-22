@@ -30,6 +30,28 @@ struct Backend(Mutex<Option<Child>>);
 
 struct EngineTail(Arc<Mutex<Tail>>);
 
+struct WindowKey(Arc<Mutex<Option<String>>>);
+
+fn key_script(handle: &tauri::AppHandle) -> String {
+    let key = handle.state::<WindowKey>().0.lock().ok().and_then(|slot| slot.clone()).unwrap_or_default();
+    engine_start::key_script(&engine_url(), &key)
+}
+
+fn grant_engine_origin(handle: &tauri::AppHandle) -> bool {
+    let port = PORT.load(Ordering::SeqCst);
+    if port == DEFAULT_PORT {
+        return true;
+    }
+    let mut capability = tauri::ipc::CapabilityBuilder::new("engine-origin")
+        .remote(format!("http://127.0.0.1:{port}/*"))
+        .local(false)
+        .windows(["main", "extra-*"]);
+    for permission in engine_start::WINDOW_PERMISSIONS {
+        capability = capability.permission(*permission);
+    }
+    handle.add_capability(capability).is_ok()
+}
+
 static PORT: AtomicU16 = AtomicU16::new(DEFAULT_PORT);
 
 static ENGINE_GROUP: AtomicI32 = AtomicI32::new(0);
@@ -104,11 +126,17 @@ fn source_root() -> Option<PathBuf> {
     root.join("formpublisher").is_file().then_some(root)
 }
 
-fn follow<R: Read + Send + 'static>(stream: Option<R>, tail: Arc<Mutex<Tail>>) {
+fn follow<R: Read + Send + 'static>(stream: Option<R>, tail: Arc<Mutex<Tail>>, key: Arc<Mutex<Option<String>>>) {
     let Some(stream) = stream else { return };
     std::thread::spawn(move || {
         for line in BufReader::new(stream).lines() {
             let Ok(line) = line else { break };
+            if let Some(found) = engine_start::window_key(&line) {
+                if let Ok(mut slot) = key.lock() {
+                    *slot = Some(found);
+                }
+                continue;
+            }
             if let Ok(mut kept) = tail.lock() {
                 kept.push(&line);
             }
@@ -146,8 +174,9 @@ fn spawn_engine(handle: &tauri::AppHandle) -> Result<Child, Failure> {
     #[cfg(windows)]
     win_job::hold_pid(child.id());
     let tail = handle.state::<EngineTail>().0.clone();
-    follow(child.stdout.take(), tail.clone());
-    follow(child.stderr.take(), tail);
+    let key = handle.state::<WindowKey>().0.clone();
+    follow(child.stdout.take(), tail.clone(), key.clone());
+    follow(child.stderr.take(), tail, key);
     Ok(child)
 }
 
@@ -204,6 +233,7 @@ fn open_main(handle: &tauri::AppHandle) {
     let Ok(url) = engine_url().parse() else { return };
     let builder = WebviewWindowBuilder::new(handle, "main", WebviewUrl::External(url))
         .title("FormPublisher")
+        .initialization_script(key_script(handle))
         .visible(reveal::BUILD_VISIBLE)
         .background_color(reveal::BACKGROUND)
         .inner_size(width, height)
@@ -290,6 +320,18 @@ fn start_engine(handle: tauri::AppHandle) {
             }
             std::thread::sleep(Duration::from_millis(250));
         }
+        let asked = Instant::now();
+        while handle.state::<WindowKey>().0.lock().map(|slot| slot.is_none()).unwrap_or(true) {
+            if asked.elapsed() > engine_start::KEY_WAIT {
+                engine_failed(&handle, Failure::NoKey);
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(50));
+        }
+        if !grant_engine_origin(&handle) {
+            engine_failed(&handle, Failure::Window);
+            return;
+        }
         let opener = handle.clone();
         let _ = handle.run_on_main_thread(move || open_main(&opener));
     });
@@ -308,6 +350,7 @@ fn open_window(app: tauri::AppHandle, path: String, title: Option<String>) -> Re
     );
     let builder = WebviewWindowBuilder::new(&app, label, WebviewUrl::External(url))
         .title(title.unwrap_or_else(|| "FormPublisher".to_string()))
+        .initialization_script(key_script(&app))
         .visible(reveal::BUILD_VISIBLE)
         .background_color(reveal::BACKGROUND)
         .inner_size(MIN_SIZE.0, MIN_SIZE.1)
@@ -339,6 +382,7 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .manage(Backend(Mutex::new(None)))
         .manage(EngineTail(Arc::new(Mutex::new(Tail::default()))))
+        .manage(WindowKey(Arc::new(Mutex::new(None))))
         .on_window_event(|window, event| {
             if window.label() != "splash"
                 && matches!(

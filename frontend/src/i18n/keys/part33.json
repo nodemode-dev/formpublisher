@@ -1,0 +1,4 @@
+[
+"Previewing loads whatever the site itself loads from other hosts.",
+"The deep check loads the site as a browser would, including what it loads from other hosts."
+]

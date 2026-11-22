@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.0 · 2026-11-22
+
+- Only the FormPublisher window, its command line and its MCP server can change anything. Every request that changes something needs a key the engine makes at each start; reads work as before, and FormWeb's Send to FormPublisher keeps its own rule. A site you preview cannot reach the app.
+- In the desktop app only the engine's own address may use the app's system functions, and the window is served with a content security policy.
+- Signing keys are kept in your system's password store (macOS Keychain, Windows Credential Manager, the Secret Service on Linux). The store is opened only to create, sign, export, import or remove a key; listing keys never touches it. Where there is no store, the secret is a file only you can read. Keys from earlier versions move over the first time they are used.
+- Removing a key removes its secret. Trash keeps only the public half, and a key restored from Trash can verify but not sign.
+- Export and Import in the Package sheet, and `keys --export` and `keys --import` on the command line: a key leaves as a PEM file encrypted with a passphrase you choose, and comes back from one. Agents have no tool for either.
+- Verify tells you who signed. A signature made with one of your keys says so with the key's name. A valid signature from a key you do not have is a warning, "Signed by a key you do not have", in the window, on the command line (which then exits 1 unless `--allow-unknown`) and in the MCP tool's answer (`known`).
+- Preview and Problems each say in one line that previewing and the deep check load what the site itself loads from other hosts. FormPublisher sends nothing of its own.
+- The engine's test suite cannot find or start an agent program and never touches your real home folder or password store.
+
 ## 0.5.0 · 2026-11-22
 
 - The desktop app's engine starts and ends with its window on every system. On Windows the shell holds the engine in a job object, so ending the app by any means ends the engine; everywhere the engine also watches the app that started it and leaves within about two seconds of it going. An engine left running by an earlier copy is ended and replaced, never reused.

@@ -76,6 +76,13 @@ pins). After changing the command
 line, the MCP tools or a skill, run `./formpublisher agents sync` so the `.agents`
 mirror follows.
 
+The engine's tests run with `python -m pytest -q backend/tests` (install
+`backend/requirements-test.txt` first; the `.fweb` tests need `formweb-core` built).
+Every test runs against stand-ins that the fixture in `backend/tests/conftest.py`
+sets: its own home folder, a `PATH` of the system folders only (so no agent program
+can be found), its own agent configuration folders and keyring's fail backend, so a
+test never touches your real files, your agents' setup or your password store.
+
 - Keep each pull request to one change.
 - Write commit subjects in Conventional Commits: `feat(engine): ...`,
   `fix(window): ...`, `docs(...)`. Leave the version and `CHANGELOG.md` alone; a

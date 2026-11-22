@@ -22,9 +22,11 @@ export interface BuildDetail extends BuildSummary {
   checks: { errors: number; warnings: number; infos: number } | null;
 }
 
-export interface KeyInfo { id: string; name: string; fingerprint: string; created: string; encrypted: boolean }
+export type KeySecret = 'store' | 'file' | 'none';
 
-export interface VerifyResult { valid: boolean; key: string; reason: string }
+export interface KeyInfo { id: string; name: string; fingerprint: string; created: string; encrypted: boolean; secret: KeySecret; canSign: boolean }
+
+export interface VerifyResult { valid: boolean; known: boolean; key: string; signerName: string; reason: string; message: string }
 
 export interface ReproduceResult { same: boolean; sha256: string; expected: string }
 
@@ -133,7 +135,8 @@ export function toDetail(raw: unknown): BuildDetail | null {
 function toKey(raw: unknown): KeyInfo | null {
   if (!isObj(raw)) return null;
   const id = str(raw.id);
-  return id ? { id, name: str(raw.name) || id, fingerprint: str(raw.fingerprint), created: str(raw.created), encrypted: raw.encrypted === true } : null;
+  const secret: KeySecret = raw.secret === 'store' || raw.secret === 'none' ? raw.secret : 'file';
+  return id ? { id, name: str(raw.name) || id, fingerprint: str(raw.fingerprint), created: str(raw.created), encrypted: raw.encrypted === true, secret, canSign: raw.canSign !== false && secret !== 'none' } : null;
 }
 
 function toSide(raw: unknown): CompareSide {
@@ -188,7 +191,8 @@ export const buildsApi = {
   async verify(id: string): Promise<VerifyResult> {
     const raw = await request<unknown>(`/api/builds/${enc(id)}/verify`, { method: 'POST' });
     const o = isObj(raw) ? raw : {};
-    return { valid: o.valid === true, key: str(o.key), reason: str(o.reason) };
+    const signer = isObj(o.signer) ? o.signer : {};
+    return { valid: o.valid === true, known: o.known === true, key: str(signer.fingerprint) || str(o.key), signerName: str(signer.name) || str(signer.id), reason: str(o.reason), message: str(o.message) };
   },
   async compare(a: string, b: string): Promise<CompareResult> {
     const raw = await request<unknown>(`/api/builds/${enc(a)}/compare/${enc(b)}`);
@@ -209,6 +213,18 @@ export const buildsApi = {
   async createKey(name: string, passphrase: string): Promise<KeyInfo> {
     const raw = await request<unknown>('/api/keys', body('POST', passphrase ? { name, passphrase } : { name }));
     const k = toKey(isObj(raw) && isObj(raw.key) ? raw.key : raw);
+    if (!k) throw new ApiError('The engine returned an unexpected answer', 502);
+    return k;
+  },
+  async exportKey(id: string, path: string, passphrase: string, current: string): Promise<string> {
+    const raw = await request<unknown>(`/api/keys/${enc(id)}/export`, body('POST', current ? { path, passphrase, current } : { path, passphrase }));
+    return isObj(raw) ? str(raw.file) : '';
+  },
+  async importKey(pem: string, passphrase: string, name: string): Promise<KeyInfo> {
+    const data: Record<string, string> = { pem };
+    if (passphrase) data.passphrase = passphrase;
+    if (name) data.name = name;
+    const k = toKey(await request<unknown>('/api/keys/import', body('POST', data)));
     if (!k) throw new ApiError('The engine returned an unexpected answer', 502);
     return k;
   },

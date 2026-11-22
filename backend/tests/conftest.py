@@ -22,8 +22,27 @@ def core_path() -> Path | None:
     return None
 
 
+def system_path() -> str:
+    if os.name == "nt":
+        return str(Path(os.environ.get("SystemRoot") or "C:\\Windows") / "System32")
+    return "/usr/bin:/bin"
+
+
 @pytest.fixture(autouse=True)
 def home(tmp_path, monkeypatch):
+    core_env = os.environ.get("FORMPUBLISHER_FORMWEB_CORE", "").strip()
+    if core_env:
+        monkeypatch.setenv("FORMPUBLISHER_FORMWEB_CORE", str(Path(core_env).expanduser().resolve()))
+    user = tmp_path / "user"
+    user.mkdir()
+    for name in ("HOME", "USERPROFILE"):
+        monkeypatch.setenv(name, str(user))
+    monkeypatch.setenv("PATH", system_path())
+    monkeypatch.setenv("PYTHON_KEYRING_BACKEND", "keyring.backends.fail.Keyring")
+    for name in ("CODEX_HOME", "CLAUDE_CONFIG_DIR", "CURSOR_CONFIG_DIR", "XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_CACHE_HOME", "XDG_STATE_HOME", "APPDATA", "LOCALAPPDATA"):
+        monkeypatch.setenv(name, str(user / name.lower()))
+    for name in ("FORMMCP_BIN", "FORMPUBLISHER_LAUNCHER", "APPIMAGE"):
+        monkeypatch.delenv(name, raising=False)
     folder = tmp_path / "home"
     monkeypatch.setenv("FORMPUBLISHER_HOME", str(folder))
     monkeypatch.setenv("FORMPUBLISHER_PORT", "18299")

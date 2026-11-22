@@ -1,3 +1,5 @@
+import base64
+import hashlib
 import json
 import os
 import re
@@ -274,17 +276,28 @@ def _restore_key(entry: Path, row: dict, dest: Path) -> dict:
         key_row = None
     if not isinstance(key_row, dict) or not isinstance(key_row.get("id"), str):
         raise _error("The key record in this entry is missing or damaged.", 409, "entry-damaged")
-    if (entry / dest.name).name != f"{key_row['id']}.pem" or not (entry / dest.name).is_file():
-        raise _error("The key file is missing from this entry.", 409, "entry-damaged")
+    if dest.name != f"{key_row['id']}.pem":
+        raise _error("The key record in this entry is missing or damaged.", 409, "entry-damaged")
+    try:
+        raw = base64.b64decode(str(key_row.get("publicKey", "")), validate=True)
+    except (ValueError, TypeError):
+        raw = b""
+    if len(raw) != 32 or hashlib.sha256(raw).hexdigest()[:16] != key_row["id"]:
+        raise _error("The key record in this entry is missing or damaged.", 409, "entry-damaged")
+    key_row["fingerprint"] = keys.fingerprint_of(raw)
+    legacy = entry / dest.name
     with keys._lock:
         if any(r.get("id") == key_row["id"] for r in keys._load()):
             raise _error("A key with this id already exists.", 409, "place-taken")
-        shutil.move(str(entry / dest.name), str(dest))
-        os.chmod(dest, 0o600)
-        keys._save(keys._load() + [key_row])
+        if legacy.is_file():
+            stored = keys.adopt_private(key_row, legacy.read_bytes())
+            legacy.unlink()
+        else:
+            stored = keys._public_row(key_row)
+            keys._save(keys._load() + [stored])
     shutil.rmtree(entry, ignore_errors=True)
     bus.emit("keys.created", id=key_row["id"], name=key_row.get("name"), restored=True)
-    return {"id": key_row["id"], "name": key_row.get("name")}
+    return {"id": key_row["id"], "name": key_row.get("name"), "canSign": stored.get("secret") is not None}
 
 
 def _key_record(entry: Path) -> dict | None:
@@ -344,9 +357,8 @@ def _rescue_key(entry: Path, passphrase: str | None) -> dict:
     with keys._lock:
         if any(r.get("id") == key_id for r in keys._load()) or dest.exists() or dest.is_symlink():
             raise _error("A key with this id already exists.", 409, "place-taken")
-        shutil.move(str(source), str(dest))
-        os.chmod(dest, 0o600)
-        keys._save(keys._load() + [key_row])
+        keys.adopt_private(key_row, data)
+        source.unlink()
     shutil.rmtree(entry, ignore_errors=True)
     bus.emit("keys.created", id=key_id, name=key_row["name"], restored=True)
     return {"id": key_id, "name": key_row["name"], "rescued": True, "origin": f"keys/{key_id}.pem"}
