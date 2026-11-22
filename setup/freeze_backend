@@ -84,6 +84,9 @@ if [ "$os" = windows ]; then extra+=(--collect-all winpty); else extra+=(--colle
 if [ "$os" = macos ] && [ -n "${APPLE_SIGNING_IDENTITY:-}" ]; then
   extra+=(--codesign-identity "$APPLE_SIGNING_IDENTITY" --osx-entitlements-file "$ROOT/src-tauri/entitlements.plist")
 fi
+while IFS= read -r lib; do
+  if [ -n "$lib" ]; then extra+=(--add-binary "$lib${sep}."); say "the engine takes cryptography's own OpenSSL first: $lib"; fi
+done < <("$py" -I "$ROOT/setup/openssl_libs.py")
 rm -rf build/pyinstaller dist-engine
 "$py" -m PyInstaller --noconfirm --clean --onedir --name formpublisher-engine \
   --distpath dist-engine --workpath build/pyinstaller --specpath build/pyinstaller \

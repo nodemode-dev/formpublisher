@@ -16,6 +16,7 @@
 - The GitHub Pages workflow uses the current action versions and keeps dotfiles such as `.well-known/`. Each deploy command names the major version it was checked with (`netlify-cli@27`, `wrangler@4`, `vercel@66`).
 - The check messages, Prepare notes and live-check findings are translated in all 26 languages, including the check messages added in 0.9.0, which showed in English before.
 - The README says plainly what FormPublisher and FormWeb do not do.
+- The Intel Mac build works again. The engine now carries the OpenSSL that cryptography was built against, instead of Python's older copy. The 0.9.0 build stopped at the engine's self-check with "Symbol not found: _SSL_get0_group_name".
 
 ## 0.9.0 · 2026-11-22
 
