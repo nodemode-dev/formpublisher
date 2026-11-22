@@ -1,7 +1,7 @@
 import '../styles/hosting.css';
 import guide from '../../../docs/HOSTING.md?raw';
 import { Dialog } from './dialogs';
-import { escapeHtml, q } from './dom';
+import { el, escapeHtml, q } from './dom';
 
 export const HOSTING_PART: Record<string, string> = {
   'static-zip': 'static-zip',
@@ -83,6 +83,8 @@ export class HostingSheet extends Dialog {
     super('Host it yourself', 760, 'fp-host-dlg');
     this.page = document.createElement('article');
     this.page.className = 'fp-host-page';
+    this.page.lang = 'en';
+    this.page.setAttribute('translate', 'no');
     this.page.innerHTML = renderGuide(guide);
     this.body.appendChild(this.page);
     this.page.addEventListener('click', (e) => {
@@ -91,6 +93,7 @@ export class HostingSheet extends Dialog {
       e.preventDefault();
       this.jump(link.dataset.part ?? '');
     });
+    this.foot.appendChild(el('<span class="fp-host-note">The guide is in English.</span>'));
     this.button('Close', 'primary', () => this.close());
   }
 

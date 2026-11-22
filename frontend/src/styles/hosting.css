@@ -1,5 +1,7 @@
 .fp-dialog.fp-host-dlg { height: min(86vh, 820px); }
 .fp-host-dlg .fp-dlg-body { display: block; scrollbar-gutter: stable; }
+.fp-host-note { flex: 1 1 0; align-self: center; min-width: 0; overflow: hidden; color: var(--text-muted); font-size: var(--fp-12); text-overflow: ellipsis; white-space: nowrap; }
+:root[lang^="en"] .fp-host-note { visibility: hidden; }
 .fp-host-page { max-width: 68ch; color: var(--text-secondary); font-size: var(--fp-13); line-height: 1.6; }
 .fp-host-page p, .fp-host-page ul, .fp-host-page ol { margin: 0 0 var(--space-3); }
 .fp-host-page ul, .fp-host-page ol { padding-left: 20px; }

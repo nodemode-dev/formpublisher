@@ -2,6 +2,8 @@ import '../styles/templates.css';
 import { api } from '../api';
 import type { App } from '../app-api';
 import { templatesApi, type StartedSite, type TemplateItem, type TemplateList } from '../api-templates';
+import { onLanguage } from '../i18n';
+import { fmtCount, fmtDate } from './builds';
 import { Dialog } from './dialogs';
 import { el, inTauri, patchList, q, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
@@ -9,10 +11,6 @@ import { icon } from './icons';
 const SKELETONS = 3;
 
 const megabytes = (bytes: number): string => `${(bytes / 1048576).toFixed(1)} MB`;
-const when = (iso: string): string => {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-};
 
 async function openExternal(target: string): Promise<void> {
   if (inTauri()) {
@@ -28,17 +26,20 @@ const skeleton = (): string => `<div class="fp-tpl-card is-skeleton" aria-hidden
 export class TemplatesSheet extends Dialog {
   private readonly list: HTMLElement;
   private readonly status: HTMLElement;
+  private readonly said: HTMLElement;
+  private readonly more: HTMLElement;
   private readonly getBtn: HTMLButtonElement;
   private readonly none: HTMLElement;
   private readonly done: HTMLElement;
   private started: StartedSite | null = null;
+  private kept: TemplateList | null = null;
   private busy = false;
 
   constructor(private readonly app: App) {
     super('Templates', 760, 'fp-tpl-dlg');
     this.body.appendChild(el(`<div class="fp-tpl-wrap">
 <p class="fp-tpl-intro">Start a site from a template, edit it in FormWeb, then check, package and publish it here. The list comes from the public formai-templates repository on GitHub. Nothing is fetched until you ask.</p>
-<div class="fp-tpl-bar"><button class="fp-btn fp-btn-primary fp-btn-sm" type="button" data-a="get">${icon('download', 14)}<span data-f="getlabel">Get the templates</span></button><span class="fp-tpl-status" data-f="status" role="status"></span></div>
+<div class="fp-tpl-bar"><button class="fp-btn fp-btn-primary fp-btn-sm" type="button" data-a="get">${icon('download', 14)}<span data-f="getlabel">Get the templates</span></button><span class="fp-tpl-status" data-f="status" role="status"><span data-f="said"></span> <span data-f="more"></span></span></div>
 <div class="fp-tpl-grid">${Array.from({ length: SKELETONS }, skeleton).join('')}<div class="fp-tpl-list" hidden></div></div>
 <div class="fp-tpl-none"></div>
 <section class="fp-tpl-done" aria-live="polite">
@@ -53,6 +54,8 @@ export class TemplatesSheet extends Dialog {
 </div>`));
     this.list = q(this.body, '.fp-tpl-list');
     this.status = q(this.body, '[data-f="status"]');
+    this.said = q(this.status, '[data-f="said"]');
+    this.more = q(this.status, '[data-f="more"]');
     this.getBtn = q<HTMLButtonElement>(this.body, '[data-a="get"]');
     this.none = q(this.body, '.fp-tpl-none');
     this.done = q(this.body, '.fp-tpl-done');
@@ -66,6 +69,7 @@ export class TemplatesSheet extends Dialog {
       else if (action === 'edit') void this.edit();
       else if (action === 'publish') void this.publish();
     });
+    onLanguage(() => { if (this.kept) this.sayKept(this.kept); });
   }
 
   async show(): Promise<void> {
@@ -77,8 +81,10 @@ export class TemplatesSheet extends Dialog {
     }
   }
 
-  private say(text: string, bad = false): void {
-    setText(this.status, text);
+  private say(text: string, bad = false, more = ''): void {
+    this.kept = null;
+    setText(this.said, text);
+    setText(this.more, more);
     this.status.classList.toggle('is-error', bad);
   }
 
@@ -88,13 +94,20 @@ export class TemplatesSheet extends Dialog {
     if (!data.fetched) { this.say(''); return; }
     q(this.body, '.fp-tpl-grid').querySelectorAll('.is-skeleton').forEach((n) => n.remove());
     setHidden(this.list, false);
-    const others = data.notStartable ? ` ${data.notStartable} more are parts for FormWeb's own library, not whole sites, so they are not offered here.` : '';
-    this.say(`Kept list from ${when(data.fetchedAt)}: ${data.items.length} whole sites.${others}`);
+    this.sayKept(data);
     patchList(this.list, data.items, {
       key: (item) => item.id,
       create: (item) => this.card(item),
       update: (node, item) => this.fill(node, item),
     });
+  }
+
+  private sayKept(data: TemplateList): void {
+    const others = data.notStartable === 1
+      ? "1 more is a part for FormWeb's own library, not a whole site, so it is not offered here."
+      : data.notStartable ? `${data.notStartable} more are parts for FormWeb's own library, not whole sites, so they are not offered here.` : '';
+    this.say(`Kept list from ${fmtDate(data.fetchedAt)}: ${fmtCount(data.items.length, 'whole site', 'whole sites')}.`, false, others);
+    this.kept = data;
   }
 
   private card(item: TemplateItem): HTMLElement {
@@ -145,7 +158,7 @@ export class TemplatesSheet extends Dialog {
     setText(q(this.done, '[data-f="done"]'), `Downloading ${name} and checking its SHA-256`);
     try {
       this.started = await templatesApi.start(id, folder);
-      setText(q(this.done, '[data-f="done"]'), `Made a FormWeb project from ${name} (${this.started.files} files).`);
+      setText(q(this.done, '[data-f="done"]'), `Made a FormWeb project from ${name} (${fmtCount(this.started.files, 'file', 'files')}).`);
       setText(q(this.done, '[data-f="path"]'), this.started.project);
     } catch (e) {
       this.started = null;

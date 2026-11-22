@@ -2,8 +2,8 @@
 
 Living log for the desktop shell (Tauri 2). Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.4.0
-Last updated: 2026-11-22 · v0.4.0, no shell change (the window gains Templates and the hosting guide; see frontend/HASHOUT_LOG.md); v0.3.4 the desktop build runs a pinned Tauri command line from frontend/node_modules, and build_app.bat stops when the install fails; v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
+Current build version: v0.4.1
+Last updated: 2026-11-22 · v0.4.1, no shell change (the window text is in the 26 languages; see frontend/HASHOUT_LOG.md); v0.4.0, no shell change (the window gains Templates and the hosting guide; see frontend/HASHOUT_LOG.md); v0.3.4 the desktop build runs a pinned Tauri command line from frontend/node_modules, and build_app.bat stops when the install fails; v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
 
 ---
 
