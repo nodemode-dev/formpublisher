@@ -1,0 +1,8 @@
+{
+  "Speed": "速度",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "在本機上測得的實驗室數值，CPU 與網路皆已降速。良好標準為 LCP 不超過 2.5 秒且沒有版面位移（CLS 0）。INP 需要真實訪客，因此不測量。",
+  "Largest element: {0}": "最大元素：{0}",
+  "Not measured": "未測量",
+  "Warning": "警告",
+  "Error": "錯誤"
+}

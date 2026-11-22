@@ -230,6 +230,16 @@ A site whose address has a folder in it (a base URL such as `https://example.org
 | `forms.local-address` | warning | a `form` whose `action` goes to this computer or the local network (`localhost`, a `.local` name, a host name without a dot, or a loopback, private, link-local or unspecified address), or into `/api/forms/` on the site itself (FormWeb's own form route, which no static host serves). The message names the page and the address. A form with no `action` (FormWeb writes a form with a scripted reply that way) and a form that posts to a service on the web are not reported. The rest of the page still works, so this is a warning |
 | `budget.file` | warning over 1 MiB, error over 5 MiB | HTML, CSS and JS files; media (images, video, audio, fonts) warn over 20 MiB |
 | `budget.page` | warning | a route's HTML plus the CSS and JS it references directly totals over 500 KiB |
+| `seo.canonical` | warning | a page that is not `noindex` has no `link rel="canonical"`, a page has more than one, or the canonical link is not a full `http` or `https` address |
+| `seo.og` | info | one problem per page naming which of `og:title`, `og:type`, `og:image` and `og:url` (the four the Open Graph protocol requires) are missing, and one when `og:image` is not a full address. Info rather than warning, because FormWeb exports no `og:image` today |
+| `seo.jsonld` | error | a `script type="application/ld+json"` block is not valid JSON; a page without structured data is fine |
+| `seo.hreflang` | warning | in a page's `link rel="alternate" hreflang` links: a value that is not a language code, a language-region code or `x-default`; an address that is not full; links that leave out the page itself; the page listing itself in another language than its route's locale; and a missing return link (another page lists this one as a version, and this one does not link back), reported once on the page that lacks it. `x-default` is optional |
+| `site.favicon` | warning, once per site | the home page has no `link rel="icon"` and there is no `/favicon.ico` |
+| `site.404` | warning, once per site | there is neither `404.html` nor `404/index.html` |
+| `a11y.link-name` | warning | a link has no name a screen reader can announce: no text, no `aria-label`, `aria-labelledby` or `title`, and no image with `alt` inside it |
+| `a11y.label` | warning | an `input`, `select` or `textarea` has no label: it is not inside a `label`, no `label for` names its id, and it has no `aria-label`, `aria-labelledby` or `title`. Hidden, submit, button and reset inputs, and an image input with `alt`, need none |
+
+`a11y.link-name` and `a11y.label` skip content inside an element with `hidden` or `aria-hidden="true"`.
 
 ### Live tier
 
@@ -247,6 +257,9 @@ A deep check drives the Chrome or Microsoft Edge you already have installed thro
 | `deep.external` | warning | a request to another host |
 | `deep.cls` | warning above 0, error at 0.1 and up | layout shift, with the value in the message |
 | `deep.overflow` | error | the page is wider than the viewport |
+| `deep.lcp` | warning over 2.5 s, error over 4 s | the largest contentful paint: the time, the width and the largest element are in the message. A lab value, see [Speed and contrast](#speed-and-contrast) |
+| `a11y.contrast` | warning | text below the contrast WCAG 2.2 asks for, 4.5:1, or 3:1 for large text (24 px, or 18.66 px and bold). The message names the three worst with their ratio and colours, how many more fail, and how many text elements were not measured |
+| `deep.skipped` | info | the largest contentful paint or the text contrast could not be measured on a route and width, with the reason; the rest of the page and of the run are checked |
 | `deep.unavailable` | info | no browser could be started: neither the `checks.chromePath` browser, Google Chrome nor Microsoft Edge, nor Chrome in the usual places (from source, also when Playwright is not installed). In the installed app the fix reads "Install Google Chrome or Microsoft Edge, or set the browser's path in Preferences, then run the deep check again." The row has an Open Preferences button that opens Preferences at Checks. |
 | `deep.failed` | error | the deep run failed for another reason. The engine logs it and sends the live event `checks.failed` instead of `checks.done` (below), and the window shows one row, "The deep check could not finish: [reason]", which goes when the next deep check starts |
 
@@ -257,6 +270,32 @@ Each message names the route and width. A thumbnail of each route (1440 by 900, 
 A deep run reports on the live socket: `checks.progress` while it works, then `checks.done` with the summary. When the run fails for another reason than a missing browser, it sends `checks.failed` instead, with `run`, `site`, `revision`, `tier` (always `deep`) and `reason`, and writes the failure to the engine's log.
 
 The deep tier needs Playwright for Python and a Chrome or Edge on the computer. From source, `./formpublisher_oc_install` installs Playwright (`backend/requirements-deep.txt`, which is part of the locks). The desktop app ships it: Playwright and the Node.js driver it carries are frozen into the engine, so there is nothing to install there. FormPublisher never downloads a browser. It drives the browser at the `checks.chromePath` setting (Preferences, Checks) when that is set, else your installed Google Chrome, then Microsoft Edge, then Chrome in the usual places (Google Chrome on macOS, `google-chrome`, `google-chrome-stable` or `chromium` on Linux, `Program Files` on Windows). Results are stored per revision in `checks/[site]/[revision]/results.json`.
+
+### Speed and contrast
+
+On every route and width the deep check also measures the largest contentful paint (LCP), the layout shift (CLS) and the contrast of the text. These are lab values: they are measured on this computer, in a fresh browser with the CPU slowed 4 times and the network at 150 ms and 200 KB/s, so they compare routes, widths and runs with each other. They are not what visitors of the published site measure, and a fast computer or a slow one moves them. Interaction to Next Paint (INP) needs a real visitor's input and is not measured.
+
+- **LCP** is the last largest-contentful-paint entry, read one second after the page loads and before the check scrolls, because a visitor's first scroll ends LCP. Over 2.5 s is a warning and over 4 s an error (`deep.lcp`); good is 2.5 s or less.
+- **CLS** adds up every layout shift not caused by input while the page loads and scrolls to the bottom and back. Any shift is a warning and 0.1 or more an error (`deep.cls`).
+- **Contrast** looks at up to 400 text elements a page. The colours of the text and of what is under it are put together from the element up through every ancestor's background and opacity, over white, and the ratio is WCAG 2.2's. A failure is judged again after 400 ms and 150 ms, and only a steady one is reported (`a11y.contrast`). Hidden and disabled text and SVG text are skipped.
+
+Contrast over images, gradients or moving content is not measured. Text over an image, a gradient, a blend mode, a filter, a painted pseudo-element or another element, text in something that is animating its colour, opacity, background, filter or visibility, and failing text with a shadow or an outline are counted as not measured, never guessed. Check those by eye.
+
+After a deep check the Problems tab ends with a Speed block: a row for each route and, for each width, the LCP in seconds and the CLS. A value past a limit carries the warning or error icon, whose name is the word Warning or Error, so the mark does not rest on colour alone. A dash means the value was not measured, and pointing at a cell shows the largest element and any note. The line under the block says that these are lab values and that INP is not measured. The block shows with All tiers or Deep in the tier filter; before the first deep check of a revision it is not there at all. The same values are `measures` in `GET /api/checks/{site}/{revision}` (one entry per route and width with `route`, `width`, `lcp` in seconds, `cls`, `lcpElement`, `contrast` with `checked`, `failing`, `unmeasured` and `truncated`, and `notes`; `lcp` and `cls` may be null), next to `inp: "not measured"`. `run_checks` and `get_checks` return them, and `./formpublisher run check SITE-ID --deep` prints them as a speed block under the problems.
+
+### Where the rules come from
+
+Each rule rests on the page below, read on 22 November 2026. The links show as addresses in the window.
+
+- `seo.canonical`: Google Search Central, "Consolidate duplicate URLs", [developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls)
+- `seo.og`: The Open Graph protocol, [ogp.me](https://ogp.me/)
+- `seo.jsonld`: Google Search Central, "Introduction to structured data", [developers.google.com/search/docs/appearance/structured-data/intro-structured-data](https://developers.google.com/search/docs/appearance/structured-data/intro-structured-data)
+- `seo.hreflang`: Google Search Central, "Tell Google about localized versions of your page", [developers.google.com/search/docs/specialty/international/localized-versions](https://developers.google.com/search/docs/specialty/international/localized-versions)
+- `site.favicon`: MDN, the `rel` attribute's `icon`, [developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel#icon](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel#icon), and the HTML standard, [html.spec.whatwg.org/multipage/links.html#rel-icon](https://html.spec.whatwg.org/multipage/links.html#rel-icon)
+- `site.404`: the 404 pages of Cloudflare Pages, [developers.cloudflare.com/pages/configuration/serving-pages/#not-found-behavior](https://developers.cloudflare.com/pages/configuration/serving-pages/#not-found-behavior), Netlify, [docs.netlify.com/manage/routing/redirects/redirect-options/#custom-404-page-handling](https://docs.netlify.com/manage/routing/redirects/redirect-options/#custom-404-page-handling), GitHub Pages, [docs.github.com/en/pages/getting-started-with-github-pages/creating-a-custom-404-page-for-your-github-pages-site](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-custom-404-page-for-your-github-pages-site), and Vercel, [vercel.com/docs/routing/custom-404-pages](https://vercel.com/docs/routing/custom-404-pages)
+- `a11y.contrast`, `a11y.link-name` and `a11y.label`: W3C, WCAG 2.2, success criteria 1.4.3 Contrast (Minimum), [w3.org/TR/WCAG22/#contrast-minimum](https://www.w3.org/TR/WCAG22/#contrast-minimum), 2.4.4 Link Purpose (In Context), [w3.org/TR/WCAG22/#link-purpose-in-context](https://www.w3.org/TR/WCAG22/#link-purpose-in-context), 4.1.2 Name, Role, Value, [w3.org/TR/WCAG22/#name-role-value](https://www.w3.org/TR/WCAG22/#name-role-value), 1.3.1 Info and Relationships, [w3.org/TR/WCAG22/#info-and-relationships](https://www.w3.org/TR/WCAG22/#info-and-relationships), and 3.3.2 Labels or Instructions, [w3.org/TR/WCAG22/#labels-or-instructions](https://www.w3.org/TR/WCAG22/#labels-or-instructions)
+- `deep.lcp` and INP: web.dev, "Largest Contentful Paint", [web.dev/articles/lcp](https://web.dev/articles/lcp), and "Web Vitals", [web.dev/articles/vitals](https://web.dev/articles/vitals)
+- Prepare's header limits for Cloudflare Pages: Cloudflare Pages, "Headers", [developers.cloudflare.com/pages/configuration/headers](https://developers.cloudflare.com/pages/configuration/headers/)
 
 ## Packages and signatures
 
@@ -279,7 +318,7 @@ Each build lives in `builds/[site]/[id]/`:
 
 ```json
 {
-  "builtWith": "FormPublisher 0.8.0",
+  "builtWith": "FormPublisher 0.9.0",
   "checks": { "errors": 0, "infos": 0, "tiers": ["static"], "warnings": 0 },
   "files": [ { "path": "index.html", "sha256": "...", "size": 1024 } ],
   "format": "formpublisher-site",
@@ -393,7 +432,7 @@ UTF-8 JSON, indented two spaces, with a trailing newline:
   "site": { "id": "northwind-notes", "name": "Northwind Notes" },
   "build": "a1b2c3d4e5f6",
   "revision": "20261111T010203Z",
-  "builtWith": "FormPublisher 0.8.0",
+  "builtWith": "FormPublisher 0.9.0",
   "createdAt": "2026-11-11T01:02:03Z",
   "package": { "file": "site.zip", "sha256": "64 lowercase hex digits", "size": 12345 },
   "signature": null
@@ -440,6 +479,8 @@ What each host gets. Every folder is written from the build's own `site.zip`, ne
 | nginx | `site/` with `formpublisher.conf` (a `server` block with `try_files`, `error_page 404`, one `location =` per redirect, `add_header ... always`, gzip) `nginx-test.conf` and `nginx-check.sh` | `sh nginx-check.sh`, and a `docker run` line with `nginx:stable` |
 
 A FormWeb 404 page exported as `404/index.html` counts as the site's 404, and is also written as `404.html` for the hosts that look for that name. A host that cannot represent something says so under Warnings and never drops it silently: GitHub Pages has no server redirects and ignores custom headers, so each redirect becomes a meta-refresh page and each ignored header is named.
+
+Cloudflare Pages has limits of its own, and Prepare warns past them while still writing every rule: more than 2,000 static or 100 splat redirects in `_redirects`, more than 100 header rules in `_headers`, and a line in `_headers` longer than 2,000 characters (the whole line counts, header name and value included). The warnings read, for example, "101 header rules exceed Cloudflare Pages' limit of 100 rules in _headers." and "1 line in _headers is longer than Cloudflare Pages' limit of 2,000 characters a line." A header rule is a line that names a path, not one of the indented header lines under it.
 
 FormWeb 0.19.7 exports splat redirects (`/blog/*` to `/docs/:splat`) and a root `404.html`. Netlify and Cloudflare Pages write the splat into `_redirects`, Vercel writes it as `:path*` in `vercel.json`, and nginx writes it as a regex `location`. GitHub Pages has no server redirects, so it carries a splat redirect through a small script at the top of `404.html` (the site's own or the minimal one): a visitor to `/blog/a/b` is sent to `/docs/a/b` with the query and hash kept, and the status is the 404 page's, not 301 or 302. The script works under the site's base path (the model's `baseUrl`, else the 404 page's canonical link, else `/`, and a note says which), never turns `/blog//evil.com` into another site, and `redirects/README.txt` lists the splats. With scripts off, a visitor at a splat address sees the 404 page, because only the script follows these redirects. Exact redirects stay pages of their own: a small script sends the visitor on with their query and hash (a target with its own query keeps only that query, and a hash in the target wins), and the meta refresh stays as the fallback without scripts. Like the minimal 404 page's home link, use the same base path. An export without `site.formweb.json` and `asset-access.json` still imports, and GitHub Pages then takes the base path from the 404 page's canonical link and says so in its note. A redirect to another site (`/ext` to `https://example.org/x`, or `/out/*` to `https://example.org/:splat`; FormWeb itself refuses such targets, so they come from a hand-edited `redirects.json`) is written with its full URL on all six targets and in the site host, and the GitHub Pages script sends `/repo/out//evil.com` to `https://example.org/evil.com`, never to `//evil.com`. nginx redirects keep the query string (`$is_args$args`) unless the target has its own. An older export has only `404/index.html`. Every target then writes it as `404.html` with its URLs made root-absolute, and says so in its notes. Static zip stays byte for byte.
 

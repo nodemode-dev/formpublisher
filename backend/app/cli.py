@@ -582,6 +582,13 @@ def say_check(data: dict) -> str:
         lines.append(f"{p.get('severity', ''):<8} {p.get('route', ''):<28} {p.get('code', '')}  {p.get('message', '')}")
         if p.get("fix"):
             lines.append(f"{'':<8} fix: {p['fix']}")
+    measures = data.get("measures") or []
+    if measures:
+        lines.append("speed (lab values from this computer, CPU and network slowed; good LCP is 2.5 s or less; INP is not measured)")
+        for m in measures:
+            lcp = f"{m['lcp']:.2f} s" if isinstance(m.get("lcp"), (int, float)) else "-"
+            cls = f"{m['cls']:.3f}" if isinstance(m.get("cls"), (int, float)) else "-"
+            lines.append(f"{'':<8} {m.get('route', ''):<28} {m.get('width', '')!s:>5} px  LCP {lcp:>7}  CLS {cls}")
     return "\n".join(lines)
 
 

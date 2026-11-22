@@ -2,7 +2,7 @@
 name: formpublisher-harness
 description: Drives FormPublisher, the Form family's site publisher, through its formpublisher MCP server (formpublisher_tab in the dock) or the ./formpublisher run command line. Use whenever the person wants a site started from a template, a FormWeb site-export.zip, publication folder, .fweb project or .fpub package imported, the site open in FormWeb brought in, sites, routes or revisions listed or compared, a site previewed (preview_site), checked (static or deep), built into a deterministic site.zip, inspected or reproduced, signed with an Ed25519 key and verified against their own keys, or prepared for a host (Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx or a plain zip) and the folder verified; or when formpublisher tools such as list_sites, import_site, run_checks, build_package or prepare_publish are available or fail. Not for editing a site (that is FormWeb), not for changing FormPublisher's own source code (use formpublisher-skillset), and not for uploading to a host, which FormPublisher never does.
 metadata:
-  version: "0.8.0"
+  version: "0.9.0"
 ---
 
 # formpublisher harness
@@ -165,11 +165,14 @@ curl -s -X POST 127.0.0.1:8280/api/checks/run -H 'Content-Type: application/json
 curl -s 127.0.0.1:8280/api/checks/SITE-ID/REVISION
 # {"problems": [{"id": "static:link.broken:about/:3", "tier": "static", "severity": "error",
 #   "code": "link.broken", "route": "/about/", "message": "...", "fix": "...", "file": "about/index.html", "line": 3}],
-#  "summary": {"errors": 1, "warnings": 0, "infos": 0, "tiers": ["static"], "ran": true},
-#  "thumbs": {"/": "/api/checks/SITE-ID/REVISION/thumbs/ab12.png"}}
+#  "summary": {"errors": 1, "warnings": 0, "infos": 0, "tiers": {"static": 1, "live": 0, "deep": 0}, "ran": ["static", "deep"]},
+#  "thumbs": {"/": "/api/checks/SITE-ID/REVISION/thumbs/ab12.png"},
+#  "measures": [{"route": "/index.html", "width": 1440, "lcp": 1.33, "cls": 0, "lcpElement": "h1",
+#    "contrast": {"checked": 38, "failing": 0, "unmeasured": 7, "truncated": false}, "notes": []}],
+#  "inp": "not measured", "running": null}
 ```
 
-Report the counts and the problems as returned, with each code and fix. A `deep.unavailable` problem means no Chrome or Edge could be started (or, from source, Playwright is missing); say so and do not install a browser. A `deep.failed` problem (error) means the deep run could not finish; report its reason and point to `logs/engine.log` in the data folder; an HTTP 500 with the code `internal` names that file in `detail` and carries its path as `log`. The codes are listed in `docs/MANUAL.md`.
+Report the counts and the problems as returned, with each code and fix. The static tier also reports search and sharing (`seo.canonical`, `seo.og` as info, `seo.jsonld` as an error, `seo.hreflang`), the site as a whole (`site.favicon`, `site.404`, once each) and accessibility (`a11y.link-name`, `a11y.label`). After a deep run, `measures` holds the largest contentful paint in seconds and the layout shift for each route and width; give them as lab values from this computer with the CPU and network slowed, never as what visitors see, and say that INP is not measured. `deep.lcp` warns over 2.5 s and is an error over 4 s, `deep.cls` warns on any shift and is an error at 0.1, `a11y.contrast` warns below WCAG 2.2's 4.5:1 (3:1 for large text), and `deep.skipped` (info) means one measurement failed on a page while the rest ran. Contrast over images, gradients or moving content is not measured, so do not call a page's contrast fine on the strength of this check alone. When `prepare_publish` for `cloudflare-pages` warns past 100 header rules or a `_headers` line over 2,000 characters, pass the warning on as it is. A `deep.unavailable` problem means no Chrome or Edge could be started (or, from source, Playwright is missing); say so and do not install a browser. A `deep.failed` problem (error) means the deep run could not finish; report its reason and point to `logs/engine.log` in the data folder; an HTTP 500 with the code `internal` names that file in `detail` and carries its path as `log`. The codes are listed in `docs/MANUAL.md`.
 
 Build, reproduce, compare and download:
 

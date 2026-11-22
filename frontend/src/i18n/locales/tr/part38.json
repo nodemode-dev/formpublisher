@@ -1,0 +1,8 @@
+{
+  "Speed": "Hız",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "Bu bilgisayarda, işlemci ve ağ yavaşlatılarak alınan laboratuvar değerleri. İyi değer, 2,5 sn veya daha kısa LCP ve hiç düzen kayması olmamasıdır (CLS 0). INP gerçek bir ziyaretçi gerektirir ve ölçülmez.",
+  "Largest element: {0}": "En büyük öğe: {0}",
+  "Not measured": "Ölçülmedi",
+  "Warning": "Uyarı",
+  "Error": "Hata"
+}

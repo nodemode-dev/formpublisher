@@ -9,6 +9,8 @@ LOCAL_TOOL = "npx wrangler pages dev site"
 
 STATIC_LIMIT = 2000
 DYNAMIC_LIMIT = 100
+HEADER_RULES = 100
+HEADER_LINE = 2000
 
 
 def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
@@ -24,6 +26,13 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
         result.warnings.append(f"{statics} static redirects exceed Cloudflare Pages' limit of {STATIC_LIMIT}; the extra rules will be ignored.")
     if splats > DYNAMIC_LIMIT:
         result.warnings.append(f"{splats} splat redirects exceed Cloudflare Pages' limit of {DYNAMIC_LIMIT} dynamic rules.")
+    header_lines = headers.splitlines()
+    header_rules = sum(1 for ln in header_lines if ln.strip() and not ln[0].isspace() and not ln.startswith("#"))
+    long_lines = sum(1 for ln in header_lines if len(ln) > HEADER_LINE)
+    if header_rules > HEADER_RULES:
+        result.warnings.append(f"{header_rules} header rules exceed Cloudflare Pages' limit of {HEADER_RULES} rules in _headers.")
+    if long_lines:
+        result.warnings.append(f"{long_lines} {'line' if long_lines == 1 else 'lines'} in _headers {'is' if long_lines == 1 else 'are'} longer than Cloudflare Pages' limit of {HEADER_LINE:,} characters a line.")
     result.command("Deploy", f"npx wrangler pages deploy site --project-name {inp.slug}")
     result.command("Run it locally", "npx wrangler pages dev site")
     result.notes.append(f"Cloudflare allows {STATIC_LIMIT} static and {DYNAMIC_LIMIT} dynamic redirect rules in _redirects.")

@@ -1,0 +1,8 @@
+{
+  "Speed": "Snelheid",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "Labwaarden van deze computer, met vertraagde CPU en vertraagd netwerk. Goed is een LCP van 2,5 s of minder en geen lay-outverschuiving (CLS 0). INP vraagt een echte bezoeker en wordt niet gemeten.",
+  "Largest element: {0}": "Grootste element: {0}",
+  "Not measured": "Niet gemeten",
+  "Warning": "Waarschuwing",
+  "Error": "Fout"
+}

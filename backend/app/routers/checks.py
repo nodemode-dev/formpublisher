@@ -66,7 +66,7 @@ def _deep(run: str, site: str, revision: str, root, widths: list[int], motion: s
     result = deep.execute(site, revision, root, routes, widths, motion, progress)
     checks.store_tier(
         site, revision, "deep",
-        {k: result[k] for k in ("problems", "thumbs", "widths", "motion", "routes")},
+        {k: result[k] for k in ("problems", "thumbs", "widths", "motion", "routes", "measures") if k in result},
     )
 
 

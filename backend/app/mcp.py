@@ -166,7 +166,7 @@ def build(client: Client | None = None) -> MCPServer:
 
     @server.tool(
         name="run_checks",
-        description="Run the checks on an imported site's revision and return the problems with route, severity, code, message and fix, and a summary of counts per severity. The static tier is offline and always runs; set deep to also drive the installed Chrome at the given widths (slow, needs Playwright) against the site served on this computer only. The result is stored in FormPublisher's data folder, replacing the last result of that revision, for get_checks and the next build_package.",
+        description="Run the checks on an imported site's revision and return the problems with route, severity, code, message and fix, and a summary of counts per severity. The static tier is offline and always runs; set deep to also drive the installed Chrome at the given widths (slow, needs Playwright) against the site served on this computer only, which adds measures: the largest contentful paint in seconds and the layout shift for each route and width, lab values with the CPU and network slowed. INP is not measured. The result is stored in FormPublisher's data folder, replacing the last result of that revision, for get_checks and the next build_package.",
         annotations=ToolAnnotations(title="Run checks", readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False),
     )
     async def run_checks(
@@ -179,7 +179,7 @@ def build(client: Client | None = None) -> MCPServer:
 
     @server.tool(
         name="get_checks",
-        description="Read the stored check results of a site's revision (problems, counts per severity, which tiers ran) without running anything. Read only.",
+        description="Read the stored check results of a site's revision (problems, counts per severity, which tiers ran, and the deep tier's measures per route and width) without running anything. Read only.",
         annotations=ToolAnnotations(title="Stored check results", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
     )
     async def get_checks(id: SiteId, revision: Revision = None) -> dict:

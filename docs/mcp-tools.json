@@ -108,7 +108,7 @@
         "idempotentHint": true,
         "openWorldHint": false
       },
-      "description": "Read the stored check results of a site's revision (problems, counts per severity, which tiers ran) without running anything."
+      "description": "Read the stored check results of a site's revision (problems, counts per severity, which tiers ran, and the deep tier's measures per route and width) without running anything."
     },
     {
       "name": "get_prepared",

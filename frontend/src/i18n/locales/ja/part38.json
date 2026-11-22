@@ -1,0 +1,8 @@
+{
+  "Speed": "速度",
+  "Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.": "このコンピューターで CPU とネットワークを低速化して測ったラボ値です。良好の目安は LCP が 2.5 秒以下で、レイアウトのずれがないこと (CLS 0) です。INP は実際の訪問者が必要なため計測しません。",
+  "Largest element: {0}": "最大の要素: {0}",
+  "Not measured": "未計測",
+  "Warning": "警告",
+  "Error": "エラー"
+}

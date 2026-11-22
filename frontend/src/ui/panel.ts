@@ -1,9 +1,9 @@
 import '../styles/panel.css';
 import type { App } from '../app-api';
-import { fetchResults, postLive, siteRevision, startRun, type Problem, type Severity, type Tier } from '../api-checks';
+import { fetchResults, postLive, siteRevision, startRun, type Measure, type Problem, type Severity, type Tier } from '../api-checks';
 import { emit, on, type ProbeMessage, type RouteStatus } from '../events';
 import { onLanguage, t } from '../i18n';
-import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
+import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setStyleVar, setText } from './dom';
 import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
 import { icon } from './icons';
 import { refuse } from './notice-step';
@@ -20,6 +20,7 @@ interface SiteData {
   remote: Problem[];
   failed: Problem | null;
   thumbs: Record<string, string>;
+  measures: Measure[];
   ran: boolean;
   revision: string | null;
   path: string;
@@ -52,6 +53,29 @@ function bytesLabel(b: number): string {
   if (b < 1024) return `${b} B`;
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
   return `${(b / 1024 / 1024).toFixed(1)} MB`;
+}
+
+const LCP_WARN = 2.5;
+const LCP_ERROR = 4;
+const CLS_ERROR = 0.1;
+const SPEED_NOTE = 'Lab values from this computer, with the CPU and network slowed. Good is LCP 2.5 s or less and no layout shift (CLS 0). INP needs a real visitor and is not measured.';
+const SPEED_HTML = `<section class="fp-pn-speed" role="group" aria-label="Speed" hidden><div class="fp-pn-row fp-pn-speed-row fp-pn-speed-head"><span class="fp-pn-speed-title">Speed</span><span class="fp-pn-speed-cols"></span></div><div class="fp-pn-speed-rows"></div><p class="fp-pn-speed-note">${SPEED_NOTE}</p></section>`;
+const SPEED_ROW = '<div class="fp-pn-row fp-pn-speed-row"><span class="fp-pn-speed-route" translate="no"></span><span class="fp-pn-speed-cols"></span></div>';
+const SPEED_CELL = '<span class="fp-pn-speed-cell"><span class="fp-pn-speed-k" translate="no">LCP</span><span class="fp-pn-speed-v" data-m="lcp" translate="no"></span><span class="fp-pn-speed-flag" data-m="lcp"></span><span class="fp-pn-speed-k" translate="no">CLS</span><span class="fp-pn-speed-v" data-m="cls" translate="no"></span><span class="fp-pn-speed-flag" data-m="cls"></span></span>';
+
+function lcpSeverity(v: number | null): Severity | 'ok' {
+  if (v === null) return 'ok';
+  return v > LCP_ERROR ? 'error' : v > LCP_WARN ? 'warning' : 'ok';
+}
+
+function clsSeverity(v: number | null): Severity | 'ok' {
+  if (v === null || v <= 0) return 'ok';
+  return v >= CLS_ERROR ? 'error' : 'warning';
+}
+
+function clsLabel(v: number): string {
+  const short = v.toFixed(3);
+  return v > 0 && Number(short) === 0 ? v.toFixed(4) : short;
 }
 
 const SEV_LABEL = 'Filter by severity';
@@ -102,6 +126,10 @@ class Panel {
   private readonly revs: RevisionsView;
   private readonly revPage: HTMLElement;
   private readonly revCount: HTMLElement;
+  private readonly probBody: HTMLElement;
+  private readonly speed: HTMLElement;
+  private readonly speedHead: HTMLElement;
+  private readonly speedRows: HTMLElement;
 
   constructor(private readonly app: App) {
     const root = app.mounts.bottom;
@@ -117,6 +145,11 @@ class Panel {
     this.runBtn = q(this.pages.problems, '[data-act="run"]');
     this.deepBtn = q(this.pages.problems, '[data-act="deep"]');
     this.progress = q(this.pages.problems, '.fp-pn-progress');
+    this.probBody = q(this.pages.problems, '.fp-pn-body');
+    this.speed = el(SPEED_HTML);
+    this.speedHead = q(this.speed, '.fp-pn-speed-head .fp-pn-speed-cols');
+    this.speedRows = q(this.speed, '.fp-pn-speed-rows');
+    this.lists.problems.append(this.speed);
     const badge = (t: HTMLElement): HTMLElement => {
       const b = el(`<span class="fp-badge is-count fp-pn-count">0</span>`);
       t.append(b);
@@ -322,7 +355,7 @@ class Panel {
   private get(id: string): SiteData {
     let d = this.data.get(id);
     if (!d) {
-      d = { con: [], net: [], live: new Map(), remote: [], failed: null, thumbs: {}, ran: false, revision: null, path: '/', seq: 0, token: 0, signature: '' };
+      d = { con: [], net: [], live: new Map(), remote: [], failed: null, thumbs: {}, measures: [], ran: false, revision: null, path: '/', seq: 0, token: 0, signature: '' };
       this.data.set(id, d);
     }
     return d;
@@ -354,6 +387,7 @@ class Panel {
       if (token !== d.token) return;
       d.remote = r.problems;
       d.thumbs = r.thumbs;
+      d.measures = r.measures;
       d.ran = r.summary.ran || r.problems.some((p) => p.tier !== 'live');
       this.schedule();
     } catch {
@@ -621,6 +655,7 @@ class Panel {
     setClass(this.statusDot, 'is-ok', errors === 0 && warnings === 0 && Boolean(d?.ran));
     setText(this.empties.problems, all.length === 0 ? 'No problems found yet.' : 'No problems match the filters.');
     setHidden(this.empties.problems, shown.length > 0);
+    this.paintSpeed(d, shown.length);
     setText(this.empties.console, 'Nothing in the console yet.');
     setHidden(this.empties.console, (d?.con.length ?? 0) > 0);
     setText(this.empties.network, 'No network requests yet.');
@@ -657,6 +692,80 @@ class Panel {
     setText(q(node, '.fp-pn-tier'), p.tier);
     setAttr(node, 'data-route', p.route);
     setAttr(node, 'title', p.fix ? `${p.message} · ${p.fix}` : p.message);
+  }
+
+  private paintSpeed(d: SiteData | null, rows: number): void {
+    const list = d ? d.measures : [];
+    const tier = this.tierSel.value;
+    const visible = list.length > 0 && (tier === 'all' || tier === 'deep');
+    setHidden(this.speed, !visible);
+    setClass(this.probBody, 'is-speed-only', visible && rows === 0);
+    if (!visible) return;
+    const widths = Array.from(new Set(list.map((m) => m.width)));
+    const routes = Array.from(new Set(list.map((m) => m.route)));
+    const at = new Map(list.map((m) => [`${m.route}\n${m.width}`, m]));
+    setStyleVar(this.speed, '--fp-speed-n', String(widths.length));
+    patchList(this.speedHead, widths, {
+      key: (w) => String(w),
+      create: (w) => {
+        const node = el('<span class="fp-pn-speed-w" translate="no"></span>');
+        setText(node, `${w} px`);
+        return node;
+      },
+      update: () => undefined,
+    });
+    const cells = (row: HTMLElement, route: string): void => {
+      patchList(q(row, '.fp-pn-speed-cols'), widths, {
+        key: (w) => String(w),
+        create: (w) => {
+          const cell = el(SPEED_CELL);
+          this.paintSpeedCell(cell, at.get(`${route}\n${w}`));
+          return cell;
+        },
+        update: (cell, w) => this.paintSpeedCell(cell, at.get(`${route}\n${w}`)),
+      });
+    };
+    patchList(this.speedRows, routes, {
+      key: (r) => r,
+      create: (r) => {
+        const row = el(SPEED_ROW);
+        const name = q(row, '.fp-pn-speed-route');
+        setText(name, r);
+        setAttr(name, 'title', r);
+        cells(row, r);
+        return row;
+      },
+      update: (row, r) => cells(row, r),
+    });
+  }
+
+  private paintSpeedCell(cell: HTMLElement, m: Measure | undefined): void {
+    const lcp = m ? m.lcp : null;
+    const cls = m ? m.cls : null;
+    setText(q(cell, '.fp-pn-speed-v[data-m="lcp"]'), lcp === null ? '-' : `${lcp.toFixed(2)} s`);
+    setText(q(cell, '.fp-pn-speed-v[data-m="cls"]'), cls === null ? '-' : clsLabel(cls));
+    this.paintFlag(q(cell, '.fp-pn-speed-flag[data-m="lcp"]'), lcpSeverity(lcp));
+    this.paintFlag(q(cell, '.fp-pn-speed-flag[data-m="cls"]'), clsSeverity(cls));
+    const tip = m ? [m.lcpElement ? `Largest element: ${m.lcpElement}` : '', ...m.notes].filter(Boolean).join(' · ') : 'Not measured';
+    if (tip) setAttr(cell, 'title', tip);
+    else if (cell.hasAttribute('title')) cell.removeAttribute('title');
+  }
+
+  private paintFlag(node: HTMLElement, sev: Severity | 'ok'): void {
+    if (node.dataset.sev === sev) return;
+    node.dataset.sev = sev;
+    node.className = sev === 'ok' ? 'fp-pn-speed-flag' : `fp-pn-speed-flag fp-pn-sev is-${sev}`;
+    node.innerHTML = sev === 'ok' ? '' : icon(SEV_ICON[sev], 12);
+    if (sev === 'ok') {
+      node.removeAttribute('role');
+      node.removeAttribute('aria-label');
+      node.removeAttribute('title');
+      return;
+    }
+    const word = sev === 'error' ? 'Error' : 'Warning';
+    setAttr(node, 'role', 'img');
+    setAttr(node, 'aria-label', word);
+    setAttr(node, 'title', word);
   }
 
   private routeFor(route: string): string {

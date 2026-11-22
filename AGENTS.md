@@ -8,7 +8,7 @@ When the person wants a site started from a template, opened, imported, listed, 
 
 - `formpublisher_status`: the engine, the data folder, whether a FormWeb is reachable.
 - `list_sites`, `import_site` (a `site-export.zip`, `.fweb`, `.fpub` or publication folder path), `list_formweb_projects` (FormWeb's saved projects, the open one first), `import_formweb_current` (the site open in FormWeb, or a saved project with `project`), `receive_status` (what FormWeb sent by itself), `site_routes`, `list_revisions`, `diff_revisions`, `preview_site` (addresses on the local preview host; it opens nothing).
-- `run_checks` (static always, `deep` for the Chrome run), `get_checks`.
+- `run_checks` (static always, `deep` for the Chrome run, which adds `measures`: the largest contentful paint and the layout shift per route and width, lab values with the CPU and network slowed; INP is not measured), `get_checks`.
 - `build_package`, `list_builds`, `inspect_build`, `compare_builds`, `reproduce_build`, `save_fpub` (a build as one `.fpub` file at a path the person named), `list_keys`, `sign_build` (with a key the person named; it replaces an earlier signature), `verify_build` (`known` says whether the signer's key is one of the person's own; report `valid` true with `known` false as a warning, "signed by a key you do not have", never as verified).
 - `list_targets`, `prepare_publish` (build id and target ids: `static-zip`, `netlify`, `cloudflare-pages`, `vercel`, `github-pages`, `nginx`; preparing again deletes the target's previous folder), `get_prepared`, `verify_prepared` (after the person changed a prepared folder).
 - `list_trash`, `restore_from_trash`.
