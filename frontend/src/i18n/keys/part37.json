@@ -1,0 +1,23 @@
+[
+"Signing keys",
+"Your keys",
+"No keys yet. Create one below or import one.",
+"Import...",
+"Export...",
+"Created on {0}",
+"Removed key {0}.",
+"Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.",
+"Remove key",
+"Browser for the deep check",
+"The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.",
+"Browse...",
+"Type the full path of the browser program in the field.",
+"Choose the browser",
+"Give the full path of the browser program, starting from the top folder.",
+"Cleared. The deep check looks for a browser itself.",
+"There is no file at that path.",
+"No keys yet. Create one in Preferences.",
+"Manage keys",
+"Create a key in Preferences",
+"Open Preferences"
+]

@@ -1,24 +1,26 @@
 import '../styles/package.css';
-import { buildsApi, type BuildDetail, type CheckSummary, type KeyInfo, type KeySecret } from '../api-builds';
+import { buildsApi, type BuildDetail, type CheckSummary, type KeyInfo } from '../api-builds';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
 import { copyText, fmtBytes, fmtCount, showInLibrary } from './builds';
 import { Dialog } from './dialogs';
-import { el, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
+import { el, q, setAttr, setClass, setDisabled, setText } from './dom';
 import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
 import { icon } from './icons';
-import { exportKeyDialog, importKeyDialog } from './key-transfer';
 import { refuse, refuseStep } from './notice-step';
 import { runChecks } from './panel';
+import { bindPreferences, openPreferences } from './preferences';
+import { KEPT } from './prefs-keys';
 import { installPublish } from './publish-sheet';
 
 type Tone = '' | 'ok' | 'warn' | 'error';
 
-const KEPT: Record<KeySecret, string> = { store: 'Password store', file: 'Private file', none: 'Verify only' };
-
 const KEY_LABEL = 'Signing key';
+const NONE_LABEL = 'No keys yet. Create one in Preferences.';
+const MANAGE = 'Manage keys';
+const MAKE = 'Create a key in Preferences';
 
-const noKeys = (any: boolean): DropdownOption => ({ value: '', label: any ? 'Choose a key' : 'No keys yet' });
+const noKeys = (none: boolean): DropdownOption => ({ value: '', label: none ? NONE_LABEL : 'Choose a key' });
 
 const message = (e: unknown): string => (e instanceof Error && e.message ? e.message : 'Request failed');
 
@@ -34,23 +36,18 @@ class PackageSheet extends Dialog {
   private revision = '';
   private build: BuildDetail | null = null;
   private keys: KeyInfo[] = [];
+  private keysLoaded = false;
   private busy = false;
   private seq = 0;
   private readonly f: Record<string, HTMLElement> = {};
   private readonly keySel: Dropdown;
   private readonly pass: HTMLInputElement;
-  private readonly newName: HTMLInputElement;
-  private readonly newPass: HTMLInputElement;
-  private readonly newBox: HTMLElement;
   private readonly checksBtn: HTMLButtonElement;
   private readonly reproBtn: HTMLButtonElement;
   private readonly signBtn: HTMLButtonElement;
   private readonly verifyBtn: HTMLButtonElement;
-  private readonly createBtn: HTMLButtonElement;
-  private readonly newBtn: HTMLButtonElement;
+  private readonly chip: HTMLButtonElement;
   private readonly copyBtn: HTMLButtonElement;
-  private readonly exportBtn: HTMLButtonElement;
-  private readonly importBtn: HTMLButtonElement;
   private readonly buildBtn: HTMLButtonElement;
   private readonly downloadBtn: HTMLButtonElement;
   private readonly libraryBtn: HTMLButtonElement;
@@ -82,16 +79,12 @@ class PackageSheet extends Dialog {
 <section class="fp-pkg-sec">
 <div class="fp-pkg-sec-h">Signature</div>
 <div class="fp-pkg-line">${dropdownHtml({ cls: 'fp-select fp-pkg-grow', label: KEY_LABEL, data: { f: 'key' }, options: [noKeys(false)] })}<input class="fp-input fp-pkg-pass" type="password" data-f="pass" placeholder="Passphrase" aria-label="Passphrase" autocomplete="off"><button class="fp-btn fp-btn-sm" type="button" data-a="sign">${icon('key', 14)}<span>Sign</span></button></div>
-<div class="fp-pkg-line"><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="newkey">${icon('plus', 14)}<span>New key</span></button><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="exportkey">Export...</button><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="importkey">Import...</button><span class="fp-pkg-grow fp-pkg-res" data-f="sign" role="status"></span></div>
-<div class="fp-pkg-line fp-pkg-newkey" hidden><input class="fp-input fp-pkg-grow" data-f="newname" placeholder="Key name" aria-label="Key name" autocomplete="off"><input class="fp-input fp-pkg-pass" type="password" data-f="newpass" placeholder="Passphrase (optional)" aria-label="New key passphrase" autocomplete="new-password"><button class="fp-btn fp-btn-sm" type="button" data-a="create">Create key</button></div>
+<div class="fp-pkg-line"><button class="fp-chip" type="button" data-a="managekeys">${icon('key', 14)}<span class="fp-chip-label"><span data-f="chip-manage">${MANAGE}</span><span data-f="chip-make" class="is-off" aria-hidden="true">${MAKE}</span></span><span class="fp-chip-go">${icon('chevronRight', 14)}</span></button><span class="fp-pkg-grow fp-pkg-res" data-f="sign" role="status"></span></div>
 <div class="fp-pkg-line"><button class="fp-btn fp-btn-sm" type="button" data-a="verify">${icon('shield', 14)}<span>Verify</span></button><span class="fp-pkg-grow fp-pkg-res is-verify" data-f="verify" role="status"></span></div>
 </section></div>`));
     for (const n of Array.from(this.body.querySelectorAll<HTMLElement>('[data-f]'))) this.f[n.dataset.f ?? ''] = n;
     this.keySel = new Dropdown(this.f.key as HTMLButtonElement, { label: KEY_LABEL, options: [noKeys(false)], change: () => this.sync() });
     this.pass = this.f.pass as HTMLInputElement;
-    this.newName = this.f.newname as HTMLInputElement;
-    this.newPass = this.f.newpass as HTMLInputElement;
-    this.newBox = q(this.body, '.fp-pkg-newkey');
     this.bar = q(this.body, '.fp-pkg-progress');
     this.dot = this.f.dot;
     const btn = (a: string): HTMLButtonElement => q<HTMLButtonElement>(this.body, `[data-a="${a}"]`);
@@ -99,11 +92,8 @@ class PackageSheet extends Dialog {
     this.reproBtn = btn('repro');
     this.signBtn = btn('sign');
     this.verifyBtn = btn('verify');
-    this.createBtn = btn('create');
-    this.newBtn = btn('newkey');
+    this.chip = btn('managekeys');
     this.copyBtn = btn('copy');
-    this.exportBtn = btn('exportkey');
-    this.importBtn = btn('importkey');
     this.button('Close', 'ghost', () => this.close());
     this.libraryBtn = this.button('Show in library', 'ghost', () => this.toLibrary());
     this.downloadBtn = this.button('Download', 'ghost', () => this.download());
@@ -171,11 +161,13 @@ class PackageSheet extends Dialog {
     }
   }
 
-  private async loadKeys(): Promise<void> {
+  async loadKeys(): Promise<void> {
     try {
       this.keys = await buildsApi.keys();
+      this.keysLoaded = true;
     } catch {
       this.keys = [];
+      this.keysLoaded = false;
     }
     this.paintKeys(this.keySel.value);
   }
@@ -190,8 +182,14 @@ class PackageSheet extends Dialog {
   }
 
   private paintKeys(keep: string): void {
-    const items: DropdownOption[] = [noKeys(this.keys.length > 0), ...this.keys.map((k) => ({ value: k.id, label: `${k.name}  ${k.fingerprint.slice(0, 22)}`, detail: KEPT[k.secret], disabled: !k.canSign, literal: true }))];
-    this.keySel.setOptions(items, items.some((k) => k.value === keep) ? keep : undefined);
+    const none = this.keysLoaded && this.keys.length === 0;
+    setClass(this.f['chip-manage'], 'is-off', none);
+    setClass(this.f['chip-make'], 'is-off', !none);
+    setAttr(this.f['chip-manage'], 'aria-hidden', String(none));
+    setAttr(this.f['chip-make'], 'aria-hidden', String(!none));
+    const items: DropdownOption[] = [noKeys(none), ...this.keys.map((k) => ({ value: k.id, label: `${k.name}  ${k.fingerprint.slice(0, 22)}`, detail: KEPT[k.secret], disabled: !k.canSign, literal: true }))];
+    const signers = this.keys.filter((k) => k.canSign);
+    this.keySel.setOptions(items, items.some((k) => k.value === keep && keep !== '') ? keep : signers.length === 1 ? signers[0].id : undefined);
     this.sync();
   }
 
@@ -226,10 +224,6 @@ class PackageSheet extends Dialog {
     setDisabled(this.downloadBtn, this.busy || !has);
     setDisabled(this.libraryBtn, !has);
     setDisabled(this.publishBtn, this.busy || !has);
-    setDisabled(this.newBtn, this.busy);
-    setDisabled(this.exportBtn, this.busy || !key || !key.canSign);
-    setDisabled(this.importBtn, this.busy);
-    setDisabled(this.createBtn, this.busy);
     setDisabled(this.pass, this.busy || !key || !key.encrypted);
     setAttr(this.pass, 'placeholder', key && !key.encrypted ? 'No passphrase' : 'Passphrase');
     setClass(this.bar, 'is-running', this.busy && this.running === 'build');
@@ -322,37 +316,6 @@ class PackageSheet extends Dialog {
     });
   }
 
-  private async runCreateKey(): Promise<void> {
-    const name = this.newName.value.trim();
-    if (!name) {
-      say(this.f.sign, 'Give the key a name.', 'error');
-      this.newName.focus();
-      return;
-    }
-    await this.guard('other', async () => {
-      try {
-        const k = await buildsApi.createKey(name, this.newPass.value);
-        this.newName.value = '';
-        this.newPass.value = '';
-        setHidden(this.newBox, true);
-        this.keys = await buildsApi.keys();
-        this.paintKeys(k.id);
-        say(this.f.sign, `Created key ${k.name}.`, 'ok');
-      } catch (e) {
-        say(this.f.sign, message(e), 'error');
-      }
-    });
-  }
-
-  private async afterImport(id: string): Promise<void> {
-    try {
-      this.keys = await buildsApi.keys();
-    } catch {
-      return;
-    }
-    this.paintKeys(id);
-  }
-
   private async runChecksNow(): Promise<void> {
     await this.guard('other', async () => {
       try {
@@ -397,19 +360,9 @@ class PackageSheet extends Dialog {
       else if (a === 'repro') void this.runReproduce();
       else if (a === 'sign') void this.runSign();
       else if (a === 'verify') void this.runVerify();
-      else if (a === 'create') void this.runCreateKey();
       else if (a === 'copy' && this.build) void copyText(this.build.sha256);
-      else if (a === 'exportkey') {
-        const key = this.keys.find((k) => k.id === this.keySel.value);
-        if (key?.canSign) exportKeyDialog(key);
-      } else if (a === 'importkey') importKeyDialog((k) => { void this.afterImport(k.id); });
-      else if (a === 'newkey') {
-        setHidden(this.newBox, !this.newBox.hidden);
-        if (!this.newBox.hidden) this.newName.focus();
-      }
+      else if (a === 'managekeys') openPreferences('keys');
     });
-    this.newName.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.runCreateKey(); } });
-    this.newPass.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.runCreateKey(); } });
     this.pass.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.runSign(); } });
   }
 }
@@ -418,9 +371,11 @@ let sheet: PackageSheet | null = null;
 
 export function installPackaging(app: App): void {
   sheet ??= new PackageSheet(app);
+  bindPreferences(app);
   installPublish(app);
   on('fp:live', (ev) => {
     if (ev.type === 'checks.done' && typeof ev.site === 'string') sheet?.refreshFor(ev.site);
+    if (ev.type.startsWith('keys.') && sheet?.isOpen) void sheet.loadKeys();
   });
   on('fp:checks', (d) => sheet?.refreshFor(d.siteId));
   on('fp:site-closed', (d) => sheet?.siteClosed(d.id));

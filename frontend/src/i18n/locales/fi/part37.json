@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Allekirjoitusavaimet",
+  "Your keys": "Avaimesi",
+  "No keys yet. Create one below or import one.": "Ei vielä avaimia. Luo avain alla tai tuo avain.",
+  "Import...": "Tuo...",
+  "Export...": "Vie...",
+  "Created on {0}": "Luotu {0}",
+  "Removed key {0}.": "Avain {0} poistettiin.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "Poistetaanko {0}? Sen yksityinen avain poistetaan, joten se ei voi enää allekirjoittaa. Roskakori säilyttää sen julkisen avaimen, joten sen allekirjoitukset voi yhä tarkistaa.",
+  "Remove key": "Poista avain",
+  "Browser for the deep check": "Syvätarkistuksen selain",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "Syvätarkistus ohjaa tätä selainta. Kun kenttä on tyhjä, se etsii Google Chromea, sitten Microsoft Edgeä ja sitten paikkoja, joihin selaimet yleensä asennetaan.",
+  "Browse...": "Selaa...",
+  "Type the full path of the browser program in the field.": "Kirjoita kenttään selainohjelman koko polku.",
+  "Choose the browser": "Valitse selain",
+  "Give the full path of the browser program, starting from the top folder.": "Anna selainohjelman koko polku ylimmästä kansiosta alkaen.",
+  "Cleared. The deep check looks for a browser itself.": "Tyhjennetty. Syvätarkistus etsii selaimen itse.",
+  "There is no file at that path.": "Polussa ei ole tiedostoa.",
+  "No keys yet. Create one in Preferences.": "Ei vielä avaimia. Luo avain asetuksissa.",
+  "Manage keys": "Hallitse avaimia",
+  "Create a key in Preferences": "Luo avain asetuksissa",
+  "Open Preferences": "Avaa asetukset"
+}

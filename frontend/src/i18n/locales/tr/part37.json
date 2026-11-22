@@ -1,0 +1,23 @@
+{
+  "Signing keys": "İmzalama anahtarları",
+  "Your keys": "Anahtarlarınız",
+  "No keys yet. Create one below or import one.": "Henüz anahtar yok. Aşağıda bir anahtar oluşturun ya da içe aktarın.",
+  "Import...": "İçe aktar...",
+  "Export...": "Dışa aktar...",
+  "Created on {0}": "Oluşturulma: {0}",
+  "Removed key {0}.": "{0} anahtarı kaldırıldı.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "{0} kaldırılsın mı? Özel anahtarı silinir, bu yüzden artık imzalayamaz. Çöp kutusu genel anahtarını saklar, bu yüzden imzaları yine de denetlenebilir.",
+  "Remove key": "Anahtarı kaldır",
+  "Browser for the deep check": "Derin denetim için tarayıcı",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "Derin denetim bu tarayıcıyı kullanır. Alan boşsa önce Google Chrome'u, sonra Microsoft Edge'i, sonra tarayıcıların genellikle kurulduğu yerleri arar.",
+  "Browse...": "Gözat...",
+  "Type the full path of the browser program in the field.": "Tarayıcı programının tam yolunu alana yazın.",
+  "Choose the browser": "Tarayıcıyı seçin",
+  "Give the full path of the browser program, starting from the top folder.": "Tarayıcı programının tam yolunu en üst klasörden başlayarak verin.",
+  "Cleared. The deep check looks for a browser itself.": "Temizlendi. Derin denetim bir tarayıcıyı kendisi arar.",
+  "There is no file at that path.": "Bu yolda dosya yok.",
+  "No keys yet. Create one in Preferences.": "Henüz anahtar yok. Tercihler'de bir tane oluşturun.",
+  "Manage keys": "Anahtarları yönet",
+  "Create a key in Preferences": "Tercihler'de anahtar oluştur",
+  "Open Preferences": "Tercihler'i aç"
+}

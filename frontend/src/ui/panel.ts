@@ -7,6 +7,7 @@ import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } 
 import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
 import { icon } from './icons';
 import { refuse } from './notice-step';
+import { openPreferences } from './preferences';
 import { RevisionsView } from './revisions';
 
 interface ConEntry { seq: number; level: 'error' | 'warn'; text: string; where: string }
@@ -562,6 +563,13 @@ class Panel {
       key: (p) => p.id,
       create: (p) => {
         const node = el(`<div class="fp-pn-row fp-pn-prob" role="row" tabindex="0"><span class="fp-pn-sev"></span><span class="fp-pn-code" translate="no"></span><span class="fp-pn-msg"></span><span class="fp-pn-route" translate="no"></span><span class="fp-pn-tier"></span></div>`);
+        if (p.code === 'deep.unavailable') {
+          const act = el<HTMLButtonElement>('<button class="fp-pn-act" type="button">Open Preferences</button>');
+          act.addEventListener('click', (e) => { e.stopPropagation(); openPreferences('checks'); });
+          act.addEventListener('keydown', (e) => e.stopPropagation());
+          q(node, '.fp-pn-msg').after(act);
+          node.classList.add('has-act');
+        }
         this.paintProblem(node, p);
         return node;
       },

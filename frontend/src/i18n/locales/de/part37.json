@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Signaturschlüssel",
+  "Your keys": "Ihre Schlüssel",
+  "No keys yet. Create one below or import one.": "Noch keine Schlüssel. Erstellen Sie unten einen oder importieren Sie einen.",
+  "Import...": "Importieren...",
+  "Export...": "Exportieren...",
+  "Created on {0}": "Erstellt am {0}",
+  "Removed key {0}.": "Schlüssel {0} entfernt.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "{0} entfernen? Der private Schlüssel wird gelöscht, damit kann er nicht mehr signieren. Der Papierkorb behält den öffentlichen Schlüssel, damit lassen sich seine Signaturen weiter prüfen.",
+  "Remove key": "Schlüssel entfernen",
+  "Browser for the deep check": "Browser für die Tiefenprüfung",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "Die Tiefenprüfung steuert diesen Browser. Ist das Feld leer, sucht sie Google Chrome, dann Microsoft Edge, dann die Orte, an denen Browser üblicherweise installiert sind.",
+  "Browse...": "Durchsuchen...",
+  "Type the full path of the browser program in the field.": "Geben Sie den vollständigen Pfad des Browserprogramms in das Feld ein.",
+  "Choose the browser": "Browser auswählen",
+  "Give the full path of the browser program, starting from the top folder.": "Geben Sie den vollständigen Pfad des Browserprogramms an, beginnend beim obersten Ordner.",
+  "Cleared. The deep check looks for a browser itself.": "Geleert. Die Tiefenprüfung sucht selbst nach einem Browser.",
+  "There is no file at that path.": "Unter diesem Pfad gibt es keine Datei.",
+  "No keys yet. Create one in Preferences.": "Noch keine Schlüssel. Erstellen Sie einen in den Einstellungen.",
+  "Manage keys": "Schlüssel verwalten",
+  "Create a key in Preferences": "Schlüssel in den Einstellungen erstellen",
+  "Open Preferences": "Einstellungen öffnen"
+}

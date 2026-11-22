@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Signeringsnøkler",
+  "Your keys": "Dine nøkler",
+  "No keys yet. Create one below or import one.": "Ingen nøkler ennå. Opprett en nedenfor, eller importer en.",
+  "Import...": "Importer...",
+  "Export...": "Eksporter...",
+  "Created on {0}": "Opprettet {0}",
+  "Removed key {0}.": "Nøkkelen {0} er fjernet.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "Fjerne {0}? Den private nøkkelen slettes, så den kan ikke lenger signere. Papirkurven beholder den offentlige nøkkelen, så signaturene kan fortsatt kontrolleres.",
+  "Remove key": "Fjern nøkkel",
+  "Browser for the deep check": "Nettleser for den grundige kontrollen",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "Den grundige kontrollen styrer denne nettleseren. Når feltet er tomt, ser den etter Google Chrome, så Microsoft Edge, så stedene der nettlesere vanligvis installeres.",
+  "Browse...": "Bla gjennom...",
+  "Type the full path of the browser program in the field.": "Skriv inn hele banen til nettleserprogrammet i feltet.",
+  "Choose the browser": "Velg nettleseren",
+  "Give the full path of the browser program, starting from the top folder.": "Oppgi hele banen til nettleserprogrammet, fra den øverste mappen.",
+  "Cleared. The deep check looks for a browser itself.": "Tømt. Den grundige kontrollen finner en nettleser selv.",
+  "There is no file at that path.": "Det finnes ingen fil på den banen.",
+  "No keys yet. Create one in Preferences.": "Ingen nøkler ennå. Opprett en i Innstillinger.",
+  "Manage keys": "Administrer nøkler",
+  "Create a key in Preferences": "Opprett en nøkkel i Innstillinger",
+  "Open Preferences": "Åpne Innstillinger"
+}

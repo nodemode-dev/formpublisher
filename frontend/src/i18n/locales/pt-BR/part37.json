@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Chaves de assinatura",
+  "Your keys": "Suas chaves",
+  "No keys yet. Create one below or import one.": "Nenhuma chave ainda. Crie uma abaixo ou importe uma.",
+  "Import...": "Importar...",
+  "Export...": "Exportar...",
+  "Created on {0}": "Criada em {0}",
+  "Removed key {0}.": "Chave {0} removida.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "Remover {0}? A chave privada é apagada, então ela não pode mais assinar. A Lixeira guarda a chave pública, então suas assinaturas ainda podem ser verificadas.",
+  "Remove key": "Remover chave",
+  "Browser for the deep check": "Navegador da verificação profunda",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "A verificação profunda controla este navegador. Quando o campo está vazio, ela procura o Google Chrome, depois o Microsoft Edge, depois os locais onde os navegadores costumam ser instalados.",
+  "Browse...": "Procurar...",
+  "Type the full path of the browser program in the field.": "Digite no campo o caminho completo do programa do navegador.",
+  "Choose the browser": "Escolher o navegador",
+  "Give the full path of the browser program, starting from the top folder.": "Informe o caminho completo do programa do navegador, a partir da pasta raiz.",
+  "Cleared. The deep check looks for a browser itself.": "Limpo. A verificação profunda procura um navegador por conta própria.",
+  "There is no file at that path.": "Não há nenhum arquivo nesse caminho.",
+  "No keys yet. Create one in Preferences.": "Nenhuma chave ainda. Crie uma em Preferências.",
+  "Manage keys": "Gerenciar chaves",
+  "Create a key in Preferences": "Criar uma chave em Preferências",
+  "Open Preferences": "Abrir Preferências"
+}

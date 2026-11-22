@@ -1,0 +1,23 @@
+{
+  "Signing keys": "签名密钥",
+  "Your keys": "你的密钥",
+  "No keys yet. Create one below or import one.": "暂无密钥。请在下方创建一个，或导入一个。",
+  "Import...": "导入...",
+  "Export...": "导出...",
+  "Created on {0}": "创建于 {0}",
+  "Removed key {0}.": "已移除密钥 {0}。",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "要移除 {0} 吗？其私钥将被删除，因此无法再签名。废纸篓会保留其公钥，因此仍可检查其签名。",
+  "Remove key": "移除密钥",
+  "Browser for the deep check": "深度检查使用的浏览器",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "深度检查会驱动此浏览器。字段为空时，它会依次查找 Google Chrome、Microsoft Edge，以及浏览器通常的安装位置。",
+  "Browse...": "浏览...",
+  "Type the full path of the browser program in the field.": "请在字段中输入浏览器程序的完整路径。",
+  "Choose the browser": "选择浏览器",
+  "Give the full path of the browser program, starting from the top folder.": "请填写浏览器程序的完整路径，从最上层文件夹开始。",
+  "Cleared. The deep check looks for a browser itself.": "已清除。深度检查会自行查找浏览器。",
+  "There is no file at that path.": "该路径下没有文件。",
+  "No keys yet. Create one in Preferences.": "暂无密钥。请在偏好设置中创建一个。",
+  "Manage keys": "管理密钥",
+  "Create a key in Preferences": "在偏好设置中创建密钥",
+  "Open Preferences": "打开偏好设置"
+}

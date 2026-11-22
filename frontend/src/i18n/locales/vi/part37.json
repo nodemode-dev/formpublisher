@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Khóa ký",
+  "Your keys": "Khóa của bạn",
+  "No keys yet. Create one below or import one.": "Chưa có khóa. Hãy tạo một khóa bên dưới hoặc nhập một khóa.",
+  "Import...": "Nhập...",
+  "Export...": "Xuất...",
+  "Created on {0}": "Tạo ngày {0}",
+  "Removed key {0}.": "Đã xóa khóa {0}.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "Xóa {0}? Khóa riêng của nó sẽ bị xóa nên không thể ký nữa. Thùng rác giữ khóa công khai của nó nên vẫn kiểm tra được các chữ ký.",
+  "Remove key": "Xóa khóa",
+  "Browser for the deep check": "Trình duyệt cho kiểm tra chuyên sâu",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "Kiểm tra chuyên sâu điều khiển trình duyệt này. Khi ô trống, nó tìm Google Chrome, rồi Microsoft Edge, rồi các nơi trình duyệt thường được cài đặt.",
+  "Browse...": "Duyệt...",
+  "Type the full path of the browser program in the field.": "Nhập đường dẫn đầy đủ của chương trình trình duyệt vào ô.",
+  "Choose the browser": "Chọn trình duyệt",
+  "Give the full path of the browser program, starting from the top folder.": "Cho biết đường dẫn đầy đủ của chương trình trình duyệt, bắt đầu từ thư mục trên cùng.",
+  "Cleared. The deep check looks for a browser itself.": "Đã xóa. Kiểm tra chuyên sâu tự tìm trình duyệt.",
+  "There is no file at that path.": "Không có tệp nào ở đường dẫn đó.",
+  "No keys yet. Create one in Preferences.": "Chưa có khóa. Hãy tạo một khóa trong Tùy chọn.",
+  "Manage keys": "Quản lý khóa",
+  "Create a key in Preferences": "Tạo khóa trong Tùy chọn",
+  "Open Preferences": "Mở Tùy chọn"
+}

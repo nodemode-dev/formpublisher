@@ -21,6 +21,14 @@
 .fp-kt-field[hidden] { display: none; }
 .fp-kt-error { min-height: 2.8em; overflow-wrap: anywhere; }
 .fp-pkg-res.is-verify { min-height: 2.8em; display: flex; align-items: center; overflow-wrap: anywhere; }
+.fp-chip { display: inline-flex; align-items: center; gap: var(--space-1); flex: none; max-width: 60%; height: var(--ctl-sm); padding: 0 var(--space-1) 0 var(--space-2); border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface-2); color: var(--text-secondary); font: inherit; font-size: var(--fs-12); text-align: left; white-space: nowrap; cursor: pointer; }
+.fp-chip:hover { border-color: var(--accent-line); color: var(--text-primary); }
+.fp-chip:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+.fp-chip > .icon:first-child { color: var(--accent-ink); }
+.fp-chip-label { display: inline-grid; min-width: 0; }
+.fp-chip-label > span { grid-area: 1 / 1; overflow: hidden; text-overflow: ellipsis; }
+.fp-chip-label > .is-off { visibility: hidden; }
+.fp-chip-go { display: inline-flex; color: var(--text-muted); }
 body.theme-light .fp-pkg-res.is-ok { color: var(--success-fill); }
 body.theme-light .fp-pkg-res.is-error { color: var(--danger-fill); }
 .fp-pkg-pass { width: 150px; flex: none; }
