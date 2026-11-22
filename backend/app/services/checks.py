@@ -31,6 +31,10 @@ CSS_COMMENT = re.compile(r"/\*.*?\*/", re.S)
 JS_EXTERNAL = re.compile(r"""(?:\bfetch|\bimport|\bnew\s+URL)\s*\(\s*(["'`])(https?://[^"'`\s]+)\1""")
 SITEMAP_LOC = re.compile(r"<loc>\s*(.*?)\s*</loc>", re.I | re.S)
 FORMS_PATH = "/api/forms/"
+VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
+OG_REQUIRED = ("og:title", "og:type", "og:image", "og:url")
+HREFLANG = re.compile(r"^(x-default|[a-z]{2}(-[a-z]{4})?(-[a-z]{2})?)$", re.I)
+UNLABELED_TYPES = {"hidden", "submit", "button", "reset"}
 _lock = threading.RLock()
 _live: dict[tuple[str, str], dict[str, dict]] = {}
 
@@ -182,6 +186,25 @@ class Page(HTMLParser):
         self.style_buf: list[str] | None = None
         self.style_line = 0
         self.svg = 0
+        self.canonicals: list[str] = []
+        self.og: dict[str, str] = {}
+        self.icon = False
+        self.alternates: list[tuple[str, str, int]] = []
+        self.jsonld: list[tuple[int, str]] = []
+        self.jsonld_buf: list[str] | None = None
+        self.jsonld_line = 0
+        self.hidden = 0
+        self.hidden_tag: str | None = None
+        self.anchor: dict | None = None
+        self.unnamed_links: list[tuple[int, str]] = []
+        self.label_depth = 0
+        self.label_for: set[str] = set()
+        self.controls: list[tuple[int, str, dict, bool]] = []
+
+    def _close_anchor(self) -> None:
+        if self.anchor is not None and not self.anchor["named"]:
+            self.unnamed_links.append((self.anchor["line"], self.anchor["href"]))
+        self.anchor = None
 
     def _asset(self, tag: str, attr: str, url: str | None, line: int) -> None:
         if url and url.strip():
@@ -190,6 +213,12 @@ class Page(HTMLParser):
     def handle_starttag(self, tag, attrs):
         line = self.getpos()[0]
         a = {k: (v if v is not None else "") for k, v in attrs}
+        if self.hidden_tag:
+            if tag == self.hidden_tag:
+                self.hidden += 1
+        elif tag not in VOID and ("hidden" in a or a.get("aria-hidden", "").strip().lower() == "true"):
+            self.hidden_tag = tag
+            self.hidden = 1
         if "id" in a and a["id"]:
             self.ids.add(a["id"])
         if tag == "a" and a.get("name"):
@@ -216,17 +245,32 @@ class Page(HTMLParser):
                 self.description = a.get("content", "")
             elif name == "robots" and "noindex" in a.get("content", "").lower():
                 self.noindex = True
+            prop = a.get("property", "").strip().lower()
+            if prop.startswith("og:") and prop not in self.og:
+                self.og[prop] = a.get("content", "").strip()
         elif tag == "link":
             rels = set(a.get("rel", "").lower().split())
             if "canonical" in rels and a.get("href"):
                 self.canonical = a["href"]
+            if "canonical" in rels:
+                self.canonicals.append(a.get("href", "").strip())
+            if "icon" in rels and a.get("href", "").strip():
+                self.icon = True
+            if "alternate" in rels and "hreflang" in a:
+                self.alternates.append((a["hreflang"].strip(), a.get("href", "").strip(), line))
             if rels & RES_RELS:
                 self._asset("link", "href", a.get("href"), line)
         elif tag == "a":
             if a.get("href", "").strip():
                 self.links.append((a["href"].strip(), line))
+                self._close_anchor()
+                if not self.hidden:
+                    named = any(a.get(k, "").strip() for k in ("aria-label", "aria-labelledby", "title"))
+                    self.anchor = {"line": line, "href": a["href"].strip(), "named": named}
         elif tag == "img":
             self.images.append((line, a))
+            if self.anchor is not None and not self.hidden and a.get("alt", "").strip():
+                self.anchor["named"] = True
             self._asset("img", "src", a.get("src"), line)
             self._srcset(tag, a.get("srcset"), line)
         elif tag == "source":
@@ -237,8 +281,19 @@ class Page(HTMLParser):
             self._asset(tag, "poster", a.get("poster"), line)
         elif tag in ("script", "track", "iframe", "embed"):
             self._asset(tag, "src", a.get("src"), line)
-        elif tag == "input" and a.get("type", "").lower() == "image":
-            self._asset(tag, "src", a.get("src"), line)
+            if tag == "script" and a.get("type", "").strip().lower() == "application/ld+json":
+                self.jsonld_buf = []
+                self.jsonld_line = line
+        elif tag in ("input", "select", "textarea"):
+            kind = a.get("type", "").strip().lower() if tag == "input" else tag
+            if kind == "image":
+                self._asset(tag, "src", a.get("src"), line)
+            if not self.hidden and kind not in UNLABELED_TYPES and not (kind == "image" and a.get("alt", "").strip()):
+                self.controls.append((line, tag, a, self.label_depth > 0))
+        elif tag == "label":
+            self.label_depth += 1
+            if a.get("for", "").strip():
+                self.label_for.add(a["for"].strip())
         elif tag == "form":
             self.forms.append((line, a))
         elif len(tag) == 2 and tag[0] == "h" and tag[1] in "123456":
@@ -253,6 +308,10 @@ class Page(HTMLParser):
                 self._asset(tag, "srcset", pieces[0], line)
 
     def handle_endtag(self, tag):
+        if self.hidden_tag and tag == self.hidden_tag:
+            self.hidden -= 1
+            if not self.hidden:
+                self.hidden_tag = None
         if tag == "svg" and self.svg:
             self.svg -= 1
         elif tag == "title" and self.title_buf is not None:
@@ -261,12 +320,23 @@ class Page(HTMLParser):
         elif tag == "style" and self.style_buf is not None:
             self.styles.append((self.style_line, "".join(self.style_buf)))
             self.style_buf = None
+        elif tag == "script" and self.jsonld_buf is not None:
+            self.jsonld.append((self.jsonld_line, "".join(self.jsonld_buf)))
+            self.jsonld_buf = None
+        elif tag == "a":
+            self._close_anchor()
+        elif tag == "label" and self.label_depth:
+            self.label_depth -= 1
 
     def handle_data(self, data):
         if self.title_buf is not None:
             self.title_buf.append(data)
         elif self.style_buf is not None:
             self.style_buf.append(data)
+        elif self.jsonld_buf is not None:
+            self.jsonld_buf.append(data)
+        elif self.anchor is not None and not self.hidden and data.strip():
+            self.anchor["named"] = True
 
 
 def css_refs(text: str) -> list[tuple[str, int]]:
@@ -311,6 +381,7 @@ class Runner:
         self.pages: dict[str, Page | None] = {}
         self.route_file: dict[str, str] = {}
         self.file_route: dict[str, str] = {}
+        self.route_locale: dict[str, str] = {}
         self.own_hosts: set[str] = {"localhost", "127.0.0.1"}
         self.remote: dict[str, list[tuple]] = {}
 
@@ -379,6 +450,8 @@ class Runner:
                 continue
             self.route_file[path] = rel
             self.file_route.setdefault(rel, path)
+            if isinstance(row.get("locale"), str) and row["locale"].strip():
+                self.route_locale[path] = row["locale"].strip()
             routes.append(path)
         return sorted(routes)
 
@@ -527,6 +600,7 @@ class Runner:
                     "Describe the image in alt text, or use an empty alt for decoration.",
                     file=rel, line=line, selector=selector, url=src or None, key=src,
                 )
+        self.check_a11y(rel, route, page)
         self.check_forms(rel, route, page)
         if not routed:
             return
@@ -573,6 +647,168 @@ class Runner:
                     "Use heading levels in order without skipping.", file=rel, line=line,
                 )
             previous = level
+        self.check_share(rel, route, page)
+
+    def check_a11y(self, rel: str, route: str, page: Page) -> None:
+        for line, href in page.unnamed_links:
+            self.add(
+                "a11y.link-name", "warning", route,
+                f"The link to {href} has no text a screen reader can announce.",
+                "Add link text, an aria-label, or alt text on the image inside the link.",
+                file=rel, line=line, selector=f'a[href="{href}"]', url=href, key=href,
+            )
+        for line, tag, attrs, wrapped in page.controls:
+            ident = attrs.get("id", "").strip()
+            if wrapped or (ident and ident in page.label_for):
+                continue
+            if any(attrs.get(k, "").strip() for k in ("aria-label", "aria-labelledby", "title")):
+                continue
+            name = attrs.get("name", "").strip()
+            kind = (attrs.get("type", "").strip().lower() or "text") if tag == "input" else tag
+            what = f"{kind} field named {name}" if name else f"{kind} field"
+            if name:
+                selector = f'{tag}[name="{name}"]'
+            elif ident:
+                selector = f"#{ident}"
+            else:
+                selector = tag
+            self.add(
+                "a11y.label", "warning", route,
+                f"The {what} has no label.",
+                "Add a label linked to the field with for, or an aria-label, so screen readers can name it.",
+                file=rel, line=line, selector=selector, key=name or ident,
+            )
+
+    def check_share(self, rel: str, route: str, page: Page) -> None:
+        canonicals = [c for c in page.canonicals if c]
+        if not canonicals and not page.noindex:
+            self.add(
+                "seo.canonical", "warning", route, "The page has no canonical link.",
+                "Set the site address in FormWeb so each page names its canonical URL.", file=rel,
+            )
+        elif len(page.canonicals) > 1:
+            self.add(
+                "seo.canonical", "warning", route, f"The page has {len(page.canonicals)} canonical links.",
+                "Keep one canonical link per page.", file=rel,
+            )
+        for href in canonicals[:1]:
+            parts = urlsplit(href)
+            if parts.scheme not in ("http", "https") or not parts.netloc:
+                self.add(
+                    "seo.canonical", "warning", route, f"The canonical link {href} is not an absolute URL.",
+                    "Use the full address, starting with https://.", file=rel, url=href, key=href,
+                )
+        missing = [p for p in OG_REQUIRED if not page.og.get(p)]
+        if missing:
+            names = missing[0] if len(missing) == 1 else ", ".join(missing[:-1]) + " and " + missing[-1]
+            self.add(
+                "seo.og", "info", route,
+                f"The page has no {names} Open Graph tag." if len(missing) == 1 else f"The page has no {names} Open Graph tags.",
+                "Add og:title, og:type, og:image and og:url so links to the page show a full preview.", file=rel,
+            )
+        image = page.og.get("og:image")
+        if image:
+            parts = urlsplit(image)
+            if parts.scheme not in ("http", "https") or not parts.netloc:
+                self.add(
+                    "seo.og", "info", route, f"The og:image {image} is not an absolute URL.",
+                    "Use the full address of the image, starting with https://.", file=rel, url=image, key=image,
+                )
+        for line, text in page.jsonld:
+            try:
+                json.loads(text)
+            except ValueError as exc:
+                self.add(
+                    "seo.jsonld", "error", route,
+                    f"The structured data block is not valid JSON: {getattr(exc, 'msg', str(exc))}.",
+                    "Correct the JSON-LD in the page, or remove the block.", file=rel, line=line,
+                )
+
+    def own_file(self, href: str) -> str | None:
+        parts = urlsplit(href)
+        if parts.scheme not in ("http", "https") or not self.is_own(parts.hostname):
+            return None
+        kind, found, _status = self.index.resolve(self.index.local(parts.path or "/"))
+        return found if kind == "file" else None
+
+    def check_hreflang(self, routes: list[str]) -> None:
+        lists: dict[str, dict[str, tuple[str, str]]] = {}
+        for route in routes:
+            rel = self.route_file[route]
+            page = self.page(rel)
+            if page is None:
+                continue
+            lists[rel] = {}
+            for lang, href, _line in page.alternates:
+                found = self.own_file(href)
+                if found is not None and found not in lists[rel]:
+                    lists[rel][found] = (lang, href)
+        for route in routes:
+            rel = self.route_file[route]
+            page = self.page(rel)
+            if page is None or rel not in lists:
+                continue
+            for lang, href, line in page.alternates:
+                if not HREFLANG.match(lang):
+                    self.add(
+                        "seo.hreflang", "warning", route,
+                        f"The hreflang value {lang or '(empty)'} is not a language code or language-region code.",
+                        "Use an ISO 639-1 language code with an optional ISO 3166-1 region, such as en or en-GB, or x-default.",
+                        file=rel, line=line, url=href or None, key=lang,
+                    )
+                parts = urlsplit(href)
+                if parts.scheme not in ("http", "https") or not parts.netloc:
+                    self.add(
+                        "seo.hreflang", "warning", route,
+                        f"The hreflang link for {lang} points at {href or '(nothing)'}, which is not a full address.",
+                        "Use the full address of each version, starting with https://.",
+                        file=rel, line=line, url=href or None, key=href,
+                    )
+            if page.alternates:
+                own = lists[rel].get(rel)
+                if own is None and page.canonical not in {h for _l, h, _n in page.alternates}:
+                    self.add(
+                        "seo.hreflang", "warning", route,
+                        "The page's hreflang links do not list the page itself.",
+                        "Add an hreflang link for this page's own language that points at its own address.",
+                        file=rel,
+                    )
+                locale = self.route_locale.get(route)
+                if own is not None and locale and own[0].lower() != "x-default":
+                    if own[0].split("-")[0].lower() != locale.replace("_", "-").split("-")[0].lower():
+                        self.add(
+                            "seo.hreflang", "warning", route,
+                            f"The page lists itself as {own[0]}, but the route's locale is {locale}.",
+                            "Make the page's own hreflang value match its locale.",
+                            file=rel, url=own[1], key=own[1],
+                        )
+            for other in sorted(lists):
+                if other == rel or rel not in lists[other] or other in lists[rel]:
+                    continue
+                lang, _href = lists[other][rel]
+                back = self.route_of(other)
+                self.add(
+                    "seo.hreflang", "warning", route,
+                    f"The page at {back} lists this page as its {lang} version, but this page has no hreflang link back to {back}.",
+                    "List every language version on each version, this page included, so the links go both ways.",
+                    file=rel, url=back, key=back,
+                )
+
+    def check_site(self, routes: list[str]) -> None:
+        if not routes:
+            return
+        home = self.index.lookup("/")
+        page = self.page(home) if home else None
+        if not (page is not None and page.icon) and "favicon.ico" not in self.index.files:
+            self.add(
+                "site.favicon", "warning", "/", "The site has no favicon.",
+                "Add a site icon in FormWeb, or put favicon.ico at the root of the site.", file=home,
+            )
+        if "404.html" not in self.index.files and "404/index.html" not in self.index.files:
+            self.add(
+                "site.404", "warning", "/", "The site has no 404 page.",
+                "Add a page at /404 in FormWeb so hosts show it for addresses that do not exist.",
+            )
 
     def check_forms(self, rel: str, route: str, page: Page) -> None:
         for line, attrs in page.forms:
@@ -777,6 +1013,8 @@ class Runner:
         self.report_external()
         self.check_redirects()
         self.check_seo(routes)
+        self.check_hreflang(routes)
+        self.check_site(routes)
         self.check_budgets(routes)
         self.problems.sort(key=lambda p: (p["route"], p["code"], p.get("line") or 0, p["id"]))
         return self.problems
