@@ -1092,6 +1092,7 @@ def report(site: str, revision: str) -> dict:
     problems: list[dict] = []
     ran: list[str] = []
     thumbs: dict[str, str] = {}
+    measures: list[dict] = []
     for tier in ("static", "deep"):
         block = stored.get(tier)
         if isinstance(block, dict):
@@ -1100,6 +1101,8 @@ def report(site: str, revision: str) -> dict:
             if tier == "deep" and isinstance(block.get("thumbs"), dict):
                 for route, name in block["thumbs"].items():
                     thumbs[route] = f"/api/checks/{site}/{revision}/thumbs/{name}.png"
+            if tier == "deep" and isinstance(block.get("measures"), list):
+                measures = [m for m in block["measures"] if isinstance(m, dict)]
     if live:
         ran.append("live")
         problems.extend(live)
@@ -1117,6 +1120,8 @@ def report(site: str, revision: str) -> dict:
             "ran": ran,
         },
         "thumbs": thumbs,
+        "measures": measures,
+        "inp": "not measured",
     }
 
 
