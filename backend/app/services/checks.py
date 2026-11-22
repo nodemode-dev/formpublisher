@@ -31,7 +31,21 @@ CSS_COMMENT = re.compile(r"/\*.*?\*/", re.S)
 JS_EXTERNAL = re.compile(r"""(?:\bfetch|\bimport|\bnew\s+URL)\s*\(\s*(["'`])(https?://[^"'`\s]+)\1""")
 SITEMAP_LOC = re.compile(r"<loc>\s*(.*?)\s*</loc>", re.I | re.S)
 FORMS_PATH = "/api/forms/"
-VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
+FORMS_FIX = "See Forms in the hosting guide (Host it yourself, Forms)."
+WEB3FORMS = "https://api.web3forms.com/submit"
+UNSENT_TYPES = {"submit", "button", "reset", "image"}
+ANALYTICS_FIX = "See Analytics and search engines in the hosting guide (Host it yourself, Analytics and search engines)."
+ANALYTICS_SRC = (
+    ("Cloudflare Web Analytics", ("static.cloudflareinsights.com",), re.compile(r"^/beacon\.min\.js$")),
+    ("Plausible", ("plausible.io",), re.compile(r"^/js/(?:pa-[^/]+|script[^/]*)\.js$")),
+    ("Fathom", ("cdn.usefathom.com",), re.compile(r"^/script\.js$")),
+    ("GoatCounter", ("gc.zgo.at",), re.compile(r"^/count\.js$")),
+    ("Simple Analytics", ("scripts.simpleanalyticscdn.com",), re.compile(r"^/latest\.js$")),
+    ("Google Analytics", ("www.googletagmanager.com", "googletagmanager.com"), re.compile(r"^/(?:gtag/js|gtm\.js)$")),
+)
+GOOGLE_INLINE = re.compile(r"googletagmanager\.com/(?:gtag/js|gtm\.js)")
+VERCEL_STUB = re.compile(r"\bwindow\.va\s*=")
+VOID ={"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 OG_REQUIRED = ("og:title", "og:type", "og:image", "og:url")
 HREFLANG = re.compile(r"^(x-default|[a-z]{2}(-[a-z]{4})?(-[a-z]{2})?)$", re.I)
 UNLABELED_TYPES = {"hidden", "submit", "button", "reset"}
@@ -180,6 +194,11 @@ class Page(HTMLParser):
         self.assets: list[dict] = []
         self.images: list[tuple[int, dict]] = []
         self.forms: list[tuple[int, dict]] = []
+        self.form_fields: list[list[tuple[int, str, dict]]] = []
+        self.in_form = False
+        self.scripts: list[tuple[int, dict]] = []
+        self.inline_js: list[str] = []
+        self.script_buf: list[str] | None = None
         self.headings: list[tuple[int, int]] = []
         self.styles: list[tuple[int, str]] = []
         self.title_buf: list[str] | None = None
@@ -284,8 +303,14 @@ class Page(HTMLParser):
             if tag == "script" and a.get("type", "").strip().lower() == "application/ld+json":
                 self.jsonld_buf = []
                 self.jsonld_line = line
+            elif tag == "script":
+                self.scripts.append((line, a))
+                if not a.get("src", "").strip():
+                    self.script_buf = []
         elif tag in ("input", "select", "textarea"):
             kind = a.get("type", "").strip().lower() if tag == "input" else tag
+            if self.in_form and self.form_fields:
+                self.form_fields[-1].append((line, tag, a))
             if kind == "image":
                 self._asset(tag, "src", a.get("src"), line)
             if not self.hidden and kind not in UNLABELED_TYPES and not (kind == "image" and a.get("alt", "").strip()):
@@ -296,6 +321,8 @@ class Page(HTMLParser):
                 self.label_for.add(a["for"].strip())
         elif tag == "form":
             self.forms.append((line, a))
+            self.form_fields.append([])
+            self.in_form = True
         elif len(tag) == 2 and tag[0] == "h" and tag[1] in "123456":
             self.headings.append((int(tag[1]), line))
 
@@ -323,6 +350,11 @@ class Page(HTMLParser):
         elif tag == "script" and self.jsonld_buf is not None:
             self.jsonld.append((self.jsonld_line, "".join(self.jsonld_buf)))
             self.jsonld_buf = None
+        elif tag == "script" and self.script_buf is not None:
+            self.inline_js.append("".join(self.script_buf))
+            self.script_buf = None
+        elif tag == "form":
+            self.in_form = False
         elif tag == "a":
             self._close_anchor()
         elif tag == "label" and self.label_depth:
@@ -335,6 +367,8 @@ class Page(HTMLParser):
             self.style_buf.append(data)
         elif self.jsonld_buf is not None:
             self.jsonld_buf.append(data)
+        elif self.script_buf is not None:
+            self.script_buf.append(data)
         elif self.anchor is not None and not self.hidden and data.strip():
             self.anchor["named"] = True
 
@@ -370,6 +404,37 @@ def local_host(host: str) -> bool:
         return False
     address = getattr(address, "ipv4_mapped", None) or address
     return address.is_loopback or address.is_private or address.is_link_local or address.is_unspecified
+
+
+def analytics_src(src: str) -> str | None:
+    parts = urlsplit("http:" + src if src.startswith("//") else src)
+    host = (parts.hostname or "").lower()
+    for name, hosts, path in ANALYTICS_SRC:
+        if host in hosts and path.match(parts.path):
+            return name
+    return None
+
+
+def analytics_of(page: Page) -> set[str]:
+    found = set()
+    for _line, attrs in page.scripts:
+        src = attrs.get("src", "").strip()
+        if not src:
+            continue
+        parts = urlsplit("http:" + src if src.startswith("//") else src)
+        name = analytics_src(src)
+        if name:
+            found.add(name)
+        if parts.path.endswith("/script.js") and attrs.get("data-website-id", "").strip():
+            found.add("Umami")
+        if parts.path == "/_vercel/insights/script.js":
+            found.add("Vercel Web Analytics")
+    for text in page.inline_js:
+        if GOOGLE_INLINE.search(text):
+            found.add("Google Analytics")
+        if VERCEL_STUB.search(text):
+            found.add("Vercel Web Analytics")
+    return found
 
 
 class Runner:
@@ -511,6 +576,8 @@ class Runner:
                 )
 
     def external(self, rel: str, route: str, ref: dict, url: str) -> None:
+        if ref.get("tag") == "script" and analytics_src(url):
+            return
         self.remote.setdefault(url, []).append((route, rel, ref.get("line"), ref.get("selector")))
 
     def report_external(self) -> None:
@@ -700,10 +767,9 @@ class Runner:
                 )
         missing = [p for p in OG_REQUIRED if not page.og.get(p)]
         if missing:
-            names = missing[0] if len(missing) == 1 else ", ".join(missing[:-1]) + " and " + missing[-1]
             self.add(
                 "seo.og", "info", route,
-                f"The page has no {names} Open Graph tag." if len(missing) == 1 else f"The page has no {names} Open Graph tags.",
+                f"The page has no {missing[0]} Open Graph tag." if len(missing) == 1 else f"The page has none of these Open Graph tags: {', '.join(missing)}.",
                 "Add og:title, og:type, og:image and og:url so links to the page show a full preview.", file=rel,
             )
         image = page.og.get("og:image")
@@ -760,7 +826,7 @@ class Runner:
                 if parts.scheme not in ("http", "https") or not parts.netloc:
                     self.add(
                         "seo.hreflang", "warning", route,
-                        f"The hreflang link for {lang} points at {href or '(nothing)'}, which is not a full address.",
+                        f"The hreflang link for {lang or '(empty)'} points at {href or '(nothing)'}, which is not a full address.",
                         "Use the full address of each version, starting with https://.",
                         file=rel, line=line, url=href or None, key=href,
                     )
@@ -810,23 +876,94 @@ class Runner:
                 "Add a page at /404 in FormWeb so hosts show it for addresses that do not exist.",
             )
 
+    def check_analytics(self, routes: list[str]) -> None:
+        files = sorted({self.route_file[r] for r in routes} if routes else self.html_files(), key=self.route_of)
+        found: dict[str, list[str]] = {}
+        counted = []
+        for rel in files:
+            page = self.page(rel)
+            if page is None:
+                continue
+            for name in analytics_of(page):
+                found.setdefault(name, []).append(rel)
+            if not page.noindex and rel not in ("404.html", "404/index.html"):
+                counted.append(rel)
+        for name in sorted(found):
+            lacking = [rel for rel in counted if rel not in found[name]]
+            if lacking:
+                missing = [self.route_of(rel) for rel in lacking]
+                shown = ", ".join(missing[:5]) + (f" and {len(missing) - 5} more" if len(missing) > 5 else "")
+                self.add(
+                    "analytics.partial", "warning", missing[0],
+                    f"{name} is on {len(counted) - len(missing)} of {len(counted)} pages; it is missing from {shown}.",
+                    "Add the same snippet to the site's head in FormWeb so it is on every page. " + ANALYTICS_FIX,
+                    file=lacking[0], key=name,
+                )
+            if name == "Google Analytics":
+                self.add(
+                    "analytics.cookies", "info", self.route_of(found[name][0]),
+                    "The site loads the Google tag from googletagmanager.com. Google Analytics sets cookies (_ga) in visitors' browsers.",
+                    ANALYTICS_FIX, file=found[name][0], key=name,
+                )
+
+    def form_problem(self, rel: str, route: str, page: Page, action: str, posts: bool) -> tuple[str, str] | None:
+        nothing = "so it will send nothing once the site is on a static host."
+        if not action or action.startswith("#"):
+            if not posts:
+                return None
+            return "forms.no-endpoint", f"The form on {route} posts to {action or 'no address'} ({'it has no action' if not action else 'the page itself'}), {nothing}"
+        target = self.target_path(rel, page, action)
+        if target is None:
+            return None
+        if target[0] == "ext" or target[0] == "own":
+            host = urlsplit("http:" + action if action.startswith("//") else action).hostname or ""
+            if local_host(host):
+                return "forms.local-address", f"The form on {route} sends to {action}, which will not answer once the site is published, so the form will not send."
+            if target[0] == "ext":
+                return None
+        path = self.index.local(target[1]) if target[0] != "self" else ""
+        if path.startswith(FORMS_PATH):
+            return "forms.no-endpoint", f"The form on {route} sends to {action}, FormWeb's own form route, {nothing}"
+        if not posts:
+            return None
+        return "forms.no-endpoint", f"The form on {route} posts to {action}, an address on the site itself, {nothing}"
+
     def check_forms(self, rel: str, route: str, page: Page) -> None:
-        for line, attrs in page.forms:
+        for index, (line, attrs) in enumerate(page.forms):
+            fields = page.form_fields[index] if index < len(page.form_fields) else []
             action = attrs.get("action", "").strip()
-            target = self.target_path(rel, page, action) if action and not action.startswith("#") else None
-            if target is None or target[0] == "self":
+            name = attrs.get("name", "").strip()
+            posts = attrs.get("method", "").strip().lower() == "post"
+            netlify = "netlify" in attrs or attrs.get("data-netlify", "").strip().lower() == "true"
+            selector = f'form[action="{action}"]' if action else (f'form[name="{name}"]' if name else "form")
+            found = None if netlify else self.form_problem(rel, route, page, action, posts)
+            if netlify and not name:
+                found = "forms.no-endpoint", f"The form on {route} has Netlify's form attribute but no name, and Netlify needs a name for each form, so it will send nothing once the site is on a static host."
+            if found is not None:
+                self.add(found[0], "error", route, found[1], FORMS_FIX, file=rel, line=line, selector=selector, url=action or None, key=action or name)
                 continue
-            if target[0] == "int":
-                if not self.index.local(target[1]).startswith(FORMS_PATH):
+            if not (posts or netlify):
+                continue
+            if action.lower().rstrip("/") == WEB3FORMS and not any(
+                tag == "input" and a.get("name", "").strip() == "access_key" and a.get("value", "").strip() for _l, tag, a in fields
+            ):
+                self.add(
+                    "forms.access-key", "error", route,
+                    f"The form on {route} posts to Web3Forms but has no hidden access_key field with a value, so Web3Forms cannot deliver it.",
+                    FORMS_FIX, file=rel, line=line, selector=selector, url=action, key=action,
+                )
+                continue
+            for field_line, tag, a in fields:
+                kind = (a.get("type", "").strip().lower() or "text") if tag == "input" else tag
+                if kind in UNSENT_TYPES or a.get("name", "").strip() or "disabled" in a:
                     continue
-            elif not local_host(urlsplit("http:" + action if action.startswith("//") else action).hostname or ""):
-                continue
-            self.add(
-                "forms.local-address", "warning", route,
-                f"The form on {route} sends to {action}, which will not answer once the site is published, so the form will not send.",
-                "In FormWeb, give the form a scripted reply (Motion > Script, trigger Submit), or point its action at a form service on the web.",
-                file=rel, line=line, selector=f'form[action="{action}"]', url=action, key=action,
-            )
+                ident = a.get("id", "").strip()
+                self.add(
+                    "forms.field-name", "warning", route,
+                    f"A field ({kind}) in the form on {route} has no name, so its value is not sent.",
+                    "Give the field a name in FormWeb. " + FORMS_FIX,
+                    file=rel, line=field_line, selector=f"#{ident}" if ident else tag, key=ident or kind,
+                )
 
     def check_css(self, rel: str) -> None:
         text = _read_text(self.root / rel)
@@ -1015,6 +1152,7 @@ class Runner:
         self.check_seo(routes)
         self.check_hreflang(routes)
         self.check_site(routes)
+        self.check_analytics(routes)
         self.check_budgets(routes)
         self.problems.sort(key=lambda p: (p["route"], p["code"], p.get("line") or 0, p["id"]))
         return self.problems

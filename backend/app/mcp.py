@@ -26,6 +26,7 @@ INSTRUCTIONS = (
     "and look at a revision in a browser with preview_site, which gives addresses on the local preview host and opens nothing. "
     "Then run_checks, build_package, inspect_build, compare_builds and reproduce_build; to sign, call list_keys and sign_build with a key the person named, then verify_build. "
     "Finish with list_targets and prepare_publish, which writes a folder per host with the commands to run (nothing is uploaded), and verify_prepared to confirm a folder still matches its build. "
+    "After the person deployed it themselves and asked for it, check_live_site reads their public site at the address they gave and reports what to fix; it uploads nothing. "
     "To start a new site, list_templates reads the template list the person fetched and start_from_template writes a FormWeb project into a folder they named; editing it happens in FormWeb. "
     "Each tool's _meta carries formpublisher/class: read (reads only), data (writes only inside FormPublisher's data folder) or path (writes to a path the person named). "
     "FormPublisher only reads from FormWeb and never changes it. "
@@ -58,6 +59,7 @@ TOOL_CLASS = {
     "prepare_publish": "data",
     "get_prepared": "read",
     "verify_prepared": "data",
+    "check_live_site": "data",
     "list_templates": "read",
     "start_from_template": "path",
     "list_trash": "read",
@@ -304,6 +306,19 @@ def build(client: Client | None = None) -> MCPServer:
         target: Annotated[str, Field(description="The target id the folder was prepared for, as listed by get_prepared.")],
     ) -> dict:
         return await run(link.verify_prepared, build, target)
+
+    @server.tool(
+        name="check_live_site",
+        description="Read the person's own public site over the internet, at the address they gave, after they deployed it themselves; it uploads nothing and sends nothing but ordinary page requests. Run it only when the person asked for it. It reports whether the bare name and www both answer (DNS and the home page), whether each certificate is valid and not within 7 days of expiry, whether http redirects to https, whether the build's redirects hold, whether an address that does not exist gets 404, and whether up to three non-HTML files match the build's SHA-256. Each problem has code (live.dns, live.tls, live.cert-expiry, live.www, live.http, live.redirect, live.404, live.build), severity, message, fix and guide, the part of docs/HOSTING.md to read (guideTopic names the paragraph in it). The result is kept in FormPublisher's data folder for the window; ok is true when there is no warning or error.",
+        annotations=ToolAnnotations(title="Check the live site", readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=True),
+    )
+    async def check_live_site(
+        id: SiteId,
+        address: Annotated[str, Field(description="The site's public address the person gave: a domain name or an https address with no path, for example example.com or https://www.example.com. Both the bare name and www are read.")],
+        build: Annotated[str | None, Field(description="A build id from list_builds to compare the site online with; default the site's newest build.")] = None,
+        target: Annotated[str | None, Field(description="The target id the site is deployed on (from list_targets), so each finding names that host's part of the guide; default the one target prepared for the build, if only one.")] = None,
+    ) -> dict:
+        return await run(link.live_check, id, address, build, target)
 
     @server.tool(
         name="list_templates",

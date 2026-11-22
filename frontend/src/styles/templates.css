@@ -5,10 +5,19 @@
 .fp-tpl-bar { display: flex; align-items: center; gap: var(--space-3); min-height: var(--ctl-sm); }
 .fp-tpl-status { flex: 1 1 0; min-width: 0; min-height: calc(2 * 1.4em); color: var(--text-secondary); font-size: var(--fs-12); line-height: 1.4; }
 .fp-tpl-status.is-error { color: var(--danger-text); }
+.fp-tpl-types { display: flex; align-items: center; gap: var(--space-2); min-width: 0; min-height: var(--ctl-sm); overflow-x: auto; overflow-y: hidden; }
+.fp-tpl-chip { display: inline-flex; align-items: center; flex: none; height: var(--ctl-sm); padding: 0 var(--space-3); border: 1px solid var(--line-2); border-radius: var(--radius-pill); background: var(--surface-1); color: var(--text-secondary); font: inherit; font-size: var(--fs-12); white-space: nowrap; cursor: pointer; transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast); }
+.fp-tpl-chip:hover { border-color: var(--line-3); color: var(--text-primary); }
+.fp-tpl-chip:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+.fp-tpl-chip[aria-pressed="true"] { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-ink); }
 .fp-tpl-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
 .fp-tpl-list { display: contents; }
 .fp-tpl-list[hidden] { display: none; }
-.fp-tpl-card { display: grid; grid-template-rows: auto auto 1fr auto auto auto; gap: 4px; min-width: 0; padding: 6px 6px 10px; border: 1px solid var(--line-1); border-radius: var(--radius-lg, var(--radius-md)); background: var(--surface-1); }
+.fp-tpl-card { display: grid; grid-template-rows: auto auto auto 1fr auto auto auto; gap: 4px; min-width: 0; padding: 6px 6px 10px; border: 1px solid var(--line-1); border-radius: var(--radius-lg, var(--radius-md)); background: var(--surface-1); }
+.fp-tpl-card[hidden] { display: none; }
+.fp-tpl-kind { display: flex; align-items: center; min-width: 0; height: 18px; margin-top: 2px; padding: 0 4px; }
+.fp-badge.fp-tpl-type { display: inline-block; max-width: 100%; overflow: hidden; line-height: 16px; text-overflow: ellipsis; }
+.fp-badge.fp-tpl-type[hidden] { display: none; }
 .fp-tpl-card.is-skeleton .fp-tpl-name, .fp-tpl-card.is-skeleton .fp-tpl-desc { color: transparent; }
 .fp-tpl-card.is-skeleton .fp-tpl-start { visibility: hidden; }
 .fp-tpl-preview { display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius-md); background: var(--surface-2); }

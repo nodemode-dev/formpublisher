@@ -1,5 +1,27 @@
 {
+  "inp": "not measured",
+  "measures": [],
   "problems": [
+    {
+      "code": "site.favicon",
+      "file": "index.html",
+      "fix": "Add a site icon in FormWeb, or put favicon.ico at the root of the site.",
+      "id": "static:site.favicon:/:",
+      "message": "The site has no favicon.",
+      "route": "/",
+      "severity": "warning",
+      "tier": "static"
+    },
+    {
+      "code": "seo.og",
+      "file": "404/index.html",
+      "fix": "Add og:title, og:type, og:image and og:url so links to the page show a full preview.",
+      "id": "static:seo.og:404/index.html:",
+      "message": "The page has no og:image Open Graph tag.",
+      "route": "/404/index.html",
+      "severity": "info",
+      "tier": "static"
+    },
     {
       "code": "link.broken",
       "file": "about/index.html",
@@ -14,6 +36,16 @@
       "url": "/missing"
     },
     {
+      "code": "seo.og",
+      "file": "about/index.html",
+      "fix": "Add og:title, og:type, og:image and og:url so links to the page show a full preview.",
+      "id": "static:seo.og:about/index.html:",
+      "message": "The page has no og:image Open Graph tag.",
+      "route": "/about/index.html",
+      "severity": "info",
+      "tier": "static"
+    },
+    {
       "code": "heading.h1",
       "file": "index.html",
       "fix": "Use exactly one h1 heading per page.",
@@ -22,6 +54,16 @@
       "message": "The page has 2 h1 headings.",
       "route": "/index.html",
       "severity": "warning",
+      "tier": "static"
+    },
+    {
+      "code": "seo.og",
+      "file": "index.html",
+      "fix": "Add og:title, og:type, og:image and og:url so links to the page show a full preview.",
+      "id": "static:seo.og:index.html:",
+      "message": "The page has no og:image Open Graph tag.",
+      "route": "/index.html",
+      "severity": "info",
       "tier": "static"
     },
     {
@@ -34,21 +76,31 @@
       "route": "/product/index.html",
       "severity": "warning",
       "tier": "static"
+    },
+    {
+      "code": "seo.og",
+      "file": "product/index.html",
+      "fix": "Add og:title, og:type, og:image and og:url so links to the page show a full preview.",
+      "id": "static:seo.og:product/index.html:",
+      "message": "The page has no og:image Open Graph tag.",
+      "route": "/product/index.html",
+      "severity": "info",
+      "tier": "static"
     }
   ],
   "running": null,
   "summary": {
     "errors": 1,
-    "infos": 0,
+    "infos": 4,
     "ran": [
       "static"
     ],
     "tiers": {
       "deep": 0,
       "live": 0,
-      "static": 3
+      "static": 8
     },
-    "warnings": 2
+    "warnings": 3
   },
   "thumbs": {}
 }

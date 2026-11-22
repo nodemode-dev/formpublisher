@@ -15,11 +15,11 @@
 </p>
 
 <p align="center">
-  What it does not do: FormPublisher hosts nothing, uploads nothing and buys no domain; it has no editor of its own (sites are edited in FormWeb, free and in the same family) and no shop, forms backend or CMS.
+  What it does not do: FormPublisher hosts nothing, uploads nothing and buys no domain, and it has no editor of its own. Sites are edited in FormWeb, free and in the same family, and FormWeb, not FormPublisher, has the CMS. The sites FormPublisher prepares are static files, so on your host neither app gives them a shop checkout, bookings, member accounts, email campaigns or a cookie banner. Forms send through your host's form feature or a form service, and the guide shows both. FormWeb's shop, member and consent controls need its own server or a provider you connect.
 </p>
 
 <p align="center">
-  <img alt="version 0.9.0" src="https://img.shields.io/badge/version-0.9.0-4f6bff?style=flat-square">
+  <img alt="version 0.10.0" src="https://img.shields.io/badge/version-0.10.0-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -134,7 +134,7 @@
     </td>
     <td width="50%" valign="top">
       <h3>Agent tools</h3>
-      27 command line commands and 29 MCP tools (listed in <a href="docs/mcp-tools.json">docs/mcp-tools.json</a>, generated from the code) cover the whole path from a template or an import to a prepared folder and its verify, and the trash, so Claude Code, Codex, Cursor and Antigravity do what a person does in the window. Deleting for good stays a person's action.
+      28 command line commands and 30 MCP tools (listed in <a href="docs/mcp-tools.json">docs/mcp-tools.json</a>, generated from the code) cover the whole path from a template or an import to a prepared folder and its verify, the live-site check after the person deployed it, and the trash, so Claude Code, Codex, Cursor and Antigravity do what a person does in the window. Deleting for good stays a person's action.
     </td>
   </tr>
   <tr>
@@ -231,7 +231,7 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
 <table>
   <tr>
     <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Builds · Trash · Demos · menubar · site tabs · routes strip · inspector · bottom panel · agent dock · status bar · Preferences · Keyboard Shortcuts</td>
-    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · preview · check · build · inspect · compare · reproduce · sign · verify · keys · fpub · targets · prepare · prepared · verify-prepared · trash · receive-status · templates · start</td>
+    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · preview · check · build · inspect · compare · reproduce · sign · verify · keys · fpub · targets · prepare · prepared · verify-prepared · live-check · trash · receive-status · templates · start</td>
     <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · .fweb project · .fpub package · publication folder · the running FormWeb's current site or a saved project · sent from FormWeb (endpoint or inbox) · the demo</td>
   </tr>
 </table>
@@ -269,6 +269,7 @@ The window, the command line and the MCP server call one engine, so an agent and
 | `keys`, `keys --create NAME`, `keys --export ID --to FILE [--force]`, `keys --import FILE [--name NAME]` | list keys and where each secret is kept, create one, export one to an encrypted `.pem` file (it asks for a passphrase of at least 8 characters), import one from such a file |
 | `targets`, `prepare BUILD --target T [--include-model]`, `prepared BUILD` | list hosts, prepare a folder per host (FormWeb's model files left out unless `--include-model`), list what is prepared |
 | `verify-prepared BUILD TARGET` | check that a prepared folder still matches its build (exits 1 when it does not) |
+| `live-check ID --address DOMAIN [--build B] [--target T]` | after you deployed it yourself, read your public site and print one line per finding: DNS, certificates, `www`, http to https, the build's redirects, the 404, and whether it is this build (reads only; exits 1 on a warning or error) |
 | `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back (`--to PATH` names the place when it is unknown; `--passphrase-stdin` reads one line for a locked key rebuilt from its `.pem`), delete one for good, empty it (refuses without `--yes`) |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
 | `templates [--fetch]`, `start TEMPLATE --to FOLDER` | the kept template list (`--fetch` reads it now), and a FormWeb project made from one |
@@ -293,6 +294,7 @@ Every command takes `--json`. The MCP server's tools work over the same routes; 
 | `list_targets`, `get_prepared` | read | list the six hosts, read what is prepared |
 | `prepare_publish` | data | prepare folders with their commands (`includeModel` keeps FormWeb's model files); marked destructive, as it deletes the target's previous folder first |
 | `verify_prepared` | data | check that a prepared folder still matches its build, keeping the verdict beside the folder |
+| `check_live_site` | data | read the person's public site over the internet at the address they gave (the network; it uploads nothing) and keep the findings in the data folder |
 | `list_trash` | read | read the trash |
 | `restore_from_trash` | data | move an entry back to its recorded or inferred origin (no tool deletes) |
 | `list_templates` | read | read the template list the person fetched |

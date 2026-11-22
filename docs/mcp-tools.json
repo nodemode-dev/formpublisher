@@ -1,12 +1,12 @@
 {
   "generated": "./formpublisher agents sync from backend/app/mcp.py and backend/app/cli.py; do not edit by hand",
   "counts": {
-    "tools": 29,
+    "tools": 30,
     "read": 17,
-    "data": 10,
+    "data": 11,
     "path": 2
   },
-  "commandCount": 27,
+  "commandCount": 28,
   "commands": [
     "status",
     "sites",
@@ -30,6 +30,7 @@
     "prepare",
     "prepared",
     "verify-prepared",
+    "live-check",
     "preview",
     "trash",
     "receive-status",
@@ -61,6 +62,19 @@
         "openWorldHint": false
       },
       "description": "Build the deterministic package for a site's revision in FormPublisher's data folder: site.zip plus publish.json with the SHA-256 and size of every file, the routes, redirects, headers and the summary of the checks stored at that moment."
+    },
+    {
+      "name": "check_live_site",
+      "title": "Check the live site",
+      "class": "data",
+      "annotations": {
+        "title": "Check the live site",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      },
+      "description": "Read the person's own public site over the internet, at the address they gave, after they deployed it themselves; it uploads nothing and sends nothing but ordinary page requests."
     },
     {
       "name": "compare_builds",

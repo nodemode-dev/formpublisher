@@ -10,7 +10,7 @@ from pathlib import Path
 from app import targets
 from app.services import intake, package, paths, trash
 from app.services.bus import bus
-from app.targets._common import MODEL_FILES, PreparedInput, PreparedResult
+from app.targets._common import MODEL_FILES, PreparedInput, PreparedResult, netlify_forms
 
 _lock = threading.RLock()
 
@@ -90,6 +90,7 @@ def _build_folder(module, inp: PreparedInput, out: Path) -> PreparedResult:
     result = module.prepare(inp, out)
     if not isinstance(result, PreparedResult):
         raise _error(f"target {module.ID} returned an invalid result", 500)
+    netlify_forms(inp, result, module.ID, getattr(module, "NAME", module.ID))
     if inp.excluded and module.ID != "static-zip":
         result.notes.append(f"Left out FormWeb's model files ({', '.join(inp.excluded)}). Prepare again with includeModel to keep them in site/.")
     elif module.ID == "static-zip" and any(n in MODEL_FILES for n in inp.names + inp.excluded):

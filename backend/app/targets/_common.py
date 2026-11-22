@@ -143,3 +143,18 @@ def netlify_style(inp: PreparedInput, result: PreparedResult, with_404: bool) ->
         blocks.append(pattern + "\n" + "".join(f"  {k}: {v}\n" for k, v in sorted(values.items())))
     headers = "\n".join(blocks) if blocks else "# No custom headers.\n"
     return redirects, headers
+
+
+NETLIFY_FORM = re.compile(rb"""<form\b[^>]*?\s(?:netlify|data-netlify\s*=\s*["']?true)(?=[\s>/="'])""", re.I)
+
+
+def netlify_forms(inp: PreparedInput, result: PreparedResult, target_id: str, target_name: str) -> None:
+    pages = [n for n in inp.names if n.lower().endswith((".html", ".htm")) and NETLIFY_FORM.search(inp.read(n))]
+    if not pages:
+        return
+    shown = ", ".join(pages[:5]) + (f" and {len(pages) - 5} more" if len(pages) > 5 else "")
+    if target_id == "netlify":
+        result.notes.append(f"A form on {shown} has Netlify's form attribute. Netlify's form detection is off until you turn it on: open the project's Forms page, choose Enable form detection, then deploy again. See Forms in the hosting guide.")
+    else:
+        where = "Unless your host is Netlify" if target_id == "static-zip" else f"On {target_name}"
+        result.warnings.append(f"A form on {shown} has Netlify's form attribute. {where}, that form delivers nothing. See Forms in the hosting guide.")

@@ -1,14 +1,25 @@
 import '../styles/templates.css';
 import { api } from '../api';
 import type { App } from '../app-api';
-import { templatesApi, type StartedSite, type TemplateItem, type TemplateList } from '../api-templates';
+import { SITE_TYPES, templatesApi, type SiteType, type StartedSite, type TemplateItem, type TemplateList } from '../api-templates';
 import { onLanguage } from '../i18n';
 import { fmtCount, fmtDate } from './builds';
 import { Dialog } from './dialogs';
-import { el, inTauri, patchList, q, setDisabled, setHidden, setText } from './dom';
+import { el, inTauri, patchList, q, setAttr, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
 
 const SKELETONS = 3;
+
+type Filter = SiteType | 'all';
+
+const TYPE_LABELS: Record<Filter, string> = {
+  all: 'All',
+  business: 'Business and services',
+  portfolio: 'Portfolio',
+  blog: 'Blog',
+  event: 'Event',
+  shop: 'Shop window',
+};
 
 const megabytes = (bytes: number): string => `${(bytes / 1048576).toFixed(1)} MB`;
 
@@ -21,10 +32,12 @@ async function openExternal(target: string): Promise<void> {
   window.open(target, '_blank', 'noopener');
 }
 
-const skeleton = (): string => `<div class="fp-tpl-card is-skeleton" aria-hidden="true"><span class="fp-tpl-preview"></span><span class="fp-tpl-name">&nbsp;</span><span class="fp-tpl-desc">&nbsp;</span><span class="fp-tpl-meta"></span><span class="fp-tpl-credit"></span><span class="fp-btn fp-btn-sm fp-tpl-start">${icon('plus', 14)}<span>Start a site from this</span></span></div>`;
+const skeleton = (): string => `<div class="fp-tpl-card is-skeleton" aria-hidden="true"><span class="fp-tpl-preview"></span><span class="fp-tpl-kind"></span><span class="fp-tpl-name">&nbsp;</span><span class="fp-tpl-desc">&nbsp;</span><span class="fp-tpl-meta"></span><span class="fp-tpl-credit"></span><span class="fp-btn fp-btn-sm fp-tpl-start">${icon('plus', 14)}<span>Start a site from this</span></span></div>`;
 
 export class TemplatesSheet extends Dialog {
   private readonly list: HTMLElement;
+  private readonly types: HTMLElement;
+  private filter: Filter = 'all';
   private readonly status: HTMLElement;
   private readonly said: HTMLElement;
   private readonly more: HTMLElement;
@@ -40,6 +53,7 @@ export class TemplatesSheet extends Dialog {
     this.body.appendChild(el(`<div class="fp-tpl-wrap">
 <p class="fp-tpl-intro">Start a site from a template, edit it in FormWeb, then check, package and publish it here. The list comes from the public formai-templates repository on GitHub. Nothing is fetched until you ask.</p>
 <div class="fp-tpl-bar"><button class="fp-btn fp-btn-primary fp-btn-sm" type="button" data-a="get">${icon('download', 14)}<span data-f="getlabel">Get the templates</span></button><span class="fp-tpl-status" data-f="status" role="status"><span data-f="said"></span> <span data-f="more"></span></span></div>
+<div class="fp-tpl-types" role="group" aria-label="Site type"></div>
 <div class="fp-tpl-grid">${Array.from({ length: SKELETONS }, skeleton).join('')}<div class="fp-tpl-list" hidden></div></div>
 <div class="fp-tpl-none"></div>
 <section class="fp-tpl-done" aria-live="polite">
@@ -53,6 +67,7 @@ export class TemplatesSheet extends Dialog {
 </section>
 </div>`));
     this.list = q(this.body, '.fp-tpl-list');
+    this.types = q(this.body, '.fp-tpl-types');
     this.status = q(this.body, '[data-f="status"]');
     this.said = q(this.status, '[data-f="said"]');
     this.more = q(this.status, '[data-f="more"]');
@@ -65,6 +80,7 @@ export class TemplatesSheet extends Dialog {
       if (!t) return;
       const action = t.dataset.a;
       if (action === 'get') void this.refresh();
+      else if (action === 'type') this.choose((t.dataset.key ?? 'all') as Filter);
       else if (action === 'start') void this.start(t.closest<HTMLElement>('[data-key]')?.dataset.key ?? '', t.closest<HTMLElement>('[data-key]')?.dataset.name ?? '');
       else if (action === 'edit') void this.edit();
       else if (action === 'publish') void this.publish();
@@ -100,6 +116,26 @@ export class TemplatesSheet extends Dialog {
       create: (item) => this.card(item),
       update: (node, item) => this.fill(node, item),
     });
+    const present = SITE_TYPES.filter((type) => data.items.some((item) => item.type === type));
+    if (this.filter !== 'all' && !present.includes(this.filter)) this.filter = 'all';
+    patchList<Filter>(this.types, present.length ? ['all', ...present] : [], {
+      key: (type) => type,
+      create: (type) => el(`<button class="fp-tpl-chip" type="button" data-a="type" data-key="${type}" aria-pressed="false">${TYPE_LABELS[type]}</button>`),
+      update: () => undefined,
+    });
+    this.applyFilter();
+  }
+
+  private choose(next: Filter): void {
+    if (next !== 'all' && !(SITE_TYPES as readonly string[]).includes(next)) return;
+    if (next === this.filter) return;
+    this.filter = next;
+    this.applyFilter();
+  }
+
+  private applyFilter(): void {
+    for (const chip of Array.from(this.types.children) as HTMLElement[]) setAttr(chip, 'aria-pressed', String(chip.dataset.key === this.filter));
+    for (const card of Array.from(this.list.children) as HTMLElement[]) setHidden(card, this.filter !== 'all' && card.dataset.type !== this.filter);
   }
 
   private sayKept(data: TemplateList): void {
@@ -111,7 +147,7 @@ export class TemplatesSheet extends Dialog {
   }
 
   private card(item: TemplateItem): HTMLElement {
-    const node = el(`<article class="fp-tpl-card" data-key=""><span class="fp-tpl-preview"><img alt="" width="320" height="180" decoding="async" draggable="false"></span><span class="fp-tpl-name" translate="no"></span><span class="fp-tpl-desc"></span><span class="fp-tpl-meta"></span><span class="fp-tpl-credit"></span><button class="fp-btn fp-btn-sm fp-tpl-start" type="button" data-a="start">${icon('plus', 14)}<span>Start a site from this</span></button></article>`);
+    const node = el(`<article class="fp-tpl-card" data-key=""><span class="fp-tpl-preview"><img alt="" width="320" height="180" decoding="async" draggable="false"></span><span class="fp-tpl-kind"><span class="fp-badge fp-tpl-type" hidden></span></span><span class="fp-tpl-name" translate="no"></span><span class="fp-tpl-desc"></span><span class="fp-tpl-meta"></span><span class="fp-tpl-credit"></span><button class="fp-btn fp-btn-sm fp-tpl-start" type="button" data-a="start">${icon('plus', 14)}<span>Start a site from this</span></button></article>`);
     const img = q<HTMLImageElement>(node, 'img');
     img.addEventListener('load', () => img.classList.add('is-loaded'));
     this.fill(node, item);
@@ -125,6 +161,12 @@ export class TemplatesSheet extends Dialog {
     setText(q(node, '.fp-tpl-desc'), item.description || 'A whole FormWeb site with its pages and pictures.');
     setText(q(node, '.fp-tpl-meta'), `${megabytes(item.bytes)} · ${item.licence}`);
     setText(q(node, '.fp-tpl-credit'), item.credit);
+    if (node.dataset.type !== item.type) {
+      node.dataset.type = item.type;
+      const badge = q(node, '.fp-tpl-type');
+      setText(badge, item.type ? TYPE_LABELS[item.type] : '');
+      setHidden(badge, !item.type);
+    }
     const img = q<HTMLImageElement>(node, 'img');
     const src = item.preview ? templatesApi.previewUrl(item.id) : '';
     if (img.dataset.src !== src) {

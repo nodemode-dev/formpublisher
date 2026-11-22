@@ -1,7 +1,29 @@
 /* Generated from checks.json, publish.json and prepared.json (real runs of the engine). Loaded as a script so the demo opens from disk. */
 window.FP_DEMO = {
  "checks": {
+  "inp": "not measured",
+  "measures": [],
   "problems": [
+   {
+    "code": "site.favicon",
+    "file": "index.html",
+    "fix": "Add a site icon in FormWeb, or put favicon.ico at the root of the site.",
+    "id": "static:site.favicon:/:",
+    "message": "The site has no favicon.",
+    "route": "/",
+    "severity": "warning",
+    "tier": "static"
+   },
+   {
+    "code": "seo.og",
+    "file": "404/index.html",
+    "fix": "Add og:title, og:type, og:image and og:url so links to the page show a full preview.",
+    "id": "static:seo.og:404/index.html:",
+    "message": "The page has no og:image Open Graph tag.",
+    "route": "/404/index.html",
+    "severity": "info",
+    "tier": "static"
+   },
    {
     "code": "link.broken",
     "file": "about/index.html",
@@ -16,6 +38,16 @@ window.FP_DEMO = {
     "url": "/missing"
    },
    {
+    "code": "seo.og",
+    "file": "about/index.html",
+    "fix": "Add og:title, og:type, og:image and og:url so links to the page show a full preview.",
+    "id": "static:seo.og:about/index.html:",
+    "message": "The page has no og:image Open Graph tag.",
+    "route": "/about/index.html",
+    "severity": "info",
+    "tier": "static"
+   },
+   {
     "code": "heading.h1",
     "file": "index.html",
     "fix": "Use exactly one h1 heading per page.",
@@ -24,6 +56,16 @@ window.FP_DEMO = {
     "message": "The page has 2 h1 headings.",
     "route": "/index.html",
     "severity": "warning",
+    "tier": "static"
+   },
+   {
+    "code": "seo.og",
+    "file": "index.html",
+    "fix": "Add og:title, og:type, og:image and og:url so links to the page show a full preview.",
+    "id": "static:seo.og:index.html:",
+    "message": "The page has no og:image Open Graph tag.",
+    "route": "/index.html",
+    "severity": "info",
     "tier": "static"
    },
    {
@@ -36,45 +78,60 @@ window.FP_DEMO = {
     "route": "/product/index.html",
     "severity": "warning",
     "tier": "static"
+   },
+   {
+    "code": "seo.og",
+    "file": "product/index.html",
+    "fix": "Add og:title, og:type, og:image and og:url so links to the page show a full preview.",
+    "id": "static:seo.og:product/index.html:",
+    "message": "The page has no og:image Open Graph tag.",
+    "route": "/product/index.html",
+    "severity": "info",
+    "tier": "static"
    }
   ],
   "running": null,
   "summary": {
    "errors": 1,
-   "infos": 0,
+   "infos": 4,
    "ran": [
     "static"
    ],
    "tiers": {
     "deep": 0,
     "live": 0,
-    "static": 3
+    "static": 8
    },
-   "warnings": 2
+   "warnings": 3
   },
   "thumbs": {}
  },
  "prepared": {
-  "build": "c0fbe406652f",
+  "build": "1b6cac412739",
   "results": {
    "cloudflare-pages": {
     "commands": [
      {
       "cwd": ".",
+      "label": "Create the project (the first time only)",
+      "run": "npx wrangler@4 pages project create northwind-notes-2f2448 --production-branch main"
+     },
+     {
+      "cwd": ".",
       "label": "Deploy",
-      "run": "npx wrangler pages deploy site --project-name northwind-notes-17959d"
+      "run": "npx wrangler@4 pages deploy site --project-name northwind-notes-2f2448"
      },
      {
       "cwd": ".",
       "label": "Run it locally",
-      "run": "npx wrangler pages dev site"
+      "run": "npx wrangler@4 pages dev site"
      }
     ],
     "files": [
      {
       "path": "site/404.html",
-      "sha256": "7afe07b96db69cb4ca2e298399f149d342d38929e3960ec9598aeb4a4393d931",
-      "size": 10052
+      "sha256": "59699609e61e6ae795822eeee92bb4fa70c5c43a7d3cec18977f79f09fea5424",
+      "size": 10028
      },
      {
       "path": "site/404/index.html",
@@ -212,7 +269,7 @@ window.FP_DEMO = {
       "size": 523
      }
     ],
-    "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/cloudflare-pages",
+    "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/cloudflare-pages",
     "includeModel": false,
     "leftOut": [
      "asset-access.json",
@@ -222,9 +279,10 @@ window.FP_DEMO = {
     "notes": [
      "Cloudflare allows 2000 static and 100 dynamic redirect rules in _redirects.",
      "No 404 rule is written: Pages serves 404.html on its own when the file exists.",
+     "This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.",
      "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
     ],
-    "preparedAt": "2026-11-10T09:23:25Z",
+    "preparedAt": "2026-11-22T22:39:03Z",
     "warnings": []
    },
    "github-pages": {
@@ -263,13 +321,13 @@ window.FP_DEMO = {
     "files": [
      {
       "path": ".github/workflows/pages.yml",
-      "sha256": "350d12b5c4935582aa5dbb975771009511ccafbef0e3f02cf5493e3bbe3ca908",
-      "size": 577
+      "sha256": "27836a4e1873543c01b9b466e8ad17433b37439ee633f1f3f23e9b60276cf42c",
+      "size": 614
      },
      {
       "path": "redirects/README.txt",
-      "sha256": "5353f11f8d9bd98057c276b30a70ad1cf5d3233b3435af35f9c6b443775314d7",
-      "size": 397
+      "sha256": "a8a08e7e4bb972af25c153f1dd5c5c0490918d44039ff448e4c8b28ca9aa1dcb",
+      "size": 398
      },
      {
       "path": "site/.nojekyll",
@@ -278,8 +336,8 @@ window.FP_DEMO = {
      },
      {
       "path": "site/404.html",
-      "sha256": "7afe07b96db69cb4ca2e298399f149d342d38929e3960ec9598aeb4a4393d931",
-      "size": 10052
+      "sha256": "59699609e61e6ae795822eeee92bb4fa70c5c43a7d3cec18977f79f09fea5424",
+      "size": 10028
      },
      {
       "path": "site/404/index.html",
@@ -383,13 +441,13 @@ window.FP_DEMO = {
      },
      {
       "path": "site/notes/index.html",
-      "sha256": "f2478cdf90b16464ca1cf888933bf4025d78016752c64397f214658bb9557705",
-      "size": 312
+      "sha256": "0ffbc6cead252dc71b7a903daaa14d292dc69215467e1eae13fd8af6960536df",
+      "size": 500
      },
      {
       "path": "site/pricing/index.html",
-      "sha256": "3bb616382e1a52bb9364fb677754810af17026282c86e954192e9a9837d94577",
-      "size": 304
+      "sha256": "c8a272e0ef069086155be17ce0a420450cecd063afcd0ddb1f44af3593b11b89",
+      "size": 490
      },
      {
       "path": "site/product/index.html",
@@ -417,7 +475,7 @@ window.FP_DEMO = {
       "size": 523
      }
     ],
-    "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/github-pages",
+    "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/github-pages",
     "includeModel": false,
     "leftOut": [
      "asset-access.json",
@@ -426,13 +484,14 @@ window.FP_DEMO = {
     "name": "GitHub Pages",
     "notes": [
      "The site's own 404.html is used for unknown paths.",
+     "This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.",
      "2 redirect(s) became meta-refresh pages; see redirects/README.txt.",
      "Then set Settings > Pages > Source to the gh-pages branch.",
      "Or copy .github/workflows/pages.yml into your repository (with the site/ folder) and set Pages > Source to GitHub Actions.",
      ".nojekyll stops GitHub from running Jekyll over the files.",
      "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
     ],
-    "preparedAt": "2026-11-10T09:23:25Z",
+    "preparedAt": "2026-11-22T22:39:03Z",
     "warnings": [
      "GitHub Pages ignores custom headers, so Referrer-Policy, X-Content-Type-Options for /* will not be sent.",
      "GitHub Pages ignores custom headers, so Cache-Control for /assets/* will not be sent."
@@ -443,24 +502,24 @@ window.FP_DEMO = {
      {
       "cwd": ".",
       "label": "Draft deploy (preview URL)",
-      "run": "npx netlify-cli deploy --dir site"
+      "run": "npx netlify-cli@27 deploy --dir site"
      },
      {
       "cwd": ".",
       "label": "Production deploy",
-      "run": "npx netlify-cli deploy --dir site --prod"
+      "run": "npx netlify-cli@27 deploy --dir site --prod"
      },
      {
       "cwd": ".",
       "label": "Run it locally",
-      "run": "npx netlify-cli dev --dir site"
+      "run": "npx netlify-cli@27 dev --dir site"
      }
     ],
     "files": [
      {
       "path": "site/404.html",
-      "sha256": "7afe07b96db69cb4ca2e298399f149d342d38929e3960ec9598aeb4a4393d931",
-      "size": 10052
+      "sha256": "59699609e61e6ae795822eeee92bb4fa70c5c43a7d3cec18977f79f09fea5424",
+      "size": 10028
      },
      {
       "path": "site/404/index.html",
@@ -598,7 +657,7 @@ window.FP_DEMO = {
       "size": 523
      }
     ],
-    "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/netlify",
+    "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/netlify",
     "includeModel": false,
     "leftOut": [
      "asset-access.json",
@@ -609,22 +668,18 @@ window.FP_DEMO = {
      "You can also drag the site folder onto app.netlify.com/drop.",
      "_redirects lists exact rules first, then splat rules; Netlify uses the first match.",
      "A final rule serves 404.html with status 404 for unknown paths.",
+     "This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.",
      "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
     ],
-    "preparedAt": "2026-11-10T09:23:25Z",
+    "preparedAt": "2026-11-22T22:39:03Z",
     "warnings": []
    },
    "nginx": {
     "commands": [
      {
       "cwd": ".",
-      "label": "Prepare a scratch folder for the check",
-      "run": "mkdir -p /tmp/formpublisher-nginx"
-     },
-     {
-      "cwd": ".",
       "label": "Check the config",
-      "run": "nginx -t -p /tmp/formpublisher-nginx/ -c \"$PWD/nginx-test.conf\""
+      "run": "sh nginx-check.sh"
      },
      {
       "cwd": ".",
@@ -635,18 +690,23 @@ window.FP_DEMO = {
     "files": [
      {
       "path": "formpublisher.conf",
-      "sha256": "f936bb5eb2d586e35b40620c26295b7f030ab998e04c6f8392f0735485480254",
-      "size": 1200
+      "sha256": "5e45092e8e1ef03dce379d50dec5bf22f7e5ef1378aa80868380148805674e81",
+      "size": 1252
+     },
+     {
+      "path": "nginx-check.sh",
+      "sha256": "cfdd5147b2f4096e2ef6705c78bf141baee81c09a4f006da2657481618ee7dae",
+      "size": 2685
      },
      {
       "path": "nginx-test.conf",
-      "sha256": "b577acf8c39173afedd31ec6a9d6ac50379b098af6f475f388de1418c9b1fdc5",
-      "size": 763
+      "sha256": "2a578ffbbb52ca046a0d79ad30c099d8111e6b98517eb8f75cd54a5626469978",
+      "size": 738
      },
      {
       "path": "site/404.html",
-      "sha256": "7afe07b96db69cb4ca2e298399f149d342d38929e3960ec9598aeb4a4393d931",
-      "size": 10052
+      "sha256": "59699609e61e6ae795822eeee92bb4fa70c5c43a7d3cec18977f79f09fea5424",
+      "size": 10028
      },
      {
       "path": "site/404/index.html",
@@ -774,7 +834,7 @@ window.FP_DEMO = {
       "size": 523
      }
     ],
-    "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/nginx",
+    "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/nginx",
     "includeModel": false,
     "leftOut": [
      "asset-access.json",
@@ -783,11 +843,14 @@ window.FP_DEMO = {
     "name": "nginx",
     "notes": [
      "formpublisher.conf is one server block for conf.d; nginx-test.conf wraps it so nginx -t can parse it alone.",
+     "nginx-check.sh runs nginx -t on a scratch copy with unix sockets instead of ports, then again with each listen line on a loopback port (NGINX_CHECK_PORT sets the first one), so it needs no root, no IPv6 and no network and changes nothing in this folder.",
      "Unknown paths return 404 through try_files and show the site's 404.html.",
+     "This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.",
      "absolute_redirect is off so redirects keep working behind a port mapping or a proxy.",
-     "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
+     "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/.",
+     "nginx -t runs where nginx is installed; nginx was not found on this machine, so the config was not checked here."
     ],
-    "preparedAt": "2026-11-10T09:23:25Z",
+    "preparedAt": "2026-11-22T22:39:03Z",
     "warnings": []
    },
    "static-zip": {
@@ -806,18 +869,18 @@ window.FP_DEMO = {
     "files": [
      {
       "path": "README.txt",
-      "sha256": "a6e0ed39d4e44c8a4c19e67d806247ea04b80e18a311f8d95e1ba1f0d67c734d",
+      "sha256": "f42639a4e909773744bf5eeca57a38f44e0c37c7971a742e60c075bff9ae501a",
       "size": 609
      },
      {
       "path": "SHA256SUMS",
-      "sha256": "22313803a5a69c881bf3a44251ef6c9ea6e1b5247d51eb776997d2eeddf3ec47",
+      "sha256": "d7f54f76e27959c0d1756af9f45ec1741c19e4a8d3a6d92690959a8930c739fc",
       "size": 154
      },
      {
       "path": "publish.json",
-      "sha256": "80d5b133d16ecd027ca0dff2b86f1b7adbb128a9e9b7c4e9fb7c33d55c518ca2",
-      "size": 6281
+      "sha256": "0edad11851c285f178d57c75c688ae7a16038d2ac85c1737143140845af3eee3",
+      "size": 6282
      },
      {
       "path": "site.zip",
@@ -825,16 +888,17 @@ window.FP_DEMO = {
       "size": 377852
      }
     ],
-    "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/static-zip",
+    "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/static-zip",
     "includeModel": false,
     "leftOut": [],
     "name": "Static zip",
     "notes": [
      "site.zip is the build's own bytes, so its hash matches publish.json and any signature.",
      "This host has no server rules: redirects and headers in publish.json are not applied by a plain file server.",
+     "This export has 404/index.html and no 404.html; a host that needs a 404.html must be given a copy of it.",
      "site.zip is unchanged, so it still holds FormWeb's model files. The includeModel option only affects the site/ folders of the other hosts."
     ],
-    "preparedAt": "2026-11-10T09:23:25Z",
+    "preparedAt": "2026-11-22T22:39:03Z",
     "warnings": []
    },
    "vercel": {
@@ -842,24 +906,24 @@ window.FP_DEMO = {
      {
       "cwd": ".",
       "label": "Preview deploy",
-      "run": "npx vercel deploy site"
+      "run": "npx vercel@66 deploy site"
      },
      {
       "cwd": ".",
       "label": "Production deploy",
-      "run": "npx vercel deploy site --prod"
+      "run": "npx vercel@66 deploy site --prod"
      },
      {
       "cwd": ".",
       "label": "Run it locally",
-      "run": "npx vercel dev site"
+      "run": "npx vercel@66 dev site"
      }
     ],
     "files": [
      {
       "path": "site/404.html",
-      "sha256": "7afe07b96db69cb4ca2e298399f149d342d38929e3960ec9598aeb4a4393d931",
-      "size": 10052
+      "sha256": "59699609e61e6ae795822eeee92bb4fa70c5c43a7d3cec18977f79f09fea5424",
+      "size": 10028
      },
      {
       "path": "site/404/index.html",
@@ -992,7 +1056,7 @@ window.FP_DEMO = {
       "size": 716
      }
     ],
-    "folder": "/tmp/fplab-8405/home/prepared/northwind-notes-17959d/c0fbe406652f/vercel",
+    "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/vercel",
     "includeModel": false,
     "leftOut": [
      "asset-access.json",
@@ -1001,9 +1065,10 @@ window.FP_DEMO = {
     "name": "Vercel",
     "notes": [
      "vercel.json sits inside site/ so the deploy picks it up; Vercel serves 404.html itself when the file exists.",
+     "This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.",
      "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
     ],
-    "preparedAt": "2026-11-10T09:23:25Z",
+    "preparedAt": "2026-11-22T22:39:03Z",
     "warnings": []
    }
   }
@@ -1011,16 +1076,16 @@ window.FP_DEMO = {
  "publish": {
   "created": true,
   "files": 27,
-  "id": "c0fbe406652f",
+  "id": "1b6cac412739",
   "publish": {
-   "builtWith": "FormPublisher 0.1.2",
+   "builtWith": "FormPublisher 0.10.0",
    "checks": {
     "errors": 1,
-    "infos": 0,
+    "infos": 4,
     "tiers": [
      "static"
     ],
-    "warnings": 2
+    "warnings": 3
    },
    "files": [
     {
@@ -1223,19 +1288,19 @@ window.FP_DEMO = {
     }
    ],
    "site": {
-    "id": "northwind-notes-17959d",
-    "name": "northwind-notes",
-    "revision": "20261110T092325Z",
+    "id": "northwind-notes-2f2448",
+    "name": "Northwind Notes",
+    "revision": "20261122T223903Z",
     "source": {
      "kind": "formweb-export"
     }
    },
    "version": 1
   },
-  "revision": "20261110T092325Z",
+  "revision": "20261122T223903Z",
   "signature": false,
   "signed": false,
-  "site": "northwind-notes-17959d",
+  "site": "northwind-notes-2f2448",
   "size": 377852
  }
 };

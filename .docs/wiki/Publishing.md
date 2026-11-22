@@ -13,9 +13,9 @@ Every folder is written from the build's own `site.zip`, never from the live sit
 | Host | Writes | Commands |
 | --- | --- | --- |
 | Static zip | `site.zip`, `publish.json`, `SHA256SUMS`, `README.txt` | `unzip`, `python3 -m http.server` |
-| Netlify | `site/` with `_redirects` (and a `/* /404.html 404` rule when the site has a 404 page) and `_headers` | `npx netlify-cli deploy --dir site`, with `--prod`, and `dev` |
-| Cloudflare Pages | `site/` with `_redirects` and `_headers`; no 404 rule, Pages serves `404.html` itself | `npx wrangler pages deploy site`, and `pages dev` |
-| Vercel | `site/` with `vercel.json` | `npx vercel deploy site`, with `--prod`, and `dev` |
+| Netlify | `site/` with `_redirects` (and a `/* /404.html 404` rule when the site has a 404 page) and `_headers` | `npx netlify-cli@27 deploy --dir site`, with `--prod`, and `dev` |
+| Cloudflare Pages | `site/` with `_redirects` and `_headers`; no 404 rule, Pages serves `404.html` itself | `npx wrangler@4 pages project create` the first time, `npx wrangler@4 pages deploy site`, and `pages dev` |
+| Vercel | `site/` with `vercel.json` | `npx vercel@66 deploy site`, with `--prod`, and `dev` |
 | GitHub Pages | `site/` with `.nojekyll`, a `404.html` that also follows folder redirects, redirect pages (a script that keeps the query and hash, with a meta refresh as the fallback), and a workflow in `.github/workflows/pages.yml` | `git` for a `gh-pages` branch, or the workflow |
 | nginx | `site/` with `formpublisher.conf`, `nginx-test.conf` and `nginx-check.sh` | `sh nginx-check.sh`, and `docker run` with `nginx:stable` |
 

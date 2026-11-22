@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.10.0 · 2026-11-22
+
+- Eight whole sites to start from, up from three. FormWeb 0.28.0 adds a business, a portfolio, a blog, an event and a shop window. Each card shows its site type, and chips filter the list by type.
+- Templates come from a fixed release of formai-templates (v0.2.0), not from its main branch, and a preview shows only when its SHA-256 matches the index.
+- Forms that work on a static host. A form with nowhere to send its data is now an error that names the new Forms part of the hosting guide. A form posting to Netlify Forms or to a form service passes. Prepare says what a Netlify form needs on each host.
+- A live-site check, in Publish, on the command line (`live-check`) and as the `check_live_site` tool. After you deploy, it reads your own public address only when you press the button and confirm. It reports whether the bare name and `www` answer, whether the certificate is valid and not near its end, whether http goes to https, whether the redirects hold, whether a missing page gets 404, and whether the files online are this build. It uploads nothing.
+- The hosting guide gains an "Analytics and search engines" part. If your site carries an analytics snippet, the checks make sure it is on every page. FormPublisher adds no analytics and sends nothing.
+- The guide's host details were read again from each host's page:
+  - deploying to Netlify or Vercel without an account;
+  - GitHub's domain verification;
+  - Let's Encrypt certificates getting shorter in 2027 and 2028;
+  - Cloudflare's limits;
+  - Node.js 22.13 or later.
+- The GitHub Pages workflow uses the current action versions and keeps dotfiles such as `.well-known/`. Each deploy command names the major version it was checked with (`netlify-cli@27`, `wrangler@4`, `vercel@66`).
+- The check messages, Prepare notes and live-check findings are translated in all 26 languages, including the check messages added in 0.9.0, which showed in English before.
+- The README says plainly what FormPublisher and FormWeb do not do.
+- The Intel Mac build works again. The engine now carries the OpenSSL that cryptography was built against, instead of Python's older copy. The 0.9.0 build stopped at the engine's self-check with "Symbol not found: _SSL_get0_group_name".
+
 ## 0.9.0 · 2026-11-22
 
 - The checks cover what Wix and Squarespace set up for you for search and sharing. A page needs one canonical link with a full address, and Open Graph's four tags (`og:title`, `og:type`, `og:image`, `og:url`) so links to it show a preview. Structured data must parse. Every language version must list the others and be listed back. The site needs a favicon and a 404 page.

@@ -11,6 +11,7 @@ import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } 
 import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
 import { HOSTING_PART, openHosting } from './hosting-sheet';
 import { icon } from './icons';
+import { LivePane } from './live-pane';
 import { refuseStep } from './notice-step';
 import { toast } from './toast';
 
@@ -98,6 +99,7 @@ class PublishSheet extends Dialog {
   private readonly bar: HTMLElement;
   private readonly closeBtn: HTMLButtonElement;
   private readonly prepareBtn: HTMLButtonElement;
+  private readonly live = new LivePane();
 
   constructor(private readonly app: App) {
     super('Publish site', 680, 'fp-pub-dlg');
@@ -123,6 +125,7 @@ class PublishSheet extends Dialog {
 </div>
 </section></div>`));
     for (const n of Array.from(this.body.querySelectorAll<HTMLElement>('[data-f]'))) this.f[n.dataset.f ?? ''] = n;
+    q(this.body, '.fp-pub-wrap').appendChild(this.live.node);
     this.buildSel = new Dropdown(this.f.build as HTMLButtonElement, { label: BUILD_LABEL, options: [NO_BUILDS], change: (v) => this.pickBuild(v) });
     this.buildNowBtn = q<HTMLButtonElement>(this.body, '[data-a="build"]');
     this.allBtn = q<HTMLButtonElement>(this.body, '[data-a="all"]');
@@ -184,6 +187,7 @@ class PublishSheet extends Dialog {
     try {
       this.targets = await publishApi.targets();
       this.targetsLoaded = true;
+      this.live.setTargets(this.targets);
     } catch (e) {
       this.targets = [];
       say(this.f.prep, message(e), 'error');
@@ -275,6 +279,8 @@ class PublishSheet extends Dialog {
     const rows = this.targets.map((t) => m?.results.get(t.id)).filter((r): r is PreparedTarget => r !== undefined);
     for (const r of m?.results.values() ?? []) if (!rows.includes(r)) rows.push(r);
     setHidden(this.none, rows.length > 0);
+    const hosts = rows.map((r) => r.target);
+    this.live.context(this.site, this.buildId, hosts.length > 1 ? hosts.filter((id) => id !== 'static-zip') : hosts);
     patchList(this.rlist, rows, {
       key: (r) => r.target,
       create: (r) => this.resultNode(r),

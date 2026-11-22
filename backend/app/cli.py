@@ -456,6 +456,14 @@ class Client:
         addresses = [{"route": path, "url": urllib.parse.urljoin(mounted["url"], urllib.parse.quote(path.lstrip("/").removesuffix("index.html")))} for path in rows]
         return {"site": site_id, "revision": chosen, "url": mounted["url"], "origin": mounted["origin"], "generation": mounted["generation"], "addresses": addresses}
 
+    def live_check(self, site_id: str, address: str, build_id: str | None = None, target: str | None = None) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("POST", f"/api/live/{_q(site_id)}", {"address": address, "build": build_id, "target": target})
+        from app.services import live_site
+
+        return self._local(live_site.run, site_id, address, build_id, target)
+
 
 def _q(value: str) -> str:
     return urllib.parse.quote(value, safe="")
@@ -738,6 +746,16 @@ def say_preview(data: dict) -> str:
     return "\n".join(lines)
 
 
+def say_live(data: dict) -> str:
+    lines = []
+    for p in data.get("problems") or []:
+        where = f"docs/HOSTING.md#{p.get('guide')}" + (f" ({p['guideTopic']})" if p.get("guideTopic") else "")
+        fix = f"  fix: {p['fix']}" if p.get("fix") else ""
+        read = f"  read: {where}" if p.get("severity") in ("error", "warning") else ""
+        lines.append(f"{p.get('severity', ''):<7}  {p.get('code', '')}  {p.get('message', '')}{fix}{read}")
+    return "\n".join(lines)
+
+
 def build_parser() -> argparse.ArgumentParser:
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--json", action="store_true", help="print the raw JSON result")
@@ -807,6 +825,11 @@ def build_parser() -> argparse.ArgumentParser:
     vp = sub.add_parser("verify-prepared", parents=[common], help="check that a prepared folder still matches its build; exits 1 when it does not")
     vp.add_argument("build")
     vp.add_argument("target", help="target id the folder was prepared for (see prepared)")
+    lc = sub.add_parser("live-check", parents=[common], help="read your public site at the address you give and report DNS, certificates, www, redirects, 404 and whether it is this build; uploads nothing; exits 1 on a warning or error")
+    lc.add_argument("id", metavar="SITE")
+    lc.add_argument("--address", required=True, help="the site's public address, a domain name or an https address with no path, for example example.com")
+    lc.add_argument("--build", metavar="ID", help="the build to compare with (default: the site's newest build)")
+    lc.add_argument("--target", metavar="T", help="the host it is deployed on, so findings name that host's part of the guide (default: the one target prepared for the build, if only one)")
     pv = sub.add_parser("preview", parents=[common], help="mount a site revision on the running engine's local preview host and print the addresses to open")
     pv.add_argument("id")
     pv.add_argument("--revision", help="revision to show (default: the latest)")
@@ -923,6 +946,8 @@ def main(argv: list[str] | None = None) -> int:
             data, say = client.reproduce(args.build), say_reproduce
         elif args.command == "verify-prepared":
             data, say = client.verify_prepared(args.build, args.target), say_verify_prepared
+        elif args.command == "live-check":
+            data, say = client.live_check(args.id, args.address, args.build, args.target), say_live
         elif args.command == "preview":
             data, say = client.preview(args.id, args.revision), say_preview
         elif args.command == "fpub":
@@ -975,7 +1000,7 @@ def main(argv: list[str] | None = None) -> int:
         os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
     if args.command == "verify" and not (data.get("valid") and (data.get("known") or args.allow_unknown)):
         return 1
-    if (args.command == "reproduce" and not data.get("same")) or (args.command == "verify-prepared" and not data.get("ok")):
+    if (args.command == "reproduce" and not data.get("same")) or (args.command in ("verify-prepared", "live-check") and not data.get("ok")):
         return 1
     return 0
 

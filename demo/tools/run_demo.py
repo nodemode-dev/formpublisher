@@ -1,8 +1,9 @@
 """Run the sample site through a FormPublisher engine and write the data the offline demo shows.
 
-Usage: python3 run_demo.py --engine http://127.0.0.1:PORT --out OUT_DIR (--zip SITE_ZIP | --bundled) [--name NAME] [--include-model]
+Usage: python3 run_demo.py --engine http://127.0.0.1:PORT --key-file HOME/engine.key --out OUT_DIR (--zip SITE_ZIP | --bundled) [--name NAME] [--include-model]
 
 --engine         a running FormPublisher engine (use a private data folder: it gets a site, a build and prepared folders).
+--key-file       the engine.key in that engine's data folder, so the engine accepts the requests as its command line's.
 --zip            the export zip to import (from build_site.py, or demo/sample-site.zip). It must be readable by the engine.
 --bundled        instead of --zip, open the sample site bundled with the engine (POST /api/demo/sample).
 --name           site name for --zip (default northwind-notes).
@@ -26,14 +27,17 @@ src.add_argument("--zip")
 src.add_argument("--bundled", action="store_true")
 ap.add_argument("--name", default="northwind-notes")
 ap.add_argument("--include-model", action="store_true")
+ap.add_argument("--key-file", required=True)
 ARGS = ap.parse_args()
 B = ARGS.engine.rstrip("/")
+KEY = json.loads(Path(ARGS.key_file).read_text(encoding="utf-8"))["key"]
 OUT = Path(ARGS.out)
 
 
 def call(method, path, body=None):
     data = json.dumps(body).encode() if body is not None else None
-    req = urllib.request.Request(B + path, data=data, method=method, headers={"content-type": "application/json"} if data else {})
+    headers = {"x-formpublisher-key": KEY, **({"content-type": "application/json"} if data else {})}
+    req = urllib.request.Request(B + path, data=data, method=method, headers=headers)
     try:
         return json.loads(urllib.request.urlopen(req, timeout=300).read())
     except urllib.error.HTTPError as e:

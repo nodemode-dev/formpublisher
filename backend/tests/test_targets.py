@@ -41,7 +41,7 @@ def test_model_files_are_left_out_of_host_folders(prepared):
 
 
 def test_nothing_is_uploaded_the_commands_are_for_the_person(prepared):
-    assert prepared["netlify"]["commands"][0]["run"] == "npx netlify-cli deploy --dir site"
+    assert prepared["netlify"]["commands"][0]["run"] == "npx netlify-cli@27 deploy --dir site"
     assert prepared["github-pages"]["commands"][-2]["run"].startswith("git push")
     assert prepared["nginx"]["commands"][0]["run"] == "sh nginx-check.sh"
 

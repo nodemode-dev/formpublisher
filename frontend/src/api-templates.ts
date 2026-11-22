@@ -2,6 +2,9 @@ import { ApiError } from './api';
 
 type Json = Record<string, unknown>;
 
+export const SITE_TYPES = ['business', 'portfolio', 'blog', 'event', 'shop'] as const;
+export type SiteType = typeof SITE_TYPES[number];
+
 export interface TemplateItem {
   id: string;
   name: string;
@@ -10,6 +13,7 @@ export interface TemplateItem {
   sha256: string;
   licence: string;
   credit: string;
+  type: SiteType | '';
   preview: string | null;
 }
 
@@ -32,6 +36,7 @@ export interface StartedSite {
 const isObj = (v: unknown): v is Json => typeof v === 'object' && v !== null && !Array.isArray(v);
 const str = (v: unknown): string => (typeof v === 'string' ? v : '');
 const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+const siteType = (v: unknown): SiteType | '' => (SITE_TYPES as readonly unknown[]).includes(v) ? v as SiteType : '';
 
 async function request(path: string, init?: RequestInit): Promise<Json> {
   let res: Response;
@@ -51,7 +56,7 @@ async function request(path: string, init?: RequestInit): Promise<Json> {
 
 function toItem(raw: unknown): TemplateItem | null {
   if (!isObj(raw) || !str(raw.id)) return null;
-  return { id: str(raw.id), name: str(raw.name), description: str(raw.description), bytes: num(raw.bytes), sha256: str(raw.sha256), licence: str(raw.licence), credit: str(raw.credit), preview: str(raw.preview) || null };
+  return { id: str(raw.id), name: str(raw.name), description: str(raw.description), bytes: num(raw.bytes), sha256: str(raw.sha256), licence: str(raw.licence), credit: str(raw.credit), type: siteType(raw.type), preview: str(raw.preview) || null };
 }
 
 function toList(raw: Json): TemplateList {
