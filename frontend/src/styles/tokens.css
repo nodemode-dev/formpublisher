@@ -128,6 +128,7 @@
   --cv-tabs-h: 32px;
   --cv-options-h: 44px;
   --cv-status-h: 28px;
+  --cv-rail-w: 52px;
   --fp-strip-w: 232px;
   --fp-props-w: 308px;
   --fp-bottom-h: 132px;
@@ -148,6 +149,7 @@ body.theme-light {
   --cta-bg: var(--text-primary);
   --cta-bg-hover: color-mix(in srgb, var(--text-primary) 85%, var(--bg-primary));
   --cta-text: var(--bg-secondary);
+  --accent-ink: var(--accent-ink-light, #2e6c3b);
   --bg-input: var(--bg-secondary);
   --bg-hover: rgba(0, 0, 0, 0.06);
   --bg-scrim: rgba(40, 36, 28, 0.45);

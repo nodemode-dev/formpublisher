@@ -21,6 +21,9 @@ export class RouteList {
       if (row?.dataset.key) hooks.select(row.dataset.key);
     });
     host.addEventListener('keydown', (e) => this.onKey(e));
+    host.closest('.fp-app')?.addEventListener('fp-layout', () => {
+      for (const node of Array.from(this.host.querySelectorAll<HTMLElement>('.fp-route'))) this.paintLabel(node, node.dataset.key ?? '');
+    });
     on('fp:checks', (d) => {
       if (d.siteId !== this.siteId) return;
       this.status = d.status ?? {};
@@ -58,7 +61,14 @@ export class RouteList {
     setAttr(node, 'aria-selected', String(r.path === this.selected));
     setAttr(node, 'tabindex', r.path === tabStop ? '0' : '-1');
     setAttr(node, 'title', r.page ? `${r.path} · ${r.page}` : r.path);
+    this.paintLabel(node, r.path);
     this.paintChecks(node, r.path);
+  }
+
+  private paintLabel(node: HTMLElement, path: string): void {
+    const folded = this.host.closest('.fp-app')?.classList.contains('is-strip-folded') === true;
+    if (folded) setAttr(node, 'aria-label', path);
+    else if (node.hasAttribute('aria-label')) node.removeAttribute('aria-label');
   }
 
   private paintChecks(node: HTMLElement, path: string): void {

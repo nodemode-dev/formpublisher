@@ -29,6 +29,7 @@
   var DEFAULT_ACCENT = '#5fe07a';
   var INK = '#0b1a10';
   var PREVIOUS_ACCENT = '#f97316';
+  var MOVED = 'formpublisher.accentMoved';
   var LIGHT = { 'light': 1, 'sand': 1 };
   var PROFILES = {
     'studio':        ['#111111', '#17151b', '#222127', '#2a2a2a', '#34333a', '#f7f7f7', '#a4a4a4', '#8a8a8b', '#1c1b1d', '#5e5e60', '#191919'],
@@ -50,8 +51,9 @@
   var NAMES = ['--bg-primary', '--bg-secondary', '--bg-tertiary', '--border-color', '--border-light', '--text-primary', '--text-secondary', '--text-muted', '--canvas-bg', '--grid-color'];
   var theme = DEFAULT_THEME, accent = DEFAULT_ACCENT, intensity = 1, density = '';
   try {
-    var raw = localStorage.getItem(KEY);
-    if (raw) { var s = JSON.parse(raw); if (s.density === 'compact' || s.density === 'comfortable') density = s.density; if (s.appearance === 3 || s.appearance === 2) { if (s.theme && PROFILES[s.theme]) theme = s.theme; if (s.accentColor && s.accentColor !== PREVIOUS_ACCENT && !(s.appearance === 2 && s.accentColor === '#aba0d3')) accent = s.accentColor; if (s.appearance === 3 && typeof s.intensity === 'number') intensity = Math.min(1.5, Math.max(0, s.intensity)); } }
+    var raw = localStorage.getItem(KEY), s = raw ? JSON.parse(raw) : null;
+    if (!localStorage.getItem(MOVED)) { if (s && typeof s.accentColor === 'string' && s.accentColor.toLowerCase() === PREVIOUS_ACCENT) { s.accentColor = DEFAULT_ACCENT; localStorage.setItem(KEY, JSON.stringify(s)); } localStorage.setItem(MOVED, '1'); }
+    if (s) { if (s.density === 'compact' || s.density === 'comfortable') density = s.density; if (s.appearance === 3 || s.appearance === 2) { if (s.theme && PROFILES[s.theme]) theme = s.theme; if (s.accentColor && !(s.appearance === 2 && s.accentColor === '#aba0d3')) accent = s.accentColor; if (s.appearance === 3 && typeof s.intensity === 'number') intensity = Math.min(1.5, Math.max(0, s.intensity)); } }
   } catch (e) {}
   var p = PROFILES[theme], root = document.documentElement, i;
   if (density) root.classList.add('fp-density-' + density);
@@ -65,6 +67,19 @@
   root.style.setProperty('--accent-color-hover', 'color-mix(in srgb, ' + accent + ' 82%, #ffffff)');
   var an = parseInt(accent.replace('#', '').slice(0, 6), 16), lin = function (c) { c = c / 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
   root.style.setProperty('--text-on-accent', isNaN(an) || 0.2126 * lin((an >> 16) & 255) + 0.7152 * lin((an >> 8) & 255) + 0.0722 * lin(an & 255) > 0.2 ? INK : '#ffffff');
+  var rgb = function (h) { h = String(h).replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); if (!/^[0-9a-f]{6}/i.test(h)) return null; var n = parseInt(h.slice(0, 6), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  var mix = function (a, b, t) { return [0, 1, 2].map(function (k) { return Math.round(a[k] * (1 - t) + b[k] * t); }); };
+  var lum = function (c) { return 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]); };
+  var ratio = function (a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  var ac = rgb(accent), ink = '#2e6c3b';
+  if (ac) {
+    var surf = [], c = ac, t, k;
+    ['light', 'sand'].forEach(function (n) { var q = PROFILES[n]; surf.push(rgb(q[0]), rgb(q[1]), rgb(q[2]), mix(rgb(q[10]), ac, 0.3)); });
+    for (t = 0; t <= 1; t = Math.round((t + 0.02) * 100) / 100) { c = mix(ac, [0, 0, 0], t); for (k = 0; k < surf.length && ratio(c, surf[k]) >= 4.5; k++); if (k === surf.length) break; }
+    if (t > 1) c = [0, 0, 0];
+    ink = '#' + ((1 << 24) | (c[0] << 16) | (c[1] << 8) | c[2]).toString(16).slice(1);
+  }
+  root.style.setProperty('--accent-ink-light', ink);
   root.style.setProperty('--accent-intensity', String(intensity));
   root.style.background = p[0];
   var tc = document.querySelector('meta[name="theme-color"]');

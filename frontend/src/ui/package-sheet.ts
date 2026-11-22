@@ -2,10 +2,10 @@ import '../styles/package.css';
 import { buildsApi, type BuildDetail, type CheckSummary, type KeyInfo, type KeySecret } from '../api-builds';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
-import { onLanguage, t } from '../i18n';
 import { copyText, fmtBytes, fmtCount, showInLibrary } from './builds';
 import { Dialog } from './dialogs';
-import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
+import { el, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
+import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
 import { icon } from './icons';
 import { exportKeyDialog, importKeyDialog } from './key-transfer';
 import { refuse, refuseStep } from './notice-step';
@@ -14,9 +14,11 @@ import { installPublish } from './publish-sheet';
 
 type Tone = '' | 'ok' | 'warn' | 'error';
 
-interface KeyOption { id: string; name: string; encrypted: boolean; canSign: boolean }
-
 const KEPT: Record<KeySecret, string> = { store: 'Password store', file: 'Private file', none: 'Verify only' };
+
+const KEY_LABEL = 'Signing key';
+
+const noKeys = (any: boolean): DropdownOption => ({ value: '', label: any ? 'Choose a key' : 'No keys yet' });
 
 const message = (e: unknown): string => (e instanceof Error && e.message ? e.message : 'Request failed');
 
@@ -35,7 +37,7 @@ class PackageSheet extends Dialog {
   private busy = false;
   private seq = 0;
   private readonly f: Record<string, HTMLElement> = {};
-  private readonly keySel: HTMLSelectElement;
+  private readonly keySel: Dropdown;
   private readonly pass: HTMLInputElement;
   private readonly newName: HTMLInputElement;
   private readonly newPass: HTMLInputElement;
@@ -79,13 +81,13 @@ class PackageSheet extends Dialog {
 </section>
 <section class="fp-pkg-sec">
 <div class="fp-pkg-sec-h">Signature</div>
-<div class="fp-pkg-line"><select class="fp-select fp-pkg-grow" data-f="key" aria-label="Signing key"></select><input class="fp-input fp-pkg-pass" type="password" data-f="pass" placeholder="Passphrase" aria-label="Passphrase" autocomplete="off"><button class="fp-btn fp-btn-sm" type="button" data-a="sign">${icon('key', 14)}<span>Sign</span></button></div>
+<div class="fp-pkg-line">${dropdownHtml({ cls: 'fp-select fp-pkg-grow', label: KEY_LABEL, data: { f: 'key' }, options: [noKeys(false)] })}<input class="fp-input fp-pkg-pass" type="password" data-f="pass" placeholder="Passphrase" aria-label="Passphrase" autocomplete="off"><button class="fp-btn fp-btn-sm" type="button" data-a="sign">${icon('key', 14)}<span>Sign</span></button></div>
 <div class="fp-pkg-line"><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="newkey">${icon('plus', 14)}<span>New key</span></button><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="exportkey">Export...</button><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="importkey">Import...</button><span class="fp-pkg-grow fp-pkg-res" data-f="sign" role="status"></span></div>
 <div class="fp-pkg-line fp-pkg-newkey" hidden><input class="fp-input fp-pkg-grow" data-f="newname" placeholder="Key name" aria-label="Key name" autocomplete="off"><input class="fp-input fp-pkg-pass" type="password" data-f="newpass" placeholder="Passphrase (optional)" aria-label="New key passphrase" autocomplete="new-password"><button class="fp-btn fp-btn-sm" type="button" data-a="create">Create key</button></div>
 <div class="fp-pkg-line"><button class="fp-btn fp-btn-sm" type="button" data-a="verify">${icon('shield', 14)}<span>Verify</span></button><span class="fp-pkg-grow fp-pkg-res is-verify" data-f="verify" role="status"></span></div>
 </section></div>`));
     for (const n of Array.from(this.body.querySelectorAll<HTMLElement>('[data-f]'))) this.f[n.dataset.f ?? ''] = n;
-    this.keySel = this.f.key as HTMLSelectElement;
+    this.keySel = new Dropdown(this.f.key as HTMLButtonElement, { label: KEY_LABEL, options: [noKeys(false)], change: () => this.sync() });
     this.pass = this.f.pass as HTMLInputElement;
     this.newName = this.f.newname as HTMLInputElement;
     this.newPass = this.f.newpass as HTMLInputElement;
@@ -109,7 +111,6 @@ class PackageSheet extends Dialog {
     this.buildBtn = this.button('Build', 'primary', () => { void this.runBuild(); });
     this.wire();
     this.sync();
-    onLanguage(() => this.paintKeys(this.keySel.value));
   }
 
   async show(): Promise<void> {
@@ -189,24 +190,8 @@ class PackageSheet extends Dialog {
   }
 
   private paintKeys(keep: string): void {
-    const items: KeyOption[] = [{ id: '', name: t(this.keys.length ? 'Choose a key' : 'No keys yet'), encrypted: false, canSign: true }, ...this.keys.map((k) => ({ id: k.id, name: `${k.name}  ${k.fingerprint.slice(0, 22)}  ·  ${t(KEPT[k.secret])}`, encrypted: k.encrypted, canSign: k.canSign }))];
-    patchList(this.keySel, items, {
-      key: (k) => k.id || '-',
-      create: (k) => {
-        const o = el<HTMLOptionElement>('<option></option>');
-        o.value = k.id;
-        if (k.id) o.translate = false;
-        o.textContent = k.name;
-        o.disabled = !k.canSign;
-        return o;
-      },
-      update: (n, k) => {
-        setText(n, k.name);
-        const o = n as HTMLOptionElement;
-        if (o.disabled !== !k.canSign) o.disabled = !k.canSign;
-      },
-    });
-    if (this.keySel.value !== keep && items.some((k) => k.id === keep)) this.keySel.value = keep;
+    const items: DropdownOption[] = [noKeys(this.keys.length > 0), ...this.keys.map((k) => ({ value: k.id, label: `${k.name}  ${k.fingerprint.slice(0, 22)}`, detail: KEPT[k.secret], disabled: !k.canSign, literal: true }))];
+    this.keySel.setOptions(items, items.some((k) => k.value === keep) ? keep : undefined);
     this.sync();
   }
 
@@ -423,7 +408,6 @@ class PackageSheet extends Dialog {
         if (!this.newBox.hidden) this.newName.focus();
       }
     });
-    this.keySel.addEventListener('change', () => this.sync());
     this.newName.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.runCreateKey(); } });
     this.newPass.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.runCreateKey(); } });
     this.pass.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); void this.runSign(); } });

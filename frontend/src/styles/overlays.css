@@ -12,7 +12,9 @@
 .fp-menu:not(.has-checks) .fp-menu-check { display: none; }
 .fp-menu-item.is-checked .fp-menu-check { visibility: visible; }
 .fp-menu-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fp-menu-keys { color: color-mix(in srgb, var(--text-primary) 45%, transparent); font-size: var(--fs-12); letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+.fp-menu-keys { display: inline-flex; align-items: center; justify-content: flex-end; justify-self: end; gap: calc(var(--space-1) / 2); color: color-mix(in srgb, var(--text-primary) 45%, transparent); font-size: var(--fs-12); font-variant-numeric: tabular-nums; }
+.fp-kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 var(--space-1); border: 1px solid var(--line-1); border-radius: var(--radius-sm); background: var(--surface-raised); color: var(--text-secondary); font: inherit; font-size: var(--fs-11); font-weight: 500; line-height: 1; }
+.fp-menu-item:hover:not(:disabled) .fp-kbd, .fp-menu-item:focus-visible:not(:disabled) .fp-kbd { color: var(--text-primary); }
 .fp-menu-sub .fp-menu-keys { display: inline-flex; }
 .fp-menu-sep { height: 1px; margin: 6px 10px; background: color-mix(in srgb, var(--text-primary) 12%, transparent); }
 
@@ -76,7 +78,7 @@ body.theme-light .fp-toast.is-error { color: var(--danger-fill); }
 .fp-swatch-chip i:nth-child(2) { flex: 1; height: 5px; border-radius: 3px; background: var(--accent-color); }
 .fp-swatch-chip i:nth-child(3) { width: 9px; height: 9px; border-radius: 50%; background: var(--sw-c); }
 .fp-swatch-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fp-accents { display: flex; align-items: center; gap: 6px; }
+.fp-accents { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .fp-accent { --ac: var(--accent-color); width: 22px; height: 22px; padding: 0; border: 2px solid transparent; border-radius: 50%; background: var(--ac); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25); cursor: pointer; }
 .fp-accent.is-on { border-color: var(--text-primary); }
 .fp-accent-input { width: 30px; height: 24px; padding: 0; border: 1px solid var(--line-2); border-radius: var(--radius); background: transparent; cursor: pointer; }

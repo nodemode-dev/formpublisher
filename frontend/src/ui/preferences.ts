@@ -5,9 +5,10 @@ import { LANGUAGES, language, setLanguage, storedLanguage } from '../i18n';
 import { VERSION } from '../version';
 import { Dialog } from './dialogs';
 import { el, escapeHtml, q, setAttr, setClass, setDisabled, setText, setValue } from './dom';
+import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
 import { PrefsShell } from './prefs-shell';
 import { reservePrefs } from './reserve';
-import { DEFAULT_ACCENT, applyDensity, applyTheme, readChoice, readDensity, saveChoice, setAccent, setTheme, THEMES, type Density } from './themes';
+import { DEFAULT_ACCENT, PREVIOUS_DEFAULT_ACCENT, applyDensity, applyTheme, readChoice, readDensity, saveChoice, setAccent, setTheme, THEMES, type Density } from './themes';
 
 export type PrefsSection = 'general' | 'interface' | 'formweb' | 'about';
 
@@ -18,7 +19,9 @@ const SECTIONS: Array<[PrefsSection, string, string]> = [
   ['about', 'About', 'info'],
 ];
 
-const ACCENTS = [DEFAULT_ACCENT, '#ef4444', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
+const ACCENTS = [DEFAULT_ACCENT, PREVIOUS_DEFAULT_ACCENT, '#ef4444', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
+const LANGUAGE_LABEL = 'Language';
+const LANGUAGE_OPTIONS: DropdownOption[] = LANGUAGES.map(([value, label]) => ({ value, label, literal: true }));
 const DENSITIES: Array<[Density, string]> = [['compact', 'Compact'], ['standard', 'Regular'], ['comfortable', 'Comfortable']];
 
 const swatch = (id: string): string => {
@@ -46,12 +49,12 @@ export class Preferences extends Dialog {
 
   constructor(private readonly app: App) {
     super('Preferences', 760, 'fp-prefs-dlg');
-    const langs = LANGUAGES.map(([code, name]) => `<option value="${code}" translate="no">${escapeHtml(name)}</option>`).join('');
+    const langs = dropdownHtml({ cls: 'fp-select', label: LANGUAGE_LABEL, data: { ctl: 'language' }, options: LANGUAGE_OPTIONS, value: storedLanguage() });
     const root = el(`<div class="fp-prefs">
 <div class="fp-prefs-pages">
 <section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="general"><div class="fp-prefs-secbody">
 <section class="fp-prefs-group"><h3 class="fp-prefs-label">Language</h3>
-<div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Language</div><div class="fp-pref-hint">The window changes to the language you choose.</div></div><select class="fp-select" data-ctl="language" aria-label="Language">${langs}</select></div>
+<div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Language</div><div class="fp-pref-hint">The window changes to the language you choose.</div></div>${langs}</div>
 </section>
 </div></section>
 <section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="interface"><div class="fp-prefs-secbody">
@@ -111,8 +114,12 @@ export class Preferences extends Dialog {
     this.autoBuild = q<HTMLInputElement>(root, '[data-ctl="auto-build"]');
     this.autoCheck.addEventListener('change', () => { void this.saveFlag('receive.autoCheck', this.autoCheck); });
     this.autoBuild.addEventListener('change', () => { void this.saveFlag('receive.autoBuild', this.autoBuild); });
-    const lang = q<HTMLSelectElement>(root, '[data-ctl="language"]');
-    lang.value = storedLanguage();
+    const lang: Dropdown = new Dropdown(q<HTMLButtonElement>(root, '[data-ctl="language"]'), {
+      label: LANGUAGE_LABEL,
+      options: LANGUAGE_OPTIONS,
+      value: storedLanguage(),
+      change: (want) => { void setLanguage(want).then(() => { if (lang.value === want) lang.set(language()); }); },
+    });
 
     root.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
@@ -125,10 +132,6 @@ export class Preferences extends Dialog {
       const act = target.closest<HTMLElement>('[data-act]')?.dataset.act;
       if (act === 'fw-save') void this.saveFormWeb();
       else if (act === 'fw-test') void this.testFormWeb();
-    });
-    lang.addEventListener('change', () => {
-      const want = lang.value;
-      void setLanguage(want).then(() => { if (lang.value === want) lang.value = language(); });
     });
     this.accentInput.addEventListener('input', () => setAccent(this.accentInput.value));
     this.intensity.addEventListener('input', () => {

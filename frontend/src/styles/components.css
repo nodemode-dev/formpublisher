@@ -11,12 +11,12 @@
 
 .fp-icon-btn { display: inline-flex; align-items: center; justify-content: center; flex: none; width: var(--ctl-md); height: var(--ctl-md); padding: 0; border: 0; border-radius: var(--radius); background: transparent; color: var(--text-muted); cursor: pointer; }
 .fp-icon-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-.fp-icon-btn.is-active { background: var(--bg-tertiary); color: var(--accent-color); }
+.fp-icon-btn.is-active { background: var(--bg-tertiary); color: var(--accent-ink); }
 .fp-icon-btn:disabled { opacity: 0.4; cursor: default; }
 .fp-icon-btn.is-sm { width: var(--ctl-sm); height: var(--ctl-sm); }
 .fp-tt-btn { display: inline-grid; place-items: center; flex: none; width: var(--ctl-md); height: var(--ctl-md); padding: 0; border: 1px solid var(--line-2); border-radius: 7px; background: var(--surface-1); color: var(--text-secondary); cursor: pointer; }
 .fp-tt-btn:hover { background: var(--surface-raised); color: var(--text-primary); }
-.fp-tt-btn.is-on { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-color); }
+.fp-tt-btn.is-on { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-ink); }
 .fp-sep { flex: none; width: 1px; height: 18px; margin: 0 var(--space-1); background: var(--line-2); }
 
 .fp-input { width: 100%; height: var(--ctl); padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--radius-md); background: var(--surface-field); color: var(--text-primary); font: inherit; font-size: var(--fs-13); outline: 0; }
@@ -27,8 +27,7 @@
 .fp-seg { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--line-2); border-radius: 9px; background: var(--surface-1); }
 .fp-seg button { display: inline-grid; place-items: center; flex: 1; min-width: 0; height: 26px; padding: 0 8px; border: 0; border-radius: var(--radius); background: transparent; color: var(--text-secondary); font: inherit; font-size: var(--fs-12); cursor: pointer; }
 .fp-seg button:hover { color: var(--text-primary); }
-.fp-seg button.is-on { background: var(--accent-soft); color: var(--accent-color); }
-body.theme-light .fp-seg button.is-on { color: color-mix(in srgb, var(--accent-color) 45%, var(--text-primary)); }
+.fp-seg button.is-on { background: var(--accent-soft); color: var(--accent-ink); }
 
 .fp-card { border: 1px solid var(--line-1); border-radius: var(--radius-xl); background: var(--surface-2); }
 body.theme-light .fp-card { background: var(--bg-tertiary); }

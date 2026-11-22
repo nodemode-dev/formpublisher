@@ -117,6 +117,7 @@ class CompareDialog extends Dialog {
   private readonly head: HTMLElement;
   private readonly list: HTMLElement;
   private readonly none: HTMLElement;
+  private readonly results = new Map<string, CompareResult>();
   private seq = 0;
 
   constructor() {
@@ -133,22 +134,33 @@ class CompareDialog extends Dialog {
 
   async show(a: string, b: string): Promise<void> {
     const seq = ++this.seq;
+    const pair = `${a}:${b}`;
+    const known = this.results.get(pair);
     setText(q(this.head, '[data-s="a"]'), a);
     setText(q(this.head, '[data-s="b"]'), b);
-    setText(this.sum, 'Comparing');
-    setHidden(this.none, true);
-    this.list.replaceChildren();
+    if (known) this.fill(known);
+    else {
+      setText(this.sum, 'Comparing');
+      setHidden(this.none, true);
+      if (!this.isOpen) this.fill(null);
+    }
     this.open();
     try {
       const r = await buildsApi.compare(a, b);
-      if (seq === this.seq) this.fill(r);
+      if (seq !== this.seq) return;
+      this.results.set(pair, r);
+      this.fill(r);
     } catch (e) {
       if (seq !== this.seq) return;
       setText(this.sum, message(e));
     }
   }
 
-  private fill(r: CompareResult): void {
+  private fill(r: CompareResult | null): void {
+    if (!r) {
+      patchList(this.list, [], { key: () => '', create: () => el('<div></div>'), update: () => undefined });
+      return;
+    }
     setText(this.sum, `${r.added.length} added, ${r.removed.length} removed, ${r.changed.length} changed, ${r.same} unchanged`);
     const rows: Array<{ kind: 'added' | 'removed' | 'changed'; path: string; note: string }> = [
       ...r.added.map((p) => ({ kind: 'added' as const, path: p, note: '' })),

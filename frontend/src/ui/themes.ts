@@ -27,20 +27,40 @@ export const PREVIOUS_DEFAULT_ACCENT = '#f97316';
 export const INK_ON_ACCENT = '#0b1a10';
 export const DEFAULT_INTENSITY = 1;
 export const STORAGE_KEY = 'nodemode_ui_settings';
+export const ACCENT_MOVED_KEY = 'formpublisher.accentMoved';
 export const APPEARANCE = 3;
+export const LIGHT_INK_DEFAULT = '#2e6c3b';
+const LIGHT_INK_TARGET = 4.5;
+const SOFT_MAX = 0.3;
 
 export interface ThemeChoice { theme: string; accentColor: string; intensity?: number }
 export type Density = 'compact' | 'standard' | 'comfortable';
 
 const clampIntensity = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? Math.min(1.5, Math.max(0, v)) : DEFAULT_INTENSITY);
 
+function moveAccentOnce(): void {
+  try {
+    if (localStorage.getItem(ACCENT_MOVED_KEY)) return;
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const saved = raw ? JSON.parse(raw) as { accentColor?: unknown } : null;
+    if (saved && typeof saved.accentColor === 'string' && saved.accentColor.toLowerCase() === PREVIOUS_DEFAULT_ACCENT) {
+      saved.accentColor = DEFAULT_ACCENT;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    }
+    localStorage.setItem(ACCENT_MOVED_KEY, '1');
+  } catch (e) {
+    console.error('[theme] accent move failed:', e);
+  }
+}
+
 export function readChoice(): ThemeChoice {
+  moveAccentOnce();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const saved = JSON.parse(raw) as Partial<ThemeChoice> & { appearance?: number };
-      if (saved.appearance === APPEARANCE) return { theme: saved.theme && THEMES[saved.theme] ? saved.theme : DEFAULT_THEME, accentColor: !saved.accentColor || saved.accentColor === PREVIOUS_DEFAULT_ACCENT ? DEFAULT_ACCENT : saved.accentColor, intensity: clampIntensity(saved.intensity) };
-      if (saved.appearance === 2) return { theme: saved.theme && THEMES[saved.theme] ? saved.theme : DEFAULT_THEME, accentColor: !saved.accentColor || saved.accentColor === OLD_DEFAULT_ACCENT || saved.accentColor === PREVIOUS_DEFAULT_ACCENT ? DEFAULT_ACCENT : saved.accentColor, intensity: DEFAULT_INTENSITY };
+      if (saved.appearance === APPEARANCE) return { theme: saved.theme && THEMES[saved.theme] ? saved.theme : DEFAULT_THEME, accentColor: saved.accentColor || DEFAULT_ACCENT, intensity: clampIntensity(saved.intensity) };
+      if (saved.appearance === 2) return { theme: saved.theme && THEMES[saved.theme] ? saved.theme : DEFAULT_THEME, accentColor: !saved.accentColor || saved.accentColor === OLD_DEFAULT_ACCENT ? DEFAULT_ACCENT : saved.accentColor, intensity: DEFAULT_INTENSITY };
     }
   } catch (e) {
     console.error('[theme] read failed:', e);
@@ -96,6 +116,40 @@ function onAccent(hex: string): string {
   return l > 0.2 ? INK_ON_ACCENT : '#ffffff';
 }
 
+const rgbOf = (hex: string): number[] | null => {
+  const h = hex.replace('#', '');
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  if (!/^[0-9a-f]{6}/i.test(full)) return null;
+  const n = parseInt(full.slice(0, 6), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+
+const lum = (c: number[]): number => {
+  const lin = (v: number): number => { const s = v / 255; return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4); };
+  return 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+};
+
+const contrast = (a: number[], b: number[]): number => { const x = lum(a); const y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+
+const mixRgb = (a: number[], b: number[], t: number): number[] => a.map((v, i) => Math.round(v * (1 - t) + b[i] * t));
+
+export function lightInk(accent: string): string {
+  const a = rgbOf(accent);
+  if (!a) return LIGHT_INK_DEFAULT;
+  const surfaces: number[][] = [];
+  for (const p of Object.values(THEMES)) {
+    if (!p.light) continue;
+    for (const k of ['--bg-primary', '--bg-secondary', '--bg-tertiary']) { const c = rgbOf(p.vars[k]); if (c) surfaces.push(c); }
+    const node = rgbOf(p.vars['--bg-node'] || p.vars['--bg-secondary']);
+    if (node) surfaces.push(mixRgb(node, a, SOFT_MAX));
+  }
+  for (let t = 0; t <= 1; t = Math.round((t + 0.02) * 100) / 100) {
+    const c = mixRgb(a, [0, 0, 0], t);
+    if (surfaces.every((s) => contrast(c, s) >= LIGHT_INK_TARGET)) return `#${c.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+  }
+  return '#000000';
+}
+
 export function applyTheme(choice: ThemeChoice = readChoice()): void {
   const root = document.documentElement;
   const theme = THEMES[choice.theme] || THEMES[DEFAULT_THEME];
@@ -108,6 +162,7 @@ export function applyTheme(choice: ThemeChoice = readChoice()): void {
   root.style.setProperty('--accent-color-dim', choice.accentColor + '33');
   root.style.setProperty('--accent-color-hover', `color-mix(in srgb, ${choice.accentColor} 82%, #ffffff)`);
   root.style.setProperty('--text-on-accent', onAccent(choice.accentColor));
+  root.style.setProperty('--accent-ink-light', lightInk(choice.accentColor));
   root.style.setProperty('--accent-intensity', String(clampIntensity(choice.intensity)));
   root.style.setProperty('--accent-tint',hexToRgba(choice.accentColor, 0.06));
   root.style.setProperty('--accent-tint-strong', hexToRgba(choice.accentColor, 0.10));

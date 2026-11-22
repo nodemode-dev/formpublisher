@@ -8,12 +8,16 @@ import { onLanguage, t } from '../i18n';
 import { copyText, fmtCount, fmtDate } from './builds';
 import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
+import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
 import { HOSTING_PART, openHosting } from './hosting-sheet';
 import { icon } from './icons';
 import { refuseStep } from './notice-step';
 import { toast } from './toast';
 
 type Tone = '' | 'ok' | 'error';
+
+const BUILD_LABEL = 'Build';
+const NO_BUILDS: DropdownOption = { value: '', label: 'No builds yet' };
 
 interface Verdict { text: string; tone: Tone; problems: string[]; nginx?: { text: string; tone: Tone }; at?: string }
 
@@ -84,7 +88,7 @@ class PublishSheet extends Dialog {
   private seq = 0;
   private readonly memos = new Map<string, Memo>();
   private readonly f: Record<string, HTMLElement> = {};
-  private readonly buildSel: HTMLSelectElement;
+  private readonly buildSel: Dropdown;
   private readonly buildNowBtn: HTMLButtonElement;
   private readonly allBtn: HTMLButtonElement;
   private readonly tlist: HTMLElement;
@@ -101,7 +105,7 @@ class PublishSheet extends Dialog {
 <section class="fp-pkg-sec">
 <div class="fp-pkg-sec-h">Build</div>
 <div class="fp-pkg-info"><span class="fp-pkg-k">Site</span><span class="fp-pkg-v" data-f="site" translate="no"></span></div>
-<div class="fp-pkg-line"><select class="fp-select fp-pkg-grow fp-pub-build-sel" data-f="build" aria-label="Build"></select><button class="fp-btn fp-btn-sm" type="button" data-a="build">${icon('package', 14)}<span>Build now</span></button></div>
+<div class="fp-pkg-line">${dropdownHtml({ cls: 'fp-select fp-pkg-grow fp-pub-build-sel', label: BUILD_LABEL, data: { f: 'build' }, options: [NO_BUILDS] })}<button class="fp-btn fp-btn-sm" type="button" data-a="build">${icon('package', 14)}<span>Build now</span></button></div>
 <div class="fp-pub-note" data-f="buildnote" role="status"></div>
 </section>
 <section class="fp-pkg-sec">
@@ -119,7 +123,7 @@ class PublishSheet extends Dialog {
 </div>
 </section></div>`));
     for (const n of Array.from(this.body.querySelectorAll<HTMLElement>('[data-f]'))) this.f[n.dataset.f ?? ''] = n;
-    this.buildSel = this.f.build as HTMLSelectElement;
+    this.buildSel = new Dropdown(this.f.build as HTMLButtonElement, { label: BUILD_LABEL, options: [NO_BUILDS], change: (v) => this.pickBuild(v) });
     this.buildNowBtn = q<HTMLButtonElement>(this.body, '[data-a="build"]');
     this.allBtn = q<HTMLButtonElement>(this.body, '[data-a="all"]');
     this.tlist = q(this.body, '.fp-pub-tlist');
@@ -229,19 +233,9 @@ class PublishSheet extends Dialog {
   }
 
   private paintBuilds(): void {
-    const items = this.builds.length ? this.builds.map((b) => ({ id: b.id, label: `${b.id}   ${fmtDate(b.created)}` })) : [{ id: '', label: t('No builds yet') }];
-    patchList(this.buildSel, items, {
-      key: (b) => b.id || '-',
-      create: (b) => {
-        const o = el<HTMLOptionElement>('<option></option>');
-        o.value = b.id;
-        if (b.id) o.translate = false;
-        o.textContent = b.label;
-        return o;
-      },
-      update: (n, b) => setText(n, b.label),
-    });
-    if (this.buildSel.value !== this.buildId) this.buildSel.value = this.buildId;
+    const items: DropdownOption[] = this.builds.length ? this.builds.map((b) => ({ value: b.id, label: `${b.id}   ${fmtDate(b.created)}`, literal: true })) : [NO_BUILDS];
+    this.buildSel.setOptions(items);
+    this.buildSel.set(this.buildId);
     say(this.f.buildnote, this.builds.length || !this.site ? '' : 'This site has no build yet. Build it first, then prepare it for a host.', '');
   }
 
@@ -384,7 +378,7 @@ class PublishSheet extends Dialog {
     setDisabled(this.prepareBtn, this.busy || !this.buildId || !any);
     setDisabled(this.buildNowBtn, this.busy || !this.site);
     setDisabled(this.allBtn, this.busy || !this.buildId || !this.targets.length);
-    this.buildSel.disabled = this.busy || !this.builds.length;
+    this.buildSel.setDisabled(this.busy || !this.builds.length);
     for (const b of Array.from(this.rlist.querySelectorAll<HTMLButtonElement>('button[data-a]'))) setDisabled(b, this.busy);
     for (const box of Array.from(this.tlist.querySelectorAll<HTMLInputElement>('[data-pick]'))) setDisabled(box, this.busy || !this.buildId);
     setDisabled(this.f.model as HTMLInputElement, this.busy || !this.buildId);
@@ -514,6 +508,13 @@ class PublishSheet extends Dialog {
     this.sync();
   }
 
+  private pickBuild(id: string): void {
+    this.buildId = id;
+    this.paintAll();
+    this.sync();
+    if (this.buildId) void this.loadPrepared(this.buildId);
+  }
+
   private wire(): void {
     this.body.addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
@@ -546,12 +547,6 @@ class PublishSheet extends Dialog {
       if (!m) return;
       m.includeModel = (this.f.model as HTMLInputElement).checked;
       writeModel(m.includeModel);
-    });
-    this.buildSel.addEventListener('change', () => {
-      this.buildId = this.buildSel.value;
-      this.paintAll();
-      this.sync();
-      if (this.buildId) void this.loadPrepared(this.buildId);
     });
     this.body.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && !this.prepareBtn.disabled) { e.preventDefault(); void this.runPrepare(); }

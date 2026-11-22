@@ -9,7 +9,7 @@ import { installHints } from './ui/hint-strip';
 import { icon } from './ui/icons';
 import { refuse } from './ui/notice-step';
 import { openPackageSheet, installPackaging } from './ui/package-sheet';
-import { installPanel } from './ui/panel';
+import { installPanel, panelPagesHtml } from './ui/panel';
 import { askPath } from './ui/path-dialog';
 import { Preview, routeKey } from './ui/preview';
 import { LayoutState } from './ui/resizers';
@@ -63,9 +63,7 @@ const SHELL = `<div class="fp-app">
 <button class="fp-icon-btn is-sm" type="button" data-act="toggle-bottom" title="Hide the panel" aria-label="Hide the panel">${icon('chevronDown', 14)}</button>
 </div>
 <div class="fp-bottom-body">
-<div class="fp-bottom-page" data-page="problems" role="tabpanel">No problems found yet.</div>
-<div class="fp-bottom-page" data-page="console" role="tabpanel" hidden>Nothing in the console yet.</div>
-<div class="fp-bottom-page" data-page="network" role="tabpanel" hidden>No network requests yet.</div>
+${panelPagesHtml()}
 <div class="fp-bottom-page" data-page="revisions" role="tabpanel" hidden></div>
 </div>
 </section>
@@ -449,13 +447,9 @@ export async function startApp(): Promise<App> {
 
   const importFromFormWeb = async (): Promise<Site | null> => {
     if (busy) return null;
-    let project: string | null = null;
-    const projects = await api.formwebProjects().catch(() => []);
-    if (projects.length > 1) {
-      const picked = await pickFormWebProject(projects);
-      if (picked === undefined) return null;
-      project = picked;
-    }
+    const picked = await pickFormWebProject(() => api.formwebProjects().catch(() => []));
+    if (picked === undefined) return null;
+    const project = picked;
     return flow(async () => (await api.formwebImportCurrent(project)).site, 'FormWeb import finished.');
   };
 
