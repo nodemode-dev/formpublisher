@@ -65,7 +65,7 @@ jobs:
         run: python backend/formpublisher_engine.py --selfcheck
       - name: Compile
         run: python -m compileall -q backend/app setup
-      - name: Agent skills in step
+      - name: Agent skills, MCP tool list and stated counts in step
         run: ./formpublisher agents sync --check
       - name: Vendored crates in step
         run: ./formpublisher vendor --check

@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "formpublisher": {
-      "command": "${workspaceFolder}/formpublisher",
-      "args": ["mcp"]
+      "command": "node",
+      "args": ["${workspaceFolder}/setup/mcp_launch.mjs"]
     },
     "formmcp": {
       "command": "formmcp",

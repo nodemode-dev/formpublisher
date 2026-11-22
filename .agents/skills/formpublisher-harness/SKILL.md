@@ -1,15 +1,17 @@
 ---
 name: formpublisher-harness
-description: Drives FormPublisher, the Form family's site publisher, through its formpublisher MCP server (formpublisher_tab in the dock) or the ./formpublisher run command line. Use whenever the person wants a FormWeb site exported as site-export.zip imported, a FormWeb publication folder opened, the site currently open in a running FormWeb brought in, the imported sites listed, a site's routes listed, its revisions listed or compared, a .fweb project opened, a site mounted for preview, checked (static or deep), built into a deterministic site.zip, or signed with an Ed25519 key and verified against their own keys, or prepared for a host (Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx or a plain zip); or when formpublisher tools such as list_sites, import_site, run_checks, build_package or prepare_publish are available or fail. Not for editing a site (that is FormWeb), not for changing FormPublisher's own source code (use formpublisher-skillset), and not for uploading to a host, which FormPublisher never does.
+description: Drives FormPublisher, the Form family's site publisher, through its formpublisher MCP server (formpublisher_tab in the dock) or the ./formpublisher run command line. Use whenever the person wants a site started from a template, a FormWeb site-export.zip, publication folder, .fweb project or .fpub package imported, the site open in FormWeb brought in, sites, routes or revisions listed or compared, a site previewed (preview_site), checked (static or deep), built into a deterministic site.zip, inspected or reproduced, signed with an Ed25519 key and verified against their own keys, or prepared for a host (Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx or a plain zip) and the folder verified; or when formpublisher tools such as list_sites, import_site, run_checks, build_package or prepare_publish are available or fail. Not for editing a site (that is FormWeb), not for changing FormPublisher's own source code (use formpublisher-skillset), and not for uploading to a host, which FormPublisher never does.
 metadata:
-  version: "0.7.0"
+  version: "0.8.0"
 ---
 
 # formpublisher harness
 
 FormPublisher opens what FormWeb makes and shows its routes in a FormDeck-style window. Its engine keeps imported sites in its data folder (`~/FormPublisher`, or `FORMPUBLISHER_HOME`). The MCP server, named `formpublisher`, exposes the engine as tools; `./formpublisher run` is the same surface on the command line (each tool has a command, listed in the table below).
 
-When the FormPublisher window is open, the tools talk to its engine on 127.0.0.1:8280 and every change appears in the window as it happens. When it is closed, the tools run the engine's routes inside the server process against the same data folder. `status` says which.
+When the FormPublisher window is open, the tools talk to its engine on 127.0.0.1:8280 and every change appears in the window as it happens. When it is closed, the tools run the engine's routes inside the server process against the same data folder. `status` says which. The server follows MCP revision 2026-07-28 and still answers the older initialize handshake (2024-11-05 to 2025-11-25).
+
+When the formpublisher server is missing from your client, the person registers it: from a checkout `./formpublisher agents install` (Claude Code, Codex, Cursor and Antigravity; or one, such as `agents install claude`), and from an installed app the engine program inside it with `agents install` (macOS `/Applications/FormPublisher.app/Contents/Resources/engine/formpublisher-engine`, Windows `%LOCALAPPDATA%\FormPublisher\engine\formpublisher-engine.exe`, Linux deb or rpm `/usr/lib/FormPublisher/engine/formpublisher-engine`; an AppImage must be extracted first). `agents status` shows what each client has.
 
 ## In the agent dock
 
@@ -25,34 +27,49 @@ FormPublisher only reads FormWeb. It never calls FormWeb's `/api/load`, which wo
 
 ## The tools
 
-These are the exact MCP tool names, with the command that does the same thing. Ids are the ones the previous tool returned: a site id from `list_sites`, a build id from `list_builds`, a target id from `list_targets`.
+These are the exact MCP tool names, with the command that does the same thing. Ids are the ones the previous tool returned: a site id from `list_sites`, a build id from `list_builds`, a key id from `list_keys`, a target id from `list_targets`. `docs/mcp-tools.json` in the repository is the generated list of every tool and command, with the counts.
 
-| MCP tool | Command | Does | Reads only |
+Each tool has a class, which it also carries in its `_meta` as `formpublisher/class`:
+
+- `read`: reads only.
+- `data`: writes only inside FormPublisher's data folder or the engine's state (what the preview host shows).
+- `path`: writes to a path the person named; ask for that path first. These are `save_fpub` and `start_from_template`, and the second also uses the network.
+
+`prepare_publish` and `sign_build` are marked destructive: preparing again deletes the target's previous folder (anything added to it since is gone), and signing replaces a build's earlier signature. Say so before calling either on something that exists.
+
+| MCP tool | Command | Does | Class |
 | --- | --- | --- | --- |
-| `formpublisher_status` | `status` | engine, data folder, site count, FormWeb reachability | yes |
-| `list_sites` | `sites` | imported sites | yes |
-| `import_site` (path) | `import PATH` | import a site export zip, a `.fweb` project, a `.fpub` package or a publication folder as a new revision (a `.fpub` also restores its build) | no |
-| `list_formweb_projects` | `formweb-projects` | the running FormWeb's saved projects, the open one first | yes |
-| `import_formweb_current` (project) | `import-formweb [--project ID]` | import the site open in a running FormWeb, or one of its saved projects | no |
-| `site_routes` (id) | `routes ID` | routes of the latest revision | yes |
-| `list_revisions` (id) | `revisions ID` | revisions newest first, with files, bytes, routes and what changed from the one before | yes |
-| `diff_revisions` (id, from_revision, to_revision) | `diff ID [--from R] [--to R]` | files added, removed and changed (path, size, SHA-256) and routes added and removed between two revisions; default the latest against the one before | yes |
-| `run_checks` (id, deep, widths, revision) | `check ID [--deep] [--widths 390,1440]` | run the static tier, and the Chrome tier with deep | no |
-| `get_checks` (id, revision) | `check ID --last` | stored results, nothing runs | yes |
-| `build_package` (id, revision) | `build ID [--revision R]` | deterministic site.zip and publish.json | no |
-| `list_builds` | `builds` | builds, newest first | yes |
-| `save_fpub` (build, path) | `fpub BUILD [--out FILE] [--force]` | save a build as one `.fpub` file at an absolute path ending in `.fpub`; the same build gives the same bytes; the tool never replaces a file | no |
-| `sign_build` (build, key, passphrase) | `sign BUILD [--key K]` | detached Ed25519 signature | no |
-| `verify_build` (build) | `verify BUILD [--allow-unknown]` | check the signature against the zip and against the person's own keys: `valid`, `known` (the signer's key is one of theirs), `trusted` (both), `signer` (fingerprint, and the key's name when known), `message`, and `reason` when not valid | yes |
-| `list_targets` | `targets` | the six hosts | yes |
-| `prepare_publish` (build, targets, includeModel) | `prepare BUILD --target T [--target T] [--include-model]` | a folder per target with the commands to run | no |
-| `get_prepared` (build) | `prepared BUILD` | what is already prepared | yes |
-| `list_templates` | `templates` | the kept list of templates a site can start from (FormWeb whole sites from the public formai-templates index); fetches nothing, `fetched: false` until the person got the list (window, or `templates --fetch`) | yes |
-| `start_from_template` (template, folder, name) | `start TEMPLATE --to FOLDER [--name N]` | download that one file, keep it only when size and SHA-256 match the index, open it with the FormWeb core and write a new `.fweb` project into a folder the person named; never replaces a file. Editing is in FormWeb; to publish it, `import_site` the returned project | no |
-| `list_trash` | `trash` | trash entries newest first, with kind, label, origin, time and size | yes |
-| `restore_from_trash` (entry, passphrase) | `trash restore ENTRY` | move an entry back to its recorded or inferred origin (entries from before 0.1.4 have an inferred one); 409 with the reason when the place is taken, and 409 `origin-unknown` when there is none. A trashed key with a missing or damaged record is rebuilt from its `.pem`: an encrypted one answers 409 `passphrase-required`, then `passphrase-wrong`, so ask the person and pass `passphrase`; the CLI reads it with `--passphrase-stdin`. Never log or store it | no |
+| `formpublisher_status` | `status` | engine, data folder, site count, FormWeb reachability | read |
+| `list_sites` | `sites` | imported sites | read |
+| `import_site` (path) | `import PATH` | import a site export zip, a `.fweb` project, a `.fpub` package or a publication folder as a new revision (a `.fpub` also restores its build) | data |
+| `list_formweb_projects` | `formweb-projects` | the running FormWeb's saved projects, the open one first | read |
+| `import_formweb_current` (project) | `import-formweb [--project ID]` | import the site open in a running FormWeb, or one of its saved projects | data |
+| `receive_status` | `receive-status` | FormWeb's Send to FormPublisher inbox: the endpoint, the inbox folder and whether it is watched, the files waiting, `auto` (the auto-check and auto-build settings) and the last five receipts | read |
+| `site_routes` (id) | `routes ID` | routes of the latest revision | read |
+| `list_revisions` (id) | `revisions ID` | revisions newest first, with files, bytes, routes and what changed from the one before | read |
+| `diff_revisions` (id, from_revision, to_revision) | `diff ID [--from R] [--to R]` | files added, removed and changed (path, size, SHA-256) and routes added and removed between two revisions; default the latest against the one before | read |
+| `preview_site` (id, revision) | `preview ID [--revision R]` | show a revision on the local preview host (127.0.0.1, the one the window's Preview uses) and return the address of its home page and of each route; it opens nothing and writes no file, replaces what the preview host showed (the window's included) and needs the running engine | data |
+| `run_checks` (id, deep, widths, revision) | `check ID [--deep] [--widths 390,1440]` | run the static tier, and the Chrome tier with deep; the result is stored | data |
+| `get_checks` (id, revision) | `check ID --last` | stored results, nothing runs | read |
+| `build_package` (id, revision) | `build ID [--revision R]` | deterministic site.zip and publish.json | data |
+| `list_builds` | `builds` | builds, newest first | read |
+| `inspect_build` (build) | `inspect BUILD` | one build: its record, its publish.json (every file with path, size and SHA-256, routes, redirects, headers, the checks summary) and the same signature verdict as `verify_build` | read |
+| `compare_builds` (a, b) | `compare A B` | files added, removed and changed from build a to build b, and how many are the same | read |
+| `reproduce_build` (build) | `reproduce BUILD` | rebuild site.zip from its revision in a scratch folder (removed afterwards) and answer `same`, `sha256` and `expected`; the build is not changed; the command exits 1 when the bytes differ | data |
+| `save_fpub` (build, path) | `fpub BUILD [--out FILE] [--force]` | save a build as one `.fpub` file at an absolute path ending in `.fpub`; the same build gives the same bytes; the tool never replaces a file | path |
+| `list_keys` | `keys` | the signing keys: id (pass it to `sign_build`), name, fingerprint, created, `encrypted` (a passphrase is needed), `secret` (store, file or none) and `canSign` | read |
+| `sign_build` (build, key, passphrase) | `sign BUILD [--key K]` | detached Ed25519 signature, replacing an earlier one (destructive) | data |
+| `verify_build` (build) | `verify BUILD [--allow-unknown]` | check the signature against the zip and against the person's own keys: `valid`, `known` (the signer's key is one of theirs), `trusted` (both), `signer` (fingerprint, and the key's name when known), `message`, and `reason` when not valid | read |
+| `list_targets` | `targets` | the six hosts | read |
+| `prepare_publish` (build, targets, includeModel) | `prepare BUILD --target T [--target T] [--include-model]` | a folder per target with the commands to run; preparing again deletes the previous folder (destructive) | data |
+| `get_prepared` (build) | `prepared BUILD` | what is already prepared, with the last `verify_prepared` verdict | read |
+| `verify_prepared` (build, target) | `verify-prepared BUILD TARGET` | check a prepared folder against publish.json and a fresh prepare in a scratch folder; answers `ok`, the files checked and the problems; changes nothing in the folder and keeps the verdict for `get_prepared`; the command exits 1 when it does not match | data |
+| `list_templates` | `templates` | the kept list of templates a site can start from (FormWeb whole sites from the public formai-templates index); fetches nothing, `fetched: false` until the person got the list (window, or `templates --fetch`) | read |
+| `start_from_template` (template, folder, name) | `start TEMPLATE --to FOLDER [--name N]` | download that one file (the network), keep it only when size and SHA-256 match the index, open it with the FormWeb core and write a new `.fweb` project into a folder the person named; never replaces a file. Editing is in FormWeb; to publish it, `import_site` the returned project | path |
+| `list_trash` | `trash` | trash entries newest first, with kind, label, origin, time and size | read |
+| `restore_from_trash` (entry, passphrase) | `trash restore ENTRY` | move an entry back to its recorded or inferred origin (entries from before 0.1.4 have an inferred one); 409 with the reason when the place is taken, and 409 `origin-unknown` when there is none. A trashed key with a missing or damaged record is rebuilt from its `.pem`: an encrypted one answers 409 `passphrase-required`, then `passphrase-wrong`, so ask the person and pass `passphrase`; the CLI reads it with `--passphrase-stdin`. Never log or store it | data |
 
-Not tools: `trash delete ENTRY` deletes one trash entry for good and `trash empty --yes` deletes them all. There is no tool for either, and deleting stays a person's action: do it only when the person asks for that entry. `trash restore ENTRY --to PATH` (the HTTP body `{origin}`, or the Trash page's "Where does it go" dialog) restores to a named place for an entry whose origin is unknown; it stays a person's or the command line's action, and the MCP tool only restores recorded or inferred origins, so when it answers `origin-unknown` tell the person rather than inventing a path. Every error answer is `{detail, code}`, the CLI prints `error [code]: detail` (exit 1, or 3 when the engine is unreachable) and MCP tool errors start with the same label; branch on the code. The named place must fit its kind (site: lowercase letters, digits, hyphens; key: 16 hex; build: `[site]/[12-hex id]`; prepared: `[site]/[build id]/[target]`) or the engine answers 409 `place-invalid`. The full list is in the manual under Error codes. `keys` lists the signing keys and where each secret is kept (password store, private file or verify only) and `keys --create NAME [--passphrase P]` makes one. A key cannot be exported or imported by a tool: `keys --export ID --to FILE` and `keys --import FILE` (and Export... and Import... in Preferences, under Signing keys) are the person's, with passphrases only they type, so never run them yourself and never ask for an exported file's passphrase. A key that verifies but cannot sign (verify only, for instance one restored from the trash) is passed over by `sign`. `receive-status` shows the endpoint, inbox folder and last receipts for FormWeb's Send to FormPublisher. `agents sync` is `./formpublisher agents sync`.
+Not tools: `trash delete ENTRY` deletes one trash entry for good and `trash empty --yes` deletes them all. There is no tool for either, and deleting stays a person's action: do it only when the person asks for that entry. `trash restore ENTRY --to PATH` (the HTTP body `{origin}`, or the Trash page's "Where does it go" dialog) restores to a named place for an entry whose origin is unknown; it stays a person's or the command line's action, and the MCP tool only restores recorded or inferred origins, so when it answers `origin-unknown` tell the person rather than inventing a path. Every error answer is `{detail, code}`, the CLI prints `error [code]: detail` (exit 1, or 3 when the engine is unreachable) and MCP tool errors start with the same label; branch on the code. The named place must fit its kind (site: lowercase letters, digits, hyphens; key: 16 hex; build: `[site]/[12-hex id]`; prepared: `[site]/[build id]/[target]`) or the engine answers 409 `place-invalid`. The full list is in the manual under Error codes. `keys --create NAME [--passphrase P]` makes a signing key; there is no tool for it, so it is the person's, or yours only when they ask. A key cannot be exported or imported by a tool: `keys --export ID --to FILE` and `keys --import FILE` (and Export... and Import... in Preferences, under Signing keys) are the person's, with passphrases only they type, so never run them yourself and never ask for an exported file's passphrase. A key that verifies but cannot sign (verify only, for instance one restored from the trash) is passed over by `sign` (`canSign` false in `list_keys`). `agents sync` is `./formpublisher agents sync`.
 
 ## The loop
 
@@ -60,7 +77,8 @@ Not tools: `trash delete ENTRY` deletes one trash entry for good and `trash empt
 2. `list_sites`: the sites already imported.
 3. `import_site` or `import_formweb_current`: bring a site in. Give a path to a `site-export.zip` or to a publication folder, or ask for the site open in FormWeb. Ask the person before reading from a running FormWeb.
 4. `site_routes`: the routes of one imported site (path, page, locale, item, stylesheet), the same list the window's routes strip shows.
-5. `run_checks`, then `build_package`, `sign_build`, `verify_build`, `list_targets` and `prepare_publish`, as described under Publishing.
+5. `preview_site` when the person wants to look at it: give them the addresses it returns; it opens nothing.
+6. `run_checks`, then `build_package`, `list_keys`, `sign_build`, `verify_build`, `list_targets` and `prepare_publish`, as described under Publishing.
 
 ```sh
 ./formpublisher run status
@@ -73,16 +91,34 @@ Not tools: `trash delete ENTRY` deletes one trash entry for good and `trash empt
 
 `--json` after any command prints the raw answer.
 
+## Start a site and host it
+
+For a person who has no site yet and wants one on their own host:
+
+1. `list_templates`. When it answers `fetched: false`, the person gets the list first (the window, or `./formpublisher run templates --fetch`).
+2. `start_from_template` with the template id the person chose and a folder they named (a `path` tool that downloads the one file). It answers the new `.fweb` project's path.
+3. The person edits the site in FormWeb (File > Import .fweb or .fpub file...). FormPublisher does not edit sites; wait for them.
+4. `import_site` with the project path (or `import_formweb_current`, after asking, for the site open in FormWeb).
+5. `run_checks`, report the problems with their fixes, and `get_checks` to read the result again later without running anything.
+6. `build_package`.
+7. `list_keys`, then `sign_build` with the key the person named (and its passphrase from them when `encrypted` is true), then `verify_build`.
+8. `prepare_publish` with the build id and the host the person chose. Show the commands and warnings exactly as returned.
+9. Point the person to `docs/HOSTING.md` for that host's steps (account, domain, HTTPS, updates); running the commands is theirs.
+10. When the person has changed the prepared folder, or before they upload it again, `verify_prepared` with the build id and target, and report `ok` and each problem.
+
 ## Publishing
 
 FormPublisher prepares; it never uploads. Publishing is a chain, and each link needs the id the one before returned.
 
 1. `run_checks` with the site id. Report the counts and each problem with its code and fix. Add `deep` only when the person wants the browser run; `deep.unavailable` means no Chrome or Edge could be started (or, from source, Playwright is missing), and `deep.failed` means the run could not finish, so say which and give its reason.
 2. `build_package` with the site id. The same site gives the same build id, so a repeated call returns the existing build with `created` false.
-3. `sign_build` with the build id and a key the person named (a key id from `keys`). With one key in the data folder and no `key` argument it uses that one and says which; with none it fails and the person creates one with `./formpublisher run keys --create NAME`. Then `verify_build` and report `valid`, `known` and `trusted` as returned. `known` is true only when the signing key is one of the person's own, so a package signed with a key of someone else can still answer `valid` true: when `known` is false, tell the person "signed by a key you do not have" as a warning, give the `signer` fingerprint, and do not call the package verified or theirs. Never wave it through, and never pass `--allow-unknown` unless the person asks.
+3. `list_keys`, then `sign_build` with the build id and a key the person named (its id from `list_keys`, one with `canSign` true; signing again replaces the earlier signature). With one key in the data folder and no `key` argument it uses that one and says which; with none it fails and the person creates one with `./formpublisher run keys --create NAME`. Then `verify_build` and report `valid`, `known` and `trusted` as returned. `known` is true only when the signing key is one of the person's own, so a package signed with a key of someone else can still answer `valid` true: when `known` is false, tell the person "signed by a key you do not have" as a warning, give the `signer` fingerprint, and do not call the package verified or theirs. Never wave it through, and never pass `--allow-unknown` unless the person asks.
 4. `list_targets` for the six ids: `static-zip`, `netlify`, `cloudflare-pages`, `vercel`, `github-pages`, `nginx`.
 5. `prepare_publish` with the build id and the target ids the person wants. Each result has the prepared `folder`, its `files`, the `commands` (label, run, cwd) to run, `notes` and `warnings`. Show the commands exactly as returned and the warnings in full (for example GitHub Pages has no server redirects); do not run a deploy command yourself unless the person asks. Preparing again replaces the folder. Where nginx is installed, preparing the nginx target also runs `nginx -t` and adds a note or a warning, and a verify of a prepared folder answers `nginx` with `ran`, `ok`, `version` and `output` (a failure is a problem row; `ran: false` without nginx); `nginx` also carries `listen` with `ran`, `ok` and `output` for the second pass that points every listen line at a free loopback port, so a bad listen parameter fails; the nginx folder also carries `nginx-check.sh`, which the person can run with `sh nginx-check.sh` or `./nginx-check.sh` without root (it checks unix sockets, then each listen line on a loopback port, and `NGINX_CHECK_PORT` sets the first). GitHub Pages follows splat redirects through a script at the top of `404.html` under the site's base path, and with scripts off a splat address shows the 404 page, so report its note about the assumed path. The host folders leave out FormWeb's model files (`site.formweb.json`, `asset-access.json`), which no host needs, and each result lists them under `leftOut`; pass `includeModel` true only when the person wants them kept.
 6. `get_prepared` reads back what exists for a build without preparing anything. For each host it returns `verified` when a verify has run: `verifiedAt`, `ok`, `checked`, `problems` and `nginx`. That result is kept until the next prepare or remove of that host, so read it before verifying again and say when it was taken.
+7. `verify_prepared` with the build id and a target id checks that folder again (every site file against publish.json, the whole folder against a fresh prepare in a scratch folder) and stores the new verdict; it changes nothing in the folder. Use it after the person changed the folder.
+
+Other build tools: `inspect_build` reads one build's publish.json and signature state, `compare_builds` lists the files that differ between two builds, and `reproduce_build` rebuilds in a scratch folder and says whether the bytes match (report `same` false as it is, with both SHA-256 values).
 
 ```sh
 ./formpublisher run check SITE-ID
@@ -108,7 +144,7 @@ A `.fweb` project (envelope format `com.nodemode.formweb`, or FormWeb's version 
 
 These are engine routes on 127.0.0.1:8280 (the window must be open, or the engine running with `./formpublisher serve`). Send JSON; every route answers JSON. A read (GET) needs nothing more. A request that changes something (POST, PUT, PATCH, DELETE) answers 403 `forbidden` unless it carries the engine's key in the header `X-FormPublisher-Key`; the tools and `./formpublisher run` send it themselves from `engine.key` in the data folder, so prefer them to a hand-made request, and the `curl` lines below that change something need that header. Put a site id from `sites` in `site`; `revision` is optional and defaults to the latest.
 
-Mount a revision on the site host (port 8281, a separate origin that serves it like a static host). One mount is active; a new one replaces it.
+Mount a revision on the site host (port 8281, a separate origin that serves it like a static host). One mount is active; a new one replaces it. The tool `preview_site` (and `./formpublisher run preview SITE-ID`) does this and answers the addresses; prefer it to the route below.
 
 ```sh
 curl -s -X POST 127.0.0.1:8280/api/host/mount -H 'Content-Type: application/json' \

@@ -10,7 +10,7 @@ FormPublisher is the Form family's site publisher. It opens what FormWeb makes (
 - `backend/app/targets/<id>.py` is one host adapter each (discovered like the routers); `backend/app/cli.py` holds the `Client` (HTTP to a running engine, else the same services in-process) and `backend/app/mcp.py` one tool per method. A new route gets a Client method, a command and a tool together; the exact tool names are in `AGENTS.md` and `.claude/skills/formpublisher-harness`.
 - Ports: the interface on http://localhost:5280 (Vite, `server.host` false, preview on 5281), the engine on http://127.0.0.1:8280 (`FORMPUBLISHER_PORT`).
 - Data folder: `~/FormPublisher`, moved with `FORMPUBLISHER_HOME`.
-- Scripts are named as the family's: `formpublisher` (boot), `formpublisher_oc_install`, `build_app`, each with a `.bat` twin; `./formpublisher agents install|status|sync` (`setup/agents.py`) connects Claude Code, Codex and Cursor. `.claude/skills` holds the formpublisher skills; `.agents/skills` is its mirror, kept by `./formpublisher agents sync`.
+- Scripts are named as the family's: `formpublisher` (boot), `formpublisher_oc_install`, `build_app`, each with a `.bat` twin; `./formpublisher agents install|status|sync` (`setup/agents.py`) connects Claude Code, Codex, Cursor and Antigravity; an installed app runs the same with its engine program (`formpublisher-engine agents install`, see the manual's Registering the MCP server), and the repository's `.mcp.json`, `.cursor/mcp.json` and `.codex/config.toml` run `node setup/mcp_launch.mjs`. `.claude/skills` holds the formpublisher skills; `.agents/skills` is its mirror, kept by `./formpublisher agents sync`, which also writes `docs/mcp-tools.json`, the generated list of every MCP tool and command with the counts (point at it rather than stating a count).
 - Planning documents (DEV_PLAN, BUILD_NOTES, TEST_PLAN, the root HASHOUT_LOG) ship in the planning sidecar zip, not in this tree. The living logs, one `HASHOUT_LOG.md` per area (`frontend/`, `backend/`, `src-tauri/` and each module's folder), are in the tree: read them before editing.
 
 ## FormWeb
@@ -26,7 +26,7 @@ FormPublisher only reads FormWeb. It imports exports and publication folders and
 - Every chooser is the family's dropdown (`ui/dropdown.ts`), never a native `select`. Keys and settings live only in Preferences (a sheet offers a chip that opens Preferences at the panel). Accent-coloured text and icons use `--accent-ink` so they read on the light themes (fills and rings keep `--accent-color`).
 - A check never starts a real agent program; use a stand-in.
 - No emoji; no em dash in Markdown; no icon libraries (inline `currentColor` SVG only); no commented-out code; near-zero comments.
-- Every dependency that ships gets a row in `NOTICE.md`. GPL stays out of the distributed bundle.
+- Every dependency that ships gets a row in `NOTICE.md`. FormPublisher is GPL-3.0-only: permissive and GPL-3.0-compatible licences are fine, AGPL is used nowhere, and LGPL code only as a separate program. Code from FormVis and FormDeck (Apache-2.0, the same owner) may be taken; FormPortal and formcompiler (GPL-3.0-only, another product line) give the look and the data contracts, not code.
 - Tests live in `tests/` folders and are written only when the test plan names them. The engine's pytest suite is `backend/tests` (see `AGENTS.md`); keep it green and fast.
 
 ## Commits

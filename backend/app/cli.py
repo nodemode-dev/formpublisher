@@ -417,6 +417,45 @@ class Client:
 
         return self._local(inbox.status)
 
+    def inspect_build(self, build_id: str) -> dict:
+        self.connect()
+        record = self.call("GET", f"/api/builds/{_q(build_id)}") if self.url else self._local(package.get_build, build_id)
+        return {**record, "signed": bool(record.get("signature")), "signature": self.verify(build_id)}
+
+    def compare_builds(self, a: str, b: str) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", f"/api/builds/{_q(a)}/compare/{_q(b)}")
+        return self._local(package.compare, a, b)
+
+    def reproduce(self, build_id: str) -> dict:
+        self.connect()
+        if self.url:
+            made = self.call("POST", f"/api/builds/{_q(build_id)}/reproduce", {})
+        else:
+            made = self._local(package.reproduce, build_id)
+        return {"build": build_id, **made}
+
+    def verify_prepared(self, build_id: str, target: str) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("POST", f"/api/publish/{_q(build_id)}/{_q(target)}/verify", {})
+        from app.services import publish
+
+        return self._local(publish.verify, build_id, target)
+
+    def preview(self, site_id: str, revision: str | None = None) -> dict:
+        self.connect()
+        if not self.url:
+            raise OpError("the preview needs the running engine, which serves the site on its local preview host; start FormPublisher first", 3, "engine-unreachable")
+        mounted = self.call("POST", "/api/host/mount", {"site": site_id, "revision": revision})
+        state = self.call("GET", "/api/host")
+        chosen = state.get("revision") or revision
+        listed = self.call("GET", f"/api/sites/{_q(site_id)}/routes" + (f"?revision={_q(chosen)}" if chosen else ""))
+        rows = [r["path"] for r in listed.get("routes") or [] if isinstance(r.get("path"), str)]
+        addresses = [{"route": path, "url": urllib.parse.urljoin(mounted["url"], urllib.parse.quote(path.lstrip("/").removesuffix("index.html")))} for path in rows]
+        return {"site": site_id, "revision": chosen, "url": mounted["url"], "origin": mounted["origin"], "generation": mounted["generation"], "addresses": addresses}
+
 
 def _q(value: str) -> str:
     return urllib.parse.quote(value, safe="")
@@ -637,11 +676,58 @@ def say_receive(data: dict) -> str:
     lines = [
         f"endpoint  {data.get('endpoint')}",
         f"inbox     {data.get('inbox')}  " + ("watching" if data.get("watching") else "not watching") + f", {data.get('pending', 0)} waiting",
+        "arrival   " + ", ".join(f"{step} " + ("on" if (data.get("auto") or {}).get(step) else "off") for step in ("check", "build")),
     ]
     rows = data.get("receipts") or []
     lines.append("no receipts yet" if not rows else "last receipts:")
     for r in rows:
         lines.append("  " + "  ".join(f"{k} {v}" for k, v in r.items() if v not in (None, "")))
+    return "\n".join(lines)
+
+
+def say_inspect(data: dict) -> str:
+    publish = data.get("publish") or {}
+    checks_seen = publish.get("checks")
+    ran = f"checks {', '.join(checks_seen.get('tiers', []))}: {_plural(checks_seen['errors'], 'error')}, {_plural(checks_seen['warnings'], 'warning')}, {_plural(checks_seen['infos'], 'note')}" if isinstance(checks_seen, dict) else "no checks had run when it was built"
+    sig = data.get("signature") or {}
+    state = _signed_by(sig) if sig.get("valid") else f"signature: {sig.get('reason') or sig.get('message') or 'not valid'}"
+    lines = [
+        f"build {data.get('id')}  site {data.get('site')}  revision {data.get('revision')}  {_plural(data.get('files', 0), 'file')}  {data.get('size', 0)} bytes  {data.get('created', '')}",
+        f"site.zip sha256 {(publish.get('package') or {}).get('sha256', '')}",
+        ran,
+        state,
+    ]
+    for row in publish.get("files") or []:
+        lines.append(f"  {row.get('size', 0):>9}  {row.get('sha256', '')[:12]}  {row.get('path', '')}")
+    return "\n".join(lines)
+
+
+def say_compare(data: dict) -> str:
+    lines = [f"{data['a']} -> {data['b']}  +{len(data['added'])} -{len(data['removed'])} ~{len(data['changed'])} ={data['same']}"]
+    for path in data["added"]:
+        lines.append(f"added    {path}")
+    for path in data["removed"]:
+        lines.append(f"removed  {path}")
+    for row in data["changed"]:
+        lines.append(f"changed  {row['path']}  {row['a']['size']} -> {row['b']['size']} bytes  {row['a']['sha256'][:12]} -> {row['b']['sha256'][:12]}")
+    return "\n".join(lines)
+
+
+def say_reproduce(data: dict) -> str:
+    if data.get("same"):
+        return f"build {data['build']} reproduced: the same bytes  sha256 {data['sha256']}"
+    return f"build {data['build']} did not reproduce: rebuilt {data['sha256']}, expected {data['expected']}"
+
+
+def say_verify_prepared(data: dict) -> str:
+    head = f"{data['target']} for build {data['build']}  {data['folder']}  {_plural(data.get('checked', 0), 'file')} checked  " + ("matches its build" if data.get("ok") else _plural(len(data.get("problems") or []), "problem"))
+    return "\n".join([head] + [f"  {p.get('problem', '')}  {p.get('path', '')}  ({p.get('source', '')})" for p in data.get("problems") or []])
+
+
+def say_preview(data: dict) -> str:
+    lines = [f"previewing {data['site']}  revision {data.get('revision')}  at {data['url']}"]
+    for row in data.get("addresses") or []:
+        lines.append(f"  {row['url']}")
     return "\n".join(lines)
 
 
@@ -678,6 +764,13 @@ def build_parser() -> argparse.ArgumentParser:
     bd.add_argument("id")
     bd.add_argument("--revision", help="revision to build (default: the latest)")
     sub.add_parser("builds", parents=[common], help="list builds, newest first")
+    ib = sub.add_parser("inspect", parents=[common], help="show a build's publish.json: its files with sizes and SHA-256, the checks summary and the signature state")
+    ib.add_argument("build")
+    cb = sub.add_parser("compare", parents=[common], help="show the files added, removed and changed from build A to build B")
+    cb.add_argument("a")
+    cb.add_argument("b")
+    rp = sub.add_parser("reproduce", parents=[common], help="rebuild a build from its revision and say whether the bytes match; exits 1 when they do not")
+    rp.add_argument("build")
     fp = sub.add_parser("fpub", parents=[common], help="save a build as a .fpub package (the same bytes every time)")
     fp.add_argument("build")
     fp.add_argument("--out", metavar="FILE", help="where to write it (default: SITE-BUILD.fpub in the current folder)")
@@ -704,6 +797,12 @@ def build_parser() -> argparse.ArgumentParser:
     pp.add_argument("--include-model", action="store_true", help="keep FormWeb's model files (site.formweb.json, asset-access.json) in the host folders; they are left out by default")
     pd = sub.add_parser("prepared", parents=[common], help="list what is prepared for a build")
     pd.add_argument("build")
+    vp = sub.add_parser("verify-prepared", parents=[common], help="check that a prepared folder still matches its build; exits 1 when it does not")
+    vp.add_argument("build")
+    vp.add_argument("target", help="target id the folder was prepared for (see prepared)")
+    pv = sub.add_parser("preview", parents=[common], help="mount a site revision on the running engine's local preview host and print the addresses to open")
+    pv.add_argument("id")
+    pv.add_argument("--revision", help="revision to show (default: the latest)")
     tr = sub.add_parser("trash", parents=[common], help="list the trash; trash restore ENTRY, trash delete ENTRY and trash empty --yes act on it")
     tr_sub = tr.add_subparsers(dest="trash_command")
     trr = tr_sub.add_parser("restore", parents=[common], help="move an entry back to where it came from")
@@ -714,7 +813,7 @@ def build_parser() -> argparse.ArgumentParser:
     trd.add_argument("entry")
     tre = tr_sub.add_parser("empty", parents=[common], help="delete every entry for good")
     tre.add_argument("--yes", action="store_true", help="confirm that everything in the trash is deleted for good")
-    sub.add_parser("receive-status", parents=[common], help="the receive endpoint, the inbox folder and the last receipts")
+    sub.add_parser("receive-status", parents=[common], help="the receive endpoint, the inbox folder, whether sites are checked and built on arrival, and the last receipts")
     tp = sub.add_parser("templates", parents=[common], help="list the kept templates to start a site from; --fetch reads the list from the templates repository now")
     tp.add_argument("--fetch", action="store_true", help="read index.json from the templates repository now and keep it")
     st = sub.add_parser("start", parents=[common], help="make an editable FormWeb project from a kept template in a folder you name")
@@ -809,6 +908,16 @@ def main(argv: list[str] | None = None) -> int:
             data, say = client.build(args.id, args.revision), say_build
         elif args.command == "builds":
             data, say = client.builds(), say_builds
+        elif args.command == "inspect":
+            data, say = client.inspect_build(args.build), say_inspect
+        elif args.command == "compare":
+            data, say = client.compare_builds(args.a, args.b), say_compare
+        elif args.command == "reproduce":
+            data, say = client.reproduce(args.build), say_reproduce
+        elif args.command == "verify-prepared":
+            data, say = client.verify_prepared(args.build, args.target), say_verify_prepared
+        elif args.command == "preview":
+            data, say = client.preview(args.id, args.revision), say_preview
         elif args.command == "fpub":
             data, say = client.save_fpub(args.build, args.out, args.force), say_fpub
         elif args.command == "sign":
@@ -858,6 +967,8 @@ def main(argv: list[str] | None = None) -> int:
     except BrokenPipeError:
         os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
     if args.command == "verify" and not (data.get("valid") and (data.get("known") or args.allow_unknown)):
+        return 1
+    if (args.command == "reproduce" and not data.get("same")) or (args.command == "verify-prepared" and not data.get("ok")):
         return 1
     return 0
 

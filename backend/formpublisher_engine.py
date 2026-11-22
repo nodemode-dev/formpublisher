@@ -106,6 +106,42 @@ def passthrough(module_name: str, argv: list[str]) -> int:
     return int(result or 0)
 
 
+def console() -> None:
+    if os.name != "nt" or getattr(sys.stdout, "name", "") != os.devnull:
+        return
+    try:
+        import ctypes
+
+        if ctypes.windll.kernel32.AttachConsole(-1):
+            sys.stdout = open("CONOUT$", "w", encoding="utf-8")
+            sys.stderr = open("CONOUT$", "w", encoding="utf-8")
+    except (OSError, AttributeError):
+        pass
+
+
+def agents(argv: list[str]) -> int:
+    import importlib.util
+
+    if getattr(sys, "frozen", False):
+        if os.environ.get("APPIMAGE"):
+            print(f"formpublisher agents: this engine runs from inside the AppImage's mount ({os.path.dirname(sys.executable)}), a path that changes on every start, so it cannot be registered with an agent. Extract the AppImage once ({os.environ['APPIMAGE']} --appimage-extract) and run squashfs-root/usr/lib/FormPublisher/engine/formpublisher-engine agents install from there, or install the .deb or .rpm.", file=sys.stderr)
+            return 2
+        os.environ["FORMPUBLISHER_LAUNCHER"] = sys.executable
+        os.environ["FORMPUBLISHER_LAUNCHER_ARGS"] = "[]"
+        script = os.path.join(resource_dir(), "setup", "agents.py")
+    else:
+        os.environ["FORMPUBLISHER_LAUNCHER"] = sys.executable
+        os.environ["FORMPUBLISHER_LAUNCHER_ARGS"] = json.dumps([os.path.abspath(__file__)])
+        script = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "setup", "agents.py")
+    if not os.path.isfile(script):
+        print(f"formpublisher agents: {script} is missing from this engine", file=sys.stderr)
+        return 1
+    spec = importlib.util.spec_from_file_location("formpublisher_agents", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return int(module.main(argv) or 0)
+
+
 def serve() -> int:
     bundled = os.path.join(resource_dir(), "frontend_dist")
     if os.path.isdir(bundled):
@@ -138,6 +174,9 @@ def main() -> int:
         return passthrough("app.cli", args[1:])
     if args and args[0] == "mcp":
         return passthrough("app.mcp", args[1:])
+    if args and args[0] == "agents":
+        console()
+        return agents(args[1:])
     return serve()
 
 

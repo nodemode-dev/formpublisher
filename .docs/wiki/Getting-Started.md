@@ -11,7 +11,7 @@ Node 22.12 or newer and Python 3.12. The desktop app also needs Rust 1.97.0 (pin
 ./formpublisher                   # the engine on 127.0.0.1:8280 and the interface on http://localhost:5280
 ```
 
-The install uses the hashed lock (`pip install --require-hashes -r backend/requirements.lock`); after you change a requirements file, run `python setup/lock_requirements.py` and commit the locks. `./build_app` makes the desktop app start to finish (log in `build_app.log`). Windows: `formpublisher_oc_install.bat`, `formpublisher.bat`, `build_app.bat`. `./formpublisher agents install` connects Claude Code, Codex and Cursor.
+The install uses the hashed lock (`pip install --require-hashes -r backend/requirements.lock`); after you change a requirements file, run `python setup/lock_requirements.py` and commit the locks. `./build_app` makes the desktop app start to finish (log in `build_app.log`). Windows: `formpublisher_oc_install.bat`, `formpublisher.bat`, `build_app.bat`. `./formpublisher agents install` connects Claude Code, Codex, Cursor and Antigravity; an installed app does the same with its own engine program (see [Agents](Agents)).
 
 `./formpublisher backend` and `./formpublisher frontend` start one half each. One process serving the built interface: `./formpublisher build`, then `./formpublisher serve` (http://127.0.0.1:8280).
 
