@@ -15,6 +15,12 @@
 .fp-pkg-res { min-height: 18px; }
 .fp-pkg-res.is-ok { color: var(--ok-soft); }
 .fp-pkg-res.is-error { color: var(--danger-text); }
+.fp-pkg-res.is-warn { color: var(--warn); }
+.fp-kt-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+.fp-kt-field { display: grid; gap: var(--space-2); }
+.fp-kt-field[hidden] { display: none; }
+.fp-kt-error { min-height: 2.8em; overflow-wrap: anywhere; }
+.fp-pkg-res.is-verify { min-height: 2.8em; display: flex; align-items: center; overflow-wrap: anywhere; }
 body.theme-light .fp-pkg-res.is-ok { color: var(--success-fill); }
 body.theme-light .fp-pkg-res.is-error { color: var(--danger-fill); }
 .fp-pkg-pass { width: 150px; flex: none; }

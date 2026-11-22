@@ -262,8 +262,7 @@ def import_file(archive: Path, source: dict | None = None, name: str | None = No
             found = _check_signature((work / SIG_ENTRY).read_bytes(), zip_file)
             if any(found[k] != meta["signature"][k] for k in ("keyId", "fingerprint", "publicKey")):
                 raise _error("the signature is not valid: it does not match the key recorded in fpub.json", 400, "fpub-signature")
-            known = any(row.get("id") == found["keyId"] for row in keys.list_keys())
-            verdict = {"valid": True, "key": found["fingerprint"], "keyId": found["keyId"], "known": known}
+            verdict = {**keys.signer_verdict(base64.b64decode(found["publicKey"]), True), "keyId": found["keyId"]}
         site_id = site["id"]
         revision = meta["revision"] if REVISION_RE.match(meta["revision"]) else None
         origin = (publish.get("site") or {}).get("source") if isinstance((publish.get("site") or {}).get("source"), dict) else {}

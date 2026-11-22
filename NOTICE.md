@@ -22,6 +22,10 @@ FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, 
 | mcp 2.3.0 (the official MCP Python SDK) | the MCP server on stdio | MIT |
 | httpx2 2.16.0 | the engine's read-only calls to a running FormWeb | BSD-3-Clause |
 | cryptography 50.0.2 | Ed25519 keys, signatures and passphrase encryption of private keys | Apache-2.0 OR BSD-3-Clause |
+| keyring 25.7.0 | keeps each signing key's private half in the system password store (macOS Keychain, Windows Credential Manager, Secret Service on Linux) | MIT |
+| jaraco.classes 3.4.0, jaraco.context 6.1.2, jaraco.functools 4.6.0, more-itertools 11.2.1 | brought in by keyring | MIT |
+| SecretStorage 3.5.0 and jeepney 0.9.0 (Linux only) | keyring's way to the Secret Service over D-Bus | BSD-3-Clause (SecretStorage), MIT (jeepney) |
+| pywin32-ctypes 0.2.3 (Windows only) | keyring's way to Credential Manager | BSD-3-Clause |
 | Playwright for Python 1.65.0 (`backend/requirements-deep.txt`), frozen into the engine; no browser is downloaded | deep checks drive the person's installed Google Chrome or Microsoft Edge | Apache-2.0 |
 | Node.js runtime inside Playwright's driver (`playwright/driver/node`), frozen into the engine with the driver | runs Playwright's driver for the deep checks | MIT, with the third-party licences listed in the driver's own `LICENSE` and `ThirdPartyNotices` files, which ship in the engine folder under `_internal/playwright/driver/` |
 | greenlet 3.5.6 | the coroutine switching that Playwright's Python package needs | MIT AND PSF-2.0 |

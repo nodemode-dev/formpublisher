@@ -1,5 +1,5 @@
 import '../styles/package.css';
-import { buildsApi, type BuildDetail, type CheckSummary, type KeyInfo } from '../api-builds';
+import { buildsApi, type BuildDetail, type CheckSummary, type KeyInfo, type KeySecret } from '../api-builds';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
 import { onLanguage, t } from '../i18n';
@@ -7,19 +7,23 @@ import { copyText, fmtBytes, fmtCount, showInLibrary } from './builds';
 import { Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
 import { icon } from './icons';
+import { exportKeyDialog, importKeyDialog } from './key-transfer';
 import { refuse, refuseStep } from './notice-step';
 import { runChecks } from './panel';
 import { installPublish } from './publish-sheet';
 
-type Tone = '' | 'ok' | 'error';
+type Tone = '' | 'ok' | 'warn' | 'error';
 
-interface KeyOption { id: string; name: string; encrypted: boolean }
+interface KeyOption { id: string; name: string; encrypted: boolean; canSign: boolean }
+
+const KEPT: Record<KeySecret, string> = { store: 'Password store', file: 'Private file', none: 'Verify only' };
 
 const message = (e: unknown): string => (e instanceof Error && e.message ? e.message : 'Request failed');
 
 function say(node: HTMLElement, text: string, tone: Tone): void {
   setText(node, text);
   setClass(node, 'is-ok', tone === 'ok');
+  setClass(node, 'is-warn', tone === 'warn');
   setClass(node, 'is-error', tone === 'error');
 }
 
@@ -43,6 +47,8 @@ class PackageSheet extends Dialog {
   private readonly createBtn: HTMLButtonElement;
   private readonly newBtn: HTMLButtonElement;
   private readonly copyBtn: HTMLButtonElement;
+  private readonly exportBtn: HTMLButtonElement;
+  private readonly importBtn: HTMLButtonElement;
   private readonly buildBtn: HTMLButtonElement;
   private readonly downloadBtn: HTMLButtonElement;
   private readonly libraryBtn: HTMLButtonElement;
@@ -74,9 +80,9 @@ class PackageSheet extends Dialog {
 <section class="fp-pkg-sec">
 <div class="fp-pkg-sec-h">Signature</div>
 <div class="fp-pkg-line"><select class="fp-select fp-pkg-grow" data-f="key" aria-label="Signing key"></select><input class="fp-input fp-pkg-pass" type="password" data-f="pass" placeholder="Passphrase" aria-label="Passphrase" autocomplete="off"><button class="fp-btn fp-btn-sm" type="button" data-a="sign">${icon('key', 14)}<span>Sign</span></button></div>
-<div class="fp-pkg-line"><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="newkey">${icon('plus', 14)}<span>New key</span></button><span class="fp-pkg-grow fp-pkg-res" data-f="sign" role="status"></span></div>
+<div class="fp-pkg-line"><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="newkey">${icon('plus', 14)}<span>New key</span></button><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="exportkey">Export...</button><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="importkey">Import...</button><span class="fp-pkg-grow fp-pkg-res" data-f="sign" role="status"></span></div>
 <div class="fp-pkg-line fp-pkg-newkey" hidden><input class="fp-input fp-pkg-grow" data-f="newname" placeholder="Key name" aria-label="Key name" autocomplete="off"><input class="fp-input fp-pkg-pass" type="password" data-f="newpass" placeholder="Passphrase (optional)" aria-label="New key passphrase" autocomplete="new-password"><button class="fp-btn fp-btn-sm" type="button" data-a="create">Create key</button></div>
-<div class="fp-pkg-line"><button class="fp-btn fp-btn-sm" type="button" data-a="verify">${icon('shield', 14)}<span>Verify</span></button><span class="fp-pkg-grow fp-pkg-res" data-f="verify" role="status"></span></div>
+<div class="fp-pkg-line"><button class="fp-btn fp-btn-sm" type="button" data-a="verify">${icon('shield', 14)}<span>Verify</span></button><span class="fp-pkg-grow fp-pkg-res is-verify" data-f="verify" role="status"></span></div>
 </section></div>`));
     for (const n of Array.from(this.body.querySelectorAll<HTMLElement>('[data-f]'))) this.f[n.dataset.f ?? ''] = n;
     this.keySel = this.f.key as HTMLSelectElement;
@@ -94,6 +100,8 @@ class PackageSheet extends Dialog {
     this.createBtn = btn('create');
     this.newBtn = btn('newkey');
     this.copyBtn = btn('copy');
+    this.exportBtn = btn('exportkey');
+    this.importBtn = btn('importkey');
     this.button('Close', 'ghost', () => this.close());
     this.libraryBtn = this.button('Show in library', 'ghost', () => this.toLibrary());
     this.downloadBtn = this.button('Download', 'ghost', () => this.download());
@@ -181,7 +189,7 @@ class PackageSheet extends Dialog {
   }
 
   private paintKeys(keep: string): void {
-    const items: KeyOption[] = [{ id: '', name: t(this.keys.length ? 'Choose a key' : 'No keys yet'), encrypted: false }, ...this.keys.map((k) => ({ id: k.id, name: `${k.name}  ${k.fingerprint.slice(0, 22)}`, encrypted: k.encrypted }))];
+    const items: KeyOption[] = [{ id: '', name: t(this.keys.length ? 'Choose a key' : 'No keys yet'), encrypted: false, canSign: true }, ...this.keys.map((k) => ({ id: k.id, name: `${k.name}  ${k.fingerprint.slice(0, 22)}  ·  ${t(KEPT[k.secret])}`, encrypted: k.encrypted, canSign: k.canSign }))];
     patchList(this.keySel, items, {
       key: (k) => k.id || '-',
       create: (k) => {
@@ -189,9 +197,14 @@ class PackageSheet extends Dialog {
         o.value = k.id;
         if (k.id) o.translate = false;
         o.textContent = k.name;
+        o.disabled = !k.canSign;
         return o;
       },
-      update: (n, k) => setText(n, k.name),
+      update: (n, k) => {
+        setText(n, k.name);
+        const o = n as HTMLOptionElement;
+        if (o.disabled !== !k.canSign) o.disabled = !k.canSign;
+      },
     });
     if (this.keySel.value !== keep && items.some((k) => k.id === keep)) this.keySel.value = keep;
     this.sync();
@@ -222,13 +235,15 @@ class PackageSheet extends Dialog {
     setDisabled(this.buildBtn, this.busy || !this.site || !this.revision);
     setDisabled(this.checksBtn, this.busy || !this.site);
     setDisabled(this.reproBtn, this.busy || !has);
-    setDisabled(this.signBtn, this.busy || !has || !key);
+    setDisabled(this.signBtn, this.busy || !has || !key || !key.canSign);
     setDisabled(this.verifyBtn, this.busy || !has || !this.build?.signed);
     setDisabled(this.copyBtn, !has);
     setDisabled(this.downloadBtn, this.busy || !has);
     setDisabled(this.libraryBtn, !has);
     setDisabled(this.publishBtn, this.busy || !has);
     setDisabled(this.newBtn, this.busy);
+    setDisabled(this.exportBtn, this.busy || !key || !key.canSign);
+    setDisabled(this.importBtn, this.busy);
     setDisabled(this.createBtn, this.busy);
     setDisabled(this.pass, this.busy || !key || !key.encrypted);
     setAttr(this.pass, 'placeholder', key && !key.encrypted ? 'No passphrase' : 'Passphrase');
@@ -312,8 +327,9 @@ class PackageSheet extends Dialog {
       say(this.f.verify, 'Verifying', '');
       try {
         const r = await buildsApi.verify(b.id);
-        if (r.valid) say(this.f.verify, `Valid. Signed by ${r.key}.`, 'ok');
-        else say(this.f.verify, `Invalid. ${r.reason || 'The signature does not match.'}`, 'error');
+        if (r.valid && r.known) say(this.f.verify, `Verified with your key ${r.signerName || r.key}.`, 'ok');
+        else if (r.valid) say(this.f.verify, `Signed by a key you do not have. ${r.key}`, 'warn');
+        else say(this.f.verify, `Invalid. ${r.reason || r.message || 'The signature does not match.'}`, 'error');
       } catch (e) {
         say(this.f.verify, message(e), 'error');
         refuseStep(e, b.id, () => { void this.runVerify(); });
@@ -341,6 +357,15 @@ class PackageSheet extends Dialog {
         say(this.f.sign, message(e), 'error');
       }
     });
+  }
+
+  private async afterImport(id: string): Promise<void> {
+    try {
+      this.keys = await buildsApi.keys();
+    } catch {
+      return;
+    }
+    this.paintKeys(id);
   }
 
   private async runChecksNow(): Promise<void> {
@@ -389,6 +414,10 @@ class PackageSheet extends Dialog {
       else if (a === 'verify') void this.runVerify();
       else if (a === 'create') void this.runCreateKey();
       else if (a === 'copy' && this.build) void copyText(this.build.sha256);
+      else if (a === 'exportkey') {
+        const key = this.keys.find((k) => k.id === this.keySel.value);
+        if (key?.canSign) exportKeyDialog(key);
+      } else if (a === 'importkey') importKeyDialog((k) => { void this.afterImport(k.id); });
       else if (a === 'newkey') {
         setHidden(this.newBox, !this.newBox.hidden);
         if (!this.newBox.hidden) this.newName.focus();
