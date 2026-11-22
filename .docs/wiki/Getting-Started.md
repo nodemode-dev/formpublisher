@@ -30,7 +30,7 @@ The port rule: `FORMPUBLISHER_PORT` when set, else 8280 when free, else any free
 
 ## Where things are kept
 
-Imported sites and settings live in FormPublisher's data folder: `~/FormPublisher`, or the folder named by `FORMPUBLISHER_HOME`; the engine's log is `logs/engine.log` there (1 MB, 3 older files kept). Removed sites, builds, keys and prepared folders go to `trash/` there; Home's Trash page restores them (entries from before 0.1.4 too, and one whose place is unknown asks where it goes) or deletes them for good. Home sits under the title bar, so the menubar and Preferences work over it, and Recent sites stay still when a site arrives: a row says how many arrived and Show re-sorts. Keyboard Shortcuts (`Mod+/`) lets you rebind any command with Change and Reset.
+Imported sites and settings live in FormPublisher's data folder: `~/FormPublisher`, or the folder named by `FORMPUBLISHER_HOME`; the engine's log is `logs/engine.log` there (1 MB, 3 older files kept), and `engine.key` there is the key the command line and the MCP server send with a change (readable only by you, new at every engine start). Signing keys are listed in `keys/index.json`; their private halves are in the system password store. Removed sites, builds, keys and prepared folders go to `trash/` there; Home's Trash page restores them (entries from before 0.1.4 too, and one whose place is unknown asks where it goes) or deletes them for good. Home sits under the title bar, so the menubar and Preferences work over it, and Recent sites stay still when a site arrives: a row says how many arrived and Show re-sorts. Keyboard Shortcuts (`Mod+/`) lets you rebind any command with Change and Reset.
 
 ## Ports
 

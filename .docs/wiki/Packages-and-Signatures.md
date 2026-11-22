@@ -10,9 +10,11 @@ Reproduce rebuilds into a temporary folder and compares the hash.
 
 ## Keys and signatures
 
-Ed25519 through `cryptography`. The private key is PKCS8 PEM in `keys/[id].pem` (mode 0600, encrypted with a passphrase when given); the public key is raw 32 bytes in base64 in `keys/index.json`. The fingerprint is `SHA256:` plus the unpadded base64 of the SHA-256 of the public key.
+Ed25519 through `cryptography`. The public key is raw 32 bytes in base64 in `keys/index.json`, with the name, fingerprint and where its secret is kept. The private key is PKCS8 PEM (encrypted with a passphrase when given) and lives in the system password store through keyring 25.7.0: the Keychain on macOS, the Credential Manager on Windows, the Secret Service on Linux. The store is reached only to create, sign, export, import and remove a key; listing never touches it, `keys/index.json` answers. Where there is no store, the secret is a private file in `keys/` that only the person can read, and a PEM file from an earlier version is adopted on first use. Each key shows where its secret is: Password store, Private file or Verify only. The fingerprint is `SHA256:` plus the unpadded base64 of the SHA-256 of the public key.
 
-`site.zip.sig` is JSON with `algorithm`, `key` (the fingerprint), `publicKey` and `signature`, over the exact zip bytes. Verify answers `valid` and fails if any byte of the zip changed.
+Removing a key deletes its secret; the Trash keeps only the public half, and a key restored from it can verify but not sign. Export (`./formpublisher run keys --export ID --to FILE [--force]`, or Export... in the Package sheet) writes the private key to a `.pem` file that is always encrypted (a passphrase of at least 8 characters, asked twice, or `FORMPUBLISHER_KEY_PASSPHRASE`) and created readable only by the person; Import (`keys --import FILE [--name NAME]`, or Import...) adds a key from such a file. Both are also `POST /api/keys/{id}/export` and `POST /api/keys/import`. No MCP tool does either, on purpose.
+
+`site.zip.sig` is JSON with `algorithm`, `key` (the fingerprint), `publicKey` and `signature`, over the exact zip bytes. Verify checks that the signature holds over the bytes and then whether the public key it carries is one of the person's own keys. Every answer has `valid`, `known` (the signer's key is one of theirs), `trusted` (both), `signer` (the fingerprint, and the key's name when known) and `message`. A changed byte of the zip is not valid. `valid` with `known` false is a warning, "Signed by a key you do not have.": anyone can sign a changed package with a key of their own, so it does not show who made it. The command line's `verify` exits 1 for that unless `--allow-unknown`, and an imported `.fpub` answers with the same fields.
 
 ## One build in one file
 
@@ -20,4 +22,4 @@ Save as .fpub on a row of the builds library (or `./formpublisher run fpub BUILD
 
 ## In the window
 
-Package (Mod+Shift+B) builds, reproduces, signs, verifies and downloads. The Builds page in Home lists builds, inspects a file table, compares two builds, saves one as a `.fpub` and deletes. The manual has the file formats in full: `docs/MANUAL.md`.
+Package (Mod+Shift+B) builds, reproduces, signs, verifies (three states: verified with your key, signed by a key you do not have, or invalid), exports and imports keys, and downloads. The Builds page in Home lists builds, inspects a file table, compares two builds, saves one as a `.fpub` and deletes. The manual has the file formats in full: `docs/MANUAL.md`.

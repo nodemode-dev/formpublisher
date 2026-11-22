@@ -110,7 +110,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>Package and sign</h3>
-      Build a deterministic <code>site.zip</code> with a <code>publish.json</code> that lists every file by SHA-256, reproduce it byte for byte, and sign it with an Ed25519 key. Verify a signature, inspect a build and compare two.
+      Build a deterministic <code>site.zip</code> with a <code>publish.json</code> that lists every file by SHA-256, reproduce it byte for byte, and sign it with an Ed25519 key. The key's private half is kept in your system's password store (the Keychain on macOS, the Credential Manager on Windows, the Secret Service on Linux), never in a loose file where a store exists, and a key can be exported to an encrypted file and imported on another computer. Verify tells you whether a package was signed by one of your own keys and warns when the key is not yours. Inspect a build and compare two.
     </td>
     <td width="50%" valign="top">
       <h3>Open .fweb projects</h3>
@@ -221,7 +221,7 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
 <table>
   <tr>
     <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Builds · Trash · Demos · menubar · site tabs · routes strip · inspector · status bar · Preferences · Keyboard Shortcuts</td>
-    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · fpub · targets · prepare · prepared · trash · receive-status</td>
+    <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · keys · fpub · targets · prepare · prepared · trash · receive-status</td>
     <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · .fweb project · .fpub package · publication folder · the running FormWeb's current site or a saved project · sent from FormWeb (endpoint or inbox) · the demo</td>
   </tr>
 </table>
@@ -239,7 +239,7 @@ The window, the command line and the MCP server call one engine, so an agent and
 ./formpublisher run revisions SITE-ID          # its revisions; diff SITE-ID shows what changed between two
 ./formpublisher run check SITE-ID              # the static checks (--deep for the browser run, --last for the stored result)
 ./formpublisher run build SITE-ID              # the deterministic site.zip and publish.json
-./formpublisher run sign BUILD-ID --key NAME   # an Ed25519 signature; verify BUILD-ID checks it
+./formpublisher run sign BUILD-ID --key NAME   # an Ed25519 signature; verify BUILD-ID checks it against your own keys
 ./formpublisher run targets                    # the six hosts
 ./formpublisher run prepare BUILD-ID --target netlify --target nginx
 ./formpublisher mcp                            # MCP server on stdio
@@ -253,7 +253,8 @@ The window, the command line and the MCP server call one engine, so an agent and
 | `formweb-projects` | list the running FormWeb's saved projects, the open one first |
 | `check ID`, `build ID`, `builds` | run the checks, build the package, list builds |
 | `fpub BUILD [--out FILE] [--force]` | save a build as a `.fpub` (the same bytes every time; `--force` replaces a file) |
-| `sign BUILD`, `verify BUILD`, `keys` | sign, verify (exits 1 when invalid), list or create (`--create NAME`) keys |
+| `sign BUILD`, `verify BUILD [--allow-unknown]` | sign, verify (exits 1 when invalid, and when the signer is not one of your keys unless `--allow-unknown`) |
+| `keys`, `keys --create NAME`, `keys --export ID --to FILE [--force]`, `keys --import FILE [--name NAME]` | list keys and where each secret is kept, create one, export one to an encrypted `.pem` file (it asks for a passphrase of at least 8 characters), import one from such a file |
 | `targets`, `prepare BUILD --target T [--include-model]`, `prepared BUILD` | list hosts, prepare a folder per host (FormWeb's model files left out unless `--include-model`), list what is prepared |
 | `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back (`--to PATH` names the place when it is unknown; `--passphrase-stdin` reads one line for a locked key rebuilt from its `.pem`), delete one for good, empty it (refuses without `--yes`) |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
@@ -269,7 +270,7 @@ Every command takes `--json`. The MCP server has 22 tools over the same routes:
 | `list_formweb_projects` | read the running FormWeb's saved projects, the open one first |
 | `run_checks`, `get_checks` | run the checks, read the stored result |
 | `build_package`, `list_builds`, `save_fpub` | build the package, list builds, save a build as a `.fpub` (never replaces a file) |
-| `sign_build`, `verify_build` | sign with a named key, verify a signature |
+| `sign_build`, `verify_build` | sign with a named key, verify a signature (the answer says whether the signer is one of the person's own keys: `known`); no tool exports or imports a key |
 | `list_targets`, `prepare_publish`, `get_prepared` | list the six hosts, prepare folders with their commands (`includeModel` keeps FormWeb's model files), read what is prepared |
 | `list_trash`, `restore_from_trash` | read the trash, move an entry back to its recorded or inferred origin (no tool deletes) |
 | `list_templates`, `start_from_template` | read the template list the person fetched, make a FormWeb project from one in a folder they named |
@@ -297,6 +298,8 @@ Two MCP servers are registered: `formpublisher` and `formmcp`, the Form family h
 - **One engine:** a FastAPI engine on 127.0.0.1:8280 owns the imported sites and the data folder; the interface, the command line and the MCP server are thin layers over its routes.
 - **Read-only toward FormWeb:** FormPublisher imports exports and folders and may read a running FormWeb's `/api/export`, `/api/access` and `/api/projects`; it never calls FormWeb's `/api/load` and never writes to FormWeb.
 - **Loopback only:** the engine answers on 127.0.0.1 and refuses any other Host or Origin.
+- **Only the window, the command line and the MCP server change things:** every request that is not a read needs a key the engine makes at each start (403 `forbidden` without it). A script in a previewed site cannot change anything, only the engine's own origin may use the desktop shell's commands, and the window is served with a Content-Security-Policy.
+- **Keys in the password store:** a signing key's private half lives in the system password store, listing never touches it, and removing a key deletes its secret.
 - **Zero flash:** every container exists in its final layout before the first paint, and the window is revealed once it is ready.
 - **Inline icons, no libraries:** icons are inline `currentColor` SVG; colours, sizes and every `z-index` come from tokens.
 
@@ -330,10 +333,11 @@ Ports and folders:
 | `builds/` | packages: `site.zip`, `publish.json`, `site.zip.sig` |
 | `prepared/` | the folders Publish writes, one per build and host |
 | `inbox/` | sites FormWeb leaves for FormPublisher (`imported/` and `failed/` below it) |
-| `keys/` | signing keys |
+| `keys/` | `index.json`, the signing keys' public halves; private halves are in the system password store (a private file here only where there is none) |
 | `trash/` | removed items, each with a `.trash.json` record, restorable from Home |
 | `logs/` | `engine.log`, the engine's log (rotates at 1 MB, 3 older files kept) |
 | `engine.json` | the running engine's app, port, pid, version and start time, so FormWeb finds it on any port |
+| `engine.key` | the key the command line and the MCP server send with a change; readable only by you, new at every engine start, removed when the engine ends |
 
 `./formpublisher serve` serves a production build from the engine alone, `./formpublisher desktop dev` opens the desktop window, and `./formpublisher doctor` checks the toolchain. `FORMPUBLISHER_HOME` moves the data folder (`~/FormPublisher` by default).
 
