@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.0 · 2026-11-22
+
+- The checks cover what Wix and Squarespace set up for you for search and sharing. A page needs one canonical link with a full address, and Open Graph's four tags (`og:title`, `og:type`, `og:image`, `og:url`) so links to it show a preview. Structured data must parse. Every language version must list the others and be listed back. The site needs a favicon and a 404 page.
+- Accessibility in the files: a link with nothing a screen reader can announce, and a form field with no label, are warnings (WCAG 2.2).
+- The deep check measures text contrast in the browser. Text below 4.5:1 (3:1 for large text) is a warning that names the worst three, with their colours. Text over an image, a gradient or moving content is counted as not measured rather than guessed.
+- The deep check reports the largest contentful paint for each route and width beside the layout shift. LCP over 2.5 s is a warning and over 4 s an error. These are lab values from your computer with the CPU and network slowed. INP needs a real visitor and is not measured.
+- The Checks view, `check` and the `run_checks` and `get_checks` tools show LCP and CLS for each route and width.
+- Prepare for Cloudflare Pages warns past its limits for `_headers`: 100 rules, 2,000 characters a line.
+- Each check names the page its rule comes from, in the manual's Checks section.
+
 ## 0.8.0 · 2026-11-22
 
 - Agents can do everything the window does. Seven new MCP tools and commands: `list_keys`, `receive_status`, `inspect_build`, `compare_builds`, `reproduce_build`, `verify_prepared` and `preview_site`. On the command line they are `keys`, `receive-status`, `inspect`, `compare`, `reproduce`, `verify-prepared` and `preview`.
