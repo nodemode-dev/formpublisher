@@ -1,0 +1,4 @@
+{
+  "Previewing loads whatever the site itself loads from other hosts.": "Die Vorschau lädt alles, was die Website selbst von anderen Hosts lädt.",
+  "The deep check loads the site as a browser would, including what it loads from other hosts.": "Die Tiefenprüfung lädt die Website wie ein Browser, auch das, was sie von anderen Hosts lädt."
+}

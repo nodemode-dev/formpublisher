@@ -128,6 +128,8 @@ Version 2 projects import too. When a project is too big for the JSON envelope, 
 
 Opening a site mounts a revision on the site host, a second listener at 127.0.0.1:8281 (`FORMPUBLISHER_HOST_PORT`) that serves the files the way a production static host does. When that port is already taken, for example by a second engine, the engine takes a free port instead, logs a warning naming both, and reports the port it uses as `hostPort` in `/api/health` and `engine.json`, so its preview and live checks always reach its own site. It is a separate origin from the interface, so the site gets its own storage and cannot call the engine's `/api` routes. One site is mounted at a time; mounting another replaces it.
 
+A site that references fonts, scripts, images or embeds on other hosts makes your computer request them when you preview it; FormPublisher itself sends nothing to those hosts.
+
 How the host resolves a request:
 
 - `/a/b` is the file `a/b`, then `a/b/index.html`, then `a/b.html`; `/a/b/` is `a/b/index.html`; `/` is `index.html`. Query strings are ignored.
@@ -210,6 +212,8 @@ A deep check drives the Chrome or Microsoft Edge you already have installed thro
 | `deep.overflow` | error | the page is wider than the viewport |
 | `deep.unavailable` | info | no browser could be started: neither the `checks.chromePath` browser, Google Chrome nor Microsoft Edge, nor Chrome in the usual places (from source, also when Playwright is not installed). In the installed app the fix reads "Install Google Chrome or Microsoft Edge, or set the browser's path in Preferences, then run the deep check again." |
 | `deep.failed` | error | the deep run failed for another reason. The engine logs it and sends the live event `checks.failed` instead of `checks.done` (below), and the window shows one row, "The deep check could not finish: [reason]", which goes when the next deep check starts |
+
+A site that references fonts, scripts, images or embeds on other hosts makes your computer request them when the deep check loads it; FormPublisher itself sends nothing to those hosts, and the deep check only reports such requests as `deep.external`.
 
 Each message names the route and width. A thumbnail of each route (1440 by 900, scaled to 320 px wide) is saved under `checks/[site]/[revision]/thumbs/`.
 

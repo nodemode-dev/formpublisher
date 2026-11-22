@@ -23,6 +23,7 @@ const STAGE = `<div class="fp-preview" hidden>
 </div></div>
 </div>
 </div>
+<div class="fp-pv-foot"><p class="fp-pv-note">Previewing loads whatever the site itself loads from other hosts.</p></div>
 </div>`;
 
 export const routeKey = (p: string): string => {

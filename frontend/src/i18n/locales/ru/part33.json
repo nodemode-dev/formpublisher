@@ -1,0 +1,4 @@
+{
+  "Previewing loads whatever the site itself loads from other hosts.": "Просмотр загружает всё, что сам сайт загружает с других хостов.",
+  "The deep check loads the site as a browser would, including what it loads from other hosts.": "Глубокая проверка загружает сайт как браузер, включая всё, что он загружает с других хостов."
+}

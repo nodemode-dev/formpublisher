@@ -43,6 +43,8 @@
   .fp-bottom-tab .fp-badge { min-width: 16px; margin-left: 2px; padding: 0 2px; }
 }
 .fp-pn-select:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+.fp-pn-note { display: -webkit-box; flex: none; box-sizing: border-box; height: 23px; margin: 0; padding: 3px var(--space-3); overflow: hidden; border-bottom: 1px solid var(--line-0); color: var(--text-muted); font-size: var(--fp-11); line-height: 16px; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+@container (max-width: 760px) { .fp-pn-note { height: 39px; -webkit-line-clamp: 2; } }
 .fp-pn-body { position: relative; flex: 1 1 auto; min-height: 0; }
 .fp-pn-list { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; }
 .fp-pn-empty { position: absolute; inset: 0; display: grid; place-items: center; padding: 0 var(--space-4); color: var(--text-muted); font-size: var(--fp-12); text-align: center; pointer-events: none; }

@@ -1,0 +1,4 @@
+{
+  "Previewing loads whatever the site itself loads from other hosts.": "Önizleme, sitenin kendisinin başka ana bilgisayarlardan yüklediği her şeyi yükler.",
+  "The deep check loads the site as a browser would, including what it loads from other hosts.": "Derin denetim siteyi bir tarayıcı gibi yükler; başka ana bilgisayarlardan yüklenenler de buna dahildir."
+}

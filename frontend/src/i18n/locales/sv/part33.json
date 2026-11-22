@@ -1,0 +1,4 @@
+{
+  "Previewing loads whatever the site itself loads from other hosts.": "Förhandsvisningen läser in allt som webbplatsen själv läser in från andra värdar.",
+  "The deep check loads the site as a browser would, including what it loads from other hosts.": "Den djupa kontrollen läser in webbplatsen som en webbläsare, även det den läser in från andra värdar."
+}

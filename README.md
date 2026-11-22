@@ -100,7 +100,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>Preview</h3>
-      The mounted site is served by a static host on its own origin (port 8281), as a real host would. Pick a device size, force the dark or light theme, emulate reduced motion, throttle the network to Fast or Slow, and open the current route in your browser.
+      The mounted site is served by a static host on its own origin (port 8281), as a real host would. Pick a device size, force the dark or light theme, emulate reduced motion, throttle the network to Fast or Slow, and open the current route in your browser. Previewing a site and running the deep check load whatever the site itself references on other hosts (fonts, scripts, images, embeds), so your computer requests those addresses; FormPublisher sends nothing of its own, and the deep check only reports them.
     </td>
     <td width="50%" valign="top">
       <h3>Checks</h3>

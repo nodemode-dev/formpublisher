@@ -1,0 +1,4 @@
+{
+  "Previewing loads whatever the site itself loads from other hosts.": "Az előnézet mindent betölt, amit maga a webhely más gazdagépekről betölt.",
+  "The deep check loads the site as a browser would, including what it loads from other hosts.": "A mély ellenőrzés úgy tölti be a webhelyet, mint egy böngésző, a más gazdagépekről betöltött tartalmakkal együtt."
+}

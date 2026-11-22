@@ -1,0 +1,4 @@
+{
+  "Previewing loads whatever the site itself loads from other hosts.": "Esikatselu lataa kaiken, minkä sivusto itse lataa muilta isännöiltä.",
+  "The deep check loads the site as a browser would, including what it loads from other hosts.": "Syvätarkistus lataa sivuston kuten selain, myös sen muilta isännöiltä lataamat tiedot."
+}
