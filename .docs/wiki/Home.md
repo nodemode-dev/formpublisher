@@ -1,6 +1,6 @@
 # FormPublisher
 
-Release version: 0.10.0.
+Release version: 0.10.1.
 
 The Form family's site publisher. FormPublisher opens what FormWeb makes (a `site-export.zip`, a FormWeb publication folder, or the site currently open in a running FormWeb), lists its routes, and shows them in a FormDeck-style window with Home, tabs, a routes strip, an inspector and a status bar. It reads FormWeb and never changes it. It also starts a new site from a template, as a FormWeb project to edit in FormWeb, and reads a `.fweb` project or a `.fpub` package.
 
