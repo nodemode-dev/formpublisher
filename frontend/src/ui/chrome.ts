@@ -20,10 +20,9 @@ import { reserveMenubar } from './reserve';
 import { ShortcutsDialog } from './shortcuts-dialog';
 import { TemplatesSheet } from './templates-sheet';
 import { openHosting } from './hosting-sheet';
+import { openManual } from './manual-sheet';
 import { applyDensity, nextToggleTheme, readChoice, readDensity, setTheme, THEMES, type Density } from './themes';
 import { toast } from './toast';
-
-export const DOCS_URL = 'https://github.com/nodemode-dev/formpublisher/blob/main/docs/MANUAL.md';
 
 export interface Chrome {
   readonly commands: Commands;
@@ -40,15 +39,6 @@ const hasSelection = (): boolean => {
   if (a instanceof HTMLInputElement || a instanceof HTMLTextAreaElement) return (a.selectionStart ?? 0) !== (a.selectionEnd ?? 0);
   return (window.getSelection()?.toString() ?? '') !== '';
 };
-
-async function openExternal(target: string): Promise<void> {
-  if (inTauri()) {
-    const { invoke } = await import('@tauri-apps/api/core');
-    await invoke('plugin:shell|open', { path: target });
-    return;
-  }
-  window.open(target, '_blank', 'noopener');
-}
 
 const desktopWindow = async () => (await import('@tauri-apps/api/window')).getCurrentWindow();
 
@@ -226,7 +216,7 @@ export function installChrome(app: App): Chrome {
 
     { id: 'help.shortcuts', label: 'Keyboard Shortcuts', keys: ['Mod+/'], icon: 'keyboard', group: 'Help', menu: 'Help', description: 'List every command with its keys', run: () => { shortcuts ??= new ShortcutsDialog(commands); shortcuts.show(); } },
     { id: 'help.about', label: 'About formpublisher', icon: 'info', group: 'Help', menu: 'Help', description: 'Version, license and copyright', run: () => commands.run('app.preferences', { section: 'about' }) },
-    { id: 'help.docs', label: 'Documentation', icon: 'book', group: 'Help', menu: 'Help', description: 'Open the manual on GitHub', run: () => openExternal(DOCS_URL) },
+    { id: 'help.docs', label: 'Documentation', icon: 'book', group: 'Help', menu: 'Help', description: 'Open the manual', run: () => openManual() },
     { id: 'help.hosting', label: 'Host It Yourself', icon: 'globe', group: 'Help', menu: 'Help', description: 'The guide from a prepared folder to your own host, domain and HTTPS', run: () => openHosting() },
   );
 
@@ -264,7 +254,7 @@ export function installChrome(app: App): Chrome {
       home.show('trash');
     },
     showCheck: () => app.showBottomTab('problems'),
-    openManual: () => { void openExternal(`${DOCS_URL}#error-codes`); },
+    openManual: (code) => { void openManual('error-codes', code); },
     refreshSites: () => app.refreshSites(),
   };
   on('fp:notice', ({ kind, text, code, ref, run }) => {

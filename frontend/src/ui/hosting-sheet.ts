@@ -18,17 +18,36 @@ function inline(text: string): string {
   return escapeHtml(text)
     .replace(/`([^`]+)`/g, '<code translate="no">$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\[([^\]]+)\]\(#([a-z0-9-]+)\)/g, '<a href="#$2" data-part="$2">$1</a>');
+    .replace(/\[([^\]]+)\]\(#([a-z0-9-]+)\)/g, '<a href="#$2" data-part="$2">$1</a>')
+    .replace(/\[([^\]]+)\]\(([A-Za-z0-9_-]+\.md)\)/g, '<a href="#" data-doc="$2">$1</a>')
+    .replace(/\[([^\]]+)\]\([^)\s]+\)/g, '$1');
 }
 
 function table(rows: string[]): string {
   const cells = (row: string): string[] => row.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+  const codes = (cell: string): string => {
+    const found = [...cell.matchAll(/`([a-z0-9.-]+)`/g)].map((m) => m[1]);
+    return found.length && cell.replace(/`[a-z0-9.-]+`|[\s,]/g, '') === '' ? ` data-code="${found.join(' ')}"` : '';
+  };
   const head = cells(rows[0]).map((c) => `<th>${inline(c)}</th>`).join('');
-  const body = rows.slice(2).map((r) => `<tr>${cells(r).map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('');
+  const body = rows.slice(2).map((r) => { const row = cells(r); return `<tr${codes(row[0] ?? '')}>${row.map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`; }).join('');
   return `<div class="fp-host-table"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
-export function renderGuide(markdown: string): string {
+const IMAGE_ROUTE = '/api/docs/images/';
+
+function figure(line: string): string | null {
+  const md = /^!\[([^\]]*)\]\(images\/([a-z0-9-]+\.webp)\)$/.exec(line.trim());
+  const pic = md ? null : /^<picture><source media="\(prefers-color-scheme: dark\)" srcset="images\/([a-z0-9-]+\.webp)"><img alt="([^"]*)" src="images\/([a-z0-9-]+\.webp)"><\/picture>$/.exec(line.trim());
+  if (!md && !pic) return /^(!\[|<picture>)/.test(line) ? '' : null;
+  const alt = escapeHtml(md ? md[1] : pic![2]);
+  const light = md ? md[2] : pic![3];
+  const dark = md ? light.replace(/-light\.webp$/, '-dark.webp') : pic![1];
+  const img = (name: string, cls: string): string => `<img class="${cls}" src="${IMAGE_ROUTE}${name}" alt="${alt}" width="1600" height="1000" loading="lazy" decoding="async">`;
+  return `<figure class="fp-host-fig">${dark === light ? img(light, '') : img(dark, 'is-dark') + img(light, 'is-light')}</figure>`;
+}
+
+export function renderGuide(markdown: string, prefix = 'fp-host'): string {
   const lines = markdown.replace(/\r/g, '').split('\n');
   const out: string[] = [];
   let i = 0;
@@ -45,7 +64,13 @@ export function renderGuide(markdown: string): string {
     const heading = /^(#{1,3}) (.+)$/.exec(line);
     if (heading) {
       const level = heading[1].length;
-      out.push(level === 1 ? '' : `<h${level} id="fp-host-${slug(heading[2])}" class="fp-host-h${level}">${inline(heading[2])}</h${level}>`);
+      out.push(level === 1 ? '' : `<h${level} id="${prefix}-${slug(heading[2])}" class="fp-host-h${level}">${inline(heading[2])}</h${level}>`);
+      i += 1;
+      continue;
+    }
+    const fig = figure(line);
+    if (fig !== null) {
+      out.push(fig);
       i += 1;
       continue;
     }
@@ -70,7 +95,7 @@ export function renderGuide(markdown: string): string {
       continue;
     }
     const para: string[] = [];
-    for (; i < lines.length && lines[i].trim() && !/^(#|\||```|\d+\. |- )/.test(lines[i]); i += 1) para.push(lines[i]);
+    for (; i < lines.length && lines[i].trim() && !/^(#|\||```|\d+\. |- |!\[|<picture>)/.test(lines[i]); i += 1) para.push(lines[i]);
     out.push(`<p>${inline(para.join(' '))}</p>`);
   }
   return out.join('');

@@ -1,0 +1,6 @@
+{
+  "Manual": "マニュアル",
+  "The manual is in English.": "マニュアルは英語です。",
+  "The manual could not be loaded.": "マニュアルを読み込めませんでした。",
+  "Install Google Chrome or Microsoft Edge, or set the browser's path in Preferences, then run the deep check again.": "Google Chrome または Microsoft Edge をインストールするか、環境設定でブラウザーのパスを指定してから、もう一度詳細チェックを実行してください。"
+}

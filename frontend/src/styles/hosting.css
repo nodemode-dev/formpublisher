@@ -18,3 +18,10 @@
 .fp-host-table table { width: 100%; border-collapse: collapse; font-size: var(--fp-12); }
 .fp-host-table th, .fp-host-table td { padding: 6px 8px; border: 1px solid var(--line-1); text-align: left; vertical-align: top; }
 .fp-host-table th { background: var(--surface-1); color: var(--text-primary); font-weight: 600; }
+.fp-host-table tr.is-target td { background: var(--accent-tint-strong); color: var(--text-primary); }
+.fp-host-h3 { margin: var(--space-3) 0 var(--space-2); color: var(--text-primary); font-size: var(--fp-13); font-weight: 600; line-height: 1.3; }
+.fp-host-fig { margin: 0 0 var(--space-3); }
+.fp-host-fig img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; border: 1px solid var(--line-1); border-radius: var(--radius-md); background: var(--surface-1); color: transparent; }
+.fp-host-fig .is-light, body.theme-light .fp-host-fig .is-dark { display: none; }
+body.theme-light .fp-host-fig .is-light { display: block; }
+.fp-man-failed { margin: 0 0 var(--space-3); color: var(--text-secondary); font-size: var(--fp-13); }
