@@ -11,6 +11,7 @@
                             gates; --check changes nothing and exits 1 when anything drifted or fails (for CI)
 """
 
+import hashlib
 import json
 import os
 import re
@@ -37,6 +38,9 @@ HUB_CANDIDATES = (
     "/opt/homebrew/bin/formmcp",
     "/usr/bin/formmcp",
 )
+DOCK_VERSION = "2.2.1"
+LOOKUP = ROOT / "backend" / "app" / "services" / "agent_lookup.py"
+LOOKUP_HASHES = {"1.0.1": "62667f9b68b7d101e1896ce617240424e33b7e498c560bc79d45f0ab26c77d51"}
 
 
 def skill_names() -> list[str]:
@@ -96,6 +100,19 @@ def skill_problems() -> list[str]:
     return bad
 
 
+def lookup_problems() -> list[str]:
+    rel = LOOKUP.relative_to(ROOT).as_posix()
+    try:
+        raw = LOOKUP.read_bytes()
+    except OSError:
+        return [f"{rel}: missing (the shared finder for the agent programs)"]
+    said = re.search(rb'^VERSION = "([^"\r\n]+)"\r?$', raw, re.M)
+    version = said.group(1).decode("ascii", "replace") if said else "unknown"
+    if LOOKUP_HASHES.get(version) != hashlib.sha256(raw).hexdigest():
+        return [f"{rel}: does not match the hash recorded for version {version} (the shared finder changes only as a whole new version)"]
+    return []
+
+
 def _files(folder: Path) -> dict:
     return {str(p.relative_to(folder)): p.read_bytes() for p in sorted(folder.rglob("*")) if p.is_file()}
 
@@ -115,7 +132,7 @@ def sync(check: bool) -> int:
             drift.append(str(stale.relative_to(ROOT)) + " (removed skill)")
             if not check:
                 shutil.rmtree(stale, ignore_errors=True)
-    problems = skill_problems()
+    problems = skill_problems() + lookup_problems()
     if check:
         print("agents: in step" if not drift else "agents: drifted: " + ", ".join(drift) + " (run ./formpublisher agents sync)")
         for line in problems:

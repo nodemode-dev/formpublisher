@@ -5,6 +5,7 @@ import json
 import os
 import re
 import secrets
+import threading
 from pathlib import Path
 
 from app.services import paths
@@ -21,6 +22,8 @@ LOCAL_KEY = secrets.token_urlsafe(32)
 INLINE_SCRIPT = re.compile(rb"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", re.DOTALL | re.IGNORECASE)
 
 _policy: dict[str, tuple[float, str]] = {}
+_tabs: set[str] = set()
+_tabs_lock = threading.Lock()
 
 
 def desktop() -> bool:
@@ -36,8 +39,32 @@ def _same(given: str, key: str) -> bool:
     return hmac.compare_digest(given.encode("utf-8"), key.encode("utf-8"))
 
 
-def valid(value) -> bool:
+def personal(value) -> bool:
     return isinstance(value, str) and bool(value) and (_same(value, WINDOW_KEY) or _same(value, LOCAL_KEY))
+
+
+def is_tab(value) -> bool:
+    if not isinstance(value, str) or not value:
+        return False
+    with _tabs_lock:
+        live = list(_tabs)
+    return any(_same(value, token) for token in live)
+
+
+def valid(value) -> bool:
+    return personal(value) or is_tab(value)
+
+
+def issue_tab() -> str:
+    token = secrets.token_urlsafe(32)
+    with _tabs_lock:
+        _tabs.add(token)
+    return token
+
+
+def revoke_tab(token: str | None) -> None:
+    with _tabs_lock:
+        _tabs.discard(token or "")
 
 
 def is_open(path: str) -> bool:
