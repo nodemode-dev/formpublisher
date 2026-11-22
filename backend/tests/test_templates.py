@@ -46,7 +46,8 @@ def demo_item(root, core, sha=None):
     data = project.read_bytes()
     return {"id": "formweb/demos/harbour", "kind": "demo", "name": "Harbour", "description": "A whole site.",
             "path": "apps/formweb/demos/harbour.fweb", "bytes": len(data), "sha256": sha or hashlib.sha256(data).hexdigest(),
-            "licence": "Apache-2.0", "credit": "Test pictures", "preview": "apps/formweb/previews/harbour.webp"}
+            "licence": "Apache-2.0", "credit": "Test pictures", "preview": "apps/formweb/previews/harbour.webp",
+            "preview_sha256": hashlib.sha256(b"RIFF0000WEBPVP8 ").hexdigest()}
 
 
 SECTION = {"id": "formweb/templates/formtxt-404", "kind": "template", "name": "FormTxt page not found", "description": "A section.",

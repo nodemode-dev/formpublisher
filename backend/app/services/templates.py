@@ -21,7 +21,9 @@ from app.services import compile as fweb_compile
 from app.services import paths
 from app.services.intake import IntakeError
 
-DEFAULT_BASE = "https://raw.githubusercontent.com/nodemode-dev/formai-templates/main/"
+TEMPLATES_REF = "v0.2.0"
+DEFAULT_BASE = f"https://raw.githubusercontent.com/nodemode-dev/formai-templates/{TEMPLATES_REF}/"
+SITE_TYPES = ("business", "portfolio", "blog", "event", "shop")
 APP = "formweb"
 PREFIX = "apps/formweb/"
 MAX_INDEX_BYTES = 4 * 1024 * 1024
@@ -31,7 +33,7 @@ TIMEOUT = 60.0
 SHA = re.compile(r"^[0-9a-f]{64}$")
 IDENT = re.compile(r"^[a-z0-9][a-z0-9._/-]{0,160}$")
 PREVIEW_TYPES = {".webp": "image/webp", ".png": "image/png", ".jpg": "image/jpeg"}
-SOURCE = "The list comes from the public formai-templates repository on GitHub. Nothing is fetched until you ask."
+SOURCE = "The list comes from the public formai-templates repository on GitHub, at the release this version of FormPublisher names. Nothing is fetched until you ask."
 
 
 def base_url() -> str:
@@ -88,10 +90,12 @@ def _item(raw: dict, licence: str) -> dict | None:
         return None
     safe_index_path(path)
     preview = raw.get("preview")
+    preview_sha = raw.get("preview_sha256")
     if preview is not None:
         safe_index_path(preview)
-        if PurePosixPath(preview).suffix.lower() not in PREVIEW_TYPES:
+        if PurePosixPath(preview).suffix.lower() not in PREVIEW_TYPES or not isinstance(preview_sha, str) or not SHA.match(preview_sha):
             preview = None
+    site_type = raw.get("type") if raw.get("type") in SITE_TYPES else ""
     text = lambda key, limit: str(raw.get(key) or "")[:limit]
     return {
         "id": ident,
@@ -103,7 +107,9 @@ def _item(raw: dict, licence: str) -> dict | None:
         "sha256": digest,
         "licence": text("licence", 300) or licence,
         "credit": text("credit", 600),
+        "type": site_type,
         "preview": preview,
+        "previewSha256": preview_sha if preview else None,
         "start": raw["kind"] == "demo" and path.endswith(".fweb"),
     }
 
@@ -186,11 +192,20 @@ def preview(item_id: str) -> tuple[bytes, str]:
     rel = item.get("preview")
     if not rel:
         raise IntakeError("this template has no preview", 404, "not-found")
+    digest = item.get("previewSha256")
+    if not isinstance(digest, str) or not SHA.match(digest):
+        raise IntakeError("this template's preview has no SHA-256 in the index, so it is not shown", 404, "not-found")
     suffix = PurePosixPath(rel).suffix.lower()
-    cached = folder() / "previews" / (hashlib.sha256(rel.encode()).hexdigest()[:32] + suffix)
-    if not cached.is_file():
-        _write_atomic(cached, _download(safe_index_path(rel), MAX_PREVIEW_BYTES))
-    return cached.read_bytes(), PREVIEW_TYPES[suffix]
+    cached = folder() / "previews" / f"{digest}{suffix}"
+    if cached.is_file():
+        data = cached.read_bytes()
+        if hashlib.sha256(data).hexdigest() == digest:
+            return data, PREVIEW_TYPES[suffix]
+    data = _download(safe_index_path(rel), MAX_PREVIEW_BYTES)
+    if hashlib.sha256(data).hexdigest() != digest:
+        raise IntakeError(f"the preview of {item['name']} does not match the SHA-256 in the index, so it is not shown", 502, "template-mismatch")
+    _write_atomic(cached, data)
+    return data, PREVIEW_TYPES[suffix]
 
 
 def _slug(name: str) -> str:
