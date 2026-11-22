@@ -166,4 +166,32 @@ export const publishApi = {
   async remove(build: string, target: string): Promise<void> {
     await request<unknown>(`/api/publish/${enc(build)}/${enc(target)}`, { method: 'DELETE' });
   },
+  async liveStored(site: string): Promise<LiveStored> {
+    const o = await request<unknown>(`/api/live/${enc(site)}`);
+    const raw = isObj(o) ? o : {};
+    return { suggested: str(raw.suggested), last: toLive(raw.last) };
+  },
+  async liveCheck(site: string, address: string, build: string | null, target: string | null): Promise<LiveResult> {
+    const made = toLive(await request<unknown>(`/api/live/${enc(site)}`, body('POST', { address, build, target })));
+    if (!made) throw new ApiError('The engine gave no result', 0);
+    return made;
+  },
 };
+
+export type LiveSeverity = 'error' | 'warning' | 'info';
+
+export interface LiveProblem { code: string; severity: LiveSeverity; name: string; message: string; fix: string; guide: string; guideTopic: string }
+
+export interface LiveResult { address: string; names: string[]; target: string; build: string; checkedAt: string; ok: boolean; errors: number; warnings: number; problems: LiveProblem[] }
+
+export interface LiveStored { suggested: string; last: LiveResult | null }
+
+function toLive(raw: unknown): LiveResult | null {
+  if (!isObj(raw) || !Array.isArray(raw.problems)) return null;
+  const summary = isObj(raw.summary) ? raw.summary : {};
+  const problems = raw.problems.filter(isObj).map((p): LiveProblem => {
+    const sev = str(p.severity);
+    return { code: str(p.code), severity: sev === 'error' || sev === 'warning' ? sev : 'info', name: str(p.name), message: str(p.message), fix: str(p.fix), guide: str(p.guide), guideTopic: str(p.guideTopic) };
+  });
+  return { address: str(raw.address), names: Array.isArray(raw.names) ? raw.names.map(str) : [], target: str(raw.target), build: str(raw.build), checkedAt: str(raw.checkedAt), ok: raw.ok === true, errors: num(summary.errors), warnings: num(summary.warnings), problems };
+}

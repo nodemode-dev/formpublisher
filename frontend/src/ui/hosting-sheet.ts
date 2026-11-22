@@ -122,20 +122,30 @@ export class HostingSheet extends Dialog {
     this.button('Close', 'primary', () => this.close());
   }
 
-  show(part?: string): void {
+  show(part?: string, topic?: string): void {
+    if (!this.isOpen && this.scrim.nextElementSibling) this.scrim.parentElement?.appendChild(this.scrim);
     this.open(q(this.foot, '.fp-btn-primary'));
-    this.jump(part ?? '');
+    this.jump(part ?? '', topic);
   }
 
-  private jump(part: string): void {
-    const target = part ? this.page.querySelector<HTMLElement>(`#fp-host-${part}`) : null;
+  private within(head: HTMLElement, topic: string): HTMLElement | null {
+    const want = topic.toLowerCase();
+    for (let n = head.nextElementSibling as HTMLElement | null; n && n.tagName !== 'H2'; n = n.nextElementSibling as HTMLElement | null) {
+      if ((n.textContent ?? '').trim().toLowerCase().startsWith(want)) return n;
+    }
+    return null;
+  }
+
+  private jump(part: string, topic?: string): void {
+    const head = part && /^[a-z0-9-]+$/.test(part) ? this.page.querySelector<HTMLElement>(`#fp-host-${part}`) : null;
+    const target = head && topic ? (this.within(head, topic) ?? head) : head;
     this.body.scrollTop = target ? this.body.scrollTop + target.getBoundingClientRect().top - this.body.getBoundingClientRect().top : 0;
   }
 }
 
 let sheet: HostingSheet | null = null;
 
-export function openHosting(part?: string): void {
+export function openHosting(part?: string, topic?: string): void {
   sheet ??= new HostingSheet();
-  sheet.show(part);
+  sheet.show(part, topic);
 }
