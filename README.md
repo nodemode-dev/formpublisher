@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.10.0" src="https://img.shields.io/badge/version-0.10.0-4f6bff?style=flat-square">
+  <img alt="version 0.10.1" src="https://img.shields.io/badge/version-0.10.1-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -202,7 +202,7 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
     <td width="50%" valign="top"><b>Preview</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/preview-dark.webp"><img alt="The sample site in the preview stage with the routes strip and the inspector" src="docs/images/preview-light.webp"></picture></td>
   </tr>
   <tr>
-    <td width="50%" valign="top"><b>Checks</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/checks-dark.webp"><img alt="The Problems panel listing a broken link and two heading warnings" src="docs/images/checks-light.webp"></picture></td>
+    <td width="50%" valign="top"><b>Checks</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/checks-dark.webp"><img alt="The Problems panel listing a broken link, the missing favicon and two heading warnings" src="docs/images/checks-light.webp"></picture></td>
     <td width="50%" valign="top"><b>Package</b><br><picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/package-dark.webp"><img alt="The Package sheet with a built, signed and verified package" src="docs/images/package-light.webp"></picture></td>
   </tr>
   <tr>
@@ -233,6 +233,11 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
     <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Builds · Trash · Demos · menubar · site tabs · routes strip · inspector · bottom panel · agent dock · status bar · Preferences · Keyboard Shortcuts</td>
     <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · preview · check · build · inspect · compare · reproduce · sign · verify · keys · fpub · targets · prepare · prepared · verify-prepared · live-check · trash · receive-status · templates · start</td>
     <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · .fweb project · .fpub package · publication folder · the running FormWeb's current site or a saved project · sent from FormWeb (endpoint or inbox) · the demo</td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top"><h4>Templates</h4>The Templates sheet starts a site from eight FormWeb starters · site types (business, portfolio, blog, event, shop) with a filter · read from formai-templates at a fixed release · every file and preview checked against its SHA-256 · a .fweb project in a folder you choose</td>
+    <td width="33%" valign="top"><h4>Hosting guide</h4><a href="docs/HOSTING.md">docs/HOSTING.md</a> · a part for each of the six hosts · Updating the site later · Forms · Analytics and search engines · the live-site check in Publish, which reads your public site after you deployed it</td>
+    <td width="33%" valign="top"><h4>For agents</h4>28 command line commands and 30 MCP tools, listed in <a href="docs/mcp-tools.json">docs/mcp-tools.json</a> · the agent dock · skills for Claude Code, Codex and Cursor</td>
   </tr>
 </table>
 

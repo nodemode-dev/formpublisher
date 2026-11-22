@@ -95,6 +95,7 @@ rm -rf build/pyinstaller dist-engine
   --collect-submodules app --collect-submodules uvicorn --collect-submodules websockets --collect-data mcp \
   --collect-all playwright --collect-submodules keyring --copy-metadata keyring \
   --exclude-module mcp.cli --exclude-module tkinter \
+  --exclude-module keyring.testing --exclude-module keyring.devpi_client --exclude-module pytest --exclude-module _pytest --exclude-module pluggy \
   "${extra[@]}" \
   "$ROOT/backend/formpublisher_engine.py"
 out="$ROOT/src-tauri/engine"

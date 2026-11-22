@@ -101,9 +101,9 @@ An entry whose origin cannot be recorded or inferred answers 409 with the code `
 
 The dialog checks the shape of the name before it asks, and the engine applies the same rule (a wrong shape answers 409 `place-invalid`). A site is lowercase letters, digits and hyphens. A key is 16 hex characters. A build is `<site>/<12-hex build id>`. A prepared folder is `<site>/<build id>/<target>`. A restored site whose `site.json` had no id gets its folder name as id.
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="images/trash-origin-dark.webp"><img alt="The Where does it go dialog with the kind's folder as a prefix and a name field" src="images/trash-origin-light.webp"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="images/trash-origin-dark.webp"><img alt="The Restore from the trash dialog for a build whose place cannot be read: the kind's folder as a prefix, a name field and a refusal of a wrong name shown inline" src="images/trash-origin-light.webp"></picture>
 
-<picture><source media="(prefers-color-scheme: dark)" srcset="images/restore-dialog-dark.webp"><img alt="The Restore from the trash dialog with a place row, a passphrase field and a refusal shown inline" src="images/restore-dialog-light.webp"></picture>
+<picture><source media="(prefers-color-scheme: dark)" srcset="images/restore-dialog-dark.webp"><img alt="The Restore from the trash dialog for a second site: the name typed for it is taken, so the refusal shows inline, while the first site has gone back on its own" src="images/restore-dialog-light.webp"></picture>
 
 Removing a signing key deletes its secret, and the trash keeps only its public half: a key restored from the trash can verify but cannot sign (see [Keys](#keys)). An entry that an earlier version moved there still holds the key's `.pem`, and restoring it brings the secret back, kept the way a new key's is. A trashed key whose record (`entry.json`) is missing or damaged is rebuilt from such a `.pem` when you restore it. An unencrypted key gets back its id (the first 16 hex characters of the SHA-256 of its public key) and its fingerprint, and the list shows it as "Recovered key [id]". An encrypted key answers 409 `passphrase-required`; a wrong passphrase answers `passphrase-wrong`, and the right one restores the key. In the window, restoring a locked key asks for its passphrase in the Restore from the trash dialog, which shows a wrong passphrase inline and clears the field. A file that cannot be read, a key that is not Ed25519, or more than one `.pem` stays `entry-damaged`. An id that is already present answers `place-taken`. The passphrase is never logged, stored or echoed.
 
@@ -324,7 +324,7 @@ Each build lives in `builds/[site]/[id]/`:
 
 ```json
 {
-  "builtWith": "FormPublisher 0.10.0",
+  "builtWith": "FormPublisher 0.10.1",
   "checks": { "errors": 0, "infos": 0, "tiers": ["static"], "warnings": 0 },
   "files": [ { "path": "index.html", "sha256": "...", "size": 1024 } ],
   "format": "formpublisher-site",
@@ -438,7 +438,7 @@ UTF-8 JSON, indented two spaces, with a trailing newline:
   "site": { "id": "northwind-notes", "name": "Northwind Notes" },
   "build": "a1b2c3d4e5f6",
   "revision": "20261111T010203Z",
-  "builtWith": "FormPublisher 0.10.0",
+  "builtWith": "FormPublisher 0.10.1",
   "createdAt": "2026-11-11T01:02:03Z",
   "package": { "file": "site.zip", "sha256": "64 lowercase hex digits", "size": 12345 },
   "signature": null

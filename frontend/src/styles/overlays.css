@@ -86,7 +86,8 @@ body.theme-light .fp-toast.is-error { color: var(--danger-fill); }
 .fp-range input { width: 180px; accent-color: var(--accent-color); }
 .fp-range-out { min-width: 40px; color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--fs-12); text-align: right; }
 .fp-seg.fp-seg-wide { min-width: 280px; }
-.fp-fw-row { display: flex; align-items: center; gap: var(--space-2); }
+.fp-fw-url-row { display: flex; align-items: center; gap: var(--space-2); }
+.fp-fw-url-row > .fp-input { flex: 1 1 auto; min-width: 0; }
 .fp-fw-result { min-height: 18px; color: var(--text-secondary); font-size: var(--fs-12); }
 .fp-fw-result.is-error { color: var(--danger-text); }
 body.theme-light .fp-fw-result.is-error { color: var(--danger-fill); }

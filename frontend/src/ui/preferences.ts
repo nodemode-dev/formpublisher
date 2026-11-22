@@ -99,7 +99,7 @@ export class Preferences extends Dialog {
 <section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="formweb"><div class="fp-prefs-secbody">
 <section class="fp-prefs-group"><h3 class="fp-prefs-label">Connection</h3>
 <div class="fp-pref-block"><label class="fp-pref-name" for="fp-fw-url">FormWeb address</label><div class="fp-pref-hint">FormWeb runs on this computer, for example http://127.0.0.1:8240. Test saves a changed address first.</div>
-<div class="fp-fw-row"><input id="fp-fw-url" class="fp-input is-mono" type="text" spellcheck="false" autocomplete="off" translate="no" placeholder="http://127.0.0.1:8240"><button class="fp-btn" type="button" data-act="fw-save">Save</button><button class="fp-btn" type="button" data-act="fw-test">Test</button></div>
+<div class="fp-fw-url-row"><input id="fp-fw-url" class="fp-input is-mono" type="text" spellcheck="false" autocomplete="off" translate="no" placeholder="http://127.0.0.1:8240"><button class="fp-btn" type="button" data-act="fw-save">Save</button><button class="fp-btn" type="button" data-act="fw-test">Test</button></div>
 <div class="fp-fw-result" role="status" aria-live="polite"></div></div>
 </section>
 <section class="fp-prefs-group"><h3 class="fp-prefs-label">When a site arrives</h3>

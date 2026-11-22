@@ -572,3 +572,9 @@ Checked here: tsc and vite build; i18n_check; a deep run on Northwind Notes in C
 i18n: part39 (the Live site pane, 54 strings), part40 (the engine's check, Prepare and live-check messages from 0.9.0 and 0.10.0, which reached the window in English before), part41 (the five site types and "Site type"), each in 25 languages beside English.
 
 Checked here: tsc and vite build; i18n_check; in Chrome with the CPU at 4x: no request before Confirm, nothing around the results box moving as results arrive (CLS 0), the chip filter changing only `hidden` and `aria-pressed` with the same images kept; screenshots of both at 1280 and 390, dark and light. Not checked: the desktop web views, a screen reader, the translations by a reader of each language.
+
+## Phase 75: the FormWeb address row; the documents' pictures retaken · v0.10.1 (2026-11-22)
+
+`ui/preferences.ts` and `styles/overlays.css`: the FormWeb address row in Preferences used the class `fp-fw-row`, which the FormWeb project picker also uses for its radio rows; `formweb-picker.css` loads later, and its grid of `auto minmax(0, 1fr)` with a border and padding split the row: a short field, a wide Save, Test on a second line. The row is `fp-fw-url-row` (flex, gap from the spacing scale) and its field takes the free width. A class rename and one rule; nothing is rebuilt at run time.
+
+`docs/images/`: all 33 pictures retaken from the running window (Chrome through Playwright, a scratch data folder, stand-in agent programs, the bundled sample, a stand-in FormWeb on 8240 so Home shows it running), dark in Studio Dark and light in Light, at their old pixel sizes; the splash from `public/splash.html` at the splash window's size. The manual's two trash dialogs and the README's Problems picture have alt text that says what each picture now shows. The scripts are outside the repository.

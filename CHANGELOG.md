@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.10.1 · 2026-11-22
+
+- The documents say what 0.10.0 does:
+  - the README's "Everything in the box" names the templates, the hosting guide and the agents' counts;
+  - SECURITY names 0.10.x as supported and describes the window key;
+  - the wiki gains Templates and Hosting pages, and Releasing follows the FormCompiler path.
+- NOTICE lists every package that ships, with the version in the lock files and the frozen engine, and one row for each direct Rust crate.
+- The pictures in the README and the manual show the window as it is now: the green accent, the family dropdowns, Templates on Home.
+- Preferences: the FormWeb address row (the field, Save, Test) sits on one line again.
+- The engine no longer carries the test tools when it is frozen from a venv that also holds them.
+
 ## 0.10.0 · 2026-11-22
 
 - Eight whole sites to start from, up from three. FormWeb 0.28.0 adds a business, a portfolio, a blog, an event and a shop window. Each card shows its site type, and chips filter the list by type.
