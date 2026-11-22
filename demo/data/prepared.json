@@ -161,7 +161,7 @@
           "size": 523
         }
       ],
-      "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/cloudflare-pages",
+      "folder": "/tmp/tmp.B8qw3ccYtU/prepared/northwind-notes-2f2448/1b6cac412739/cloudflare-pages",
       "includeModel": false,
       "leftOut": [
         "asset-access.json",
@@ -174,7 +174,7 @@
         "This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.",
         "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
       ],
-      "preparedAt": "2026-11-22T22:39:03Z",
+      "preparedAt": "2026-11-22T23:05:45Z",
       "warnings": []
     },
     "github-pages": {
@@ -367,7 +367,7 @@
           "size": 523
         }
       ],
-      "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/github-pages",
+      "folder": "/tmp/tmp.B8qw3ccYtU/prepared/northwind-notes-2f2448/1b6cac412739/github-pages",
       "includeModel": false,
       "leftOut": [
         "asset-access.json",
@@ -383,7 +383,7 @@
         ".nojekyll stops GitHub from running Jekyll over the files.",
         "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
       ],
-      "preparedAt": "2026-11-22T22:39:03Z",
+      "preparedAt": "2026-11-22T23:05:45Z",
       "warnings": [
         "GitHub Pages ignores custom headers, so Referrer-Policy, X-Content-Type-Options for /* will not be sent.",
         "GitHub Pages ignores custom headers, so Cache-Control for /assets/* will not be sent."
@@ -549,7 +549,7 @@
           "size": 523
         }
       ],
-      "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/netlify",
+      "folder": "/tmp/tmp.B8qw3ccYtU/prepared/northwind-notes-2f2448/1b6cac412739/netlify",
       "includeModel": false,
       "leftOut": [
         "asset-access.json",
@@ -563,7 +563,7 @@
         "This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.",
         "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
       ],
-      "preparedAt": "2026-11-22T22:39:03Z",
+      "preparedAt": "2026-11-22T23:05:45Z",
       "warnings": []
     },
     "nginx": {
@@ -726,7 +726,7 @@
           "size": 523
         }
       ],
-      "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/nginx",
+      "folder": "/tmp/tmp.B8qw3ccYtU/prepared/northwind-notes-2f2448/1b6cac412739/nginx",
       "includeModel": false,
       "leftOut": [
         "asset-access.json",
@@ -742,7 +742,7 @@
         "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/.",
         "nginx -t runs where nginx is installed; nginx was not found on this machine, so the config was not checked here."
       ],
-      "preparedAt": "2026-11-22T22:39:03Z",
+      "preparedAt": "2026-11-22T23:05:45Z",
       "warnings": []
     },
     "static-zip": {
@@ -766,12 +766,12 @@
         },
         {
           "path": "SHA256SUMS",
-          "sha256": "d7f54f76e27959c0d1756af9f45ec1741c19e4a8d3a6d92690959a8930c739fc",
+          "sha256": "5e64311a709b9ba6b55ab61d69202c301c9945ae17b0ea51966a8465a88f0719",
           "size": 154
         },
         {
           "path": "publish.json",
-          "sha256": "0edad11851c285f178d57c75c688ae7a16038d2ac85c1737143140845af3eee3",
+          "sha256": "79198ffb09d8ec7805eb0d26fd612b74b48f4ccaf44e16c74982d76dda860f45",
           "size": 6282
         },
         {
@@ -780,7 +780,7 @@
           "size": 377852
         }
       ],
-      "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/static-zip",
+      "folder": "/tmp/tmp.B8qw3ccYtU/prepared/northwind-notes-2f2448/1b6cac412739/static-zip",
       "includeModel": false,
       "leftOut": [],
       "name": "Static zip",
@@ -790,7 +790,7 @@
         "This export has 404/index.html and no 404.html; a host that needs a 404.html must be given a copy of it.",
         "site.zip is unchanged, so it still holds FormWeb's model files. The includeModel option only affects the site/ folders of the other hosts."
       ],
-      "preparedAt": "2026-11-22T22:39:03Z",
+      "preparedAt": "2026-11-22T23:05:45Z",
       "warnings": []
     },
     "vercel": {
@@ -948,7 +948,7 @@
           "size": 716
         }
       ],
-      "folder": "/tmp/tmp.9rUdlext51/prepared/northwind-notes-2f2448/1b6cac412739/vercel",
+      "folder": "/tmp/tmp.B8qw3ccYtU/prepared/northwind-notes-2f2448/1b6cac412739/vercel",
       "includeModel": false,
       "leftOut": [
         "asset-access.json",
@@ -960,7 +960,7 @@
         "This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.",
         "Left out FormWeb's model files (asset-access.json, site.formweb.json). Prepare again with includeModel to keep them in site/."
       ],
-      "preparedAt": "2026-11-22T22:39:03Z",
+      "preparedAt": "2026-11-22T23:05:45Z",
       "warnings": []
     }
   }
