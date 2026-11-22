@@ -104,7 +104,7 @@
     </td>
     <td width="50%" valign="top">
       <h3>Checks</h3>
-      Static checks run offline on the files: links, assets, redirects, sitemap, robots, metadata, images, headings, external requests, forms that post to a local address and size budgets. Live checks report the console, failed requests and layout shift from the preview. A deep check drives the Chrome or Edge you already have (or the browser you name in Preferences, under Checks), in the desktop app too, at two widths on a slow network and CPU.
+      Static checks run offline on the files: links, assets, redirects, sitemap, robots, metadata, images, headings, external requests, forms that post to a local address, size budgets, canonical links, Open Graph tags, structured data, reciprocal hreflang, a favicon, a 404 page, link names and form labels. Live checks report the console, failed requests and layout shift from the preview. A deep check drives the Chrome or Edge you already have (or the browser you name in Preferences, under Checks), in the desktop app too, at two widths on a slow network and CPU, and also measures the largest contentful paint and text contrast: the Problems tab then shows a Speed block with LCP and CLS for each route and width, lab values from your computer (INP needs a real visitor and is not measured). Contrast over images, gradients or moving content is not measured. Prepare warns past Cloudflare Pages' limits of 100 header rules and 2,000 characters a line. Each rule names its source in the manual's <a href="docs/MANUAL.md#where-the-rules-come-from">Where the rules come from</a>.
     </td>
   </tr>
   <tr>
