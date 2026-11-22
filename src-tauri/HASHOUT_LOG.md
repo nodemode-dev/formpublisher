@@ -2,7 +2,7 @@
 
 Living log for the desktop shell (Tauri 2). Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.3.3
+Current build version: v0.3.4
 Last updated: 2026-11-21 · v0.3.4 the desktop build runs a pinned Tauri command line from frontend/node_modules, and build_app.bat stops when the install fails; v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
 
 ---

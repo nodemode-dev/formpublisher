@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher engine. Read it before editing `backend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.3.3
+Current build version: v0.3.4
 Last updated: 2026-11-21 · v0.3.4, Phase 70: the vendored FormWeb core stays 0.21.2, checked against FormWeb 0.27.0; v0.3.3, Phases 68 and 69: demos update in place, one old FormWeb site is adopted by name, Import lists FormWeb's saved projects, a build with no checks records null, external.request is one warning per URL, the vendored core is 0.21.2; v0.3.2: no engine change (NOTICE.md and demo/MEDIA.md record the offline demo's four copies of the mark as GPL-3.0-only, like every FormPublisher icon, at the owner's decision); Phase 67: the forms.local-address check, one site per FormWeb project on Import, the demo credits and the community files
 
 ---

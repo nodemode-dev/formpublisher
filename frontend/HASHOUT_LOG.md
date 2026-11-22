@@ -2,7 +2,7 @@
 
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
-Current build version: v0.3.3
+Current build version: v0.3.4
 Last updated: 2026-11-21 · v0.3.4, no window change: package.json pins the Tauri command line as a dev dependency; v0.3.3, Phase 67: a language switch holds Preferences, the hint strip and the menubar still (the toolbar still shifts once, by decision), Import from FormWeb lists saved projects, the Problems tooltip is translated; Phase 66: the strings of the forms.local-address check and the Import notice that says a revision was added
 
 ---
