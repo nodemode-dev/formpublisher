@@ -271,5 +271,6 @@
 "the engine returned no content for {0}": "引擎沒有傳回 {0} 的內容",
 "the engine returned invalid base64 for {0}": "引擎為 {0} 傳回了無效的 base64",
 "formweb-core returned no files": "formweb-core 沒有傳回任何檔案",
-"formweb-core returned an invalid file entry": "formweb-core 傳回了無效的檔案項目"
+"formweb-core returned an invalid file entry": "formweb-core 傳回了無效的檔案項目",
+"The deep check could not finish: {0}": "深度檢查未能完成：{0}"
 }

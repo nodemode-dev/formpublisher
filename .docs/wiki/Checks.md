@@ -12,7 +12,7 @@ From the preview probe: console errors, page errors and failed requests are erro
 
 ## Deep
 
-Serves the revision through the same site host as the preview and drives the Chrome you already have installed with Playwright, at 1440 and 390 wide, with a 4x CPU slowdown and a slow network. Codes: `deep.console`, `deep.pageerror`, `deep.request`, `deep.external`, `deep.cls`, `deep.overflow`, and `deep.unavailable` (info) when Playwright or Chrome is missing. It saves a thumbnail per route under `checks/[site]/[revision]/thumbs/`. FormPublisher never downloads a browser; the optional requirements are in `backend/requirements-deep.txt`.
+Serves the revision through the same site host as the preview and drives the Chrome or Microsoft Edge you already have installed with Playwright, at 1440 and 390 wide, with a 4x CPU slowdown and a slow network. It runs in the desktop app too: Playwright and its Node.js driver are frozen into the engine. Codes: `deep.console`, `deep.pageerror`, `deep.request`, `deep.external`, `deep.cls`, `deep.overflow`, `deep.unavailable` (info) when no browser can be started (from source, also when Playwright is missing; in the installed app its fix says to install Chrome or Edge or set the browser's path), and `deep.failed` (error) when the run fails for another reason. A run that fails sends the live event `checks.failed` (`run`, `site`, `revision`, `tier`, `reason`) instead of `checks.done`, is logged, and shows one Problems row, "The deep check could not finish: [reason]". It saves a thumbnail per route under `checks/[site]/[revision]/thumbs/`. FormPublisher never downloads a browser; from source the requirements are in `backend/requirements-deep.txt`, which the lock includes.
 
 ## Storing results
 

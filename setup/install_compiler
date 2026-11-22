@@ -2,7 +2,7 @@
 set -e
 source "$(dirname "$0")/lib.sh"
 fp_rust_env
-command -v cargo >/dev/null 2>&1 || fp_die "cargo is missing. Install Rust stable from https://rustup.rs and run ./setup/install_compiler again"
+command -v cargo >/dev/null 2>&1 || fp_die "cargo is missing. Install Rust from https://rustup.rs and run ./setup/install_compiler again"
 src="$FORMPUBLISHER_ROOT/vendor/formweb-native"
 [ -f "$src/Cargo.toml" ] || fp_die "vendor/formweb-native is missing"
 py="$(fp_python)" || fp_die "Python 3.12 or newer is missing, which the vendored crates check needs"

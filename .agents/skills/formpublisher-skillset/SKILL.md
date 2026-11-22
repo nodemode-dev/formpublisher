@@ -1,8 +1,8 @@
 ---
 name: formpublisher-skillset
-description: Use for any change to FormPublisher's own code, the Form family's site publisher. Covers the FastAPI engine in backend/app (routers, services, the site intake of FormWeb exports and publication folders, the read-only FormWeb connection, settings and the data folder), the vanilla TypeScript and Vite interface in frontend (the shell, Home, tabs, routes strip, inspector, status bar, tokens and the zero-flash rules), the command line and MCP server behind backend/formpublisher_engine.py, the Tauri 2 shell in src-tauri and its frozen engine sidecar, and the ./formpublisher scripts. Trigger on FormPublisher source files, a new route, a new tool, an engine or interface bug, ports 8280 or 5280, or HASHOUT_LOG. Not for driving FormPublisher to import and list sites (use formpublisher-harness).
+description: Use for any change to FormPublisher's own code, the Form family's site publisher. Covers the FastAPI engine in backend/app (routers, services, the site intake of FormWeb exports and publication folders, the read-only FormWeb connection, settings and the data folder), the vanilla TypeScript and Vite interface in frontend (the shell, Home, tabs, routes strip, inspector, status bar, tokens and the zero-flash rules), the command line and MCP server behind backend/formpublisher_engine.py, the Tauri 2 shell in src-tauri and its frozen engine folder, and the ./formpublisher scripts. Trigger on FormPublisher source files, a new route, a new tool, an engine or interface bug, ports 8280 or 5280, or HASHOUT_LOG. Not for driving FormPublisher to import and list sites (use formpublisher-harness).
 metadata:
-  version: "0.4.1"
+  version: "0.5.0"
 ---
 
 # formpublisher-skillset
@@ -15,11 +15,11 @@ Route every change to FormPublisher's code through this file. It maps where the 
 | --- | --- |
 | Engine entry | `backend/formpublisher_engine.py` (serve, `--selfcheck`, `cli`, `mcp`) |
 | Engine routes | `backend/app/routers/[name].py`, each exporting `router`, auto-included by `backend/app/main.py` |
-| Engine services | `backend/app/services/[name].py`: paths and the data folder, settings, site intake, the FormWeb connection, `compile` (formweb-core for .fweb), `host` (static host on 8281, served by `backend/app/host.py`), `checks` and `deep`, `package` and `keys`, `fpub` (a build saved as, and restored from, a `.fpub`; `intake` hands a `.fpub` to it first), `publish` (which also keeps each host's last verify result as `.TARGET.verify.json`) and `inbox` (prepared folders per host, and FormWeb's Send to FormPublisher), `pipeline` (the optional check and build on arrival) and `revisions` (revision lists and diffs), and `trash` (`backend/app/services/trash.py` is the only way into `trash/`, with restore, delete and empty; its routes are `backend/app/routers/trash.py`); `backend/app/static/probe.js` is the preview probe |
+| Engine services | `backend/app/services/[name].py`: paths and the data folder, settings, site intake, the FormWeb connection, `compile` (formweb-core for .fweb), `host` (static host on 8281, served by `backend/app/host.py`), `checks` and `deep`, `package` and `keys`, `fpub` (a build saved as, and restored from, a `.fpub`; `intake` hands a `.fpub` to it first), `publish` (which also keeps each host's last verify result as `.TARGET.verify.json`) and `inbox` (prepared folders per host, and FormWeb's Send to FormPublisher), `pipeline` (the optional check and build on arrival) and `revisions` (revision lists and diffs), `enginelog` (the rotating `logs/engine.log` and the watch on the desktop shell's process), and `trash` (`backend/app/services/trash.py` is the only way into `trash/`, with restore, delete and empty; its routes are `backend/app/routers/trash.py`); `backend/app/static/probe.js` is the preview probe |
 | Host targets | `backend/app/targets/[id].py`, one adapter per host (`ID`, `NAME`, `DESCRIPTION`, `LOCAL_TOOL`, `prepare`), discovered by `backend/app/targets/__init__.py`; adding a host is adding a module |
 | Command line and MCP | `backend/app/cli.py` (`Client`: HTTP to a running engine, else the same services in-process) and `backend/app/mcp.py` (one tool per `Client` method); a new route gets a `Client` method, a command and a tool together |
 | Interface | `frontend/src/`: the shell, Home, tabs, routes strip, inspector, status bar; styles and tokens in `frontend/src/styles/` |
-| Desktop shell | `src-tauri/` (Tauri 2), with app commands such as `reveal_path` in `src-tauri/src/files.rs`, and the frozen engine sidecar from `setup/freeze_backend` |
+| Desktop shell | `src-tauri/` (Tauri 2, Rust pinned in `src-tauri/rust-toolchain.toml`), with app commands such as `reveal_path` in `src-tauri/src/files.rs`, the engine start and its failure dialog in `src-tauri/src/engine_start.rs`, the Windows job object in `src-tauri/src/win_job.rs`, and the frozen engine folder (PyInstaller `--onedir`) that `setup/freeze_backend` writes to `src-tauri/engine/` and Tauri ships as the resource folder `engine` |
 | Scripts | `./formpublisher`, `./formpublisher_oc_install`, `./build_app`, each with a `.bat` twin; `setup/agents.py`, `setup/lib.sh` |
 | Agent kit | `.claude/skills` (source), `.agents/skills` (mirror), `.mcp.json`, `.codex/config.toml`, `.cursor/mcp.json` |
 | Docs | `docs/MANUAL.md`, `.docs/wiki/`, `README.md`, `CHANGELOG.md`, `NOTICE.md` |
@@ -31,7 +31,7 @@ backend/app/services (paths, settings, site intake, the FormWeb reader)
   -> backend/app/routers (one router per file, auto-included)
        -> frontend over /api and the live WebSocket
        -> the command line and MCP server over the same routes
-  -> backend/formpublisher_engine.py (PyInstaller entry) -> src-tauri sidecar
+  -> backend/formpublisher_engine.py (PyInstaller entry) -> src-tauri/engine folder
 ```
 
 ## The laws
@@ -45,12 +45,13 @@ backend/app/services (paths, settings, site intake, the FormWeb reader)
 - **Keep the agents in step.** After changing a command, a tool or a skill, run `./formpublisher agents sync` (it mirrors `.claude/skills` to `.agents/skills` and checks the skill files; `--check` fails on drift). After touching `vendor/formweb-native`, stage it and run `./formpublisher vendor --check`.
 - **Versions** are `X.Y.Z`; `frontend/package.json`, `backend/app/__init__.py`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml` carry the same one.
 - **Dependencies** each get a row in `NOTICE.md`. GPL stays out of the distributed bundle.
+- **Locks, toolchains and languages.** Python packages are locked with hashes in `backend/requirements.lock` and `backend/requirements-test.lock`, and installs use `pip install --require-hashes -r backend/requirements.lock`. After changing a requirements file, run `python setup/lock_requirements.py` (uv 0.11.32) and commit the locks; `--check` verifies them. Rust is pinned in `src-tauri/rust-toolchain.toml` and read by `fp_rust_pin` in `setup/lib.sh`; Node is 22.12 or newer. Every interface string is in all 25 locale folders: `python setup/i18n_check.py` must pass. CI runs all three, plus a Windows and a macOS shell check (`cargo check --locked`).
 - **Commits** as `nodemode-ai <mackin@nodemode.ai>` only, no trailers of any kind (see `CLAUDE.md`).
 
 ## Run it
 
 ```bash
-./formpublisher_oc_install     # backend venv and interface packages
+./formpublisher_oc_install     # backend venv (from the hashed lock) and interface packages
 ./formpublisher boot           # engine on 127.0.0.1:8280 and interface on localhost:5280
 ./formpublisher serve          # the built interface served by the engine on 8280
 ./formpublisher run status     # the command line

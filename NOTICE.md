@@ -1,6 +1,6 @@
 # FormPublisher notices
 
-FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, SPDX `GPL-3.0-only`). Copyright 2026 NodeAgentc, Inc. It includes or depends on the following work. Versions are the exact pins in `frontend/package-lock.json`, `backend/requirements.txt` (with the installed backend venv for the packages they bring) and `src-tauri/Cargo.lock`.
+FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, SPDX `GPL-3.0-only`). Copyright 2026 NodeAgentc, Inc. It includes or depends on the following work. Versions are the exact pins in `frontend/package-lock.json`, `backend/requirements.lock` (the hashed lock of `backend/requirements.txt`, `requirements-deep.txt` and `requirements-build.txt`, with the installed backend venv for the packages they bring) and `src-tauri/Cargo.lock`.
 
 ## Shipped in the app
 
@@ -15,18 +15,22 @@ FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, 
 | serde_json | the shell reading the engine's port and JSON | Apache-2.0 OR MIT |
 | objc2, objc2-app-kit (macOS only) | the splash window's corner mask and clear background | MIT |
 | gtk (Linux only) | the desktop window on Linux | MIT |
+| windows-sys 0.61.2 (Windows only) | the job object that makes the engine end with the shell | MIT OR Apache-2.0 |
 | FastAPI 0.141.1, Starlette | the engine service | MIT, BSD-3-Clause |
 | Uvicorn 0.53.0 with its `standard` extras (websockets, watchfiles, httptools, uvloop, h11, click, python-dotenv, PyYAML) | HTTP and WebSocket serving, the disk watcher | BSD-3-Clause (uvicorn, websockets, click, python-dotenv); MIT (watchfiles, httptools, h11, PyYAML, uvloop) |
 | python-multipart 0.0.32 | upload bodies (site exports) | Apache-2.0 |
 | mcp 2.3.0 (the official MCP Python SDK) | the MCP server on stdio | MIT |
 | httpx2 2.16.0 | the engine's read-only calls to a running FormWeb | BSD-3-Clause |
 | cryptography 50.0.2 | Ed25519 keys, signatures and passphrase encryption of private keys | Apache-2.0 OR BSD-3-Clause |
+| Playwright for Python 1.65.0 (`backend/requirements-deep.txt`), frozen into the engine; no browser is downloaded | deep checks drive the person's installed Google Chrome or Microsoft Edge | Apache-2.0 |
+| Node.js runtime inside Playwright's driver (`playwright/driver/node`), frozen into the engine with the driver | runs Playwright's driver for the deep checks | MIT, with the third-party licences listed in the driver's own `LICENSE` and `ThirdPartyNotices` files, which ship in the engine folder under `_internal/playwright/driver/` |
+| greenlet 3.5.6 | the coroutine switching that Playwright's Python package needs | MIT AND PSF-2.0 |
 | FormWeb engine crates 0.27.0 (formweb-model, formweb-engine, formweb-export, formweb-core), vendored unedited in `vendor/formweb-native` with FormWeb's `LICENSE`, Copyright 2026 NodeAgentc, Inc. | `formweb-core`, built by `setup/install_compiler`, opens `.fweb` projects | Apache-2.0, compatible with GPL-3.0-only |
 | serde, serde_json, sha2 and their dependencies, pinned in `vendor/formweb-native/Cargo.lock` | `formweb-core` | Apache-2.0 OR MIT |
 | pydantic, pydantic-core, annotated-types, typing-extensions, anyio, idna | request models and async I/O, brought in by the packages above | MIT, BSD-3-Clause (typing-extensions PSF-2.0) |
-| CPython 3.12, embedded by PyInstaller in the one-file engine sidecar | runs the engine | PSF-2.0 |
+| CPython 3.12, embedded by PyInstaller in the engine folder (`src-tauri/engine`, shipped as the resource folder `engine`) | runs the engine | PSF-2.0 |
 
-The Python rows are the packages in `backend/requirements.txt` and what they install; check `*.dist-info/METADATA` in `backend/venv` for exact licenses and versions of the transitive ones. What PyInstaller freezes is what the engine imports; the build tools below are not frozen.
+The Python rows are the packages in `backend/requirements.txt` and `backend/requirements-deep.txt` and what they install; check `*.dist-info/METADATA` in `backend/venv` for exact licenses and versions of the transitive ones. What PyInstaller freezes is what the engine imports; the build tools below are not frozen.
 
 ## Desktop shell: crates under other licences
 
@@ -39,9 +43,9 @@ Tauri links its own dependencies unedited (no `[patch]`, no vendored copy), some
 | Vite 8.3.5 | builds the interface | MIT |
 | TypeScript 7.0.2 | type checks the interface | Apache-2.0 |
 | `@tauri-apps/cli` 2.12.5 | builds the desktop app (`build_app` runs the copy in `frontend/node_modules`) | Apache-2.0 OR MIT |
-| PyInstaller 6.22.3 | freezes the engine sidecar (`setup/freeze_backend`) | GPL-2.0-or-later with the bootloader exception, which permits distributing the frozen program under its own licence |
-| Playwright for Python 1.65.0 (`backend/requirements-deep.txt`), installed by `./formpublisher_oc_install`, never with a browser download | deep checks drive the person's installed Chrome | Apache-2.0 |
-| Rust toolchain (cargo, rustc) | builds `formweb-core` from the vendored crates | Apache-2.0 OR MIT |
+| PyInstaller 6.22.3 | freezes the engine folder (`setup/freeze_backend`) | GPL-2.0-or-later with the bootloader exception, which permits distributing the frozen program under its own licence |
+| uv 0.11.32 | writes the requirement locks (`python setup/lock_requirements.py`); not shipped | Apache-2.0 OR MIT |
+| Rust toolchain 1.97.0 (cargo, rustc), pinned in `src-tauri/rust-toolchain.toml` | builds the desktop shell and `formweb-core` from the vendored crates | Apache-2.0 OR MIT |
 
 ## Media
 

@@ -6,7 +6,7 @@ import type { ToastAction } from './toast';
 export interface StepHost {
   openTrash(): void;
   showCheck(): void;
-  openManual(): void;
+  openManual(code?: string): void;
   refreshSites(): Promise<void>;
 }
 
@@ -53,7 +53,7 @@ export async function stepFor(code: string | undefined, ref: string | undefined,
   }
   if (code === 'formweb-unreachable') return run ? { label: 'Try again', run } : undefined;
   if (code === 'check-running') return { label: 'Show the running check', run: () => host.showCheck() };
-  if (code === 'core-missing') return { label: 'Open the manual', run: () => host.openManual() };
+  if (code === 'core-missing') return { label: 'Open the manual', run: () => host.openManual(code) };
   if (code === 'passphrase-wrong' || code === 'passphrase-required') return run ? { label: 'Enter the passphrase', run } : undefined;
   return undefined;
 }

@@ -45,8 +45,9 @@ content, or something outside the machine, could get further than it should:
 - **The FormWeb connection**: FormPublisher only reads FormWeb. Anything that makes it
   write to FormWeb, call a route that changes FormWeb's document, or reach a host
   other than the loopback FormWeb the person chose.
-- **The deep check**, which loads an imported site in the Chrome you already have:
-  a site getting out of that page.
+- **The deep check**, which loads an imported site in the Chrome or Edge you already
+  have, in the desktop app too (Playwright and its Node.js driver are frozen into the
+  engine, and no browser is downloaded): a site getting out of that page.
 - **Signing keys**: the Ed25519 keys in the `keys/` folder, which may be locked with a
   passphrase. Anything that leaks a private key or passphrase, or makes a signature
   verify for files it was not made for.

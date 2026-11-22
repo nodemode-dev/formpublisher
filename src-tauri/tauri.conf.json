@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "FormPublisher",
   "mainBinaryName": "formpublisher",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "identifier": "ai.nodemode.formpublisher",
   "build": {
     "frontendDist": "../frontend/dist"
@@ -32,8 +32,8 @@
     "active": true,
     "targets": "all",
     "category": "Productivity",
-    "shortDescription": "The Form publishing studio",
-    "longDescription": "FormPublisher is the Form family's publishing studio, a desktop app over a local engine.",
+    "shortDescription": "Check, package, sign and host FormWeb sites yourself",
+    "longDescription": "FormPublisher is the FormAI family's site publisher: it starts a FormWeb site from a template, previews and checks every route, builds a signed package and prepares a folder for each host. It never uploads; you host the site yourself. A desktop app over a local engine.",
     "publisher": "NodeAgentc, Inc.",
     "copyright": "Copyright 2026 NodeAgentc, Inc.",
     "license": "GPL-3.0-only",
@@ -41,9 +41,9 @@
     "resources": {
       "../LICENSE": "LICENSE",
       "../NOTICE.md": "NOTICE.md",
-      "../demo/sample-site.zip": "demo/sample-site.zip"
+      "../demo/sample-site.zip": "demo/sample-site.zip",
+      "engine": "engine"
     },
-    "externalBin": ["binaries/formpublisher-engine"],
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
     "macOS": {
       "minimumSystemVersion": "13.0",

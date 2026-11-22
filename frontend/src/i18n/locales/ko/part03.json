@@ -271,5 +271,6 @@
   "the engine returned no content for {0}": "엔진이 {0}에 대한 내용을 반환하지 않았습니다",
   "the engine returned invalid base64 for {0}": "엔진이 {0}에 대해 올바르지 않은 base64를 반환했습니다",
   "formweb-core returned no files": "formweb-core가 파일을 반환하지 않았습니다",
-  "formweb-core returned an invalid file entry": "formweb-core가 올바르지 않은 파일 항목을 반환했습니다"
+  "formweb-core returned an invalid file entry": "formweb-core가 올바르지 않은 파일 항목을 반환했습니다",
+  "The deep check could not finish: {0}": "심층 검사를 완료하지 못했습니다: {0}"
 }

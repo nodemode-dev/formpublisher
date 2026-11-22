@@ -7,7 +7,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from app import host as site_host
-from app.services import checks, settings
+from app.services import checks, paths, settings
 
 CPU_RATE = 4
 LATENCY_MS = 150
@@ -29,6 +29,7 @@ INIT_SCRIPT = (
     "if(!e.hadRecentInput)window.__fpcls+=e.value})}).observe({type:'layout-shift',buffered:true})}catch(e){}"
 )
 INSTALL_FIX = "Run ./formpublisher_oc_install to install the deep check requirements, and install Google Chrome."
+BROWSER_FIX = "Install Google Chrome or Microsoft Edge, or set the browser's path in Preferences, then run the deep check again."
 
 
 ENGINE_LOOP: asyncio.AbstractEventLoop | None = None
@@ -85,10 +86,11 @@ def launch(playwright):
             return playwright.chromium.launch(executable_path=configured, headless=True)
         except Exception as exc:
             errors.append(str(exc))
-    try:
-        return playwright.chromium.launch(channel="chrome", headless=True)
-    except Exception as exc:
-        errors.append(str(exc))
+    for channel in ("chrome", "msedge"):
+        try:
+            return playwright.chromium.launch(channel=channel, headless=True)
+        except Exception as exc:
+            errors.append(str(exc))
     candidates = list(CHROME_PATHS)
     program_files = os.environ.get("ProgramFiles")
     if program_files:
@@ -110,7 +112,7 @@ def unavailable(reason: str) -> dict:
         "code": "deep.unavailable",
         "route": "/",
         "message": f"Deep checks are not available on this computer. {reason}".strip(),
-        "fix": INSTALL_FIX,
+        "fix": BROWSER_FIX if paths.frozen() else INSTALL_FIX,
     }
     return {"problems": [problem], "thumbs": {}, "widths": [], "motion": "auto", "routes": 0, "available": False}
 

@@ -4,15 +4,14 @@ root="$(cd "$(dirname "$0")" && pwd)"
 pybin="$(command -v python3.12 || command -v python3)"
 [ -n "$pybin" ] || { echo "[formpublisher] Python 3.12 is needed" >&2; exit 1; }
 command -v npm > /dev/null || { echo "[formpublisher] Node.js 22.12 or newer is needed" >&2; exit 1; }
+node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>22||(a===22&&b>=12)?0:1)' || { echo "[formpublisher] Node.js 22.12 or newer is needed" >&2; exit 1; }
 echo "[formpublisher] engine: backend/venv"
 [ -x "$root/backend/venv/bin/python" ] || "$pybin" -m venv "$root/backend/venv"
-"$root/backend/venv/bin/python" -m pip install -q --upgrade pip
-"$root/backend/venv/bin/python" -m pip install -q -r "$root/backend/requirements.txt"
-"$root/backend/venv/bin/python" -m pip install -q -r "$root/backend/requirements-deep.txt"
+"$root/backend/venv/bin/python" -m pip install -q --require-hashes -r "$root/backend/requirements.lock"
 echo "[formpublisher] deep checks: Playwright is installed; no browser is downloaded; deep checks use a Chrome or Edge you already have"
 if command -v cargo > /dev/null || [ -x "$HOME/.cargo/bin/cargo" ]; then
   echo "[formpublisher] compiler: backend/bin/formweb-core"
-  "$root/setup/install_compiler"
+  "$root/setup/install_compiler" || { echo "[formpublisher] the core build failed (see above)" >&2; exit 1; }
 else
   echo "[formpublisher] Rust is not installed, so .fweb projects cannot be opened yet. Get Rust from https://rustup.rs, then run ./setup/install_compiler"
 fi

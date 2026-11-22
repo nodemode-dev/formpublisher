@@ -2,7 +2,7 @@
 name: formpublisher-harness
 description: Drives FormPublisher, the Form family's site publisher, through its formpublisher MCP server or the ./formpublisher run command line. Use whenever the person wants a FormWeb site exported as site-export.zip imported, a FormWeb publication folder opened, the site currently open in a running FormWeb brought in, the imported sites listed, a site's routes listed, its revisions listed or compared, a .fweb project opened, a site mounted for preview, checked (static or deep), built into a deterministic site.zip, or signed and verified with an Ed25519 key, or prepared for a host (Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx or a plain zip); or when formpublisher tools such as list_sites, import_site, run_checks, build_package or prepare_publish are available or fail. Not for editing a site (that is FormWeb), not for changing FormPublisher's own source code (use formpublisher-skillset), and not for uploading to a host, which FormPublisher never does.
 metadata:
-  version: "0.4.1"
+  version: "0.5.0"
 ---
 
 # formpublisher harness
@@ -73,7 +73,7 @@ Not tools: `trash delete ENTRY` deletes one trash entry for good and `trash empt
 
 FormPublisher prepares; it never uploads. Publishing is a chain, and each link needs the id the one before returned.
 
-1. `run_checks` with the site id. Report the counts and each problem with its code and fix. Add `deep` only when the person wants the browser run; `deep.unavailable` means Chrome or Playwright is missing, so say so.
+1. `run_checks` with the site id. Report the counts and each problem with its code and fix. Add `deep` only when the person wants the browser run; `deep.unavailable` means no Chrome or Edge could be started (or, from source, Playwright is missing), and `deep.failed` means the run could not finish, so say which and give its reason.
 2. `build_package` with the site id. The same site gives the same build id, so a repeated call returns the existing build with `created` false.
 3. `sign_build` with the build id and a key the person named (a key id from `keys`). With one key in the data folder and no `key` argument it uses that one and says which; with none it fails and the person creates one with `./formpublisher run keys --create NAME`. Then `verify_build` and report `valid` as returned.
 4. `list_targets` for the six ids: `static-zip`, `netlify`, `cloudflare-pages`, `vercel`, `github-pages`, `nginx`.
@@ -116,7 +116,7 @@ curl -s -X DELETE 127.0.0.1:8280/api/host/mount       # unmount
 
 `theme` is auto, dark or light; `motion` is auto or reduce; `throttle` is none, fast or slow. `probe` injects the preview probe script and is for previewing only.
 
-Run checks and read the problems. The static tier is offline and returns at once; the deep tier needs the person's installed Chrome and the optional Playwright requirements, runs in the background, and reports `checks.progress` and `checks.done` on the live socket.
+Run checks and read the problems. The static tier is offline and returns at once; the deep tier needs the person's installed Chrome or Edge (Playwright ships in the desktop app and is part of the install from source), runs in the background, and reports `checks.progress` and then `checks.done` on the live socket, or `checks.failed` (`run`, `site`, `revision`, `tier`, `reason`) when it could not finish.
 
 ```sh
 curl -s -X POST 127.0.0.1:8280/api/checks/run -H 'Content-Type: application/json' \
@@ -129,7 +129,7 @@ curl -s 127.0.0.1:8280/api/checks/SITE-ID/REVISION
 #  "thumbs": {"/": "/api/checks/SITE-ID/REVISION/thumbs/ab12.png"}}
 ```
 
-Report the counts and the problems as returned, with each code and fix. A `deep.unavailable` problem means Chrome or Playwright is missing; say so and do not install a browser. The codes are listed in `docs/MANUAL.md`.
+Report the counts and the problems as returned, with each code and fix. A `deep.unavailable` problem means no Chrome or Edge could be started (or, from source, Playwright is missing); say so and do not install a browser. A `deep.failed` problem (error) means the deep run could not finish; report its reason and point to `logs/engine.log` in the data folder; an HTTP 500 with the code `internal` names that file in `detail` and carries its path as `log`. The codes are listed in `docs/MANUAL.md`.
 
 Build, reproduce, compare and download:
 

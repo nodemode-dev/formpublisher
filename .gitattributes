@@ -2,6 +2,8 @@
 *.sh text eol=lf
 formpublisher text eol=lf
 *_oc_install text eol=lf
+build_app text eol=lf
+backend/boot_backend text eol=lf
 setup/* text eol=lf
 *.bat text eol=crlf
 *.svg text eol=lf

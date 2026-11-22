@@ -271,5 +271,6 @@
   "the engine returned no content for {0}": "mesin tidak mengembalikan konten untuk {0}",
   "the engine returned invalid base64 for {0}": "mesin mengembalikan base64 yang tidak valid untuk {0}",
   "formweb-core returned no files": "formweb-core tidak mengembalikan berkas",
-  "formweb-core returned an invalid file entry": "formweb-core mengembalikan entri berkas yang tidak valid"
+  "formweb-core returned an invalid file entry": "formweb-core mengembalikan entri berkas yang tidak valid",
+  "The deep check could not finish: {0}": "Pemeriksaan mendalam tidak dapat diselesaikan: {0}"
 }

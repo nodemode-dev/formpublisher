@@ -271,5 +271,6 @@
 "the engine returned no content for {0}": "bộ máy không trả về nội dung cho {0}",
 "the engine returned invalid base64 for {0}": "bộ máy trả về base64 không hợp lệ cho {0}",
 "formweb-core returned no files": "formweb-core không trả về tệp nào",
-"formweb-core returned an invalid file entry": "formweb-core trả về một mục tệp không hợp lệ"
+"formweb-core returned an invalid file entry": "formweb-core trả về một mục tệp không hợp lệ",
+"The deep check could not finish: {0}": "Không thể hoàn tất kiểm tra chuyên sâu: {0}"
 }

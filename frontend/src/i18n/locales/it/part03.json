@@ -271,5 +271,6 @@
   "the engine returned no content for {0}": "il motore non ha restituito contenuto per {0}",
   "the engine returned invalid base64 for {0}": "il motore ha restituito base64 non valido per {0}",
   "formweb-core returned no files": "formweb-core non ha restituito file",
-  "formweb-core returned an invalid file entry": "formweb-core ha restituito una voce di file non valida"
+  "formweb-core returned an invalid file entry": "formweb-core ha restituito una voce di file non valida",
+  "The deep check could not finish: {0}": "Il controllo approfondito non è stato completato: {0}"
 }

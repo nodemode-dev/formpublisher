@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="version 0.4.1" src="https://img.shields.io/badge/version-0.4.1-4f6bff?style=flat-square">
+  <img alt="version 0.5.0" src="https://img.shields.io/badge/version-0.5.0-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -104,7 +104,7 @@
     </td>
     <td width="50%" valign="top">
       <h3>Checks</h3>
-      Static checks run offline on the files: links, assets, redirects, sitemap, robots, metadata, images, headings, external requests, forms that post to a local address and size budgets. Live checks report the console, failed requests and layout shift from the preview. A deep check drives the Chrome you already have, at two widths on a slow network and CPU.
+      Static checks run offline on the files: links, assets, redirects, sitemap, robots, metadata, images, headings, external requests, forms that post to a local address and size budgets. Live checks report the console, failed requests and layout shift from the preview. A deep check drives the Chrome or Edge you already have, in the desktop app too, at two widths on a slow network and CPU.
     </td>
   </tr>
   <tr>
@@ -164,7 +164,7 @@
     </td>
     <td width="50%" valign="top">
       <h3>Desktop app</h3>
-      <code>./build_app</code> freezes the engine and builds a Tauri 2 shell around it: a splash, one window with no white flash, a single instance, and the engine stopped with the app, even on a terminate signal. It prefers port 8280, where FormWeb looks first.
+      <code>./build_app</code> freezes the engine into a folder and builds a Tauri 2 shell around it: a splash, one window with no white flash, a single instance, and the engine stopped with the app, even when the app is killed. It prefers port 8280, where FormWeb looks first. When the engine does not start, a dialog says why, with the engine's last lines and the path of its log. Help > Documentation opens the manual inside the window, with the network off too.
     </td>
   </tr>
   <tr>
@@ -302,7 +302,7 @@ Two MCP servers are registered: `formpublisher` and `formmcp`, the Form family h
 
 ## Run it from source
 
-**Requires:** Node 22.12 or newer, Python 3.12, git. Rust stable and the Tauri prerequisites only for the desktop window.
+**Requires:** Node 22.12 or newer, Python 3.12, git. Rust 1.97.0 (pinned in `src-tauri/rust-toolchain.toml`) and the Tauri prerequisites only for the desktop window, which runs on macOS 13 or newer on Apple silicon, macOS 14 or newer on Intel, Windows and Linux.
 
 ```sh
 git clone git@github.com:nodemode-dev/formpublisher.git
@@ -312,7 +312,7 @@ cd formpublisher
 ./formpublisher                   # interface at http://localhost:5280, engine on 127.0.0.1:8280
 ```
 
-`./formpublisher_oc_install` is the install, `./formpublisher` is the boot, and `./build_app` makes the desktop app start to finish and logs to `build_app.log`. On Windows use `formpublisher_oc_install.bat`, `formpublisher.bat` and `build_app.bat`.
+`./formpublisher_oc_install` is the install (it installs the engine's packages from the hashed lock, `pip install --require-hashes -r backend/requirements.lock`), `./formpublisher` is the boot, and `./build_app` makes the desktop app start to finish and logs to `build_app.log`. After you change a requirements file, run `python setup/lock_requirements.py` and commit the locks. On Windows use `formpublisher_oc_install.bat`, `formpublisher.bat` and `build_app.bat`.
 
 Ports and folders:
 
@@ -332,6 +332,7 @@ Ports and folders:
 | `inbox/` | sites FormWeb leaves for FormPublisher (`imported/` and `failed/` below it) |
 | `keys/` | signing keys |
 | `trash/` | removed items, each with a `.trash.json` record, restorable from Home |
+| `logs/` | `engine.log`, the engine's log (rotates at 1 MB, 3 older files kept) |
 | `engine.json` | the running engine's app, port, pid, version and start time, so FormWeb finds it on any port |
 
 `./formpublisher serve` serves a production build from the engine alone, `./formpublisher desktop dev` opens the desktop window, and `./formpublisher doctor` checks the toolchain. `FORMPUBLISHER_HOME` moves the data folder (`~/FormPublisher` by default).

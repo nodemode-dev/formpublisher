@@ -271,5 +271,6 @@
   "the engine returned no content for {0}": "motoren returnerte ikke noe innhold for {0}",
   "the engine returned invalid base64 for {0}": "motoren returnerte ugyldig base64 for {0}",
   "formweb-core returned no files": "formweb-core returnerte ingen filer",
-  "formweb-core returned an invalid file entry": "formweb-core returnerte en ugyldig filoppføring"
+  "formweb-core returned an invalid file entry": "formweb-core returnerte en ugyldig filoppføring",
+  "The deep check could not finish: {0}": "Den grundige kontrollen kunne ikke fullføres: {0}"
 }

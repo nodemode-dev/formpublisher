@@ -1016,7 +1016,7 @@ dependencies = [
 
 [[package]]
 name = "formpublisher"
-version = "0.4.1"
+version = "0.5.0"
 dependencies = [
  "gtk",
  "objc2",
@@ -1027,6 +1027,7 @@ dependencies = [
  "tauri-plugin-dialog",
  "tauri-plugin-shell",
  "tauri-plugin-single-instance",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

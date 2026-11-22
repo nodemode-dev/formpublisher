@@ -2,8 +2,8 @@
 
 Living log for the desktop shell (Tauri 2). Source files stay comment-free; what they would have said lives here.
 
-Current build version: v0.4.1
-Last updated: 2026-11-22 · v0.4.1, no shell change (the window text is in the 26 languages; see frontend/HASHOUT_LOG.md); v0.4.0, no shell change (the window gains Templates and the hosting guide; see frontend/HASHOUT_LOG.md); v0.3.4 the desktop build runs a pinned Tauri command line from frontend/node_modules, and build_app.bat stops when the install fails; v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
+Current build version: v0.5.0
+Last updated: 2026-11-22 · v0.5.0 the engine is held in a Windows job object, a leftover engine is replaced, a failed start shows the engine's last lines and its log, the engine ships as a folder resource, Rust is pinned at 1.97.0 and the Intel Mac build declares macOS 14; v0.4.1, no shell change (the window text is in the 26 languages; see frontend/HASHOUT_LOG.md); v0.4.0, no shell change (the window gains Templates and the hosting guide; see frontend/HASHOUT_LOG.md); v0.3.4 the desktop build runs a pinned Tauri command line from frontend/node_modules, and build_app.bat stops when the install fails; v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
 
 ---
 
@@ -14,16 +14,19 @@ src-tauri/
 ├── Cargo.toml          package formpublisher, its own [workspace]; tauri 2 (macos-private-api), shell, dialog, single-instance, serde_json; gtk on Linux, objc2 on macOS (reveal and traffic lights)
 ├── Cargo.lock          resolved by cargo check on Linux (466 packages)
 ├── build.rs            the app commands with generated allow permissions (app_ready, open_window, reveal_path)
-├── tauri.conf.json     splash window, macOSPrivateApi, externalBin, resources, bundle metadata
+├── rust-toolchain.toml the pinned Rust version (1.97.0, minimal profile)
+├── tauri.conf.json     splash window, macOSPrivateApi, resources (the engine folder among them), bundle metadata
 ├── entitlements.plist  hardened runtime exceptions for the frozen Python engine
 ├── capabilities/       default.json: the engine origin http://127.0.0.1:*/* as a remote URL (8280 or the port the shell picked)
 ├── icons/              32x32, 128x128, 128x128@2x, icon.png, icon.icns, icon.ico
-├── binaries/           .gitkeep; the frozen engine is placed here at build time
+├── engine/             .gitkeep; setup/freeze_backend places the frozen engine folder here at build time
 └── src/
+    ├── engine_start.rs the engine's last lines, the start failures and their sentences, the data folder and log path, the health answer, replacing a leftover engine
     ├── files.rs        reveal_path, limited to the data folder
-    ├── main.rs         port choice, engine health check and start in its own process group, signals, main window, open_window, exit
+    ├── main.rs         port choice, engine start in its own process group with its output followed, signals, main window, open_window, exit
     ├── reveal.rs       splash minimum, bar finish, fallback, rounded splash, hidden-until-ready main window
-    └── traffic_lights.rs  macOS: the inset of the close, minimize and zoom buttons in the overlay title bar
+    ├── traffic_lights.rs  macOS: the inset of the close, minimize and zoom buttons in the overlay title bar
+    └── win_job.rs      Windows: the job object that ends the engine with the shell (FormDeck's file, unchanged)
 ```
 
 ---
@@ -148,3 +151,36 @@ Until 0.3.3 `build_app` and `build_app.bat` ran `npx --yes @tauri-apps/cli@2`, w
 `build_app` runs `node frontend/node_modules/.bin/tauri` from the repository root, the way `./formpublisher desktop dev` already does; `build_app.bat` runs `frontend\node_modules\.bin\tauri.cmd`, as `formpublisher.bat desktop dev` does. Both install again when that file is missing (a `frontend/node_modules` from before the pin has no copy of the tool). `build_app.bat` also stops now, with exit code 1 and a message, when the install of the engine and the window fails; before, it went on to a build that could not succeed.
 
 Checked: `npm ci`, `npm audit --audit-level=low` (0 vulnerabilities) and `npm run build` in `frontend`; from the repository root `node frontend/node_modules/.bin/tauri --version` (2.12.5), `build --help` and `info` (it finds `src-tauri`; tauri 2.12.5, api 2.12.1, no version-mismatch warning); `bash -n build_app`. Not run: a desktop build (no WebKitGTK here), any line of `build_app.bat` (no Windows or Wine here; its install check is the idiom `formpublisher.bat boot` already has, `call ... & if errorlevel 1`, which Phase 45 ran under Wine), macOS.
+
+---
+
+## The engine starts, stops and reports with its shell {#engine-start}
+- refers-to: src/main.rs :: engine_program, follow, spawn_engine, kill_backend, engine_failed, engine_exit, start_engine · src/engine_start.rs · src/win_job.rs · Cargo.toml · tauri.conf.json :: bundle.resources
+- kind: decision
+- logged: v0.5.0 · 2026-11-22
+
+Until 0.4.1 the shell adopted any 200 from `/api/health` on its port, started the one-file sidecar with its output thrown away, had no hold on it on Windows, and said only "did not start". Now:
+
+- `win_job.rs` is FormDeck's file, byte for byte (Apache-2.0, the same owner): one job object with `KILL_ON_JOB_CLOSE`, `hold_pid` after the spawn, `end` in `kill_backend`. When the shell dies by any means Windows closes the job handle and ends the engine. `windows-sys` 0.61.2 was already in the lock through Tauri; it is now a direct dependency with the four features the file uses.
+- `engine_start.rs` holds what does not need a window: `Tail` (the engine's last 12 lines, 300 characters each, never a line holding `window-key`, which 0.6.0 will send), `Failure` and its sentences, `message`, `data_folder` (`FORMPUBLISHER_HOME` with `~` expanded as the engine's `expanduser` does, else `~/FormPublisher`), `engine_log`, `health` (reads the whole answer and takes `app` and `version` from the JSON, where the old check read 16 bytes for ` 200`) and `replace_leftover`. FormDeck's unit tests of the same shapes were not brought over: no test is written until the owner has tested.
+- `replace_leftover` reads `engine.json` in the data folder (the engine has written it since 0.2.x: app, pid, port, version). When the pid is not this process and the port answers as `formpublisher`, that engine is ended (`kill -TERM`, then `-KILL` after 2.5 s; `taskkill /PID n /T /F` on Windows, with no console window) and the shell waits up to 5 s for the port to stop answering. It is never adopted, whatever its version: single-instance already guarantees no other window owns it, an engine of another version would serve an old window, and from 0.6.0 an adopted engine could not hand over its window key. A stale `engine.json` whose port does not answer is left alone, so a recycled pid is never ended.
+- `start_engine` then chooses the port (so 8280 is free again after a replacement), spawns, and waits up to 90 s (`HEALTH_WAIT`; a first launch on a slow disk scans a 255 MB folder) for a health answer whose version is the shell's own `CARGO_PKG_VERSION`. An engine that exits first gives `Stopped(code)`, another version gives `WrongVersion`, silence gives `TimedOut`.
+- `spawn_engine` pipes stdout and stderr and `follow` drains each on its own thread into the `Tail` (a pipe nobody reads would stop the engine once it fills). The engine gets `FORMPUBLISHER_SHELL_PID` and `FORMPUBLISHER_DESKTOP=1`; it watches that pid itself (backend log, Phase 72), which covers macOS and Linux, where there is no job object, and backs the job up on Windows.
+- `engine_failed` closes the splash, waits 150 ms for the reader threads to take the last lines, and shows a native error dialog: the sentence, "The engine's last lines:", and the log's path when the file exists. `open_main` failing reports `Failure::Window` from its own thread, because a blocking dialog on the main thread would stop the event loop it needs.
+- `engine_program` looks in the bundle's resource folder first (`resource_dir()/engine`), then `../Resources/engine`, `engine` beside the binary (where `tauri dev` copies resources) and last beside the binary (an older one-file sidecar). `tauri.conf.json` maps `engine` to the resource `engine` and has no `externalBin`; `src-tauri/engine/.gitkeep` is tracked so `cargo check` finds the folder before any freeze, and `src-tauri/binaries/` is gone.
+
+Checked here: `cargo check --locked --target x86_64-pc-windows-msvc` passes with no warning (Rust 1.97.0). Not run: `cargo check` for the Linux host (no GTK or WebKitGTK development packages in this workspace, and they cannot be installed) or for `aarch64-apple-darwin` (objc2's build script needs Apple's compiler); CI's new `windows-shell` and `macos-shell` jobs run both natively. Nothing was run on Windows or macOS: the job object, `taskkill`, the dialog and the replaced engine are steps in TEST_PLAN.md.
+
+## The Rust toolchain is pinned {#rust-pin}
+- refers-to: rust-toolchain.toml · setup/lib.sh :: fp_rust_pin, fp_rust_env · build_app
+- kind: decision
+- logged: v0.5.0 · 2026-11-22
+
+`rust-toolchain.toml` names 1.97.0 with the minimal profile. `setup/lib.sh` exported `RUSTUP_TOOLCHAIN=stable`, and that variable wins over any toolchain file, so the pin had to go there too: `fp_rust_pin` reads the channel from this file (`FORMPUBLISHER_RUST_TOOLCHAIN` still overrides it) and `fp_rust_env` exports it when that toolchain is installed; `build_app` installs it when it is missing. The vendored `vendor/formweb-native` carries no toolchain file of its own, because that folder is a byte copy of FormWeb's and `vendor --check` refuses a file FormWeb does not have; the scripts and CI build it with the same pinned version through `RUSTUP_TOOLCHAIN`.
+
+## The minimum macOS differs by processor {#macos-minimum}
+- refers-to: tauri.conf.json :: bundle.macOS.minimumSystemVersion · build_app :: tauri_args
+- kind: decision
+- logged: v0.5.0 · 2026-11-22
+
+`tauri.conf.json` says 13.0, which is what the Apple silicon build needs. The Intel build installs a `cryptography` wheel built for macOS 14 (PyPI has none for Intel at this version; the family's release build supplies one), so `build_app` adds `--config '{"bundle":{"macOS":{"minimumSystemVersion":"14.0"}}}'` when the target is `x86_64-*`. One file cannot hold two values, and saying 14 for both would turn away Apple silicon Macs on 13 that run it. formcompiler's registry entry (`catalog.minimum_os.macos`) says "macOS 13" and needs the same split; that is a change in formcompiler.

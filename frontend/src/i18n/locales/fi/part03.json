@@ -271,5 +271,6 @@
   "the engine returned no content for {0}": "moottori ei palauttanut sisältöä kohteelle {0}",
   "the engine returned invalid base64 for {0}": "moottori palautti virheellistä base64:ää kohteelle {0}",
   "formweb-core returned no files": "formweb-core ei palauttanut tiedostoja",
-  "formweb-core returned an invalid file entry": "formweb-core palautti virheellisen tiedostomerkinnän"
+  "formweb-core returned an invalid file entry": "formweb-core palautti virheellisen tiedostomerkinnän",
+  "The deep check could not finish: {0}": "Syvätarkistusta ei voitu suorittaa loppuun: {0}"
 }
