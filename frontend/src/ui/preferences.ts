@@ -7,7 +7,7 @@ import { Dialog } from './dialogs';
 import { el, escapeHtml, q, setAttr, setClass, setDisabled, setText, setValue } from './dom';
 import { PrefsShell } from './prefs-shell';
 import { reservePrefs } from './reserve';
-import { applyDensity, applyTheme, readChoice, readDensity, saveChoice, setAccent, setTheme, THEMES, type Density } from './themes';
+import { DEFAULT_ACCENT, applyDensity, applyTheme, readChoice, readDensity, saveChoice, setAccent, setTheme, THEMES, type Density } from './themes';
 
 export type PrefsSection = 'general' | 'interface' | 'formweb' | 'about';
 
@@ -18,7 +18,7 @@ const SECTIONS: Array<[PrefsSection, string, string]> = [
   ['about', 'About', 'info'],
 ];
 
-const ACCENTS = ['#f97316', '#ef4444', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
+const ACCENTS = [DEFAULT_ACCENT, '#ef4444', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
 const DENSITIES: Array<[Density, string]> = [['compact', 'Compact'], ['standard', 'Regular'], ['comfortable', 'Comfortable']];
 
 const swatch = (id: string): string => {

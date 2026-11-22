@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
-  --accent-color: #f97316;
-  --accent-color-dim: #f9731633;
+  --accent-color: #5fe07a;
+  --accent-color-dim: #5fe07a33;
   --accent-color-hover: color-mix(in srgb, var(--accent-color) 82%, #ffffff);
 
   --bg-primary: #111111;
@@ -25,6 +25,7 @@
   --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
   --shadow-window: 0 24px 60px rgba(0,0,0,0.6);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -45,14 +46,14 @@
 
   --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', system-ui, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, 'JetBrains Mono', monospace;
-  --fp-9: 9px;
-  --fp-10: 10px;
-  --fp-11: 11px;
-  --fp-12: 12px;
-  --fp-13: 13px;
-  --fp-14: 14px;
-  --fp-16: 16px;
-  --fp-18: 18px;
+  --fs-9: 9px;
+  --fs-10: 10px;
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-16: 16px;
+  --fs-18: 18px;
 
   --ctl-sm: 24px;
   --ctl-md: 28px;
@@ -63,7 +64,8 @@
   --bg-input: var(--bg-tertiary);
   --bg-hover: rgba(255, 255, 255, 0.06);
   --bg-scrim: rgba(0, 0, 0, 0.6);
-  --text-on-accent: #fff;
+  --text-on-accent: #0b1a10;
+  --text-on-danger: #fff;
   --text-on-cta: #000;
   --border-soft: rgba(255, 255, 255, 0.08);
   --accent-tint: color-mix(in srgb, var(--accent-color) 6%, transparent);
@@ -122,10 +124,10 @@
   --z-overlay-modal: 60000;
   --z-debug: 100000;
 
-  --fp-titlebar-h: 44px;
-  --fp-tabs-h: 32px;
-  --fp-options-h: 44px;
-  --fp-status-h: 28px;
+  --cv-titlebar-h: 44px;
+  --cv-tabs-h: 32px;
+  --cv-options-h: 44px;
+  --cv-status-h: 28px;
   --fp-strip-w: 232px;
   --fp-props-w: 308px;
   --fp-bottom-h: 132px;
@@ -155,5 +157,5 @@ body.theme-light {
   --glass-shadow: 0 16px 40px rgba(96, 90, 70, 0.18), 0 2px 6px rgba(96, 90, 70, 0.12);
 }
 
-html.fp-density-compact { --ctl-sm: 22px; --ctl-md: 26px; --ctl: 28px; --ctl-lg: 32px; --ctl-xl: 36px; --fp-titlebar-h: 38px; --fp-tabs-h: 28px; --fp-status-h: 24px; }
-html.fp-density-comfortable { --ctl-sm: 28px; --ctl-md: 32px; --ctl: 36px; --ctl-lg: 40px; --ctl-xl: 44px; --fp-titlebar-h: 50px; --fp-tabs-h: 36px; --fp-status-h: 32px; }
+html.fp-density-compact { --ctl-sm: 22px; --ctl-md: 26px; --ctl: 28px; --ctl-lg: 32px; --ctl-xl: 36px; --cv-titlebar-h: 38px; --cv-tabs-h: 28px; --cv-status-h: 24px; }
+html.fp-density-comfortable { --ctl-sm: 28px; --ctl-md: 32px; --ctl: 36px; --ctl-lg: 40px; --ctl-xl: 44px; --cv-titlebar-h: 50px; --cv-tabs-h: 36px; --cv-status-h: 32px; }

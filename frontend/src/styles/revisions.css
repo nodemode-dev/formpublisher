@@ -1,10 +1,10 @@
-.fp-rv { display: grid; width: 100%; box-sizing: border-box; justify-self: stretch; grid-template-columns: minmax(200px, 34%) minmax(0, 1fr); height: 100%; min-height: 0; color: var(--text-secondary); font-size: var(--fp-12); }
+.fp-rv { display: grid; width: 100%; box-sizing: border-box; justify-self: stretch; grid-template-columns: minmax(200px, 34%) minmax(0, 1fr); height: 100%; min-height: 0; color: var(--text-secondary); font-size: var(--fs-12); }
 .fp-rv-side { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: 1px solid var(--line-0); }
 .fp-rv-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .fp-rv-head, .fp-rv-bar { display: flex; align-items: center; gap: var(--space-2); flex: none; height: 34px; padding: 0 var(--space-3); border-bottom: 1px solid var(--line-0); white-space: nowrap; }
 .fp-rv-title { color: var(--text-primary); font-weight: 500; }
 .fp-rv-lab { color: var(--text-muted); }
-.fp-rv-stamp { max-width: 150px; overflow: hidden; color: var(--text-primary); font-family: var(--font-mono); font-size: var(--fp-11); text-overflow: ellipsis; }
+.fp-rv-stamp { max-width: 150px; overflow: hidden; color: var(--text-primary); font-family: var(--font-mono); font-size: var(--fs-11); text-overflow: ellipsis; }
 .fp-rv-spacer { flex: 1 1 auto; }
 .fp-rv-sum { flex: none; font-variant-numeric: tabular-nums; }
 .fp-rv-sum.is-added { color: var(--success-fill); }
@@ -25,22 +25,22 @@ body.theme-light .fp-rv-sum.is-removed { color: var(--danger-fill); }
 .fp-rv-files { grid-area: 2 / 1; }
 .fp-rv-chg { grid-area: 2 / 2; }
 .fp-rv-latest[hidden] { display: none; }
-.fp-rv-files { color: var(--text-muted); font-size: var(--fp-11); }
-.fp-rv-chg { justify-self: end; color: var(--text-muted); font-family: var(--font-mono); font-size: var(--fp-11); }
+.fp-rv-files { color: var(--text-muted); font-size: var(--fs-11); }
+.fp-rv-chg { justify-self: end; color: var(--text-muted); font-family: var(--font-mono); font-size: var(--fs-11); }
 .fp-rv-row { display: grid; grid-template-columns: 96px minmax(0, 1fr) 150px 96px; align-items: center; column-gap: var(--space-3); height: 26px; padding: 0 var(--space-3); border-bottom: 1px solid var(--line-0); white-space: nowrap; }
 .fp-rv-row > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.fp-rv-kind { font-size: var(--fp-11); }
+.fp-rv-kind { font-size: var(--fs-11); }
 .fp-rv-row[data-kind="added"] .fp-rv-kind, .fp-rv-row[data-kind="route-added"] .fp-rv-kind { color: var(--success-fill); }
 .fp-rv-row[data-kind="removed"] .fp-rv-kind, .fp-rv-row[data-kind="route-removed"] .fp-rv-kind { color: var(--danger); }
 .fp-rv-row[data-kind="changed"] .fp-rv-kind { color: var(--warn); }
-.fp-rv-path { color: var(--text-primary); font-family: var(--font-mono); font-size: var(--fp-11); }
-.fp-rv-size, .fp-rv-hash { color: var(--text-muted); font-family: var(--font-mono); font-size: var(--fp-11); }
+.fp-rv-path { color: var(--text-primary); font-family: var(--font-mono); font-size: var(--fs-11); }
+.fp-rv-size, .fp-rv-hash { color: var(--text-muted); font-family: var(--font-mono); font-size: var(--fs-11); }
 .fp-rv-dlg .fp-dlg-body { display: block; padding: 0; overflow: hidden; }
 .fp-rv-dlg .fp-rv { height: 420px; }
 .fp-bottom-page[data-page="revisions"] { display: block; padding: 0; text-align: left; }
 .fp-bottom-page[data-page="revisions"][hidden] { display: none; }
 .fp-pref-check { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--accent-color); cursor: pointer; }
 .fp-card-revs { display: block; height: 18px; padding: 0 4px; overflow: hidden; }
-.fp-card-revbtn { display: inline-block; max-width: 100%; height: 18px; overflow: hidden; border-radius: var(--radius); color: var(--text-muted); font-size: var(--fp-11); line-height: 18px; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.fp-card-revbtn { display: inline-block; max-width: 100%; height: 18px; overflow: hidden; border-radius: var(--radius); color: var(--text-muted); font-size: var(--fs-11); line-height: 18px; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
 .fp-card-revbtn:hover { color: var(--text-primary); text-decoration: underline; }
 .fp-card-revbtn:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; }

@@ -4,5 +4,5 @@
 .fp-fw-row:has(input:checked) { border-color: var(--accent-color); }
 .fp-fw-row input { margin: 0; accent-color: var(--accent-color); }
 .fp-fw-text { display: grid; min-width: 0; }
-.fp-fw-name { overflow: hidden; color: var(--text-primary); font-size: var(--fp-13); text-overflow: ellipsis; white-space: nowrap; }
-.fp-fw-meta { overflow: hidden; color: var(--text-muted); font-size: var(--fp-12); text-overflow: ellipsis; white-space: nowrap; }
+.fp-fw-name { overflow: hidden; color: var(--text-primary); font-size: var(--fs-13); text-overflow: ellipsis; white-space: nowrap; }
+.fp-fw-meta { overflow: hidden; color: var(--text-muted); font-size: var(--fs-12); text-overflow: ellipsis; white-space: nowrap; }

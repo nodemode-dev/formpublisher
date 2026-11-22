@@ -21,8 +21,10 @@ export const THEMES: Record<string, ThemeProfile> = {
 };
 
 export const DEFAULT_THEME = 'studio';
-export const DEFAULT_ACCENT = '#f97316';
+export const DEFAULT_ACCENT = '#5fe07a';
 export const OLD_DEFAULT_ACCENT = '#aba0d3';
+export const PREVIOUS_DEFAULT_ACCENT = '#f97316';
+export const INK_ON_ACCENT = '#0b1a10';
 export const DEFAULT_INTENSITY = 1;
 export const STORAGE_KEY = 'nodemode_ui_settings';
 export const APPEARANCE = 3;
@@ -37,8 +39,8 @@ export function readChoice(): ThemeChoice {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const saved = JSON.parse(raw) as Partial<ThemeChoice> & { appearance?: number };
-      if (saved.appearance === APPEARANCE) return { theme: saved.theme && THEMES[saved.theme] ? saved.theme : DEFAULT_THEME, accentColor: saved.accentColor || DEFAULT_ACCENT, intensity: clampIntensity(saved.intensity) };
-      if (saved.appearance === 2) return { theme: saved.theme && THEMES[saved.theme] ? saved.theme : DEFAULT_THEME, accentColor: !saved.accentColor || saved.accentColor === OLD_DEFAULT_ACCENT ? DEFAULT_ACCENT : saved.accentColor, intensity: DEFAULT_INTENSITY };
+      if (saved.appearance === APPEARANCE) return { theme: saved.theme && THEMES[saved.theme] ? saved.theme : DEFAULT_THEME, accentColor: !saved.accentColor || saved.accentColor === PREVIOUS_DEFAULT_ACCENT ? DEFAULT_ACCENT : saved.accentColor, intensity: clampIntensity(saved.intensity) };
+      if (saved.appearance === 2) return { theme: saved.theme && THEMES[saved.theme] ? saved.theme : DEFAULT_THEME, accentColor: !saved.accentColor || saved.accentColor === OLD_DEFAULT_ACCENT || saved.accentColor === PREVIOUS_DEFAULT_ACCENT ? DEFAULT_ACCENT : saved.accentColor, intensity: DEFAULT_INTENSITY };
     }
   } catch (e) {
     console.error('[theme] read failed:', e);
@@ -80,8 +82,18 @@ function hexToRgba(hex: string, alpha: number): string {
   const h = hex.replace('#', '');
   const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
   const n = parseInt(full.slice(0, 6), 16);
-  if (Number.isNaN(n)) return `rgba(249,115,22,${alpha})`;
+  if (Number.isNaN(n)) return hexToRgba(DEFAULT_ACCENT, alpha);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+}
+
+function onAccent(hex: string): string {
+  const h = hex.replace('#', '');
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const n = parseInt(full.slice(0, 6), 16);
+  if (Number.isNaN(n)) return INK_ON_ACCENT;
+  const lin = (c: number): number => { const s = c / 255; return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4); };
+  const l = 0.2126 * lin((n >> 16) & 255) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
+  return l > 0.2 ? INK_ON_ACCENT : '#ffffff';
 }
 
 export function applyTheme(choice: ThemeChoice = readChoice()): void {
@@ -95,8 +107,9 @@ export function applyTheme(choice: ThemeChoice = readChoice()): void {
   root.style.setProperty('--accent-color', choice.accentColor);
   root.style.setProperty('--accent-color-dim', choice.accentColor + '33');
   root.style.setProperty('--accent-color-hover', `color-mix(in srgb, ${choice.accentColor} 82%, #ffffff)`);
+  root.style.setProperty('--text-on-accent', onAccent(choice.accentColor));
   root.style.setProperty('--accent-intensity', String(clampIntensity(choice.intensity)));
-  root.style.setProperty('--accent-tint', hexToRgba(choice.accentColor, 0.06));
+  root.style.setProperty('--accent-tint',hexToRgba(choice.accentColor, 0.06));
   root.style.setProperty('--accent-tint-strong', hexToRgba(choice.accentColor, 0.10));
   root.style.background = theme.vars['--bg-primary'];
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.vars['--bg-primary']);

@@ -1,9 +1,9 @@
 .fp-dialog.fp-tpl-dlg { height: min(86vh, 780px); }
 .fp-tpl-dlg .fp-dlg-body { scrollbar-gutter: stable; }
 .fp-tpl-wrap { display: grid; align-content: start; gap: var(--space-3); min-width: 0; }
-.fp-tpl-intro { margin: 0; min-height: calc(3 * 1.5em); color: var(--text-secondary); font-size: var(--fp-13); line-height: 1.5; }
+.fp-tpl-intro { margin: 0; min-height: calc(3 * 1.5em); color: var(--text-secondary); font-size: var(--fs-13); line-height: 1.5; }
 .fp-tpl-bar { display: flex; align-items: center; gap: var(--space-3); min-height: var(--ctl-sm); }
-.fp-tpl-status { flex: 1 1 0; min-width: 0; min-height: calc(2 * 1.4em); color: var(--text-secondary); font-size: var(--fp-12); line-height: 1.4; }
+.fp-tpl-status { flex: 1 1 0; min-width: 0; min-height: calc(2 * 1.4em); color: var(--text-secondary); font-size: var(--fs-12); line-height: 1.4; }
 .fp-tpl-status.is-error { color: var(--danger-text); }
 .fp-tpl-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
 .fp-tpl-list { display: contents; }
@@ -14,16 +14,16 @@
 .fp-tpl-preview { display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius-md); background: var(--surface-2); }
 .fp-tpl-preview img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity var(--transition-fast); }
 .fp-tpl-preview img.is-loaded { opacity: 1; }
-.fp-tpl-name { overflow: hidden; padding: 0 4px; color: var(--text-primary); font-size: var(--fp-13); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.fp-tpl-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; min-height: calc(3 * 1.4em); overflow: hidden; padding: 0 4px; color: var(--text-secondary); font-size: var(--fp-12); line-height: 1.4; }
-.fp-tpl-meta, .fp-tpl-credit { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; min-height: calc(2 * 1.4em); overflow: hidden; padding: 0 4px; color: var(--text-muted); font-size: var(--fp-11); line-height: 1.4; }
+.fp-tpl-name { overflow: hidden; padding: 0 4px; color: var(--text-primary); font-size: var(--fs-13); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.fp-tpl-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; min-height: calc(3 * 1.4em); overflow: hidden; padding: 0 4px; color: var(--text-secondary); font-size: var(--fs-12); line-height: 1.4; }
+.fp-tpl-meta, .fp-tpl-credit { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; min-height: calc(2 * 1.4em); overflow: hidden; padding: 0 4px; color: var(--text-muted); font-size: var(--fs-11); line-height: 1.4; }
 .fp-tpl-start { justify-self: start; margin: 4px 4px 0; }
-.fp-tpl-none { min-height: 18px; color: var(--text-muted); font-size: var(--fp-12); }
+.fp-tpl-none { min-height: 18px; color: var(--text-muted); font-size: var(--fs-12); }
 .fp-tpl-none[hidden] { display: none; }
 .fp-tpl-done { display: grid; gap: var(--space-2); padding: var(--space-3); border: 1px dashed var(--line-2); border-radius: var(--radius-md); }
-.fp-tpl-done-text { min-height: calc(2 * 1.4em); color: var(--text-primary); font-size: var(--fp-13); line-height: 1.4; }
+.fp-tpl-done-text { min-height: calc(2 * 1.4em); color: var(--text-primary); font-size: var(--fs-13); line-height: 1.4; }
 .fp-tpl-done.is-error .fp-tpl-done-text { color: var(--danger-text); }
-.fp-tpl-path { min-height: 18px; overflow-wrap: anywhere; color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--fp-12); user-select: text; }
+.fp-tpl-path { min-height: 18px; overflow-wrap: anywhere; color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--fs-12); user-select: text; }
 .fp-tpl-next { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.fp-tpl-hint { color: var(--text-muted); font-size: var(--fp-12); line-height: 1.5; }
+.fp-tpl-hint { color: var(--text-muted); font-size: var(--fs-12); line-height: 1.5; }
 @media (max-width: 720px) { .fp-tpl-grid { grid-template-columns: minmax(0, 1fr); } }

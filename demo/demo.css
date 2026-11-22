@@ -1,7 +1,7 @@
 /* FormPublisher offline demo. Tokens are the app's own (frontend/src/styles/tokens.css and the Studio Dark and Light profiles in ui/themes.ts). */
 :root {
   color-scheme: dark;
-  --accent-color: #f97316;
+  --accent-color: #5fe07a;
   --bg-primary: #111111;
   --bg-secondary: #17151b;
   --bg-tertiary: #222127;

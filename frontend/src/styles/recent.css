@@ -1,4 +1,4 @@
-.fp-recent-note { display: flex; flex-direction: row-reverse; align-items: center; gap: var(--space-3); flex: 0 1 260px; min-width: 0; height: var(--ctl-sm); color: var(--text-secondary); font-size: var(--fp-12); }
+.fp-recent-note { display: flex; flex-direction: row-reverse; align-items: center; gap: var(--space-3); flex: 0 1 260px; min-width: 0; height: var(--ctl-sm); color: var(--text-secondary); font-size: var(--fs-12); }
 .fp-home-head-actions > .fp-recent-note { flex: none; width: 260px; }
 @container (max-width: 619px) { .fp-home-head-actions > .fp-recent-note { width: 120px; } }
 .fp-recent-note > .fp-btn { width: 104px; }
