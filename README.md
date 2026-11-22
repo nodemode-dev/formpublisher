@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  What it does not do: FormPublisher hosts nothing, uploads nothing and buys no domain; it has no editor of its own (sites are edited in FormWeb, free and in the same family) and no shop, forms backend or CMS.
+  What it does not do: FormPublisher hosts nothing, uploads nothing and buys no domain, and it has no editor of its own. Sites are edited in FormWeb, free and in the same family, and FormWeb, not FormPublisher, has the CMS. The sites FormPublisher prepares are static files, so on your host neither app gives them a shop checkout, bookings, member accounts, email campaigns or a cookie banner. Forms send through your host's form feature or a form service, and the guide shows both. FormWeb's shop, member and consent controls need its own server or a provider you connect.
 </p>
 
 <p align="center">
