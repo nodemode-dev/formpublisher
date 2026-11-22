@@ -767,10 +767,9 @@ class Runner:
                 )
         missing = [p for p in OG_REQUIRED if not page.og.get(p)]
         if missing:
-            names = missing[0] if len(missing) == 1 else ", ".join(missing[:-1]) + " and " + missing[-1]
             self.add(
                 "seo.og", "info", route,
-                f"The page has no {names} Open Graph tag." if len(missing) == 1 else f"The page has no {names} Open Graph tags.",
+                f"The page has no {missing[0]} Open Graph tag." if len(missing) == 1 else f"The page has none of these Open Graph tags: {', '.join(missing)}.",
                 "Add og:title, og:type, og:image and og:url so links to the page show a full preview.", file=rel,
             )
         image = page.og.get("og:image")
@@ -827,7 +826,7 @@ class Runner:
                 if parts.scheme not in ("http", "https") or not parts.netloc:
                     self.add(
                         "seo.hreflang", "warning", route,
-                        f"The hreflang link for {lang} points at {href or '(nothing)'}, which is not a full address.",
+                        f"The hreflang link for {lang or '(empty)'} points at {href or '(nothing)'}, which is not a full address.",
                         "Use the full address of each version, starting with https://.",
                         file=rel, line=line, url=href or None, key=href,
                     )

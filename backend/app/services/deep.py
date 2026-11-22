@@ -447,19 +447,19 @@ def read_contrast(page, collector: Collector, record: dict) -> None:
     record["contrast"] = {k: data[k] for k in ("checked", "failing", "unmeasured", "truncated")}
     if not data["failing"]:
         return
-    parts = [
-        f"{item['what']} \"{item['text']}\" {item['ratio']:.2f}:1, {item['fg']} on {item['bg']} (needs {item['need']:g}:1)"
+    parts = [f"Text contrast is too low on {collector.where()}."] + [
+        f"{item['what']} \"{item['text']}\": {item['ratio']:.2f}:1, {item['fg']} on {item['bg']} (needs {item['need']:g}:1)"
         for item in data["worst"][:CONTRAST_LIST]
     ]
-    more = data["failing"] - len(parts)
-    tail = f"; and {more} more" if more > 0 else ""
+    more = data["failing"] - (len(parts) - 1)
+    if more > 0:
+        parts.append(f"{more} more text {'element is' if more == 1 else 'elements are'} too low.")
     count = data["unmeasured"]
-    note = ""
     if count:
-        note = f" {count} text {'element' if count == 1 else 'elements'} over images, gradients, blending or moving content {'was' if count == 1 else 'were'} not measured."
+        parts.append(f"{count} text {'element' if count == 1 else 'elements'} over images, gradients, blending or moving content {'was' if count == 1 else 'were'} not measured.")
     collector.add(
         "a11y.contrast", "warning", "contrast",
-        f"Text contrast is too low on {collector.where()}: {'; '.join(parts)}{tail}.{note}",
+        " · ".join(parts),
         "Darken the text or lighten its background until normal text reaches 4.5:1 and large text (24 px, or 18.66 px bold) reaches 3:1.",
     )
 
