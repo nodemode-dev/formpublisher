@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0 · 2026-11-22
+
+- FormPublisher looks like the rest of the FormAI family. Its accent is green; if you picked your own accent, it is kept. Orange is still offered. Text on the accent and accent-coloured text on the light themes are drawn in an ink that stays readable.
+- Every chooser is the family's dropdown, with full keyboard use, and menus show shortcuts as key caps.
+- Lists are cards, and the current item glows. The routes column, the inspector and the bottom panel can be resized by dragging or with the keyboard, and they remember their size. The routes column folds to a narrow strip of thumbnails.
+- Signing keys and the deep check's browser have their own panels in Preferences. The Package sheet only chooses a key, and Manage keys opens the panel. Advice that names a setting opens Preferences at it.
+- The agent dock: View, Agent Dock (Cmd or Ctrl+J) opens a terminal panel at the bottom of the window, which can move to the right. It has a shell, and a tab for each of Claude Code, Codex, Cursor and Antigravity that is on your computer. It finds them even when the app was started from the Finder or the Start menu. The line under the tabs hands a request to Claude Code. Each agent tab can use FormPublisher's tools with a key of its own, and the key ends when the tab closes.
+- The splash stays in front of other windows while it shows.
+- Nothing that flashed or jumped when lists refreshed still does: the builds compare, the FormWeb project list and the bottom panel keep their content and update in place.
+
 ## 0.6.0 · 2026-11-22
 
 - Only the FormPublisher window, its command line and its MCP server can change anything. Every request that changes something needs a key the engine makes at each start; reads work as before, and FormWeb's Send to FormPublisher keeps its own rule. A site you preview cannot reach the app.

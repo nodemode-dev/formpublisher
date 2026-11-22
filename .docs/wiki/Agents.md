@@ -12,9 +12,17 @@ FormPublisher's engine does every step a person does, so agents drive it the sam
 
 ## Connect
 
-`./formpublisher agents install` registers the MCP servers and copies the skills for your account in Claude Code, Codex and Cursor (`--dry-run` shows the changes; files are backed up first). `./formpublisher agents status` reports what it found. `./formpublisher agents sync` mirrors `.claude/skills` to `.agents/skills`; `--check` exits 1 on drift. `./formpublisher vendor --check` exits 1 when the vendored FormWeb crates are out of step.
+`./formpublisher agents install` registers the MCP servers and copies the skills for your account in Claude Code, Codex and Cursor (`--dry-run` shows the changes; files are backed up first). `./formpublisher agents status` reports what it found. `./formpublisher agents sync` mirrors `.claude/skills` to `.agents/skills` and checks that the shared finder `backend/app/services/agent_lookup.py` still has the bytes whose hash is recorded for its version; `--check` exits 1 on drift or a mismatch. `./formpublisher vendor --check` exits 1 when the vendored FormWeb crates are out of step.
 
 formMCP (`formmcp mcp`) is the family hub that reaches every installed Form app's tools. It is a separate app; when it is missing its entry shows as unavailable and the formpublisher server still works.
+
+## The agent dock
+
+The window has a dock for terminal tabs: View, Agent Dock, `Mod+J` (Cmd or Ctrl+J, changeable in Keyboard Shortcuts), the title bar button or the command palette. It opens at the bottom, and on the right from a window 960 px wide. A shell tab is offered whenever the computer gives the engine a terminal. Claude Code, Codex, Cursor (`cursor-agent`) and Antigravity (`agy`) each get a button when the family's finder (`backend/app/services/agent_lookup.py`) finds the program on this computer, which it can do even when the app was started from the Finder, the Dock or Explorer, and the install line shows for one that is missing. `FORMPUBLISHER_CLAUDE_BIN`, `FORMPUBLISHER_CODEX_BIN`, `FORMPUBLISHER_CURSOR_BIN` and `FORMPUBLISHER_AGY_BIN` point at a program directly. The ask line under the tabs hands a request to Claude Code: it is typed into a Claude Code tab that is running, or starts one.
+
+Each agent tab works in its own folder in the data folder, `agent-tabs/[id]/` (readable only by the person, removed when the tab closes), and reaches FormPublisher's tools through an MCP entry named `formpublisher_tab`, which runs `mcp --tab-key-file` over the file `tab.key` there. An agent started in the dock therefore has the tools with no setup, and the harness skill's rules hold in it as anywhere. The key is made for that tab alone, never appears on a command line, is accepted for the tools like the window's key but refused on the dock's own routes, and ends when the tab's program ends or its tab closes. A plain shell tab gets no key. A tab's environment keeps the person's variables and drops the engine's own `FORMPUBLISHER_` ones, except `FORMPUBLISHER_PORT` and `FORMPUBLISHER_HOME` (and `FORMPUBLISHER_TERMINAL=1`).
+
+The routes are `GET` and `POST /api/terminal`, `POST /api/terminal/{id}/restart`, `/resize` and `/ticket`, `DELETE /api/terminal/{id}`, the stream `WebSocket /api/terminal/{id}/stream?ticket=` (a ticket is bought with the window's key, spent once and good for 60 seconds) and `GET /api/agent-programs`. The dock was checked with stand-in programs only: no real Claude Code, Codex, Cursor or Antigravity has been started from it, and nothing has run on Windows or macOS. The manual's "The agent dock" has the details.
 
 ## The skills
 

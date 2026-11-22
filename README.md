@@ -48,7 +48,7 @@
     <td width="25%" valign="top"><h3>Reads FormWeb</h3>Opens a <code>site-export.zip</code>, a publication folder, or the site currently open in a running FormWeb or one of its saved projects, and never changes it.</td>
     <td width="25%" valign="top"><h3>Every route</h3>Lists the site's routes from its <code>routes.json</code>: path, page, locale, item and stylesheet.</td>
     <td width="25%" valign="top"><h3>FormDeck's window</h3>Home, tabs, a routes strip, an inspector and a status bar, in the Form family's look, with 26 interface languages.</td>
-    <td width="25%" valign="top"><h3>Agent-ready</h3>The window, a command line and an MCP server share one engine, so Claude Code, Codex and Cursor import and list sites the way a person does.</td>
+    <td width="25%" valign="top"><h3>Agent-ready</h3>The window, a command line and an MCP server share one engine, so Claude Code, Codex and Cursor import and list sites the way a person does. The window's agent dock runs them, and Antigravity, with those tools connected.</td>
   </tr>
 </table>
 
@@ -90,7 +90,7 @@
   <tr>
     <td width="50%" valign="top">
       <h3>A window you know</h3>
-      Home with Start, Recent sites, Builds, Trash and a list of demos (under the title bar, with Recent keeping still when a site arrives), a menubar with File, Edit, View, Site, Window and Help (Home is the first item of File; on macOS the menus are in the system menu bar unless View > Menus in Window is on), a Preferences window with its categories on a rail, one tab per open site, a title bar, a status bar, a dark theme and a light one, built on the same layout as FormDeck.
+      Home with Start, Recent sites, Builds, Trash and a list of demos (under the title bar, with Recent keeping still when a site arrives), a menubar with File, Edit, View, Site, Window and Help, its shortcuts drawn as key caps (Home is the first item of File; on macOS the menus are in the system menu bar unless View > Menus in Window is on), a Preferences window with its categories on a rail (General, Interface, FormWeb, Checks, Signing keys and About), one tab per open site, a title bar, a status bar, a routes strip, an inspector and a bottom panel that resize by dragging or by keyboard and remember their size (the strip folds to a rail of thumbnails), the family's dropdown for every chooser, list rows drawn as cards with an accent glow, and dark and light themes with a green accent that stays readable on the light ones, built on the same layout as FormDeck.
     </td>
     <td width="50%" valign="top">
       <h3>26 interface languages</h3>
@@ -104,13 +104,13 @@
     </td>
     <td width="50%" valign="top">
       <h3>Checks</h3>
-      Static checks run offline on the files: links, assets, redirects, sitemap, robots, metadata, images, headings, external requests, forms that post to a local address and size budgets. Live checks report the console, failed requests and layout shift from the preview. A deep check drives the Chrome or Edge you already have, in the desktop app too, at two widths on a slow network and CPU.
+      Static checks run offline on the files: links, assets, redirects, sitemap, robots, metadata, images, headings, external requests, forms that post to a local address and size budgets. Live checks report the console, failed requests and layout shift from the preview. A deep check drives the Chrome or Edge you already have (or the browser you name in Preferences, under Checks), in the desktop app too, at two widths on a slow network and CPU.
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <h3>Package and sign</h3>
-      Build a deterministic <code>site.zip</code> with a <code>publish.json</code> that lists every file by SHA-256, reproduce it byte for byte, and sign it with an Ed25519 key. The key's private half is kept in your system's password store (the Keychain on macOS, the Credential Manager on Windows, the Secret Service on Linux), never in a loose file where a store exists, and a key can be exported to an encrypted file and imported on another computer. Verify tells you whether a package was signed by one of your own keys and warns when the key is not yours. Inspect a build and compare two.
+      Build a deterministic <code>site.zip</code> with a <code>publish.json</code> that lists every file by SHA-256, reproduce it byte for byte, and sign it with an Ed25519 key. The key's private half is kept in your system's password store (the Keychain on macOS, the Credential Manager on Windows, the Secret Service on Linux), never in a loose file where a store exists, and a key can be exported to an encrypted file and imported on another computer. Keys are managed in Preferences, under Signing keys; the Package sheet only chooses one. Verify tells you whether a package was signed by one of your own keys and warns when the key is not yours. Inspect a build and compare two.
     </td>
     <td width="50%" valign="top">
       <h3>Open .fweb projects</h3>
@@ -134,7 +134,7 @@
     </td>
     <td width="50%" valign="top">
       <h3>Agent tools</h3>
-      23 command line commands and 20 MCP tools cover the whole path from import to a prepared folder, and the trash, so Claude Code, Codex and Cursor do what a person does in the window. Deleting for good stays a person's action.
+      23 command line commands and 22 MCP tools cover the whole path from import to a prepared folder, and the trash, so Claude Code, Codex and Cursor do what a person does in the window. Deleting for good stays a person's action.
     </td>
   </tr>
   <tr>
@@ -175,6 +175,16 @@
     <td width="50%" valign="top">
       <h3>Kept verify results</h3>
       The last Verify result of each prepared host, with its time, is kept beside the prepared folder and shown again in the Publish sheet after a reload or a restart, until that host is prepared again or removed.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Agent dock</h3>
+      View, Agent Dock (Cmd or Ctrl+J, or the title bar button) opens the family's shared dock at the bottom of the window, or on its right from a window 960 px wide: a shell, and a tab for Claude Code, Codex, Cursor (<code>cursor-agent</code>) and Antigravity (<code>agy</code>) for each one found on this computer, even when the app was started from the Finder, the Dock or Explorer. The ask line under the tabs hands a request to Claude Code. Each agent tab works in its own folder in the data folder and reaches FormPublisher's tools through an MCP entry named <code>formpublisher_tab</code>, with a key only that tab has, which ends with the tab; a plain shell gets none. Checked with stand-in programs only.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Preferences and keys</h3>
+      Preferences has panels for General, Interface, FormWeb, Checks (the browser the deep check drives; empty means Chrome, then Edge, then the usual places), Signing keys (each key and where its secret is kept, New key, Import, Export and Remove) and About. Keys and settings live only there: the Package sheet chooses a key, and its Manage keys chip, the deep check's unavailable row and the FormWeb notice open Preferences at the right panel.
     </td>
   </tr>
 </table>
@@ -220,7 +230,7 @@ Taken from the running app on the demo site, at 1600 by 1000, in the dark and th
 
 <table>
   <tr>
-    <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Builds · Trash · Demos · menubar · site tabs · routes strip · inspector · status bar · Preferences · Keyboard Shortcuts</td>
+    <td width="33%" valign="top"><h4>In the window</h4>Home · Start and Recent · Builds · Trash · Demos · menubar · site tabs · routes strip · inspector · bottom panel · agent dock · status bar · Preferences · Keyboard Shortcuts</td>
     <td width="33%" valign="top"><h4>Command line and MCP tools</h4>status · sites · import · routes · check · build · sign · verify · keys · fpub · targets · prepare · prepared · trash · receive-status</td>
     <td width="33%" valign="top"><h4>Ways in</h4>site-export.zip · .fweb project · .fpub package · publication folder · the running FormWeb's current site or a saved project · sent from FormWeb (endpoint or inbox) · the demo</td>
   </tr>
@@ -287,9 +297,12 @@ Home's Demos row lists four bundled sites, and Help > Demos has the same four. T
 ./formpublisher agents install       # the same MCP server and skills for your account: Claude Code, Codex and Cursor
 ./formpublisher agents status        # what is installed, which servers, how many skills, whether formMCP is found
 ./formpublisher agents sync          # mirror .claude/skills to .agents/skills
-./formpublisher agents sync --check  # exits 1 on any drift, for CI
+./formpublisher agents sync --check  # exits 1 on any drift, or when the shared finder differs from its recorded hash, for CI
 ./formpublisher vendor --check       # exits 1 when the vendored FormWeb crates are out of step, for CI
+python setup/dock_check.py           # exits 1 when frontend/src/dock differs from its MANIFEST.json, for CI
 ```
+
+The agent dock (View, Agent Dock) starts Claude Code, Codex, Cursor or Antigravity in a tab with FormPublisher's tools connected as the MCP entry `formpublisher_tab`. The engine finds the programs itself; when one is missing from the list, install it, or point `FORMPUBLISHER_CLAUDE_BIN`, `FORMPUBLISHER_CODEX_BIN`, `FORMPUBLISHER_CURSOR_BIN` or `FORMPUBLISHER_AGY_BIN` at it.
 
 Two MCP servers are registered: `formpublisher` and `formmcp`, the Form family hub that reaches every installed Form app's own tools. formMCP is a separate app: when it is not installed, `formmcp` shows as failed or unavailable in your agent and everything else works.
 
@@ -299,7 +312,9 @@ Two MCP servers are registered: `formpublisher` and `formmcp`, the Form family h
 - **Read-only toward FormWeb:** FormPublisher imports exports and folders and may read a running FormWeb's `/api/export`, `/api/access` and `/api/projects`; it never calls FormWeb's `/api/load` and never writes to FormWeb.
 - **Loopback only:** the engine answers on 127.0.0.1 and refuses any other Host or Origin.
 - **Only the window, the command line and the MCP server change things:** every request that is not a read needs a key the engine makes at each start (403 `forbidden` without it). A script in a previewed site cannot change anything, only the engine's own origin may use the desktop shell's commands, and the window is served with a Content-Security-Policy.
-- **Keys in the password store:** a signing key's private half lives in the system password store, listing never touches it, and removing a key deletes its secret.
+- **Keys in the password store:** a signing key's private half lives in the system password store, listing never touches it, and removing a key deletes its secret. Keys are managed only in Preferences.
+- **A key for each agent tab:** a tab of the agent dock gets its own key, in a file only you can read and never on a command line; it works for the tools but not on the dock's own routes, and it ends with the tab. A plain shell gets none.
+- **Shared modules, never edited here:** `frontend/src/dock/` (the dock, module 2.2.1) and `backend/app/services/agent_lookup.py` (the finder) are copied unchanged from FormVis and checked against their recorded hashes.
 - **Zero flash:** every container exists in its final layout before the first paint, and the window is revealed once it is ready.
 - **Inline icons, no libraries:** icons are inline `currentColor` SVG; colours, sizes and every `z-index` come from tokens.
 
@@ -336,6 +351,7 @@ Ports and folders:
 | `keys/` | `index.json`, the signing keys' public halves; private halves are in the system password store (a private file here only where there is none) |
 | `trash/` | removed items, each with a `.trash.json` record, restorable from Home |
 | `logs/` | `engine.log`, the engine's log (rotates at 1 MB, 3 older files kept) |
+| `agent-tabs/` | a folder for each open agent tab of the dock, readable only by you, with the tab's key (and its MCP entry, for programs that read one from a file); removed when the tab closes |
 | `engine.json` | the running engine's app, port, pid, version and start time, so FormWeb finds it on any port |
 | `engine.key` | the key the command line and the MCP server send with a change; readable only by you, new at every engine start, removed when the engine ends |
 
