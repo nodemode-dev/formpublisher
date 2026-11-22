@@ -406,6 +406,15 @@ def local_host(host: str) -> bool:
     return address.is_loopback or address.is_private or address.is_link_local or address.is_unspecified
 
 
+def analytics_src(src: str) -> str | None:
+    parts = urlsplit("http:" + src if src.startswith("//") else src)
+    host = (parts.hostname or "").lower()
+    for name, hosts, path in ANALYTICS_SRC:
+        if host in hosts and path.match(parts.path):
+            return name
+    return None
+
+
 def analytics_of(page: Page) -> set[str]:
     found = set()
     for _line, attrs in page.scripts:
@@ -413,10 +422,9 @@ def analytics_of(page: Page) -> set[str]:
         if not src:
             continue
         parts = urlsplit("http:" + src if src.startswith("//") else src)
-        host = (parts.hostname or "").lower()
-        for name, hosts, path in ANALYTICS_SRC:
-            if host in hosts and path.match(parts.path):
-                found.add(name)
+        name = analytics_src(src)
+        if name:
+            found.add(name)
         if parts.path.endswith("/script.js") and attrs.get("data-website-id", "").strip():
             found.add("Umami")
         if parts.path == "/_vercel/insights/script.js":
@@ -568,6 +576,8 @@ class Runner:
                 )
 
     def external(self, rel: str, route: str, ref: dict, url: str) -> None:
+        if ref.get("tag") == "script" and analytics_src(url):
+            return
         self.remote.setdefault(url, []).append((route, rel, ref.get("line"), ref.get("selector")))
 
     def report_external(self) -> None:
