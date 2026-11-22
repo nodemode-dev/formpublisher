@@ -243,7 +243,7 @@ Each build lives in `builds/[site]/[id]/`:
 
 ```json
 {
-  "builtWith": "FormPublisher 0.5.0",
+  "builtWith": "FormPublisher 0.6.0",
   "checks": { "errors": 0, "infos": 0, "tiers": ["static"], "warnings": 0 },
   "files": [ { "path": "index.html", "sha256": "...", "size": 1024 } ],
   "format": "formpublisher-site",
@@ -357,7 +357,7 @@ UTF-8 JSON, indented two spaces, with a trailing newline:
   "site": { "id": "northwind-notes", "name": "Northwind Notes" },
   "build": "a1b2c3d4e5f6",
   "revision": "20261111T010203Z",
-  "builtWith": "FormPublisher 0.5.0",
+  "builtWith": "FormPublisher 0.6.0",
   "createdAt": "2026-11-11T01:02:03Z",
   "package": { "file": "site.zip", "sha256": "64 lowercase hex digits", "size": 12345 },
   "signature": null
