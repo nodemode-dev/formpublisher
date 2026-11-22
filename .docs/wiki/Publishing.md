@@ -37,6 +37,10 @@ Verify re-reads the folder and checks each file against the hashes in `publish.j
 
 FormWeb's Send to FormPublisher posts a `site-export.zip` to `POST /api/receive/formweb` on this computer (headers `X-FormWeb-Version`, and optionally `X-FormWeb-Site-Name` and `X-FormWeb-Project`). Other addresses are refused. When FormPublisher is closed, FormWeb writes the file into `inbox/` in the data folder; every `*.zip` or `*.fweb` there is imported when the engine starts and every 5 seconds after, and moved to `inbox/imported/` or, with a reason, to `inbox/failed/`. FormWeb also writes a `NAME.zip.json` beside the zip with `siteName`, `project` and `version`, so an inbox arrival has a name and a later arrival of the same project adds a revision (the file moves with the zip). The window shows a toast with Open and adds the site to Recent. Two switches in Preferences, both off by default, run the static checks and then a build on every site that arrives (`receive.autoCheck`, `receive.autoBuild`). A site that arrived again lists its revisions and what changed on Home's site card and in its panel (`./formpublisher run revisions`, `diff`). `./formpublisher run receive-status` reports the endpoint, the inbox and the last receipts.
 
+## After you deployed
+
+The hosting guide, `docs/HOSTING.md`, has the steps for each host, your domain and HTTPS. The Live site part at the bottom of the sheet then reads your public site at the address you give and says what to fix. See [Hosting](Hosting).
+
 ## The same steps for agents
 
 `./formpublisher run targets`, `prepare BUILD --target T` and `prepared BUILD`, or the MCP tools `list_targets`, `prepare_publish` and `get_prepared`. See [Agents](Agents).

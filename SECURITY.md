@@ -7,7 +7,7 @@ check whether the problem is still there.
 
 | Version | Supported |
 | --- | --- |
-| 0.3.x (latest release) | Yes |
+| 0.10.x (the current line) | Yes |
 | Anything older | No |
 
 ## Reporting a vulnerability
@@ -20,6 +20,27 @@ platform, and what an attacker could do with it.
 You can expect an acknowledgement within a week. We will keep you informed while it
 is fixed and credit you in the release notes, unless you would rather not be named.
 
+## The window key
+
+Every request to the engine that is not a GET, HEAD or OPTIONS must carry a key in
+the header `X-FormPublisher-Key`. The engine makes its keys when it starts, keeps
+them in memory and accepts three kinds:
+
+- **The window's key.** In the desktop app the engine prints it for the shell, and
+  the shell hands it to the window, only on the engine's own origin and only in the
+  top frame. On the development start a browser tab claims it from
+  `POST /api/window/key`, which answers only the window's own origins and answers
+  nothing in the desktop app.
+- **The local key**, for the command line and the MCP server. It is in `engine.key`
+  in the data folder, a file only the person can read (mode 0600), new at every
+  engine start and removed when the engine ends.
+- **A tab key**, one for each agent tab of the agent dock, good while that tab's
+  program runs (see **The agent dock** below).
+
+Anything else gets 403 with the code `forbidden`. Two routes take no key:
+`/api/window/key` itself and `/api/receive/formweb`, which accepts only this
+computer.
+
 ## What counts
 
 FormPublisher runs on your own machine and opens files that are not yours yet (site
@@ -30,17 +51,9 @@ content, or something outside the machine, could get further than it should:
 - **The engine** listens on loopback (127.0.0.1): port 8280 in development
   (`FORMPUBLISHER_PORT` changes it), and port 8280 or another free loopback port in
   the desktop app. Anything that makes it reachable from another machine, or lets a
-  web page on another origin drive it. Every request that is not a GET, HEAD or
-  OPTIONS needs the window key in the header `X-FormPublisher-Key`, and one without
-  it is refused with 403 and the code `forbidden`. The engine makes the key when it
-  starts: the desktop shell hands it to its window, and a browser tab on the
-  development start claims it from `POST /api/window/key`, which answers only the
-  window's own origins. The command line and the MCP server use a second key from
-  `engine.key` in the data folder, which only the person can read, is new at every
-  engine start and is removed when the engine ends. An agent tab of the agent dock
-  has a third key of its own (see **The agent dock** below). Anything that lets a
-  request without a key change something, or hands a key to a page that is not the
-  window.
+  web page on another origin drive it. Anything that lets a request without a key
+  change something, or hands a key to a page that is not the window (see **The
+  window key** below).
 - **The site host**, the second loopback listener that serves the mounted site for
   Preview and the deep checks (port 8281, or another free loopback port): anything
   that makes it reachable from another machine, serves files outside the mounted
@@ -50,9 +63,11 @@ content, or something outside the machine, could get further than it should:
   The capability names `http://127.0.0.1:8280/*`, and when the shell picks another
   port it grants that one origin at run time; no other loopback port, the site
   host included, is granted anything. The engine serves the window with a
-  Content-Security-Policy header, and the splash has its own policy in
-  `tauri.conf.json`. Anything that gives another origin the shell's commands or
-  loosens either policy.
+  Content-Security-Policy header: scripts only from the engine itself (the page's
+  own inline script by its SHA-256), frames only from the site host, connections
+  only to the engine and the shell, and no page may frame the window. The splash
+  has its own policy in `tauri.conf.json`. Anything that gives another origin the
+  shell's commands or loosens either policy.
 - **Receiving from FormWeb** (`/api/receive/formweb` and the `inbox/` folder): a site
   accepted from any client but this computer, or an inbox file that is imported in a
   way that writes outside its site folder.
@@ -81,6 +96,16 @@ content, or something outside the machine, could get further than it should:
 - **Publish**: it prepares a folder per host with the commands to run and never
   uploads. Anything that makes it send a site or a key anywhere, or run those commands,
   without the person.
+- **The live-site check**: the one part that reaches the person's own public site.
+  It runs only when asked, reads only the address the person gives (a public domain
+  name over https, never an IP address or a local name) and `www.` in front of it,
+  follows no redirect, and sends no form, no cookie and no upload. Anything that
+  makes it read another address, run without being asked, or send something.
+- **Templates**: the list and each template come from the public formai-templates
+  repository at the release this version names, fetched only when asked. A template
+  or a preview is kept only when it matches the SHA-256 in the list, and the list
+  may only name paths under `apps/formweb/`. Anything that keeps a file that does
+  not match, or writes outside the data folder and the folder the person chose.
 - **Local files**: the data folder (`~/FormPublisher`, or `FORMPUBLISHER_HOME`), with
   `engine.key` and `agent-tabs/` in it, and the Trash that restores from it: anything
   that exposes it, or reads or writes outside it other than where the person points.

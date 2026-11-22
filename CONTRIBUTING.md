@@ -136,10 +136,10 @@ Only a maintainer pushes to `main`. Everyone else forks the repository and opens
 
 ## Releases
 
-A release is a version, and only a maintainer makes one: the version moves in every
-place together, and the `CHANGELOG.md` entry is written in the release commit, the
-last one on its pull request. No push from a contributor starts a release. See the
-wiki's [Releasing](.docs/wiki/Releasing.md) page.
+A release is a version, and only a maintainer makes one: the `CHANGELOG.md` entry is
+written in a commit before the release commit, and the release commit, the last one on
+its pull request, moves the version in every place together. No push from a contributor
+starts a release. See the wiki's [Releasing](.docs/wiki/Releasing.md) page.
 
 ## Licensing
 
