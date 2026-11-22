@@ -10,10 +10,10 @@ engine (Python 3.12, FastAPI, 127.0.0.1:8280)
     -> data folder (FORMPUBLISHER_HOME): sites, settings
     -> a running FormWeb on loopback: read-only GETs only (export, publications, releases, access, projects)
 site host (ASGI app.host, 127.0.0.1:8281): the mounted revision, probe script, no /api
-  services: host, checks, deep (Chrome via Playwright, served through the host), package, keys, compile (formweb-core), trash
-  -> data folder: checks/, builds/, keys/, trash/, engine.json
+  services: host, checks, deep (Chrome or Edge via Playwright, served through the host), package, keys, compile (formweb-core), trash, enginelog
+  -> data folder: checks/, builds/, keys/, trash/, logs/engine.log, engine.json
 command line and MCP server -> the same routes
-desktop shell (Tauri 2) -> frozen engine sidecar formpublisher-engine
+desktop shell (Tauri 2) -> frozen engine folder src-tauri/engine, program formpublisher-engine
 ```
 
 ## The interface
@@ -30,7 +30,7 @@ FormPublisher reads FormWeb and never writes to it. It imports a `site-export.zi
 
 ## Desktop
 
-The Tauri 2 shell in `src-tauri/` runs the engine as a frozen sidecar built by `setup/freeze_backend` (PyInstaller, one file, `formpublisher-engine`). The desktop build is in development.
+The Tauri 2 shell in `src-tauri/` runs the engine frozen as a folder, built by `setup/freeze_backend` (PyInstaller `--onedir`) into `src-tauri/engine/` and shipped as the resource folder `engine`: `formpublisher-engine` inside it, with Playwright and its Node.js driver frozen in. The shell reads `engine.json`, ends and replaces an engine that file names and that still answers `/api/health`, then starts its own with `FORMPUBLISHER_SHELL_PID` and `FORMPUBLISHER_DESKTOP=1`; the engine watches the shell's process and leaves within about 2 seconds of its disappearing (on Windows the shell also holds it in a job object). When the engine does not start, a native dialog says why. The engine's log is `logs/engine.log` in the data folder. Help > Documentation shows the manual the engine bundles. The desktop build is in development.
 
 ## Living logs
 

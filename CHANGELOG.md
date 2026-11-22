@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.0 · 2026-11-22
+
+- The desktop app's engine starts and ends with its window on every system. On Windows the shell holds the engine in a job object, so ending the app by any means ends the engine; everywhere the engine also watches the app that started it and leaves within about two seconds of it going. An engine left running by an earlier copy is ended and replaced, never reused.
+- When the engine cannot start, the app says why: missing from the install, could not be started, stopped with its exit code, no answer in 90 seconds, or another version answering. The message carries the engine's last lines and the path of its log.
+- The engine keeps a log, `logs/engine.log` in the data folder (1 MB, three older files kept), and an unexpected error names that file.
+- The engine is frozen as a folder inside the app instead of one file that unpacked itself at every launch, and on Windows it has no console window. On macOS every program file in that folder is signed with the app.
+- Deep checks work in the installed app, with the Chrome or Edge you already have. Nothing is downloaded. A deep check that fails now shows an error in Problems with the reason, instead of ending as if it had passed.
+- Help, Documentation opens the manual that ships inside the app, in the window, with the network off too. The Open the manual step of an error opens it at that error's row.
+- The same build every time: the engine's Python packages, PyInstaller among them, install from a lock file with hashes; the Rust compiler is pinned at 1.97.0; Node 22.12 is the one minimum named everywhere.
+- The Intel Mac build says it needs macOS 14 (Apple silicon stays at 13).
+- `formpublisher_oc_install.bat` stops with a message when the FormWeb core cannot be built.
+- CI also type-checks the desktop shell on Windows and macOS, checks that every language has every string, and checks the lock files.
+
 ## 0.4.1 · 2026-11-22
 
 - The window text that 0.4.0 added in English only is now in all 26 languages: Templates (its title, the intro, Get the templates and Check again, the kept-list line with its date and counts, Start a site from this, the line a template without a description shows, the result and the two buttons after a start, the note on how to open the project in FormWeb), Start from a Template in File and on Home, Host It Yourself in Help, What to do with this folder on each prepared host and the line beside it, and the 18 messages the templates flow can raise (the index could not be read, a size or SHA-256 that does not match, a folder that does not exist, and the rest). Each translation follows the wording of its language's earlier files, es-MX and fr-CA with theirs. Product names, file names and commands stay as written. Nobody who speaks these languages has read the 25 new translations; they were written and checked for placeholders and length, and the FormWeb menu names inside a sentence (File, Import .fweb or .fpub file) are those of FormWeb's own translations.

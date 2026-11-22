@@ -40,7 +40,7 @@ The code lives in:
 | `frontend/src` | the interface (vanilla TypeScript, Vite) |
 | `backend/app` | the engine (Python, FastAPI): one router per file in `routers/`, the work in `services/`, one host adapter per file in `targets/` |
 | `backend/formpublisher_engine.py` | the engine entry: serve, `--selfcheck`, `cli`, `mcp` |
-| `src-tauri` | the desktop shell (Rust, Tauri 2) and its frozen engine sidecar |
+| `src-tauri` | the desktop shell (Rust, Tauri 2, pinned in `rust-toolchain.toml`) and `engine/`, the frozen engine folder that `setup/freeze_backend` writes |
 | `vendor/formweb-native` | FormWeb's engine crates, vendored unedited, which build `formweb-core` |
 | `setup` | install, build, vendor check and agent scripts |
 | `demo` | the sample site, the three FormWeb demo sites and the offline demo |
@@ -54,7 +54,9 @@ Run the same checks CI runs (the `frontend` and `engine` jobs):
 
 ```sh
 (cd frontend && npm ci --no-fund && npm audit --audit-level=low && npm run build)
-pip install -r backend/requirements.txt
+python setup/lock_requirements.py --check
+pip install --require-hashes -r backend/requirements.lock
+python setup/i18n_check.py
 python backend/formpublisher_engine.py --selfcheck
 python -m compileall -q backend/app setup
 ./formpublisher agents sync --check
@@ -64,7 +66,13 @@ vendor/formweb-native/target/release/formweb-core --selfcheck
 ```
 
 The build type checks the interface and builds it; the self check imports every
-router. CI also checks the shell scripts with `bash -n`. After changing the command
+router. The lock check fails when a lock lacks a pin of a requirements file: after
+changing one, run `python setup/lock_requirements.py` (it needs uv 0.11.32) and commit
+the locks. The language check fails when a key of `frontend/src/i18n/keys` is missing
+from any locale folder, a placeholder is lost or a string holds an em dash. CI also
+checks the shell scripts with `bash -n`, and type checks the desktop shell on Windows
+and macOS (`cargo check --locked`, with the Rust version `src-tauri/rust-toolchain.toml`
+pins). After changing the command
 line, the MCP tools or a skill, run `./formpublisher agents sync` so the `.agents`
 mirror follows.
 
