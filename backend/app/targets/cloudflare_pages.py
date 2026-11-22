@@ -5,7 +5,7 @@ from app.targets._common import PreparedInput, PreparedResult, copy_site, is_spl
 ID = "cloudflare-pages"
 NAME = "Cloudflare Pages"
 DESCRIPTION = "Wrangler deploy with _redirects and _headers in Cloudflare's syntax."
-LOCAL_TOOL = "npx wrangler pages dev site"
+LOCAL_TOOL = "npx wrangler@4 pages dev site"
 
 STATIC_LIMIT = 2000
 DYNAMIC_LIMIT = 100
@@ -33,8 +33,9 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
         result.warnings.append(f"{header_rules} header rules exceed Cloudflare Pages' limit of {HEADER_RULES} rules in _headers.")
     if long_lines:
         result.warnings.append(f"{long_lines} {'line' if long_lines == 1 else 'lines'} in _headers {'is' if long_lines == 1 else 'are'} longer than Cloudflare Pages' limit of {HEADER_LINE:,} characters a line.")
-    result.command("Deploy", f"npx wrangler pages deploy site --project-name {inp.slug}")
-    result.command("Run it locally", "npx wrangler pages dev site")
+    result.command("Create the project (the first time only)", f"npx wrangler@4 pages project create {inp.slug} --production-branch main")
+    result.command("Deploy", f"npx wrangler@4 pages deploy site --project-name {inp.slug}")
+    result.command("Run it locally", "npx wrangler@4 pages dev site")
     result.notes.append(f"Cloudflare allows {STATIC_LIMIT} static and {DYNAMIC_LIMIT} dynamic redirect rules in _redirects.")
     result.notes.append("No 404 rule is written: Pages serves 404.html on its own when the file exists.")
     if inp.fallback_404:

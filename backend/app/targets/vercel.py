@@ -6,7 +6,7 @@ from app.targets._common import PreparedInput, PreparedResult, copy_site, is_spl
 ID = "vercel"
 NAME = "Vercel"
 DESCRIPTION = "CLI deploy with a vercel.json for clean URLs, redirects and headers."
-LOCAL_TOOL = "npx vercel dev site"
+LOCAL_TOOL = "npx vercel@66 dev site"
 
 
 def _source(pattern: str) -> str:
@@ -57,9 +57,9 @@ def prepare(inp: PreparedInput, out: Path) -> PreparedResult:
     if headers:
         config["headers"] = headers
     put(out, "site/vercel.json", json.dumps(config, indent=2, sort_keys=True, ensure_ascii=False) + "\n")
-    result.command("Preview deploy", "npx vercel deploy site")
-    result.command("Production deploy", "npx vercel deploy site --prod")
-    result.command("Run it locally", "npx vercel dev site")
+    result.command("Preview deploy", "npx vercel@66 deploy site")
+    result.command("Production deploy", "npx vercel@66 deploy site --prod")
+    result.command("Run it locally", "npx vercel@66 dev site")
     result.notes.append("vercel.json sits inside site/ so the deploy picks it up; Vercel serves 404.html itself when the file exists.")
     if inp.fallback_404:
         result.notes.append("This export has 404/index.html and no 404.html, so it was copied to 404.html as the 404 page.")
