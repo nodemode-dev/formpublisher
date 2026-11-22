@@ -37,6 +37,8 @@ body.theme-light .fp-pub-note.is-error { color: var(--danger-fill); }
 .fp-pub-res-list { display: grid; align-content: start; gap: var(--space-3); }
 .fp-pub-res { display: grid; align-content: start; gap: var(--space-2); min-width: 0; padding: var(--space-3); border: 1px solid var(--line-1); border-radius: var(--radius-md); background: var(--surface-1); }
 .fp-pub-res-h { display: flex; align-items: center; gap: var(--space-2); min-height: var(--ctl-sm); }
+.fp-pub-guide { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.fp-pub-guide-note { min-width: 0; overflow: hidden; color: var(--text-muted); font-size: var(--fp-12); text-overflow: ellipsis; white-space: nowrap; }
 .fp-pub-res-name { overflow: hidden; font-size: var(--fp-14); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .fp-pub-path { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
 .fp-pub-code { flex: 1; min-width: 0; padding: 4px 8px; border: 1px solid var(--line-1); border-radius: var(--radius-sm); background: var(--surface-field); color: var(--text-primary); font-family: var(--font-mono); font-size: var(--fp-12); line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; user-select: text; -webkit-user-select: text; }

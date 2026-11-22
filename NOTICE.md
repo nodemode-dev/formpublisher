@@ -21,7 +21,7 @@ FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, 
 | mcp 2.3.0 (the official MCP Python SDK) | the MCP server on stdio | MIT |
 | httpx2 2.16.0 | the engine's read-only calls to a running FormWeb | BSD-3-Clause |
 | cryptography 50.0.2 | Ed25519 keys, signatures and passphrase encryption of private keys | Apache-2.0 OR BSD-3-Clause |
-| FormWeb engine crates 0.21.2 (formweb-model, formweb-engine, formweb-export, formweb-core), vendored unedited in `vendor/formweb-native` with FormWeb's `LICENSE`, Copyright 2026 NodeAgentc, Inc. | `formweb-core`, built by `setup/install_compiler`, opens `.fweb` projects | Apache-2.0, compatible with GPL-3.0-only |
+| FormWeb engine crates 0.27.0 (formweb-model, formweb-engine, formweb-export, formweb-core), vendored unedited in `vendor/formweb-native` with FormWeb's `LICENSE`, Copyright 2026 NodeAgentc, Inc. | `formweb-core`, built by `setup/install_compiler`, opens `.fweb` projects | Apache-2.0, compatible with GPL-3.0-only |
 | serde, serde_json, sha2 and their dependencies, pinned in `vendor/formweb-native/Cargo.lock` | `formweb-core` | Apache-2.0 OR MIT |
 | pydantic, pydantic-core, annotated-types, typing-extensions, anyio, idna | request models and async I/O, brought in by the packages above | MIT, BSD-3-Clause (typing-extensions PSF-2.0) |
 | CPython 3.12, embedded by PyInstaller in the one-file engine sidecar | runs the engine | PSF-2.0 |
@@ -38,7 +38,7 @@ Tauri links its own dependencies unedited (no `[patch]`, no vendored copy), some
 | --- | --- | --- |
 | Vite 8.3.5 | builds the interface | MIT |
 | TypeScript 7.0.2 | type checks the interface | Apache-2.0 |
-| `@tauri-apps/cli` 2 | builds the desktop app (`npx @tauri-apps/cli@2`) | Apache-2.0 OR MIT |
+| `@tauri-apps/cli` 2.12.5 | builds the desktop app (`build_app` runs the copy in `frontend/node_modules`) | Apache-2.0 OR MIT |
 | PyInstaller 6.22.3 | freezes the engine sidecar (`setup/freeze_backend`) | GPL-2.0-or-later with the bootloader exception, which permits distributing the frozen program under its own licence |
 | Playwright for Python 1.65.0 (`backend/requirements-deep.txt`), installed by `./formpublisher_oc_install`, never with a browser download | deep checks drive the person's installed Chrome | Apache-2.0 |
 | Rust toolchain (cargo, rustc) | builds `formweb-core` from the vendored crates | Apache-2.0 OR MIT |

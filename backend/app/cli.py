@@ -352,6 +352,31 @@ class Client:
 
         return self._local(trash.empty)
 
+    def templates(self) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("GET", "/api/templates")
+        from app.services import templates
+
+        return self._local(templates.kept)
+
+    def fetch_templates(self) -> dict:
+        self.connect()
+        if self.url:
+            return self.call("POST", "/api/templates/fetch")
+        from app.services import templates
+
+        return self._local(templates.fetch)
+
+    def start_template(self, template: str, folder: str, name: str | None = None) -> dict:
+        self.connect()
+        absolute = str(Path(folder).expanduser().resolve())
+        if self.url:
+            return self.call("POST", "/api/templates/start", {"template": template, "folder": absolute, "name": name})
+        from app.services import templates
+
+        return self._local(templates.start, template, absolute, name)
+
     def receive_status(self) -> dict:
         self.connect()
         if self.url:
@@ -391,6 +416,21 @@ def say_status(data: dict) -> str:
         f"formweb   {web.get('url')}  " + ("reachable" if web.get("reachable") else f"not reachable ({web.get('error', 'unknown')})"),
     ]
     return "\n".join(lines)
+
+
+def say_templates(data: dict) -> str:
+    if not data.get("fetched"):
+        return f"{data['source']}\nno list kept yet; get it with: templates --fetch"
+    lines = [f"kept {data.get('fetchedAt', '')} from {data['url']}"]
+    for item in data["items"]:
+        lines.append(f"{item['id']:<36} {item['bytes'] / 1048576:>6.1f} MB  {item['name']}  ({item['licence']})")
+    if data.get("notStartable"):
+        lines.append(f"{data['notStartable']} more are parts for FormWeb's own library (sections, components, a design preset, a starter built from library sections), not whole sites, so they are not offered here")
+    return "\n".join(lines)
+
+
+def say_start(data: dict) -> str:
+    return f"made {data['project']}  from {data['template']}  {data['files']} files\nedit it in FormWeb (File > Import .fweb or .fpub file...), or publish it here with: import {data['project']}"
 
 
 def say_sites(data: dict) -> str:
@@ -628,6 +668,12 @@ def build_parser() -> argparse.ArgumentParser:
     tre = tr_sub.add_parser("empty", parents=[common], help="delete every entry for good")
     tre.add_argument("--yes", action="store_true", help="confirm that everything in the trash is deleted for good")
     sub.add_parser("receive-status", parents=[common], help="the receive endpoint, the inbox folder and the last receipts")
+    tp = sub.add_parser("templates", parents=[common], help="list the kept templates to start a site from; --fetch reads the list from the templates repository now")
+    tp.add_argument("--fetch", action="store_true", help="read index.json from the templates repository now and keep it")
+    st = sub.add_parser("start", parents=[common], help="make an editable FormWeb project from a kept template in a folder you name")
+    st.add_argument("template", help="template id from templates, for example formweb/demos/lowlight")
+    st.add_argument("--to", required=True, help="the folder the new .fweb project is written into")
+    st.add_argument("--name", help="the project's file name, default the template's name")
     return parser
 
 
@@ -691,6 +737,10 @@ def main(argv: list[str] | None = None) -> int:
                 data, say = client.trash_empty(), say_trash_empty
             else:
                 data, say = client.trash(), say_trash
+        elif args.command == "templates":
+            data, say = (client.fetch_templates() if args.fetch else client.templates()), say_templates
+        elif args.command == "start":
+            data, say = client.start_template(args.template, args.to, args.name), say_start
         else:
             data, say = client.receive_status(), say_receive
     except OpError as exc:

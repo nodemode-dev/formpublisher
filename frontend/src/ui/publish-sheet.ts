@@ -8,6 +8,7 @@ import { onLanguage, t } from '../i18n';
 import { copyText, fmtCount, fmtDate } from './builds';
 import { confirmAction, Dialog } from './dialogs';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
+import { HOSTING_PART, openHosting } from './hosting-sheet';
 import { icon } from './icons';
 import { refuseStep } from './notice-step';
 import { toast } from './toast';
@@ -303,6 +304,7 @@ class PublishSheet extends Dialog {
 <div class="fp-pub-note fp-pub-left" data-f="left"></div>
 <div class="fp-pub-sub">Folder</div>
 <div class="fp-pub-path"><div class="fp-pub-code" data-f="folder" translate="no"></div><button class="fp-btn fp-btn-sm" type="button" data-a="reveal">${icon('folder', 14)}<span>Reveal</span></button><button class="fp-btn fp-btn-sm" type="button" data-a="path">${icon('copy', 14)}<span>Copy path</span></button></div>
+<div class="fp-pub-guide"><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-a="guide">${icon('book', 14)}<span>What to do with this folder</span></button><span class="fp-pub-guide-note">FormPublisher uploads nothing: the guide takes you from this folder to your own host and domain.</span></div>
 <div class="fp-pub-sub" data-f="cmdh">Commands</div>
 <ul class="fp-pub-list" data-f="cmds"></ul>
 <div class="fp-pub-sub" data-f="noteh">Notes</div>
@@ -532,6 +534,7 @@ class PublishSheet extends Dialog {
       else if (a === 'reveal' && target) void this.runReveal(target);
       else if (a === 'path' && target) void copyText(this.memo()?.results.get(target)?.folder ?? '');
       else if (a === 'copycmd') void copyText(t.closest<HTMLElement>('.fp-pub-cmd')?.dataset.run ?? '');
+      else if (a === 'guide' && target) openHosting(HOSTING_PART[target]);
     });
     this.tlist.addEventListener('change', (e) => {
       const box = e.target as HTMLInputElement;

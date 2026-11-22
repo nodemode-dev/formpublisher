@@ -61,3 +61,26 @@ jobs:
         run: vendor/formweb-native/target/release/formweb-core --selfcheck
       - name: Shell syntax
         run: bash -n formpublisher && bash -n formpublisher_oc_install && bash -n build_app && bash -n setup/lib.sh && bash -n setup/freeze_backend && bash -n setup/install_compiler
+
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-test.txt
+      - name: Install
+        run: pip install -r backend/requirements.txt -r backend/requirements-test.txt
+      - name: Build formweb-core
+        working-directory: vendor/formweb-native
+        run: cargo build --release --locked -p formweb-core
+      - name: Engine tests
+        env:
+          FORMPUBLISHER_REQUIRE_CORE: "1"
+          FORMPUBLISHER_FORMWEB_CORE: ${{ github.workspace }}/vendor/formweb-native/target/release/formweb-core
+        run: python -m pytest -q backend/tests

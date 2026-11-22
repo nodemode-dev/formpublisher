@@ -8,13 +8,18 @@
 <h1 align="center">FormPublisher</h1>
 
 <p align="center">
-  <b>Open what FormWeb makes; see every route of the site.</b><br>
-  Import a FormWeb export, a publication folder or the site open in FormWeb,<br>
-  list its routes and look at them in a FormDeck-style window. Free and open source.
+  <b>FormPublisher - instead of Wix & Squarespace: the do-it-yourself version of a site builder, with no monthly subscription.</b><br>
+  Start from a template, edit it in FormWeb, then check, package and sign it here.<br>
+  Host it yourself with the guide, paying only your own host and domain.<br>
+  Runs locally, no account. Free & open-source under GPL-3.0.
 </p>
 
 <p align="center">
-  <img alt="version 0.3.3" src="https://img.shields.io/badge/version-0.3.3-4f6bff?style=flat-square">
+  What it does not do: FormPublisher hosts nothing, uploads nothing and buys no domain; it has no editor of its own (sites are edited in FormWeb, free and in the same family) and no shop, forms backend or CMS.
+</p>
+
+<p align="center">
+  <img alt="version 0.4.0" src="https://img.shields.io/badge/version-0.4.0-4f6bff?style=flat-square">
   <img alt="Python FastAPI engine" src="https://img.shields.io/badge/Python-FastAPI%20engine-3776ab?style=flat-square&logo=python&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-interface-3178c6?style=flat-square">
   <img alt="Tauri 2" src="https://img.shields.io/badge/Tauri-2-24C8DB?style=flat-square">
@@ -24,6 +29,7 @@
 
 <p align="center">
   <a href="docs/MANUAL.md">Manual</a> ·
+  <a href="docs/HOSTING.md">Host it yourself</a> ·
   <a href=".docs/wiki/Home.md">Wiki</a> ·
   <a href="AGENTS.md">Agents</a> ·
   <a href="#run-it-from-source">Run it from source</a>
@@ -51,6 +57,16 @@
 ## Features
 
 <table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Start from a template</h3>
+      Templates lists FormWeb's whole-site templates from the public formai-templates repository, read only when you press Get the templates. Start a site from this downloads that one file, keeps it only when its SHA-256 matches, and writes a FormWeb project into a folder you choose. Then Edit in FormWeb, or Publish it here.
+    </td>
+    <td width="50%" valign="top">
+      <h3>Host it yourself</h3>
+      The guide (<a href="docs/HOSTING.md">docs/HOSTING.md</a>, and in the window from each prepared host) takes the folder FormPublisher wrote to Netlify, Cloudflare Pages, Vercel, GitHub Pages, nginx or any static host: the steps, your domain's DNS records, HTTPS and updates. You pay your host and your domain, nothing else.
+    </td>
+  </tr>
   <tr>
     <td width="50%" valign="top">
       <h3>Import a FormWeb export</h3>
@@ -241,8 +257,9 @@ The window, the command line and the MCP server call one engine, so an agent and
 | `targets`, `prepare BUILD --target T [--include-model]`, `prepared BUILD` | list hosts, prepare a folder per host (FormWeb's model files left out unless `--include-model`), list what is prepared |
 | `trash`, `trash restore ENTRY`, `trash delete ENTRY`, `trash empty --yes` | list the trash, move an entry back (`--to PATH` names the place when it is unknown; `--passphrase-stdin` reads one line for a locked key rebuilt from its `.pem`), delete one for good, empty it (refuses without `--yes`) |
 | `receive-status` | the receive endpoint, the inbox folder and the last receipts |
+| `templates [--fetch]`, `start TEMPLATE --to FOLDER` | the kept template list (`--fetch` reads it now), and a FormWeb project made from one |
 
-Every command takes `--json`. The MCP server has 20 tools over the same routes:
+Every command takes `--json`. The MCP server has 22 tools over the same routes:
 
 | MCP tool | Does |
 | --- | --- |
@@ -255,6 +272,7 @@ Every command takes `--json`. The MCP server has 20 tools over the same routes:
 | `sign_build`, `verify_build` | sign with a named key, verify a signature |
 | `list_targets`, `prepare_publish`, `get_prepared` | list the six hosts, prepare folders with their commands (`includeModel` keeps FormWeb's model files), read what is prepared |
 | `list_trash`, `restore_from_trash` | read the trash, move an entry back to its recorded or inferred origin (no tool deletes) |
+| `list_templates`, `start_from_template` | read the template list the person fetched, make a FormWeb project from one in a folder they named |
 
 `.mcp.json`, `.codex/config.toml` and `.cursor/mcp.json` are already wired in this repo, with the `formpublisher-harness` skill for driving the app and `formpublisher-skillset` for changing it. See [`AGENTS.md`](AGENTS.md).
 
