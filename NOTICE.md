@@ -11,36 +11,46 @@ FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, 
 | JetBrains Mono by JetBrains, from `@fontsource/jetbrains-mono` 5.3.0 | code font | SIL Open Font License 1.1 |
 | Fonts inside the bundled demo sites, as woff2 files in each site's `assets/`: Inter 4 variable, Copyright (c) 2016 The Inter Project Authors (Lowlight, Northwind Notes); Space Grotesk, Copyright 2020 The Space Grotesk Project Authors (Lowlight); IBM Plex Mono, Copyright 2017 IBM Corp. (Lowlight, Looking Back, Harbour Ferries); Playfair Display, Copyright 2017 The Playfair Display Project Authors (Looking Back); Source Serif 4, Copyright 2014 The Source Serif 4 Project Authors (Looking Back); Oswald, Copyright 2016 The Oswald Project Authors (Harbour Ferries); Work Sans, Copyright 2019 The Work Sans Project Authors (Harbour Ferries). Each family's licence text ships in `demo/licenses/OFL-<Family>.txt`. Files and sources: `demo/MEDIA.md` | the text of the demo sites (`demo/sites/*.zip`, `demo/sample-site.zip`) | SIL Open Font License 1.1 |
 | `@tauri-apps/api` 2.12.1 | the interface's calls into the desktop shell | Apache-2.0 OR MIT |
-| Tauri 2: tauri, tauri-build, tauri-plugin-shell, tauri-plugin-dialog, tauri-plugin-single-instance | the desktop shell | Apache-2.0 OR MIT |
-| serde_json | the shell reading the engine's port and JSON | Apache-2.0 OR MIT |
-| objc2, objc2-app-kit (macOS only) | the splash window's corner mask and clear background | MIT |
-| gtk (Linux only) | the desktop window on Linux | MIT |
+| tauri 2.12.5 | the desktop shell: the window, its menu and the calls from the interface | Apache-2.0 OR MIT |
+| tauri-build 2.7.4 | the shell's build script | Apache-2.0 OR MIT |
+| tauri-plugin-shell 2.6.0 | opening a link or a folder outside the window | Apache-2.0 OR MIT |
+| tauri-plugin-dialog 2.8.4 | the system's open, save and message dialogs | Apache-2.0 OR MIT |
+| tauri-plugin-single-instance 2.5.5 | one running copy: a second start brings the open window forward | Apache-2.0 OR MIT |
+| serde_json 1.0.154 | the shell reading the engine's port and JSON | MIT OR Apache-2.0 |
+| objc2 0.6.5 and objc2-app-kit 0.3.2 (macOS only) | the splash window's corner mask and clear background, and the place of the window buttons | MIT (objc2); Zlib OR Apache-2.0 OR MIT (objc2-app-kit) |
+| gtk 0.18.2 (Linux only) | showing and hiding the desktop window on Linux | MIT |
 | windows-sys 0.61.2 (Windows only) | the job object that makes the engine end with the shell | MIT OR Apache-2.0 |
 | `@xterm/xterm` 6.0.0 and `@xterm/addon-fit` 0.11.0 | the terminal in the agent dock's tabs, built into the window | MIT |
-| FastAPI 0.141.1, Starlette | the engine service | MIT, BSD-3-Clause |
-| Uvicorn 0.53.0 with its `standard` extras (websockets, watchfiles, httptools, uvloop, h11, click, python-dotenv, PyYAML) | HTTP and WebSocket serving, the disk watcher | BSD-3-Clause (uvicorn, websockets, click, python-dotenv); MIT (watchfiles, httptools, h11, PyYAML, uvloop) |
+| FastAPI 0.141.1, Starlette 1.10.0, annotated-doc 0.0.7 | the engine service | MIT (FastAPI, annotated-doc); BSD-3-Clause (Starlette) |
+| Uvicorn 0.53.0 with its `standard` extras: websockets 17.4, watchfiles 1.3.0, httptools 0.9.0, uvloop 0.23.0 (macOS and Linux), h11 0.16.0, click 8.5.1, python-dotenv 1.2.4, PyYAML 6.0.4 | HTTP and WebSocket serving, the disk watcher | BSD-3-Clause (uvicorn, websockets, click, python-dotenv); MIT (watchfiles, httptools, h11, PyYAML); MIT OR Apache-2.0 (uvloop) |
 | python-multipart 0.0.32 | upload bodies (site exports) | Apache-2.0 |
-| mcp 2.3.0 (the official MCP Python SDK) | the MCP server on stdio | MIT |
-| httpx2 2.16.0 | the engine's read-only calls to a running FormWeb | BSD-3-Clause |
-| cryptography 50.0.2 | Ed25519 keys, signatures and passphrase encryption of private keys | Apache-2.0 OR BSD-3-Clause |
+| mcp 2.3.0 (the official MCP Python SDK) and mcp-types 2.3.0 (its wire types, the `mcp_types` module, installed with it) | the MCP server on stdio | MIT |
+| jsonschema 4.26.0, jsonschema-specifications 2025.9.1, referencing 0.37.0, rpds-py 2026.9.1, attrs 26.1.0, sse-starlette 3.7.0, opentelemetry-api 1.45.2 | brought in by mcp and frozen with it; the engine calls none of them itself | MIT (jsonschema, jsonschema-specifications, referencing, rpds-py, attrs); BSD-3-Clause (sse-starlette); Apache-2.0 (opentelemetry-api) |
+| PyJWT 2.15.1 | brought in by mcp for its HTTP sign-in code, which the engine does not use; in the lock, and PyInstaller leaves it out of the engine folder | MIT |
+| pywin32 312 (Windows only) | brought in by mcp for its process handling on Windows | PSF-2.0 |
+| httpx2 2.16.0, with httpcore2 2.16.0 and truststore 0.10.5 (the system's certificate store) | the engine's read-only calls to a running FormWeb; fetching the template list; reading the person's public site in the live-site check | BSD-3-Clause (httpx2, httpcore2); MIT (truststore) |
+| cryptography 50.0.2, with cffi 2.1.1 and pycparser 3.12 | Ed25519 keys, signatures and passphrase encryption of private keys; reading the certificate a site presents in the live-site check | Apache-2.0 OR BSD-3-Clause (cryptography); MIT-0 (cffi); BSD-3-Clause (pycparser) |
 | keyring 25.7.0 | keeps each signing key's private half in the system password store (macOS Keychain, Windows Credential Manager, Secret Service on Linux) | MIT |
 | jaraco.classes 3.4.0, jaraco.context 6.1.2, jaraco.functools 4.6.0, more-itertools 11.2.1 | brought in by keyring | MIT |
 | SecretStorage 3.5.0 and jeepney 0.9.0 (Linux only) | keyring's way to the Secret Service over D-Bus | BSD-3-Clause (SecretStorage), MIT (jeepney) |
 | pywin32-ctypes 0.2.3 (Windows only) | keyring's way to Credential Manager | BSD-3-Clause |
 | ptyprocess 0.7.0 (macOS and Linux) | the terminal tabs of the agent dock | ISC |
-| pywinpty 3.0.5 (Windows only) | the terminal tabs of the agent dock; its wheel carries winpty.dll and winpty-agent.exe from winpty (Ryan Prichard), OpenConsole.exe and conpty.dll from Microsoft's microsoft/terminal, and the Rust crates its own bill of materials lists | MIT (pywinpty, winpty, microsoft/terminal); MIT OR Apache-2.0 (the windows crates) || Playwright for Python 1.65.0 (`backend/requirements-deep.txt`), frozen into the engine; no browser is downloaded | deep checks drive the person's installed Google Chrome or Microsoft Edge | Apache-2.0 |
-| Node.js runtime inside Playwright's driver (`playwright/driver/node`), frozen into the engine with the driver | runs Playwright's driver for the deep checks | MIT, with the third-party licences listed in the driver's own `LICENSE` and `ThirdPartyNotices` files, which ship in the engine folder under `_internal/playwright/driver/` |
+| pywinpty 3.0.5 (Windows only) | the terminal tabs of the agent dock; its wheel carries winpty.dll and winpty-agent.exe from winpty (Ryan Prichard), OpenConsole.exe and conpty.dll from Microsoft's microsoft/terminal, and the Rust crates its own bill of materials lists | MIT (pywinpty, winpty, microsoft/terminal); MIT OR Apache-2.0 (the windows crates) |
+| Playwright for Python 1.65.0 (`backend/requirements-deep.txt`); `setup/freeze_backend` collects the whole package with its driver into the engine folder (`_internal/playwright`). No browser is bundled and none is downloaded | the deep check drives the Google Chrome or Microsoft Edge already installed on the person's computer, or the Chrome path set in Preferences | Apache-2.0 |
+| Node.js 26.13.0 inside Playwright's driver (`_internal/playwright/driver/node`), frozen into the engine with the driver | runs Playwright's driver for the deep check | MIT, with the third-party licences listed in the driver's own files, which ship in the engine folder: `_internal/playwright/driver/LICENSE` (Node.js and what it bundles) and `_internal/playwright/driver/package/ThirdPartyNotices.txt` (the driver's npm packages) |
 | greenlet 3.5.6 | the coroutine switching that Playwright's Python package needs | MIT AND PSF-2.0 |
 | FormWeb engine crates 0.27.0 (formweb-model, formweb-engine, formweb-export, formweb-core), vendored unedited in `vendor/formweb-native` with FormWeb's `LICENSE`, Copyright 2026 NodeAgentc, Inc. | `formweb-core`, built by `setup/install_compiler`, opens `.fweb` projects | Apache-2.0, compatible with GPL-3.0-only |
-| serde, serde_json, sha2 and their dependencies, pinned in `vendor/formweb-native/Cargo.lock` | `formweb-core` | Apache-2.0 OR MIT |
-| pydantic, pydantic-core, annotated-types, typing-extensions, anyio, idna | request models and async I/O, brought in by the packages above | MIT, BSD-3-Clause (typing-extensions PSF-2.0) |
+| serde 1.0.229, serde_json 1.0.152, sha2 0.11.0 and their dependencies, pinned in `vendor/formweb-native/Cargo.lock` | `formweb-core` | Apache-2.0 OR MIT |
+| pydantic 2.14.4, pydantic-core 2.50.5, annotated-types 0.8.0, typing-inspection 0.4.5, typing-extensions 4.16.0, anyio 4.16.0, idna 3.20 | request models and async I/O, brought in by the packages above | MIT (pydantic, pydantic-core, annotated-types, typing-inspection, anyio); PSF-2.0 (typing-extensions); BSD-3-Clause (idna) |
+| setuptools 84.2.1 and packaging 26.3 | brought in by PyInstaller; its start-up hook for setuptools freezes both into the engine folder, and the engine calls neither | MIT (setuptools); Apache-2.0 OR BSD-2-Clause (packaging) |
 | CPython 3.12, embedded by PyInstaller in the engine folder (`src-tauri/engine`, shipped as the resource folder `engine`) | runs the engine | PSF-2.0 |
+| Shared libraries PyInstaller copies beside CPython from the machine that builds; on a Linux build: OpenSSL 3 (libssl, libcrypto), zlib, bzip2, XZ Utils (liblzma), libffi, Expat, GNU Readline, ncurses (libtinfo) and the GCC runtime (libgcc_s, libstdc++, libatomic). Their versions are the build machine's. On macOS and Windows the same libraries come inside the Python build, except that an Intel Mac build whose cryptography links OpenSSL as a separate library carries that OpenSSL 3 (Homebrew's libssl and libcrypto, with its `ossl-modules`) in place of Python's, for both (see `setup/openssl_libs.py`) | what CPython's own modules load (TLS, compression, ctypes, XML), and on that Intel Mac build cryptography too | Apache-2.0 (OpenSSL 3); Zlib (zlib); bzip2-1.0.6 (bzip2); 0BSD (liblzma); MIT (libffi, Expat); GPL-3.0-or-later (GNU Readline); X11 (ncurses); GPL-3.0-or-later WITH GCC-exception-3.1 (the GCC runtime) |
 
-The Python rows are the packages in `backend/requirements.txt` and `backend/requirements-deep.txt` and what they install; check `*.dist-info/METADATA` in `backend/venv` for exact licenses and versions of the transitive ones. What PyInstaller freezes is what the engine imports; the build tools below are not frozen.
+The Python rows are every distribution in `backend/requirements.lock` except the build tools below, at the lock's versions; `*.dist-info/METADATA` in `backend/venv` states each licence. `setup/freeze_backend` writes the list of files in the engine folder to `backend/build/engine-files.txt`; every third-party distribution in a Linux freeze has a row above. What PyInstaller freezes is what the engine imports and what the freeze collects by name (app, uvicorn, websockets, keyring, playwright); the build tools below are not frozen. `httpx2-jsfetch` is in the lock for Emscripten only and is never installed on a desktop.
 
 ## Desktop shell: crates under other licences
 
-Tauri links its own dependencies unedited (no `[patch]`, no vendored copy), some under MPL-2.0 or LGPL-2.1-or-later terms as their crates state. The Linux bundles use the system's WebKitGTK, GTK and GLib (LGPL-2.1-or-later) as shared libraries.
+The rows above name the crates `src-tauri/Cargo.toml` asks for, at the versions `src-tauri/Cargo.lock` pins. The lock pins 466 packages in all: the others are transitive, come with the direct ones and keep their own licences, as each crate's `Cargo.toml` states. Tauri links its own dependencies unedited (no `[patch]`, no vendored copy), some under MPL-2.0 or LGPL-2.1-or-later terms as their crates state. The Linux bundles use the system's WebKitGTK, GTK and GLib (LGPL-2.1-or-later) as shared libraries.
 
 ## Build and development only (not shipped)
 
@@ -50,6 +60,8 @@ Tauri links its own dependencies unedited (no `[patch]`, no vendored copy), some
 | TypeScript 7.0.2 | type checks the interface | Apache-2.0 |
 | `@tauri-apps/cli` 2.12.5 | builds the desktop app (`build_app` runs the copy in `frontend/node_modules`) | Apache-2.0 OR MIT |
 | PyInstaller 6.22.3 | freezes the engine folder (`setup/freeze_backend`) | GPL-2.0-or-later with the bootloader exception, which permits distributing the frozen program under its own licence |
+| pytest 9.2.0, pluggy 1.7.0, iniconfig 2.3.1, Pygments 2.21.0 (`backend/requirements-test.lock`) | the engine's tests; not frozen: `setup/freeze_backend` excludes keyring's test modules (`keyring.testing`, `keyring.devpi_client`), pytest and pluggy, so a venv that also holds the test tools freezes the same engine | MIT (pytest, pluggy, iniconfig); BSD-2-Clause (Pygments) |
+| pyinstaller-hooks-contrib 2026.10, altgraph 0.17.5, macholib 1.16.4 (macOS only), pefile 2024.8.26 (Windows only) | brought in by PyInstaller for the freeze; not frozen | Apache-2.0 for the run-time hooks and GPL-2.0-or-later for the rest (pyinstaller-hooks-contrib); MIT (altgraph, macholib, pefile) |
 | uv 0.11.32 | writes the requirement locks (`python setup/lock_requirements.py`); not shipped | Apache-2.0 OR MIT |
 | Rust toolchain 1.97.0 (cargo, rustc), pinned in `src-tauri/rust-toolchain.toml` | builds the desktop shell and `formweb-core` from the vendored crates | Apache-2.0 OR MIT |
 
