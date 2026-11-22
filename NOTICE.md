@@ -38,7 +38,7 @@ Tauri links its own dependencies unedited (no `[patch]`, no vendored copy), some
 | --- | --- | --- |
 | Vite 8.3.5 | builds the interface | MIT |
 | TypeScript 7.0.2 | type checks the interface | Apache-2.0 |
-| `@tauri-apps/cli` 2 | builds the desktop app (`npx @tauri-apps/cli@2`) | Apache-2.0 OR MIT |
+| `@tauri-apps/cli` 2.12.5 | builds the desktop app (`build_app` runs the copy in `frontend/node_modules`) | Apache-2.0 OR MIT |
 | PyInstaller 6.22.3 | freezes the engine sidecar (`setup/freeze_backend`) | GPL-2.0-or-later with the bootloader exception, which permits distributing the frozen program under its own licence |
 | Playwright for Python 1.65.0 (`backend/requirements-deep.txt`), installed by `./formpublisher_oc_install`, never with a browser download | deep checks drive the person's installed Chrome | Apache-2.0 |
 | Rust toolchain (cargo, rustc) | builds `formweb-core` from the vendored crates | Apache-2.0 OR MIT |

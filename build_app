@@ -63,7 +63,7 @@ fp_say "building FormPublisher $version from $(pwd)"
 fp_say "python $("$py" -c 'import platform; print(platform.python_version())'), node $(node -v), $(rustc -V), $(cargo -V | awk '{print $1, $2}') from $(dirname "$(command -v rustc)")"
 
 step "installing the engine and the window"
-[ -x backend/venv/bin/python ] && [ -d frontend/node_modules ] || ./formpublisher_oc_install
+[ -x backend/venv/bin/python ] && [ -e frontend/node_modules/.bin/tauri ] || ./formpublisher_oc_install
 
 if [ "$os" = macos ]; then cache_root="$HOME/Library/Caches/formpublisher"; else cache_root="${XDG_CACHE_HOME:-$HOME/.cache}/formpublisher"; fi
 export CARGO_TARGET_DIR="${FORMPUBLISHER_CARGO_TARGET:-$cache_root/tauri-target}"
@@ -93,12 +93,12 @@ esac
 
 step "building the desktop app (the first build compiles several hundred Rust crates)"
 tlog="$(mktemp)"
-if ! npx --yes @tauri-apps/cli@2 "${tauri_args[@]}" 2>&1 | tee "$tlog"; then
+if ! node frontend/node_modules/.bin/tauri "${tauri_args[@]}" 2>&1 | tee "$tlog"; then
   grep -Eq 'error\[E|could not compile' "$tlog" || fp_die "tauri build failed outside the Rust compile; see the lines above"
   fp_say "the Rust compile failed; cleaning the build folder and trying once more, one crate at a time"
   ( cd src-tauri && cargo clean )
   fp_rust_fresh
-  CARGO_BUILD_JOBS=1 npx --yes @tauri-apps/cli@2 "${tauri_args[@]}" || fp_die "tauri build failed twice; send build_app.log"
+  CARGO_BUILD_JOBS=1 node frontend/node_modules/.bin/tauri "${tauri_args[@]}" || fp_die "tauri build failed twice; send build_app.log"
 fi
 rm -f "$tlog"
 
