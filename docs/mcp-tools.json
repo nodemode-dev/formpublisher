@@ -1,0 +1,413 @@
+{
+  "generated": "./formpublisher agents sync from backend/app/mcp.py and backend/app/cli.py; do not edit by hand",
+  "counts": {
+    "tools": 29,
+    "read": 17,
+    "data": 10,
+    "path": 2
+  },
+  "commandCount": 27,
+  "commands": [
+    "status",
+    "sites",
+    "import",
+    "import-formweb",
+    "formweb-projects",
+    "routes",
+    "revisions",
+    "diff",
+    "check",
+    "build",
+    "builds",
+    "inspect",
+    "compare",
+    "reproduce",
+    "fpub",
+    "sign",
+    "verify",
+    "keys",
+    "targets",
+    "prepare",
+    "prepared",
+    "verify-prepared",
+    "preview",
+    "trash",
+    "receive-status",
+    "templates",
+    "start"
+  ],
+  "protocol": {
+    "from": "backend/app/mcp.py",
+    "handshake": [
+      "2024-11-05",
+      "2025-03-26",
+      "2025-06-18",
+      "2025-11-25"
+    ],
+    "modern": [
+      "2026-07-28"
+    ]
+  },
+  "tools": [
+    {
+      "name": "build_package",
+      "title": "Build a package",
+      "class": "data",
+      "annotations": {
+        "title": "Build a package",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Build the deterministic package for a site's revision in FormPublisher's data folder: site.zip plus publish.json with the SHA-256 and size of every file, the routes, redirects, headers and the summary of the checks stored at that moment."
+    },
+    {
+      "name": "compare_builds",
+      "title": "Compare builds",
+      "class": "read",
+      "annotations": {
+        "title": "Compare builds",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Compare the files of two builds from their publish.json: the paths added and removed from a to b, the changed files with size and SHA-256 on each side, and how many are the same."
+    },
+    {
+      "name": "diff_revisions",
+      "title": "Diff revisions",
+      "class": "read",
+      "annotations": {
+        "title": "Diff revisions",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Compare two revisions of a site: the added, removed and changed files (path, size, SHA-256), a summary with counts and bytes, and the added and removed routes."
+    },
+    {
+      "name": "formpublisher_status",
+      "title": "FormPublisher status",
+      "class": "read",
+      "annotations": {
+        "title": "FormPublisher status",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Report the FormPublisher engine (running engine or in-process), its data folder, how many sites are imported, the settings, and whether FormWeb answers on its loopback address."
+    },
+    {
+      "name": "get_checks",
+      "title": "Stored check results",
+      "class": "read",
+      "annotations": {
+        "title": "Stored check results",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Read the stored check results of a site's revision (problems, counts per severity, which tiers ran) without running anything."
+    },
+    {
+      "name": "get_prepared",
+      "title": "Prepared folders",
+      "class": "read",
+      "annotations": {
+        "title": "Prepared folders",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Read what is already prepared for a build: per target the folder, files, commands, notes, warnings, preparedAt, includeModel, leftOut and verified (the last verify_prepared verdict, null when it was never verified since it was prepared)."
+    },
+    {
+      "name": "import_formweb_current",
+      "title": "Import the current FormWeb site",
+      "class": "data",
+      "annotations": {
+        "title": "Import the current FormWeb site",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "description": "Download the site currently open in FormWeb (its read-only export), or with project one of FormWeb's saved projects (its saved .fweb file, compiled here), and import it into FormPublisher's data folder as a new revision of that project's site."
+    },
+    {
+      "name": "import_site",
+      "title": "Import a site",
+      "class": "data",
+      "annotations": {
+        "title": "Import a site",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "description": "Import a site from an absolute path on this computer: a FormWeb site export zip (routes.json, sitemap.xml, robots.txt and assets/), a FormWeb publication folder, a .fweb project (compiled here with the FormWeb core) or a FormPublisher .fpub package."
+    },
+    {
+      "name": "inspect_build",
+      "title": "Inspect a build",
+      "class": "read",
+      "annotations": {
+        "title": "Inspect a build",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Read one build: its record (site, revision, files, size, created), its publish.json (the package SHA-256 and size, every file with path, size and SHA-256, routes, redirects, headers and the checks summary stored when it was built, null when no checks had run) and signature, the same verdict as verify_build (valid, known, trusted, signer, message, reason)."
+    },
+    {
+      "name": "list_builds",
+      "title": "List builds",
+      "class": "read",
+      "annotations": {
+        "title": "List builds",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "List every build with its id, site, revision, file count, size, signed flag and time, newest first."
+    },
+    {
+      "name": "list_formweb_projects",
+      "title": "FormWeb projects",
+      "class": "read",
+      "annotations": {
+        "title": "FormWeb projects",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "List the running FormWeb's saved projects through its read-only GET /api/projects: id, name, saved time, and which one is open (always first; an open site that was never saved has saved false)."
+    },
+    {
+      "name": "list_keys",
+      "title": "List signing keys",
+      "class": "read",
+      "annotations": {
+        "title": "List signing keys",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "List the person's signing keys: per key its id (pass it to sign_build), name, fingerprint, created time, encrypted (a passphrase is needed to sign), secret (where the private key is kept: store for the system password store, file for a private file in the data folder, none for a key kept only to verify) and canSign."
+    },
+    {
+      "name": "list_revisions",
+      "title": "List revisions",
+      "class": "read",
+      "annotations": {
+        "title": "List revisions",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "List the revisions of an imported site, newest first: revision id, time, file count, bytes, route count, and how many files were added, removed and changed from the revision before."
+    },
+    {
+      "name": "list_sites",
+      "title": "List sites",
+      "class": "read",
+      "annotations": {
+        "title": "List sites",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "List every imported site with its id, name, source, revisions, route count, bytes, redirect counts and import time, newest first."
+    },
+    {
+      "name": "list_targets",
+      "title": "List publish targets",
+      "class": "read",
+      "annotations": {
+        "title": "List publish targets",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "List the host targets a build can be prepared for (static-zip, netlify, cloudflare-pages, vercel, github-pages, nginx) with name, description and the local tool that serves each one."
+    },
+    {
+      "name": "list_templates",
+      "title": "List templates",
+      "class": "read",
+      "annotations": {
+        "title": "List templates",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "List the kept templates a site can start from: the FormWeb whole-site templates of the public formai-templates index, with id, name, description, size, SHA-256, licence and credit, and when the list was fetched."
+    },
+    {
+      "name": "list_trash",
+      "title": "List the trash",
+      "class": "read",
+      "annotations": {
+        "title": "List the trash",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "List what was removed and is waiting in the trash, newest first: per entry its name, kind (site, build, key or prepared), label, where it came from, when it was moved and its size."
+    },
+    {
+      "name": "prepare_publish",
+      "title": "Prepare for publishing",
+      "class": "data",
+      "annotations": {
+        "title": "Prepare for publishing",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Prepare a folder per target for a build inside FormPublisher's data folder and return, for each, the folder path, files, the exact commands to run, notes and warnings."
+    },
+    {
+      "name": "preview_site",
+      "title": "Preview a site",
+      "class": "data",
+      "annotations": {
+        "title": "Preview a site",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Show a site revision on FormPublisher's local preview host (127.0.0.1, the same host the window's Preview uses) and return the address of its home page and one address per route, for the person or a browser tool to open."
+    },
+    {
+      "name": "receive_status",
+      "title": "Received from FormWeb",
+      "class": "read",
+      "annotations": {
+        "title": "Received from FormWeb",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Report FormWeb's Send to FormPublisher inbox: the receive endpoint FormWeb posts to, the inbox folder and whether it is watched, how many files wait in it, auto (whether a site that arrives is checked and built at once, the auto-check and auto-build settings) and the last five receipts (when, how it came, whether it was taken, the file name, and the site and revision it became)."
+    },
+    {
+      "name": "reproduce_build",
+      "title": "Reproduce a build",
+      "class": "data",
+      "annotations": {
+        "title": "Reproduce a build",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Rebuild a build's site.zip from the site revision it was made from, in a scratch folder inside FormPublisher's data folder that is removed afterwards, and report same (the bytes match publish.json), sha256 (what the rebuild gave) and expected."
+    },
+    {
+      "name": "restore_from_trash",
+      "title": "Restore from the trash",
+      "class": "data",
+      "annotations": {
+        "title": "Restore from the trash",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      },
+      "description": "Move a trash entry back to where it came from: the origin the trash recorded, or one worked out from the name and contents of an entry made before the records existed (an old prepared folder is prepared again from its build)."
+    },
+    {
+      "name": "run_checks",
+      "title": "Run checks",
+      "class": "data",
+      "annotations": {
+        "title": "Run checks",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Run the checks on an imported site's revision and return the problems with route, severity, code, message and fix, and a summary of counts per severity."
+    },
+    {
+      "name": "save_fpub",
+      "title": "Save a build as .fpub",
+      "class": "path",
+      "annotations": {
+        "title": "Save a build as .fpub",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Save a build as a .fpub package (one file holding the build's publish.json, site.zip and signature) at an absolute path the person named, ending in .fpub, in a folder that exists."
+    },
+    {
+      "name": "sign_build",
+      "title": "Sign a build",
+      "class": "data",
+      "annotations": {
+        "title": "Sign a build",
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Sign a build's site.zip with one of the person's Ed25519 keys: a detached signature stored beside the zip in FormPublisher's data folder, replacing an earlier one."
+    },
+    {
+      "name": "site_routes",
+      "title": "Site routes",
+      "class": "read",
+      "annotations": {
+        "title": "Site routes",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "List the routes of an imported site's latest revision: path, page file, locale, item and stylesheet, read from routes.json or found by walking index.html files."
+    },
+    {
+      "name": "start_from_template",
+      "title": "Start a site from a template",
+      "class": "path",
+      "annotations": {
+        "title": "Start a site from a template",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      },
+      "description": "Start a site from a kept template: download that one file from the templates repository, keep it only when its size and SHA-256 match the index, open it with the FormWeb core and write it as a new .fweb project into a folder the person named."
+    },
+    {
+      "name": "verify_build",
+      "title": "Verify a build",
+      "class": "read",
+      "annotations": {
+        "title": "Verify a build",
+        "readOnlyHint": true,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Verify a build's detached signature against its site.zip bytes and the person's own keys."
+    },
+    {
+      "name": "verify_prepared",
+      "title": "Verify a prepared folder",
+      "class": "data",
+      "annotations": {
+        "title": "Verify a prepared folder",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "description": "Check that a prepared folder still matches its build: every site file against publish.json's SHA-256 and the whole folder against a fresh prepare made in a scratch folder (for nginx also nginx -t when nginx is installed)."
+    }
+  ]
+}

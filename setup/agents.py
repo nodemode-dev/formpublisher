@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-"""./formpublisher agents: driving FormPublisher in plain language with Claude Code, Codex and Cursor.
+"""./formpublisher agents: driving FormPublisher in plain language with Claude Code, Codex, Cursor and Antigravity.
 
-  install [--user] [--dry-run] [claude|codex|cursor ...]
-                            set the three up for this user account (all by default; --user says so): the formpublisher MCP server
-                            (./formpublisher mcp at this folder's absolute path), the formMCP hub when it is installed, and every
-                            skill that teaches an agent (the skillset for changing FormPublisher's own code stays in the repository);
-                            files are backed up before changing and running it again changes nothing
-  status                    what this computer has: the three clients, which servers and skills each one has, and formMCP
-  sync [--check]            mirror every skill under .claude/skills to .agents/skills and check the skill files against the upload
-                            gates; --check changes nothing and exits 1 when anything drifted or fails (for CI)
+  install [--user] [--dry-run] [claude|codex|cursor|antigravity ...]
+                            set the four up for this user account (all by default; --user says so): the formpublisher MCP server
+                            (./formpublisher mcp at this folder's absolute path, or the engine program itself in an installed app),
+                            the formMCP hub when it is installed, and every skill that teaches an agent (the skillset for changing
+                            FormPublisher's own code stays in the repository); Antigravity gets the MCP servers only, in
+                            ~/.gemini/config/mcp_config.json; files are backed up before changing and running it again changes nothing
+  status                    what this computer has: the four clients, which servers and skills each one has, and formMCP
+  sync [--check]            write docs/mcp-tools.json (the MCP tools and the command line's commands), mirror every skill under
+                            .claude/skills to .agents/skills, check the skill files against the upload gates and check the tool and
+                            command counts the documents state; --check changes nothing and exits 1 when anything drifted or fails (for CI)
 """
 
 import hashlib
@@ -24,9 +26,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SKILLS = ROOT / ".claude" / "skills"
 MIRRORS = ROOT / ".agents" / "skills"
-LAUNCH = str(ROOT / "formpublisher") if (ROOT / "formpublisher").is_file() else os.environ.get("FORMPUBLISHER_LAUNCHER") or os.environ.get("APPIMAGE") or str(ROOT / "formpublisher")
+if os.environ.get("FORMPUBLISHER_LAUNCHER"):
+    LAUNCH, ARGS = os.environ["FORMPUBLISHER_LAUNCHER"], [*json.loads(os.environ.get("FORMPUBLISHER_LAUNCHER_ARGS") or "[]"), "mcp"]
+elif os.name == "nt":
+    LAUNCH, ARGS = "node", [str(ROOT / "setup" / "mcp_launch.mjs")]
+else:
+    LAUNCH, ARGS = str(ROOT / "formpublisher"), ["mcp"]
 EMOJI = re.compile("[" + "-".join(chr(c) for c in (0x1F000, 0x1FAFF)) + chr(0x2600) + "-" + chr(0x27BF) + chr(0x2B00) + "-" + chr(0x2BFF) + chr(0xFE0F) + chr(0x200D) + "]")
-CLIENTS = ("claude", "codex", "cursor")
+CLIENTS = ("claude", "codex", "cursor", "antigravity")
+ASK_SECONDS = 30
+TOOLS_FILE = ROOT / "docs" / "mcp-tools.json"
+COUNTED = ("README.md", "docs/MANUAL.md", "AGENTS.md", "CLAUDE.md", ".docs/wiki/*.md", ".claude/skills/**/SKILL.md")
+TOOL_COUNT = re.compile(r"\b(\d+)\s+(?:MCP\s+)?tools\b", re.I)
+COMMAND_COUNT = re.compile(r"\b(\d+)\s+(?:(?:command[- ]line|CLI)\s+)?commands\b", re.I)
 NAME = "formpublisher"
 HUB = "formmcp"
 HUB_CANDIDATES = (
@@ -64,7 +76,7 @@ def formmcp_command() -> list[str] | None:
 
 
 def servers() -> dict:
-    out = {NAME: [LAUNCH, ["mcp"]]}
+    out = {NAME: [LAUNCH, list(ARGS)]}
     found = formmcp_command()
     if found:
         out[HUB] = [found[0], found[1:]]
@@ -113,12 +125,101 @@ def lookup_problems() -> list[str]:
     return []
 
 
+def _first_sentence(text: str) -> str:
+    text = " ".join((text or "").split())
+    found = re.match(r"(.+?[.!?])(?=\s|$)", text)
+    return found.group(1) if found else text
+
+
+def _tool_class(module, tool) -> str | None:
+    said = getattr(module, "TOOL_CLASS", None)
+    if isinstance(said, dict) and tool.name in said:
+        return str(said[tool.name])
+    meta = getattr(tool, "meta", None) or {}
+    for key in ("class", "formpublisher/class"):
+        if isinstance(meta, dict) and meta.get(key):
+            return str(meta[key])
+    return None
+
+
+def tool_list() -> tuple[str, list[str]]:
+    import argparse
+    import asyncio
+
+    sys.path.insert(0, str(ROOT / "backend"))
+    from app import cli, mcp
+
+    notes = []
+    tools = sorted(asyncio.run(mcp.build().list_tools()), key=lambda t: t.name)
+    rows, classes = [], {}
+    for t in tools:
+        given = t.annotations.model_dump(by_alias=True, exclude_none=True) if t.annotations else {}
+        kind = _tool_class(mcp, t)
+        classes[t.name] = kind
+        rows.append({"name": t.name, "title": t.title or given.get("title"), "class": kind, "annotations": given, "description": _first_sentence(t.description or "")})
+    if all(k is None for k in classes.values()):
+        notes.append("backend/app/mcp.py gives no class per tool yet (TOOL_CLASS or meta); docs/mcp-tools.json has class null, run ./formpublisher agents sync again once it does")
+    else:
+        notes.extend(f"backend/app/mcp.py: tool {n} has no class" for n, k in classes.items() if k is None)
+    kinds = [k for k in classes.values() if k]
+    counts = {"tools": len(rows)}
+    for kind in ("read", "data", "path"):
+        counts[kind] = kinds.count(kind) if kinds else None
+    for kind in sorted(set(kinds) - {"read", "data", "path"}):
+        counts[kind] = kinds.count(kind)
+    if getattr(mcp, "HANDSHAKE_PROTOCOL_VERSIONS", None) or getattr(mcp, "MODERN_PROTOCOL_VERSIONS", None):
+        protocol = {"from": "backend/app/mcp.py", "handshake": list(getattr(mcp, "HANDSHAKE_PROTOCOL_VERSIONS", ())), "modern": list(getattr(mcp, "MODERN_PROTOCOL_VERSIONS", ()))}
+    else:
+        from mcp_types import version as sdk
+
+        protocol = {"from": "the mcp SDK", "handshake": list(sdk.HANDSHAKE_PROTOCOL_VERSIONS), "modern": list(sdk.MODERN_PROTOCOL_VERSIONS)}
+    parser = cli.build_parser()
+    commands = [name for action in parser._actions if isinstance(action, argparse._SubParsersAction) for name in action.choices]
+    data = {"generated": "./formpublisher agents sync from backend/app/mcp.py and backend/app/cli.py; do not edit by hand", "counts": counts, "commandCount": len(commands), "commands": commands, "protocol": protocol, "tools": rows}
+    return json.dumps(data, indent=2, ensure_ascii=False) + "\n", notes
+
+
+def _count_files() -> list[Path]:
+    seen = []
+    for pattern in COUNTED:
+        for p in sorted(ROOT.glob(pattern)):
+            if p.is_file() and p not in seen:
+                seen.append(p)
+    return seen
+
+
+def count_problems(tools: int, commands: int) -> list[str]:
+    bad = []
+    for p in _count_files():
+        rel = p.relative_to(ROOT).as_posix()
+        for number, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+            for pattern, near, want, what in ((TOOL_COUNT, r"\bMCP\b", tools, "MCP tools"), (COMMAND_COUNT, r"command[- ]line|\bCLI\b", commands, "command line commands")):
+                for found in pattern.finditer(line):
+                    around = line[max(0, found.start() - 80):found.end() + 80]
+                    if not re.search(near, around, re.I) or int(found.group(1)) == want:
+                        continue
+                    bad.append(f"{rel}:{number}: says {found.group(0)!r}, the code has {want} {what}")
+    return bad
+
+
 def _files(folder: Path) -> dict:
     return {str(p.relative_to(folder)): p.read_bytes() for p in sorted(folder.rglob("*")) if p.is_file()}
 
 
 def sync(check: bool) -> int:
-    drift = []
+    drift, notes = [], []
+    try:
+        want, notes = tool_list()
+    except Exception as exc:
+        want, notes = None, [f"the tool list could not be built from backend/app/mcp.py and backend/app/cli.py: {exc!r}"]
+    if want is not None:
+        if not TOOLS_FILE.is_file() or TOOLS_FILE.read_text(encoding="utf-8") != want:
+            drift.append(str(TOOLS_FILE.relative_to(ROOT)))
+            if not check:
+                TOOLS_FILE.parent.mkdir(parents=True, exist_ok=True)
+                TOOLS_FILE.write_text(want, encoding="utf-8")
+        made = json.loads(want)
+        notes += count_problems(made["counts"]["tools"], made["commandCount"])
     names = skill_names()
     for name in names:
         mirror = MIRRORS / name
@@ -132,7 +233,10 @@ def sync(check: bool) -> int:
             drift.append(str(stale.relative_to(ROOT)) + " (removed skill)")
             if not check:
                 shutil.rmtree(stale, ignore_errors=True)
-    problems = skill_problems() + lookup_problems()
+    problems = skill_problems() + lookup_problems() + [n for n in notes if not n.startswith("backend/app/mcp.py gives no class")]
+    for line in notes:
+        if line.startswith("backend/app/mcp.py gives no class"):
+            print("agents: note: " + line)
     if check:
         print("agents: in step" if not drift else "agents: drifted: " + ", ".join(drift) + " (run ./formpublisher agents sync)")
         for line in problems:
@@ -167,22 +271,35 @@ def _hub_note(said: list) -> None:
         said.append("  formMCP is not installed here, so only the formpublisher server is set; install formMCP (https://github.com/nodemode-dev/formmcp) and run this again to reach every Form app's own tools")
 
 
+def _ask(cmd: list[str], home: Path) -> subprocess.CompletedProcess | None:
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, cwd=str(home), stdin=subprocess.DEVNULL, timeout=ASK_SECONDS)
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
 def install_claude(home: Path, dry: bool, said: list) -> None:
     said.append("Claude Code:")
     claude = shutil.which("claude")
     if claude:
         for name, (cmd, args) in servers().items():
-            have = subprocess.run([claude, "mcp", "get", name], capture_output=True, text=True, cwd=str(home))
-            if have.returncode == 0 and cmd in have.stdout:
+            line = f"claude mcp add --scope user {name} -- {subprocess.list2cmdline([cmd, *args])}"
+            have = _ask([claude, "mcp", "get", name], home)
+            if have is None:
+                said.append(f"  {claude} did not answer `claude mcp get {name}` within {ASK_SECONDS} s; nothing changed, run by hand: {line}")
+                continue
+            if have.returncode == 0 and cmd in have.stdout and all(a in have.stdout for a in args):
                 said.append(f"  MCP server {name} already set (user scope)")
                 continue
-            said.append(f"  claude mcp add --scope user {name} -- {cmd} {' '.join(args)}")
+            said.append(f"  {line}")
             if not dry:
                 if have.returncode == 0:
-                    subprocess.run([claude, "mcp", "remove", name, "--scope", "user"], capture_output=True)
-                subprocess.run([claude, "mcp", "add", "--scope", "user", name, "--", cmd, *args], check=True, capture_output=True)
+                    _ask([claude, "mcp", "remove", name, "--scope", "user"], home)
+                done = _ask([claude, "mcp", "add", "--scope", "user", name, "--", cmd, *args], home)
+                if done is None or done.returncode != 0:
+                    said.append(f"  that did not finish ({'no answer' if done is None else (done.stderr or done.stdout).strip()[:200]}); run it by hand")
     else:
-        said.append(f"  the claude command is not installed here; once it is, run: claude mcp add --scope user {NAME} -- {LAUNCH} mcp")
+        said.append(f"  the claude command is not installed here; once it is, run: claude mcp add --scope user {NAME} -- {subprocess.list2cmdline([LAUNCH, *ARGS])}")
     _hub_note(said)
     _copy_skills(home / ".claude" / "skills", dry, said)
 
@@ -193,7 +310,7 @@ def install_codex(home: Path, dry: bool, said: list) -> None:
     text = cfg.read_text(encoding="utf-8") if cfg.exists() else ""
     new = text
     for name, (cmd, args) in servers().items():
-        block = f'[mcp_servers.{name}]\ncommand = "{cmd}"\nargs = [{", ".join(json.dumps(a) for a in args)}]\nstartup_timeout_sec = 90\ntool_timeout_sec = 600\n'
+        block = f'[mcp_servers.{name}]\ncommand = {json.dumps(cmd, ensure_ascii=False)}\nargs = [{", ".join(json.dumps(a, ensure_ascii=False) for a in args)}]\nstartup_timeout_sec = 90\ntool_timeout_sec = 600\n'
         found = re.search(r"(?ms)^\[mcp_servers\." + re.escape(name) + r"\]\n.*?(?=^\[|\Z)", new)
         if found and found.group(0).strip() == block.strip():
             said.append(f"  MCP server {name} already in {cfg}")
@@ -230,6 +347,50 @@ def install_cursor(home: Path, dry: bool, said: list) -> None:
     _copy_skills(home / ".agents" / "skills", dry, said)
 
 
+def antigravity_config(home: Path) -> Path:
+    return home / ".gemini" / "config" / "mcp_config.json"
+
+
+def _ours(entry: object, cmd: str, args: list) -> bool:
+    return isinstance(entry, dict) and entry.get("args") == args and Path(str(entry.get("command", ""))).name == Path(cmd).name
+
+
+def install_antigravity(home: Path, dry: bool, said: list) -> None:
+    said.append("Antigravity:")
+    cfg = antigravity_config(home)
+    older = home / ".gemini" / "antigravity-cli" / "mcp_config.json"
+    if older.exists() and not cfg.exists():
+        said.append(f"  an older file was seen at {older} and left alone; the documented file is {cfg}")
+    try:
+        data = json.loads(cfg.read_text(encoding="utf-8") or "{}") if cfg.exists() else {}
+    except ValueError:
+        data = None
+    if not isinstance(data, dict) or not isinstance(data.get("mcpServers", {}), dict):
+        said.append(f"  {cfg} is not an MCP servers file FormPublisher can read; left alone")
+        return
+    changed = False
+    for name, (cmd, args) in servers().items():
+        entry = {"command": cmd, "args": args}
+        have = data.get("mcpServers", {}).get(name)
+        if have == entry:
+            said.append(f"  MCP server {name} already in {cfg}")
+            continue
+        if have is not None and not _ours(have, cmd, args):
+            said.append(f"  {cfg} has a server named {name} that FormPublisher did not write; left alone")
+            continue
+        said.append(f"  MCP server {name} -> {cfg}")
+        data.setdefault("mcpServers", {})[name] = entry
+        changed = True
+    if changed and not dry:
+        _backup(cfg, dry)
+        cfg.parent.mkdir(parents=True, exist_ok=True)
+        part = cfg.with_name(cfg.name + f".part-{os.getpid()}")
+        part.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+        os.replace(part, cfg)
+    _hub_note(said)
+    said.append("  skills: Antigravity gets the MCP servers only")
+
+
 def _installed_skills(root: Path) -> int:
     return sum(1 for n in user_skills() if (root / n).is_dir() and _files(root / n) == _files(SKILLS / n))
 
@@ -239,6 +400,7 @@ def status() -> int:
     want = servers()
     found = formmcp_command()
     print(f"FormPublisher at {ROOT}")
+    print(f"MCP entry this writes: {json.dumps({'command': LAUNCH, 'args': ARGS})}")
     print(f"formMCP: {' '.join(found) if found else 'not installed (the family hub that reaches every installed Form app; https://github.com/nodemode-dev/formmcp)'}")
     print(f"skills in this repository: {len(user_skills())} for agents ({len(skill_names())} with the skillset)")
     claude = shutil.which("claude")
@@ -246,24 +408,41 @@ def status() -> int:
     print(f"  program: {claude or 'not installed (https://claude.com/claude-code)'}")
     for name in want:
         if claude:
-            got = subprocess.run([claude, "mcp", "get", name], capture_output=True, text=True, cwd=str(home))
-            print(f"  MCP {name}: {'set (user scope)' if got.returncode == 0 else 'not set'}")
+            got = _ask([claude, "mcp", "get", name], home)
+            print(f"  MCP {name}: {'no answer from claude mcp get within ' + str(ASK_SECONDS) + ' s' if got is None else 'set (user scope)' if got.returncode == 0 else 'not set'}")
         else:
             print(f"  MCP {name}: unknown without the claude command")
     print(f"  skills in ~/.claude/skills: {_installed_skills(home / '.claude' / 'skills')} of {len(user_skills())} current")
     cfg = Path(os.environ.get("CODEX_HOME", home / ".codex")) / "config.toml"
     text = cfg.read_text(encoding="utf-8") if cfg.exists() else ""
     print("Codex:")
+    print(f"  program: {shutil.which('codex') or 'not installed'}")
     for name in want:
         print(f"  MCP {name}: {'set' if f'[mcp_servers.{name}]' in text else 'not set'} in {cfg}")
     print(f"  skills in ~/.agents/skills: {_installed_skills(home / '.agents' / 'skills')} of {len(user_skills())} current")
     cur = home / ".cursor" / "mcp.json"
     data = json.loads(cur.read_text(encoding="utf-8")) if cur.exists() and cur.read_text(encoding="utf-8").strip() else {}
     print("Cursor:")
+    print(f"  program: {shutil.which('cursor-agent') or shutil.which('agent') or 'not installed'}")
     for name in want:
         print(f"  MCP {name}: {'set' if name in data.get('mcpServers', {}) else 'not set'} in {cur}")
     print("  skills: Cursor reads ~/.agents/skills, counted above")
-    print("This repository's own configuration (.mcp.json, .codex/config.toml, .cursor/mcp.json) is used when an agent starts in this folder.")
+    agy = antigravity_config(home)
+    try:
+        held = json.loads(agy.read_text(encoding="utf-8") or "{}") if agy.exists() else {}
+    except ValueError:
+        held = None
+    print("Antigravity:")
+    print(f"  program: {shutil.which('agy') or 'not installed (https://antigravity.google)'}")
+    for name in want:
+        if not isinstance(held, dict):
+            print(f"  MCP {name}: unknown, {agy} is not readable JSON")
+            continue
+        got = (held.get("mcpServers") or {}).get(name)
+        print(f"  MCP {name}: {'set' if got == {'command': want[name][0], 'args': want[name][1]} else 'set to another command' if got else 'not set'} in {agy}")
+    print("  skills: none (Antigravity gets the MCP servers only)")
+    if (ROOT / ".mcp.json").is_file():
+        print("This repository's own configuration (.mcp.json, .codex/config.toml, .cursor/mcp.json) is used when an agent starts in this folder.")
     return 0
 
 
@@ -283,11 +462,11 @@ def main(argv: list[str]) -> int:
         which = [a for a in rest if not a.startswith("--")] or list(CLIENTS)
         bad = [w for w in which if w not in CLIENTS]
         if bad:
-            print(f"agents: unknown client {', '.join(bad)} (claude, codex or cursor)", file=sys.stderr)
+            print(f"agents: unknown client {', '.join(bad)} (claude, codex, cursor or antigravity)", file=sys.stderr)
             return 2
         home, said = Path(os.environ.get("HOME", str(Path.home()))), []
         for w in which:
-            {"claude": install_claude, "codex": install_codex, "cursor": install_cursor}[w](home, dry, said)
+            {"claude": install_claude, "codex": install_codex, "cursor": install_cursor, "antigravity": install_antigravity}[w](home, dry, said)
         print(("Would do (dry run):\n" if dry else "") + "\n".join(said))
         if not dry:
             print("\nRestart the clients. Then ask for a site import, for example: import the site open in FormWeb and list its routes.")

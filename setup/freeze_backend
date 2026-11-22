@@ -72,6 +72,8 @@ fi
 [ -f "$ROOT/demo/sample-site.zip" ] || die "demo/sample-site.zip is missing"
 data=(--add-data "$ROOT/frontend/dist${sep}frontend_dist" --add-data "$ROOT/backend/app/static${sep}app/static")
 [ -d "$ROOT/docs" ] && data+=(--add-data "$ROOT/docs${sep}docs")
+data+=(--add-data "$ROOT/setup/agents.py${sep}setup")
+[ -d "$ROOT/.claude/skills" ] && data+=(--add-data "$ROOT/.claude/skills${sep}.claude/skills")
 data+=(--add-data "$ROOT/demo/sample-site.zip${sep}demo" --add-binary "$core${sep}bin")
 [ -d "$ROOT/demo/sites" ] && data+=(--add-data "$ROOT/demo/sites${sep}demo/sites")
 [ -d "$ROOT/demo/licenses" ] && data+=(--add-data "$ROOT/demo/licenses${sep}demo/licenses")

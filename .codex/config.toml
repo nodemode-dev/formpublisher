@@ -1,6 +1,6 @@
 [mcp_servers.formpublisher]
-command = "sh"
-args = ["-c", "exec \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)/formpublisher\" mcp"]
+command = "node"
+args = ["-e", 'const c = require("node:child_process"), u = require("node:url"); let r; try { r = c.execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim(); } catch { r = process.cwd(); } import(u.pathToFileURL(r + "/setup/mcp_launch.mjs").href);']
 startup_timeout_sec = 90
 tool_timeout_sec = 600
 

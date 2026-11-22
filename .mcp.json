@@ -2,8 +2,8 @@
   "mcpServers": {
     "formpublisher": {
       "type": "stdio",
-      "command": "${CLAUDE_PROJECT_DIR:-.}/formpublisher",
-      "args": ["mcp"]
+      "command": "node",
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/setup/mcp_launch.mjs"]
     },
     "formmcp": {
       "type": "stdio",
