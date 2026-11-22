@@ -1,5 +1,6 @@
 import { api, ApiError, connectLive, type LiveEvent, type LiveState, type RouteInfo, type Site } from './api';
 import type { App, AppState, BottomTab, EngineState, Mounts, OpenTab, Pane } from './app-api';
+import { reserveDock } from './dock-adapter';
 import { emit, type NoticeKind } from './events';
 import { locale, onLanguage } from './i18n';
 import { brandMark } from './ui/brand';
@@ -29,7 +30,8 @@ const SHELL = `<div class="fp-app">
 <div class="fp-title-tools">
 <button class="fp-tt-btn" type="button" data-act="palette" title="Find a Command" aria-label="Find a Command">${icon('commandPalette', 16)}</button>
 <button class="fp-tt-btn fp-theme-btn" type="button" data-act="theme" title="Switch theme" aria-label="Switch theme"><span class="fp-theme-to-light">${icon('sun', 16)}</span><span class="fp-theme-to-dark">${icon('moon', 16)}</span></button>
-<button class="fp-tt-btn" type="button" data-act="preferences" title="Preferences" aria-label="Preferences">${icon('settings', 16)}</button>
+<button class="fp-tt-btn fp-dock-btn" type="button" data-act="dock" title="Agent Dock" aria-label="Agent Dock" aria-pressed="false">${icon('terminal', 16)}</button>
+<button class="fp-tt-btn" type="button" data-act="preferences"title="Preferences" aria-label="Preferences">${icon('settings', 16)}</button>
 </div>
 </header>
 <div class="fp-tabs" role="tablist" aria-label="Open sites"></div>
@@ -136,6 +138,7 @@ const routeCountText = (n: number): string => (n === 1 ? '1 route' : `${n} route
 
 export async function startApp(): Promise<App> {
   applyTheme();
+  reserveDock();
   const host = document.getElementById('app') as HTMLElement;
   mountOnce(host, SHELL);
   const root = q(host, '.fp-app');

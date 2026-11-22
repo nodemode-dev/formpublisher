@@ -33,6 +33,9 @@ jobs:
       - name: Type check and build
         working-directory: frontend
         run: npm run build
+      - name: Type check the shared dock module
+        working-directory: frontend
+        run: npm run typecheck:dock
 
   engine:
     runs-on: ubuntu-latest
@@ -56,6 +59,8 @@ jobs:
           echo "RUSTUP_TOOLCHAIN=$pin" >> "$GITHUB_ENV"
       - name: Languages complete
         run: python setup/i18n_check.py
+      - name: Shared dock module matches its manifest
+        run: python setup/dock_check.py
       - name: Self check
         run: python backend/formpublisher_engine.py --selfcheck
       - name: Compile

@@ -16,6 +16,7 @@ FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, 
 | objc2, objc2-app-kit (macOS only) | the splash window's corner mask and clear background | MIT |
 | gtk (Linux only) | the desktop window on Linux | MIT |
 | windows-sys 0.61.2 (Windows only) | the job object that makes the engine end with the shell | MIT OR Apache-2.0 |
+| `@xterm/xterm` 6.0.0 and `@xterm/addon-fit` 0.11.0 | the terminal in the agent dock's tabs, built into the window | MIT |
 | FastAPI 0.141.1, Starlette | the engine service | MIT, BSD-3-Clause |
 | Uvicorn 0.53.0 with its `standard` extras (websockets, watchfiles, httptools, uvloop, h11, click, python-dotenv, PyYAML) | HTTP and WebSocket serving, the disk watcher | BSD-3-Clause (uvicorn, websockets, click, python-dotenv); MIT (watchfiles, httptools, h11, PyYAML, uvloop) |
 | python-multipart 0.0.32 | upload bodies (site exports) | Apache-2.0 |
