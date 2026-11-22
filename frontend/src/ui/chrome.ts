@@ -18,6 +18,8 @@ import { runChecks } from './panel';
 import { Preferences, type PrefsSection } from './preferences';
 import { reserveMenubar } from './reserve';
 import { ShortcutsDialog } from './shortcuts-dialog';
+import { TemplatesSheet } from './templates-sheet';
+import { openHosting } from './hosting-sheet';
 import { applyDensity, nextToggleTheme, readChoice, readDensity, setTheme, THEMES, type Density } from './themes';
 import { toast } from './toast';
 
@@ -64,6 +66,7 @@ export function installChrome(app: App): Chrome {
   let palette: CommandPalette | null = null;
   let prefs: Preferences | null = null;
   let shortcuts: ShortcutsDialog | null = null;
+  let templates: TemplatesSheet | null = null;
 
   const density = (id: string, label: string, value: Density, keys?: string[]) => ({
     id: `view.density-${id}`,
@@ -108,6 +111,7 @@ export function installChrome(app: App): Chrome {
         if (path) await app.importFolder(path).catch(() => undefined);
       },
     },
+    { id: 'file.templates', label: 'Start from a Template...', icon: 'template', group: 'File', menu: 'File', description: 'Make a new FormWeb project from a template, to edit in FormWeb and publish here', enabled: engineUp, run: async () => { templates ??= new TemplatesSheet(app); await templates.show(); } },
     { id: 'file.import-formweb', label: 'Import from FormWeb...', icon: 'download', group: 'File', menu: 'File', description: 'Import the site that is open in FormWeb', mutates: true, enabled: engineUp, run: async () => { await app.importFromFormWeb(); } },
     { id: 'file.new-window', label: 'New Window', keys: ['Shift+Mod+N'], icon: 'newWindow', group: 'File', menu: 'File', description: 'Open another FormPublisher window',
       run: async () => {
@@ -223,6 +227,7 @@ export function installChrome(app: App): Chrome {
     { id: 'help.shortcuts', label: 'Keyboard Shortcuts', keys: ['Mod+/'], icon: 'keyboard', group: 'Help', menu: 'Help', description: 'List every command with its keys', run: () => { shortcuts ??= new ShortcutsDialog(commands); shortcuts.show(); } },
     { id: 'help.about', label: 'About formpublisher', icon: 'info', group: 'Help', menu: 'Help', description: 'Version, license and copyright', run: () => commands.run('app.preferences', { section: 'about' }) },
     { id: 'help.docs', label: 'Documentation', icon: 'book', group: 'Help', menu: 'Help', description: 'Open the manual on GitHub', run: () => openExternal(DOCS_URL) },
+    { id: 'help.hosting', label: 'Host It Yourself', icon: 'globe', group: 'Help', menu: 'Help', description: 'The guide from a prepared folder to your own host, domain and HTTPS', run: () => openHosting() },
   );
 
   commands.add(...demoCommands(app, engineUp));
@@ -230,12 +235,12 @@ export function installChrome(app: App): Chrome {
   commands.onError = (_cmd, error) => notice('error', error instanceof Error && error.message ? error.message : 'Request failed');
 
   const menus: MenuDef[] = [
-    { label: 'File', items: ['view.home', 'file.open-zip', 'file.open-folder', 'file.import-formweb', '-', 'file.new-window', 'file.close-tab', '-', 'site.package', 'publish.open', '-', 'app.preferences'] },
+    { label: 'File', items: ['view.home', 'file.templates', '-', 'file.open-zip', 'file.open-folder', 'file.import-formweb', '-', 'file.new-window', 'file.close-tab', '-', 'site.package', 'publish.open', '-', 'app.preferences'] },
     { label: 'Edit', items: ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.select-all'] },
     { label: 'View', items: ['view.builds', 'view.palette', '-', 'view.theme', { label: 'Density', items: ['view.density-compact', 'view.density-regular', 'view.density-comfortable'] }, ...(isMacDesktop() ? ['view.menus-in-window'] : []), '-', 'view.toggle-routes', 'view.toggle-inspector', 'view.toggle-bottom', '-', 'view.problems', 'view.console', 'view.network'] },
     { label: 'Site', items: ['site.check', 'site.check-deep', '-', 'site.reload-routes', 'site.reveal-folder', '-', 'site.remove'] },
     { label: 'Window', items: ['window.minimize', 'window.maximize', 'window.fullscreen'] },
-    { label: 'Help', items: ['help.docs', 'help.shortcuts', { label: 'Demos', items: DEMOS.map(demoCommand) }, '-', 'help.about'] },
+    { label: 'Help', items: ['help.docs', 'help.hosting', 'help.shortcuts', { label: 'Demos', items: DEMOS.map(demoCommand) }, '-', 'help.about'] },
   ];
 
   new MenuBar(app.mounts.menubar, commands, menus);

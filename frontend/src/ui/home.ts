@@ -98,6 +98,7 @@ export class Home {
 <div class="fp-home-open" hidden><div class="fp-home-nav-sep"></div><div class="fp-home-nav-title">Open sites</div><div class="fp-home-open-list"></div></div>
 <div class="fp-home-nav-sep"></div>
 <div class="fp-home-nav-title">Import</div>
+<button class="fp-home-nav-item" type="button" data-cmd="file.templates">${icon('template', 16)}<span>Templates</span></button>
 <button class="fp-home-nav-item" type="button" data-cmd="file.open-zip">${icon('archive', 16)}<span>Open zip</span></button>
 <button class="fp-home-nav-item" type="button" data-cmd="file.open-folder">${icon('folder', 16)}<span>Open folder</span></button>
 <button class="fp-home-nav-item" type="button" data-cmd="file.import-formweb">${icon('download', 16)}<span>Import from FormWeb</span></button>
@@ -126,6 +127,7 @@ export class Home {
 <button class="fp-btn fp-btn-primary" type="button" data-cmd="file.open-zip">${icon('archive', 14)}<span>Open zip</span></button>
 <button class="fp-btn" type="button" data-cmd="file.open-folder">${icon('folder', 14)}<span>Open folder</span></button>
 <button class="fp-btn" type="button" data-cmd="file.import-formweb">${icon('download', 14)}<span>Import from FormWeb</span></button>
+<button class="fp-btn" type="button" data-cmd="file.templates">${icon('template', 14)}<span>Start from a template</span></button>
 </div>
 </div>
 <section class="fp-home-section"><div class="fp-home-section-head"><h2 class="fp-home-section-title">Recent sites</h2><button class="fp-btn fp-btn-ghost fp-btn-sm" type="button" data-v="recent">See all</button>${NOTE('fp-recent-grid')}</div>${CARD_GRID('fp-recent-grid', true)}</section>

@@ -43,6 +43,8 @@ These are the exact MCP tool names, with the command that does the same thing. I
 | `list_targets` | `targets` | the six hosts | yes |
 | `prepare_publish` (build, targets, includeModel) | `prepare BUILD --target T [--target T] [--include-model]` | a folder per target with the commands to run | no |
 | `get_prepared` (build) | `prepared BUILD` | what is already prepared | yes |
+| `list_templates` | `templates` | the kept list of templates a site can start from (FormWeb whole sites from the public formai-templates index); fetches nothing, `fetched: false` until the person got the list (window, or `templates --fetch`) | yes |
+| `start_from_template` (template, folder, name) | `start TEMPLATE --to FOLDER [--name N]` | download that one file, keep it only when size and SHA-256 match the index, open it with the FormWeb core and write a new `.fweb` project into a folder the person named; never replaces a file. Editing is in FormWeb; to publish it, `import_site` the returned project | no |
 | `list_trash` | `trash` | trash entries newest first, with kind, label, origin, time and size | yes |
 | `restore_from_trash` (entry, passphrase) | `trash restore ENTRY` | move an entry back to its recorded or inferred origin (entries from before 0.1.4 have an inferred one); 409 with the reason when the place is taken, and 409 `origin-unknown` when there is none. A trashed key with a missing or damaged record is rebuilt from its `.pem`: an encrypted one answers 409 `passphrase-required`, then `passphrase-wrong`, so ask the person and pass `passphrase`; the CLI reads it with `--passphrase-stdin`. Never log or store it | no |
 

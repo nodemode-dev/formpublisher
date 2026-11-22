@@ -44,7 +44,7 @@ def tool_names() -> list[str]:
 
 def test_mcp_lists_the_tools():
     names = tool_names()
-    for name in ("formpublisher_status", "import_site", "run_checks", "build_package", "sign_build", "verify_build", "prepare_publish", "restore_from_trash"):
+    for name in ("formpublisher_status", "import_site", "run_checks", "build_package", "sign_build", "verify_build", "prepare_publish", "restore_from_trash", "list_templates", "start_from_template"):
         assert name in names
     assert len(names) == len(set(names))
 

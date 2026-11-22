@@ -23,7 +23,7 @@ FormPublisher only reads FormWeb. It imports exports and publication folders and
 - Every `z-index` comes from a layer token in `frontend/src/styles/tokens.css`.
 - No emoji; no em dash in Markdown; no icon libraries (inline `currentColor` SVG only); no commented-out code; near-zero comments.
 - Every dependency that ships gets a row in `NOTICE.md`. GPL stays out of the distributed bundle.
-- Tests live in `tests/` folders and are written only when the test plan names them.
+- Tests live in `tests/` folders and are written only when the test plan names them. The engine's pytest suite is `backend/tests` (see `AGENTS.md`); keep it green and fast.
 
 ## Commits
 

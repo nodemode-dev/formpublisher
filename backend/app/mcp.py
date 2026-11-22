@@ -17,6 +17,7 @@ INSTRUCTIONS = (
     "A .fpub package (save_fpub) can be opened elsewhere with import_site. "
     "Then run_checks, build_package, sign_build (with a key the person named) and verify_build, and finish with list_targets and prepare_publish, "
     "which writes a folder per host with the commands to run; nothing is uploaded. "
+    "To start a new site, list_templates reads the template list the person fetched and start_from_template writes a FormWeb project into a folder they named; editing it happens in FormWeb. "
     "FormPublisher only reads from FormWeb and never changes it."
 )
 
@@ -189,6 +190,25 @@ def build(client: Client | None = None) -> MCPServer:
     async def get_prepared(build: str) -> dict:
         """build: build id from list_builds."""
         return await run(link.prepared, build)
+
+    @server.tool(
+        name="list_templates",
+        description="List the kept templates a site can start from: the FormWeb whole-site templates of the public formai-templates index, with id, name, description, size, SHA-256, licence and credit, and when the list was fetched. Reads only the list the person already got in the window or with the CLI (templates --fetch); it fetches nothing. fetched false means no list is kept yet. Read only.",
+        annotations=ToolAnnotations(title="List templates", readOnlyHint=True, idempotentHint=True, openWorldHint=False),
+    )
+    async def list_templates() -> dict:
+        return await run(link.templates)
+
+    @server.tool(
+        name="start_from_template",
+        description="Start a site from a kept template: download that one file from the templates repository, keep it only when its size and SHA-256 match the index, open it with the FormWeb core and write it as a new .fweb project into a folder the person named. It will not replace a file. Editing happens in FormWeb (File > Import .fweb or .fpub file...); to publish it, pass the returned project path to import_site.",
+        annotations=ToolAnnotations(title="Start a site from a template", readOnlyHint=False, destructiveHint=False, idempotentHint=False, openWorldHint=True),
+    )
+    async def start_from_template(template: str, folder: str, name: str | None = None) -> dict:
+        """template: an id from list_templates. folder: absolute path of an existing folder the person named. name: the project's file name, default the template's name."""
+        if not Path(folder).expanduser().is_absolute():
+            raise ToolError("error [invalid]: folder must be absolute")
+        return await run(link.start_template, template, folder, name)
 
     @server.tool(
         name="list_trash",
