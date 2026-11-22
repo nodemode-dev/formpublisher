@@ -43,9 +43,19 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: backend/requirements.txt
+          cache-dependency-path: backend/requirements.lock
+      - name: Requirement locks hold every pin
+        run: python setup/lock_requirements.py --check
       - name: Install
-        run: pip install -r backend/requirements.txt
+        run: pip install --require-hashes -r backend/requirements.lock
+      - name: Pinned Rust toolchain
+        run: |
+          source setup/lib.sh
+          pin="$(fp_rust_pin)"
+          rustup toolchain install "$pin" --profile minimal
+          echo "RUSTUP_TOOLCHAIN=$pin" >> "$GITHUB_ENV"
+      - name: Languages complete
+        run: python setup/i18n_check.py
       - name: Self check
         run: python backend/formpublisher_engine.py --selfcheck
       - name: Compile
@@ -62,6 +72,46 @@ jobs:
       - name: Shell syntax
         run: bash -n formpublisher && bash -n formpublisher_oc_install && bash -n build_app && bash -n setup/lib.sh && bash -n setup/freeze_backend && bash -n setup/install_compiler
 
+  windows-shell:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build script tool checks
+        shell: cmd
+        run: call build_app.bat --check-tools
+      - name: Rust version is the pinned one
+        working-directory: src-tauri
+        shell: bash
+        run: |
+          rustc -V
+          rustc -V | grep -q "$(sed -n 's/^channel *= *"\([^"]*\)".*/\1/p' rust-toolchain.toml)"
+      - name: A window folder for the type check
+        shell: bash
+        run: mkdir -p frontend/dist && printf '<!doctype html><title>FormPublisher</title>' > frontend/dist/index.html
+      - name: Shell type check
+        working-directory: src-tauri
+        run: cargo check --locked
+
+  macos-shell:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: A window folder for the type check
+        run: mkdir -p frontend/dist && printf '<!doctype html><title>FormPublisher</title>' > frontend/dist/index.html
+      - name: Shell type check
+        working-directory: src-tauri
+        run: cargo check --locked
+      - name: Shell syntax
+        run: bash -n build_app && bash -n setup/freeze_backend
+
   tests:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -71,11 +121,15 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: |
-            backend/requirements.txt
-            backend/requirements-test.txt
+          cache-dependency-path: backend/requirements-test.lock
       - name: Install
-        run: pip install -r backend/requirements.txt -r backend/requirements-test.txt
+        run: pip install --require-hashes -r backend/requirements-test.lock
+      - name: Pinned Rust toolchain
+        run: |
+          source setup/lib.sh
+          pin="$(fp_rust_pin)"
+          rustup toolchain install "$pin" --profile minimal
+          echo "RUSTUP_TOOLCHAIN=$pin" >> "$GITHUB_ENV"
       - name: Build formweb-core
         working-directory: vendor/formweb-native
         run: cargo build --release --locked -p formweb-core
