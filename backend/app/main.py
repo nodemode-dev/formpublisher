@@ -15,7 +15,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app import __version__, routers
 from app import host as site_host
-from app.services import paths
+from app.services import enginelog, paths
 from app.services.bus import bus
 from app.services.codes import default_code
 from app.services.compile import CompileError
@@ -133,7 +133,9 @@ async def validation_error(_request: Request, exc: RequestValidationError):
 @app.exception_handler(Exception)
 async def internal_error(_request: Request, exc: Exception):
     log.error("unhandled error\n%s", "".join(traceback.format_exception(exc)))
-    return JSONResponse({"detail": "The engine hit an unexpected problem; see its log.", "code": "internal"}, status_code=500)
+    kept = enginelog.attached()
+    where = f"its log, {kept}" if kept else "the terminal that started it"
+    return JSONResponse({"detail": f"The engine hit an unexpected problem; see {where}.", "code": "internal", "log": str(kept) if kept else None}, status_code=500)
 
 
 def include_routers(target: FastAPI) -> None:

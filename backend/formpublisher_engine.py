@@ -1,10 +1,18 @@
 import importlib
 import json
+import logging
 import os
 import pkgutil
 import sys
 import threading
 import time
+
+if sys.stdin is None:
+    sys.stdin = open(os.devnull, encoding="utf-8")
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w", encoding="utf-8")
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w", encoding="utf-8")
 
 
 def resource_dir() -> str:
@@ -70,7 +78,15 @@ def selfcheck() -> int:
 
 
 def watch_parent() -> None:
-    if os.name != "posix" or os.environ.get("FORMPUBLISHER_WATCH_PARENT", "1") == "0":
+    if os.environ.get("FORMPUBLISHER_WATCH_PARENT", "1") == "0":
+        return
+    from app.services import enginelog, paths
+
+    def leave() -> None:
+        paths.remove_engine_file()
+        os._exit(0)
+
+    if enginelog.watch_shell(leave) or os.name != "posix":
         return
     parent = os.getppid()
     if parent <= 1:
@@ -94,14 +110,16 @@ def serve() -> int:
     bundled = os.path.join(resource_dir(), "frontend_dist")
     if os.path.isdir(bundled):
         os.environ.setdefault("FORMPUBLISHER_DIST", bundled)
-    watch_parent()
     import uvicorn
 
     from app.main import app as fastapi_app
-    from app.services import paths
+    from app.services import enginelog, paths
 
     host = os.environ.get("FORMPUBLISHER_HOST", "127.0.0.1")
     server = uvicorn.Server(uvicorn.Config(fastapi_app, host=host, port=paths.port(), log_level="info"))
+    kept = enginelog.attach()
+    logging.getLogger("formpublisher").info("engine %s starting on %s:%s, log %s", fastapi_app.version, host, paths.port(), kept)
+    watch_parent()
     server.run()
     return 0 if server.started else 3
 

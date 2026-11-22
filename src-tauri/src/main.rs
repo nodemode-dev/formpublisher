@@ -1,28 +1,34 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod engine_start;
 mod files;
 mod reveal;
 mod traffic_lights;
+#[cfg(windows)]
+mod win_job;
 
-use std::io::{Read, Write};
-use std::net::{SocketAddr, TcpListener, TcpStream};
+use std::io::{BufRead, BufReader, Read};
+use std::net::TcpListener;
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicI32, AtomicU16, Ordering};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use engine_start::{Failure, Tail};
 use tauri::{Manager, RunEvent, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_dialog::DialogExt;
 
 const DEFAULT_PORT: u16 = 8280;
-const ENGINE_WAIT: Duration = Duration::from_secs(60);
 const ENGINE_NAME: &str = if cfg!(windows) { "formpublisher-engine.exe" } else { "formpublisher-engine" };
+const ENGINE_FOLDER: &str = "engine";
 const FALLBACK_SIZE: (f64, f64) = (1280.0, 800.0);
 const MIN_SIZE: (f64, f64) = (1024.0, 680.0);
 const SCREEN_FRACTION: f64 = 0.9;
 
 struct Backend(Mutex<Option<Child>>);
+
+struct EngineTail(Arc<Mutex<Tail>>);
 
 static PORT: AtomicU16 = AtomicU16::new(DEFAULT_PORT);
 
@@ -77,25 +83,18 @@ fn choose_port() -> u16 {
         .unwrap_or(DEFAULT_PORT)
 }
 
-fn healthy() -> bool {
-    let address = engine_addr();
-    let Ok(addr) = address.parse::<SocketAddr>() else { return false };
-    let Ok(mut stream) = TcpStream::connect_timeout(&addr, Duration::from_millis(400)) else { return false };
-    let _ = stream.set_read_timeout(Some(Duration::from_millis(800)));
-    let _ = stream.set_write_timeout(Some(Duration::from_millis(800)));
-    let request = format!("GET /api/health HTTP/1.1\r\nHost: {address}\r\nConnection: close\r\n\r\n");
-    if stream.write_all(request.as_bytes()).is_err() {
-        return false;
+fn engine_program(handle: &tauri::AppHandle) -> Option<PathBuf> {
+    let exe_dir = std::env::current_exe().ok().and_then(|exe| exe.parent().map(PathBuf::from));
+    let mut places: Vec<PathBuf> = Vec::new();
+    if let Ok(resources) = handle.path().resource_dir() {
+        places.push(resources.join(ENGINE_FOLDER));
     }
-    let mut head = [0u8; 16];
-    let Ok(read) = stream.read(&mut head) else { return false };
-    String::from_utf8_lossy(&head[..read]).contains(" 200")
-}
-
-fn sidecar_path() -> Option<PathBuf> {
-    let exe = std::env::current_exe().ok()?;
-    let program = exe.parent()?.join(ENGINE_NAME);
-    program.is_file().then_some(program)
+    if let Some(dir) = exe_dir {
+        places.push(dir.join("../Resources").join(ENGINE_FOLDER));
+        places.push(dir.join(ENGINE_FOLDER));
+        places.push(dir);
+    }
+    places.into_iter().map(|folder| folder.join(ENGINE_NAME)).find(|program| program.is_file())
 }
 
 fn source_root() -> Option<PathBuf> {
@@ -105,20 +104,34 @@ fn source_root() -> Option<PathBuf> {
     root.join("formpublisher").is_file().then_some(root)
 }
 
-fn spawn_engine() -> Option<Child> {
-    let mut command = if let Some(program) = sidecar_path() {
+fn follow<R: Read + Send + 'static>(stream: Option<R>, tail: Arc<Mutex<Tail>>) {
+    let Some(stream) = stream else { return };
+    std::thread::spawn(move || {
+        for line in BufReader::new(stream).lines() {
+            let Ok(line) = line else { break };
+            if let Ok(mut kept) = tail.lock() {
+                kept.push(&line);
+            }
+        }
+    });
+}
+
+fn spawn_engine(handle: &tauri::AppHandle) -> Result<Child, Failure> {
+    let mut command = if let Some(program) = engine_program(handle) {
         Command::new(program)
     } else {
-        let root = source_root()?;
+        let root = source_root().ok_or(Failure::Missing)?;
         let mut command = Command::new(root.join("formpublisher"));
         command.arg("serve").current_dir(root);
         command
     };
     command
         .env("FORMPUBLISHER_PORT", PORT.load(Ordering::SeqCst).to_string())
+        .env(engine_start::SHELL_ENV, std::process::id().to_string())
+        .env(engine_start::DESKTOP_ENV, "1")
         .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
     #[cfg(unix)]
     {
         use std::os::unix::process::CommandExt;
@@ -129,11 +142,19 @@ fn spawn_engine() -> Option<Child> {
         use std::os::windows::process::CommandExt;
         command.creation_flags(0x0800_0000);
     }
-    command.spawn().ok()
+    let mut child = command.spawn().map_err(|err| Failure::NotStarted(err.to_string()))?;
+    #[cfg(windows)]
+    win_job::hold_pid(child.id());
+    let tail = handle.state::<EngineTail>().0.clone();
+    follow(child.stdout.take(), tail.clone());
+    follow(child.stderr.take(), tail);
+    Ok(child)
 }
 
 fn kill_backend(handle: &tauri::AppHandle) {
     let child = handle.state::<Backend>().0.lock().ok().and_then(|mut slot| slot.take());
+    #[cfg(windows)]
+    win_job::end();
     let Some(mut child) = child else { return };
     #[cfg(unix)]
     {
@@ -201,43 +222,73 @@ fn open_main(handle: &tauri::AppHandle) {
             reveal::conceal(&window);
             traffic_lights::place(&window.as_ref().window());
         }
-        Err(_) => reveal::close_splash(handle),
+        Err(_) => {
+            let failed = handle.clone();
+            std::thread::spawn(move || engine_failed(&failed, Failure::Window));
+        }
     }
 }
 
-fn engine_failed(handle: &tauri::AppHandle) {
+fn engine_failed(handle: &tauri::AppHandle, failure: Failure) {
     reveal::close_splash(handle);
+    std::thread::sleep(Duration::from_millis(150));
+    let tail = handle.state::<EngineTail>().0.lock().map(|kept| kept.lines()).unwrap_or_default();
+    let log = engine_start::engine_log().filter(|path| path.is_file());
     let _ = handle
         .dialog()
-        .message("The FormPublisher engine did not start. Please relaunch the app.")
+        .message(engine_start::message(&failure, &tail, log.as_deref()))
+        .title("FormPublisher")
+        .kind(tauri_plugin_dialog::MessageDialogKind::Error)
         .blocking_show();
     kill_backend(handle);
     handle.exit(1);
 }
 
+fn engine_exit(handle: &tauri::AppHandle) -> Option<Option<i32>> {
+    let backend = handle.state::<Backend>();
+    let mut slot = backend.0.lock().ok()?;
+    let child = slot.as_mut()?;
+    match child.try_wait() {
+        Ok(Some(status)) => Some(status.code()),
+        _ => None,
+    }
+}
+
 fn start_engine(handle: tauri::AppHandle) {
     std::thread::spawn(move || {
-        if !healthy() {
-            match spawn_engine() {
-                Some(child) => {
-                    ENGINE_GROUP.store(child.id() as i32, Ordering::SeqCst);
-                    if let Ok(mut slot) = handle.state::<Backend>().0.lock() {
-                        *slot = Some(child);
-                    }
-                }
-                None => {
-                    engine_failed(&handle);
-                    return;
+        engine_start::replace_leftover();
+        PORT.store(choose_port(), Ordering::SeqCst);
+        match spawn_engine(&handle) {
+            Ok(child) => {
+                ENGINE_GROUP.store(child.id() as i32, Ordering::SeqCst);
+                if let Ok(mut slot) = handle.state::<Backend>().0.lock() {
+                    *slot = Some(child);
                 }
             }
-            let started = Instant::now();
-            while !healthy() {
-                if started.elapsed() > ENGINE_WAIT {
-                    engine_failed(&handle);
-                    return;
-                }
-                std::thread::sleep(Duration::from_millis(250));
+            Err(failure) => {
+                engine_failed(&handle, failure);
+                return;
             }
+        }
+        let started = Instant::now();
+        let own = env!("CARGO_PKG_VERSION");
+        loop {
+            if let Some(answer) = engine_start::health(PORT.load(Ordering::SeqCst)) {
+                if answer.app == "formpublisher" && answer.version == own {
+                    break;
+                }
+                engine_failed(&handle, Failure::WrongVersion(answer.version));
+                return;
+            }
+            if let Some(code) = engine_exit(&handle) {
+                engine_failed(&handle, Failure::Stopped(code));
+                return;
+            }
+            if started.elapsed() > engine_start::HEALTH_WAIT {
+                engine_failed(&handle, Failure::TimedOut);
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(250));
         }
         let opener = handle.clone();
         let _ = handle.run_on_main_thread(move || open_main(&opener));
@@ -282,12 +333,12 @@ fn main() {
     reveal::mark_launch();
     #[cfg(unix)]
     watch_signals();
-    PORT.store(choose_port(), Ordering::SeqCst);
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| focus_main(app)))
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(Backend(Mutex::new(None)))
+        .manage(EngineTail(Arc::new(Mutex::new(Tail::default()))))
         .on_window_event(|window, event| {
             if window.label() != "splash"
                 && matches!(
