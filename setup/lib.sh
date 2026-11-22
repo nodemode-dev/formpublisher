@@ -21,13 +21,24 @@ fp_python() {
   done
   return 1
 }
+fp_rust_pin() {
+  if [ -n "${FORMPUBLISHER_RUST_TOOLCHAIN:-}" ]; then
+    echo "$FORMPUBLISHER_RUST_TOOLCHAIN"
+  else
+    sed -n 's/^channel *= *"\([^"]*\)".*/\1/p' "$FORMPUBLISHER_ROOT/src-tauri/rust-toolchain.toml" 2>/dev/null | head -1
+  fi
+}
 fp_rust_env() {
   [ -d "$HOME/.cargo/bin" ] && PATH="$HOME/.cargo/bin:$PATH"
   export PATH
   unset RUSTC RUSTC_WORKSPACE_WRAPPER RUSTFLAGS CARGO_ENCODED_RUSTFLAGS CARGO_BUILD_RUSTFLAGS CARGO_BUILD_TARGET CARGO_TARGET_DIR CARGO_BUILD_TARGET_DIR CARGO_BUILD_RUSTC
   export RUSTC_WRAPPER="" CARGO_BUILD_RUSTC_WRAPPER=""
-  if command -v rustup >/dev/null 2>&1 && rustup toolchain list 2>/dev/null | grep -q '^stable'; then
-    export RUSTUP_TOOLCHAIN="${FORMPUBLISHER_RUST_TOOLCHAIN:-stable}"
+  if command -v rustup >/dev/null 2>&1; then
+    local pin
+    pin="$(fp_rust_pin)"
+    if [ -n "$pin" ] && rustup toolchain list 2>/dev/null | grep -q "^${pin}-"; then
+      export RUSTUP_TOOLCHAIN="$pin"
+    fi
   fi
 }
 fp_rust_fresh() {

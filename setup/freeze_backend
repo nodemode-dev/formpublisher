@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-PYINSTALLER_VERSION="6.22.3"
 say() { printf '[formpublisher] %s\n' "$*"; }
 die() { printf '[formpublisher] %s\n' "$*" >&2; exit 1; }
 case "$(uname -s 2>/dev/null)" in
@@ -15,8 +14,44 @@ sep=":"
 py="$ROOT/backend/venv/bin/python"
 if [ "$os" = windows ]; then ext=".exe"; sep=";"; py="$ROOT/backend/venv/Scripts/python.exe"; fi
 [ -x "$py" ] || die "backend venv missing: run ./formpublisher_oc_install once (or python3.12 -m venv backend/venv)"
-"$py" -m pip install -q -r "$ROOT/backend/requirements.txt"
-"$py" -c "import PyInstaller" 2>/dev/null || "$py" -m pip install -q "pyinstaller==$PYINSTALLER_VERSION"
+"$py" -m pip install -q --require-hashes -r "$ROOT/backend/requirements.lock"
+sign_engine() {
+  local ent="$ROOT/src-tauri/entitlements.plist" f info signed=0 kept=0
+  local files=()
+  while IFS= read -r f; do
+    if file -b "$f" | grep -Eq 'Mach-O.*(executable|shared library|bundle)'; then files+=("$f"); fi
+  done < <(find "$1" -type f | awk -F/ '{print NF "\t" $0}' | sort -rn | cut -f2-)
+  for f in "${files[@]}"; do
+    info="$(codesign -d --verbose=4 "$f" 2>&1 || true)"
+    if printf '%s\n' "$info" | grep -q '^Timestamp=' \
+      && printf '%s\n' "$info" | grep -Eq '^CodeDirectory .*flags=[^ ]*runtime' \
+      && ! printf '%s\n' "$info" | grep -q '^Signature=adhoc' \
+      && codesign -d --entitlements - "$f" 2>/dev/null | grep -q 'com.apple.security.cs.disable-library-validation'; then
+      kept=$((kept + 1))
+      continue
+    fi
+    codesign --force --timestamp --options runtime --entitlements "$ent" --sign "$APPLE_SIGNING_IDENTITY" "$f"
+    signed=$((signed + 1))
+  done
+  for f in "${files[@]}"; do codesign --verify --strict "$f" || die "engine file failed its signature check: $f"; done
+  say "engine signed: ${#files[@]} Mach-O files, $signed signed here, $kept already signed by PyInstaller"
+}
+flatten_engine() {
+  local dir="$1" fw="$1/_internal/Python.framework" lib="$1/_internal/Python" link f
+  if [ -d "$fw" ]; then
+    [ -f "$fw/Python" ] || die "Python.framework has no Python library: $fw"
+    rm -f "$lib"
+    cp "$fw/Python" "$lib"
+    rm -rf "$fw"
+    codesign --force --sign - "$lib"
+  fi
+  while IFS= read -r link; do
+    cp -RL "$link" "$link.flat" && rm -rf "$link" && mv "$link.flat" "$link"
+  done < <(find "$dir" -type l)
+  [ -z "$(find "$dir" -type l | head -1)" ] || die "engine still holds symbolic links after flattening: $dir"
+  f="$(find "$dir" -name '*.framework' | head -1)"
+  [ -z "$f" ] || die "engine holds a .framework that cannot ship as Tauri resources: $f"
+}
 if [ -n "${FORMPUBLISHER_TARGET:-}" ]; then
   triple="$FORMPUBLISHER_TARGET"
 else
@@ -41,17 +76,29 @@ data+=(--add-data "$ROOT/demo/sample-site.zip${sep}demo" --add-binary "$core${se
 [ -d "$ROOT/demo/sites" ] && data+=(--add-data "$ROOT/demo/sites${sep}demo/sites")
 [ -d "$ROOT/demo/licenses" ] && data+=(--add-data "$ROOT/demo/licenses${sep}demo/licenses")
 cd "$ROOT/backend"
+extra=()
+if [ "$os" = windows ] && [ "${FORMPUBLISHER_ENGINE_WINDOWED:-1}" != 0 ]; then extra+=(--noconsole); fi
+if [ "$os" = macos ] && [ -n "${APPLE_SIGNING_IDENTITY:-}" ]; then
+  extra+=(--codesign-identity "$APPLE_SIGNING_IDENTITY" --osx-entitlements-file "$ROOT/src-tauri/entitlements.plist")
+fi
 rm -rf build/pyinstaller dist-engine
-"$py" -m PyInstaller --noconfirm --clean --onefile --name formpublisher-engine \
+"$py" -m PyInstaller --noconfirm --clean --onedir --name formpublisher-engine \
   --distpath dist-engine --workpath build/pyinstaller --specpath build/pyinstaller \
   "${data[@]}" \
   --paths "$ROOT/backend" \
   --collect-submodules app --collect-submodules uvicorn --collect-submodules websockets --collect-data mcp \
+  --collect-all playwright \
   --exclude-module mcp.cli --exclude-module tkinter \
+  "${extra[@]}" \
   "$ROOT/backend/formpublisher_engine.py"
-FORMPUBLISHER_HOME="$(mktemp -d)" "dist-engine/formpublisher-engine${ext}" --selfcheck || die "the frozen engine failed its self-check; nothing was copied to src-tauri/binaries"
-mkdir -p "$ROOT/src-tauri/binaries"
-out="$ROOT/src-tauri/binaries/formpublisher-engine-${triple}${ext}"
-rm -f "$out"
-cp "dist-engine/formpublisher-engine${ext}" "$out"
-say "sidecar ready: $out"
+out="$ROOT/src-tauri/engine"
+mkdir -p "$out"
+find "$out" -mindepth 1 -maxdepth 1 ! -name .gitkeep -exec rm -rf {} +
+cp -R dist-engine/formpublisher-engine/. "$out/"
+if [ "$os" = macos ]; then
+  flatten_engine "$out"
+  [ -z "${APPLE_SIGNING_IDENTITY:-}" ] || sign_engine "$out"
+fi
+FORMPUBLISHER_HOME="$(mktemp -d)" "$out/formpublisher-engine${ext}" --selfcheck || die "the frozen engine failed its self-check; see the lines above"
+find "$out" -type f | sed "s|^$out/||" | LC_ALL=C sort > "$ROOT/backend/build/engine-files.txt"
+say "engine folder ready: $out ($(wc -l < "$ROOT/backend/build/engine-files.txt" | tr -d ' ') files, listed in backend/build/engine-files.txt; built for $triple)"

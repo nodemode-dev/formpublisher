@@ -6,7 +6,7 @@ set "PYEXE=python"
 if exist "%~dp0..\backend\venv\Scripts\python.exe" set "PYEXE=%~dp0..\backend\venv\Scripts\python.exe"
 "%PYEXE%" "%~dp0vendor_check.py" --check
 if errorlevel 1 ( echo [formpublisher] the vendored crates are out of step ^(see above^); nothing was built & exit /b 1 )
-where cargo >nul 2>nul || ( echo [formpublisher] cargo is missing. Install Rust stable from https://rustup.rs and run setup\install_compiler.bat again & exit /b 1 )
+where cargo >nul 2>nul || ( echo [formpublisher] cargo is missing. Install Rust from https://rustup.rs and run setup\install_compiler.bat again & exit /b 1 )
 echo [formpublisher] building formweb-core (the first build takes a few minutes)
 cargo build --release --locked -p formweb-core
 if errorlevel 1 exit /b 1

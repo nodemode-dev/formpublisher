@@ -46,11 +46,13 @@ node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(
 fp_rust_env
 if ! command -v rustup >/dev/null 2>&1 && ! command -v cargo >/dev/null 2>&1; then
   fp_say "installing Rust with rustup (https://rustup.rs) into ~/.cargo; your shell profile is not changed"
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain stable --no-modify-path
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain "$(fp_rust_pin)" --no-modify-path
   fp_rust_env
 fi
 if command -v rustup >/dev/null 2>&1; then
-  rustup toolchain list | grep -q '^stable' || rustup toolchain install stable --profile minimal
+  pin="$(fp_rust_pin)"
+  [ -n "$pin" ] || fp_die "src-tauri/rust-toolchain.toml does not name a channel"
+  rustup toolchain list | grep -q "^${pin}-" || rustup toolchain install "$pin" --profile minimal
   fp_rust_env
 fi
 [ "$(dirname "$(command -v rustc)")" = "$(dirname "$(command -v cargo)")" ] \
@@ -73,13 +75,14 @@ fp_say "Rust build folder: $CARGO_TARGET_DIR"
 if [ "$clean" = 1 ]; then
   step "cleaning earlier builds"
   ( cd src-tauri && cargo clean )
-  rm -rf backend/build/pyinstaller backend/dist-engine src-tauri/binaries/formpublisher-engine-* frontend/dist
+  rm -rf backend/build/pyinstaller backend/dist-engine frontend/dist
+  find src-tauri/engine -mindepth 1 -maxdepth 1 ! -name .gitkeep -exec rm -rf {} + 2>/dev/null || true
 fi
 fp_rust_fresh
 
 step "building the window"
 ( cd frontend && npm run build )
-step "freezing the engine into the app's sidecar"
+step "freezing the engine into the app's engine folder"
 setup/freeze_backend
 
 tauri_args=(build)
@@ -87,6 +90,9 @@ case "$os" in
   macos)
     tauri_args+=(--bundles app)
     [ -n "${APPLE_SIGNING_IDENTITY:-}" ] || tauri_args+=(--config '{"bundle":{"macOS":{"signingIdentity":"-"}}}')
+    case "${FORMPUBLISHER_TARGET:-$(rustc -vV | awk '/^host:/ {print $2}')}" in
+      x86_64-*) tauri_args+=(--config '{"bundle":{"macOS":{"minimumSystemVersion":"14.0"}}}') ;;
+    esac
     ;;
   linux) tauri_args+=(--bundles "${FORMPUBLISHER_BUNDLES:-deb}") ;;
 esac
@@ -113,8 +119,8 @@ if [ "$os" = macos ]; then
     codesign --verify --deep --strict "$app" 2>/dev/null || fp_say "codesign could not verify the app; it is ad-hoc signed, so macOS may ask once before it opens"
   fi
   step "checking the engine inside the app"
-  FORMPUBLISHER_HOME="$(mktemp -d)" "$app/Contents/MacOS/formpublisher-engine" --selfcheck >/dev/null \
-    || fp_die "the engine inside the app failed its self-check under the app's signature; run $app/Contents/MacOS/formpublisher-engine --selfcheck to see why. Nothing was packed"
+  FORMPUBLISHER_HOME="$(mktemp -d)" "$app/Contents/Resources/engine/formpublisher-engine" --selfcheck >/dev/null \
+    || fp_die "the engine inside the app failed its self-check under the app's signature; run $app/Contents/Resources/engine/formpublisher-engine --selfcheck to see why. Nothing was packed"
   step "packing the disk image"
   mkdir -p "$bundle/dmg"
   dmg="$bundle/dmg/FormPublisher_${version}_$(uname -m).dmg"
