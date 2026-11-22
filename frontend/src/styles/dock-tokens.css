@@ -1,0 +1,62 @@
+:root, .ft-dock, .ft-tour, .ft-consent {
+  --dock-bg: var(--bg-primary);
+  --dock-bar-bg: var(--surface-1);
+  --dock-raised: var(--surface-raised);
+  --dock-hover: var(--bg-hover);
+  --dock-input-bg: var(--surface-field);
+  --dock-border: var(--line-1);
+  --dock-edge: var(--line-0);
+  --dock-divider: var(--line-0);
+  --dock-tab-border: var(--line-2);
+  --dock-outline: var(--line-2);
+  --dock-scrim: var(--bg-scrim);
+  --dock-text: var(--text-primary);
+  --dock-text-dim: var(--text-secondary);
+  --dock-text-muted: var(--text-muted);
+  --dock-tab-text: var(--text-secondary);
+  --dock-accent: var(--accent-ink);
+  --dock-accent-line: var(--accent-line);
+  --dock-accent-ink: var(--accent-ink);
+  --dock-tab-accent: var(--accent-ink);
+  --dock-danger: var(--danger);
+  --dock-danger-text: var(--danger-text);
+  --dock-space-1: var(--space-1);
+  --dock-space-2: var(--space-2);
+  --dock-space-3: var(--space-3);
+  --dock-space-4: var(--space-4);
+  --dock-radius-xs: var(--radius-xs);
+  --dock-radius-sm: var(--radius-sm);
+  --dock-radius: var(--radius);
+  --dock-radius-md: var(--radius-md);
+  --dock-tab-radius: var(--radius);
+  --dock-head-h: var(--ctl-lg);
+  --dock-tab-h: var(--ctl-sm);
+  --dock-ibtn: var(--ctl-sm);
+  --dock-ask-h: var(--ctl-xl);
+  --dock-ask-ctl-h: var(--ctl-md);
+  --dock-ctl-h: var(--ctl-sm);
+  --dock-chat-bar-h: var(--ctl-lg);
+  --dock-fs-xs: var(--fs-11);
+  --dock-fs-sm: var(--fs-12);
+  --dock-fs-md: var(--fs-14);
+  --dock-font-mono: var(--font-mono);
+  --dock-term-bg: var(--bg-primary);
+  --dock-term-fg: var(--text-primary);
+  --dock-term-cursor: var(--accent-color);
+  --dock-term-selection: var(--accent-color-dim);
+  --dock-term-font-size: var(--fs-13);
+}
+
+:root { --ft-dock-size: 280px; --ft-dock-wsize: 440px; --ft-dock-h: 0px; --ft-dock-w: 0px; }
+:root:has(> body.theme-light) { --dock-term-contrast: 4.5; }
+:root[data-ft-dock="open"]:not([data-ft-dock-side="right"]) { --ft-dock-h: min(var(--ft-dock-size), 70vh); }
+:root[data-ft-dock="open"][data-ft-dock-side="right"] { --ft-dock-w: min(var(--ft-dock-wsize), 60vw); }
+:root .fp-app { grid-template-rows: var(--cv-titlebar-h) var(--cv-tabs-h) var(--cv-options-h) minmax(0, 1fr) var(--ft-dock-h) var(--cv-status-h); }
+:root .fp-app > .ft-dock { grid-row: 5; }
+:root .fp-app > .fp-status { grid-row: 6; }
+:root[data-ft-dock-side="right"] .fp-app { grid-template-columns: minmax(0, 1fr) var(--ft-dock-w); }
+:root[data-ft-dock-side="right"] .fp-app > * { grid-column: 1 / -1; }
+:root[data-ft-dock-side="right"] .fp-app > :is(.fp-tabs, .fp-options, .fp-main) { grid-column: 1; }
+:root[data-ft-dock-side="right"] .fp-app > .ft-dock { grid-area: 2 / 2 / 5 / 3; }
+:root[data-ft-dock="open"] .fp-home { right: var(--ft-dock-w); bottom: calc(var(--ft-dock-h) + var(--cv-status-h)); }
+:root[data-ft-dock="open"] #toast-root { bottom: calc(var(--cv-status-h) + var(--ft-dock-h) + var(--space-3)); }

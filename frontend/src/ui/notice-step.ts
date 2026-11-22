@@ -1,6 +1,7 @@
 import { ApiError } from '../api';
 import { trashApi, type TrashEntry } from '../api-trash';
 import { emit } from '../events';
+import { openPreferences } from './preferences';
 import type { ToastAction } from './toast';
 
 export interface StepHost {
@@ -51,7 +52,7 @@ export async function stepFor(code: string | undefined, ref: string | undefined,
       return undefined;
     }
   }
-  if (code === 'formweb-unreachable') return run ? { label: 'Try again', run } : undefined;
+  if (code === 'formweb-unreachable') return run ? { label: 'Try again', run } : { label: 'Open Preferences', run: () => openPreferences('formweb') };
   if (code === 'check-running') return { label: 'Show the running check', run: () => host.showCheck() };
   if (code === 'core-missing') return { label: 'Open the manual', run: () => host.openManual(code) };
   if (code === 'passphrase-wrong' || code === 'passphrase-required') return run ? { label: 'Enter the passphrase', run } : undefined;

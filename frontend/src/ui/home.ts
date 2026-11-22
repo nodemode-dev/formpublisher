@@ -306,6 +306,7 @@ export class Home {
       create: (t) => {
         const b = el<HTMLButtonElement>(`<button class="fp-home-nav-item" type="button" data-open="${t.id}">${icon('globe', 16)}<span class="fp-home-open-name" translate="no"></span></button>`);
         setText(q(b, '.fp-home-open-name'), t.name);
+        setClass(b, 'is-active', t.id === state.activeId);
         return b;
       },
       update: (node, t) => {
@@ -331,6 +332,7 @@ export class Home {
     setText(q(node, '.fp-card-time'), relative(site.importedAt));
     setAttr(node, 'title', site.source);
     setText(q(node, '.fp-card-revbtn'), revisionsText(site.revisions));
+    setClass(node, 'is-current', site.id === this.app.state().activeId);
   }
 
   private showRevisions(siteId: string): void {

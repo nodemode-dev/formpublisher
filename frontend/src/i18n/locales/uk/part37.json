@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Ключі підпису",
+  "Your keys": "Ваші ключі",
+  "No keys yet. Create one below or import one.": "Ключів поки немає. Створіть ключ нижче або імпортуйте його.",
+  "Import...": "Імпорт...",
+  "Export...": "Експорт...",
+  "Created on {0}": "Створено {0}",
+  "Removed key {0}.": "Ключ {0} видалено.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "Видалити {0}? Його закритий ключ буде стерто, тож він більше не зможе підписувати. У кошику залишиться його відкритий ключ, тож його підписи все ще можна перевірити.",
+  "Remove key": "Видалити ключ",
+  "Browser for the deep check": "Браузер для глибокої перевірки",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "Глибока перевірка керує цим браузером. Якщо поле порожнє, вона шукає Google Chrome, потім Microsoft Edge, потім місця, куди зазвичай встановлюють браузери.",
+  "Browse...": "Огляд...",
+  "Type the full path of the browser program in the field.": "Введіть у поле повний шлях до програми браузера.",
+  "Choose the browser": "Виберіть браузер",
+  "Give the full path of the browser program, starting from the top folder.": "Вкажіть повний шлях до програми браузера, починаючи з верхньої папки.",
+  "Cleared. The deep check looks for a browser itself.": "Очищено. Глибока перевірка сама знайде браузер.",
+  "There is no file at that path.": "За цим шляхом немає файлу.",
+  "No keys yet. Create one in Preferences.": "Ключів поки немає. Створіть ключ у налаштуваннях.",
+  "Manage keys": "Керувати ключами",
+  "Create a key in Preferences": "Створити ключ у налаштуваннях",
+  "Open Preferences": "Відкрити налаштування"
+}

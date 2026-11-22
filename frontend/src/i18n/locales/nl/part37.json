@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Ondertekeningssleutels",
+  "Your keys": "Je sleutels",
+  "No keys yet. Create one below or import one.": "Nog geen sleutels. Maak er hieronder een of importeer er een.",
+  "Import...": "Importeren...",
+  "Export...": "Exporteren...",
+  "Created on {0}": "Gemaakt op {0}",
+  "Removed key {0}.": "Sleutel {0} verwijderd.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "{0} verwijderen? De privésleutel wordt gewist, dus hij kan niet meer ondertekenen. De Prullenbak bewaart de publieke sleutel, dus zijn handtekeningen kunnen nog worden gecontroleerd.",
+  "Remove key": "Sleutel verwijderen",
+  "Browser for the deep check": "Browser voor de diepgaande controle",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "De diepgaande controle bestuurt deze browser. Als het veld leeg is, zoekt hij Google Chrome, dan Microsoft Edge, dan de plekken waar browsers meestal staan.",
+  "Browse...": "Bladeren...",
+  "Type the full path of the browser program in the field.": "Typ het volledige pad van het browserprogramma in het veld.",
+  "Choose the browser": "Kies de browser",
+  "Give the full path of the browser program, starting from the top folder.": "Geef het volledige pad van het browserprogramma, vanaf de bovenste map.",
+  "Cleared. The deep check looks for a browser itself.": "Gewist. De diepgaande controle zoekt zelf een browser.",
+  "There is no file at that path.": "Op dat pad staat geen bestand.",
+  "No keys yet. Create one in Preferences.": "Nog geen sleutels. Maak er een in Voorkeuren.",
+  "Manage keys": "Sleutels beheren",
+  "Create a key in Preferences": "Maak een sleutel in Voorkeuren",
+  "Open Preferences": "Voorkeuren openen"
+}

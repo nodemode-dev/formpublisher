@@ -54,6 +54,8 @@ def _check(key: str, value: Any) -> Any:
     if key == "checks.chromePath":
         if len(value) > 1024 or "\x00" in value or not os.path.isabs(value):
             raise ValueError("checks.chromePath must be the absolute path of a Chrome executable")
+        if not os.path.isfile(value):
+            raise ValueError("There is no file at that path.")
         return value
     if len(value) > 64:
         raise ValueError(f"{key} is too long")

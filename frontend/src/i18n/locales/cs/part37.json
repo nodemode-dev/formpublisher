@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Podpisové klíče",
+  "Your keys": "Vaše klíče",
+  "No keys yet. Create one below or import one.": "Zatím žádné klíče. Vytvořte klíč níže nebo jej importujte.",
+  "Import...": "Importovat...",
+  "Export...": "Exportovat...",
+  "Created on {0}": "Vytvořeno {0}",
+  "Removed key {0}.": "Klíč {0} byl odebrán.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "Odebrat {0}? Jeho soukromý klíč se smaže, takže už nebude moci podepisovat. Koš si ponechá jeho veřejný klíč, takže jeho podpisy půjde dál ověřit.",
+  "Remove key": "Odebrat klíč",
+  "Browser for the deep check": "Prohlížeč pro hloubkovou kontrolu",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "Hloubková kontrola ovládá tento prohlížeč. Když je pole prázdné, hledá Google Chrome, potom Microsoft Edge, potom místa, kam se prohlížeče obvykle instalují.",
+  "Browse...": "Procházet...",
+  "Type the full path of the browser program in the field.": "Zadejte do pole úplnou cestu k programu prohlížeče.",
+  "Choose the browser": "Vyberte prohlížeč",
+  "Give the full path of the browser program, starting from the top folder.": "Uveďte úplnou cestu k programu prohlížeče, od nejvyšší složky.",
+  "Cleared. The deep check looks for a browser itself.": "Vymazáno. Hloubková kontrola si prohlížeč najde sama.",
+  "There is no file at that path.": "Na této cestě není žádný soubor.",
+  "No keys yet. Create one in Preferences.": "Zatím žádné klíče. Vytvořte klíč v Předvolbách.",
+  "Manage keys": "Spravovat klíče",
+  "Create a key in Preferences": "Vytvořit klíč v Předvolbách",
+  "Open Preferences": "Otevřít Předvolby"
+}

@@ -78,6 +78,7 @@ data+=(--add-data "$ROOT/demo/sample-site.zip${sep}demo" --add-binary "$core${se
 cd "$ROOT/backend"
 extra=()
 if [ "$os" = windows ] && [ "${FORMPUBLISHER_ENGINE_WINDOWED:-1}" != 0 ]; then extra+=(--noconsole); fi
+if [ "$os" = windows ]; then extra+=(--collect-all winpty); else extra+=(--collect-submodules ptyprocess); fi
 if [ "$os" = macos ] && [ -n "${APPLE_SIGNING_IDENTITY:-}" ]; then
   extra+=(--codesign-identity "$APPLE_SIGNING_IDENTITY" --osx-entitlements-file "$ROOT/src-tauri/entitlements.plist")
 fi

@@ -7,6 +7,11 @@ const MIN = 8;
 const MAX_PEM = 16 * 1024;
 const message = (e: unknown): string => (e instanceof Error && e.message ? e.message : 'Request failed');
 
+export function raiseDialog(d: Dialog): void {
+  const host = d.scrim.parentElement;
+  if (!d.isOpen && host && host.lastElementChild !== d.scrim) host.appendChild(d.scrim);
+}
+
 class ExportKeyDialog extends Dialog {
   private readonly lead: HTMLElement;
   private readonly path: HTMLInputElement;
@@ -54,6 +59,7 @@ class ExportKeyDialog extends Dialog {
     setText(this.error, '');
     setText(this.lead, `The private key of ${key.name} is written as a PEM file, encrypted with the passphrase you choose here. Keep the file and the passphrase apart.`);
     setHidden(this.currentBox, !key.encrypted);
+    raiseDialog(this);
     this.open(this.path);
   }
 
@@ -133,6 +139,7 @@ class ImportKeyDialog extends Dialog {
     this.wipe();
     this.name.value = '';
     setText(this.error, '');
+    raiseDialog(this);
     this.open(this.file);
   }
 
@@ -166,8 +173,43 @@ class ImportKeyDialog extends Dialog {
   }
 }
 
+class RemoveKeyDialog extends Dialog {
+  private readonly text = el('<p class="fp-note"></p>');
+  private readonly ok: HTMLButtonElement;
+  private resolve: ((v: boolean) => void) | null = null;
+
+  constructor() {
+    super('Remove key', 400);
+    this.body.appendChild(this.text);
+    this.button('Cancel', 'ghost', () => this.finish(false));
+    this.ok = this.button('Remove', 'danger', () => this.finish(true));
+    this.onClose = () => this.finish(false);
+  }
+
+  ask(key: KeyInfo): Promise<boolean> {
+    this.finish(false);
+    setText(this.text, `Remove ${key.name}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.`);
+    raiseDialog(this);
+    this.open(this.ok);
+    return new Promise((r) => { this.resolve = r; });
+  }
+
+  private finish(v: boolean): void {
+    const r = this.resolve;
+    this.resolve = null;
+    if (this.isOpen) this.close();
+    r?.(v);
+  }
+}
+
 let exporter: ExportKeyDialog | null = null;
 let importer: ImportKeyDialog | null = null;
+let remover: RemoveKeyDialog | null = null;
+
+export function confirmRemoveKey(key: KeyInfo): Promise<boolean> {
+  remover ??= new RemoveKeyDialog();
+  return remover.ask(key);
+}
 
 export function exportKeyDialog(key: KeyInfo): void {
   exporter ??= new ExportKeyDialog();

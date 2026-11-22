@@ -1,5 +1,6 @@
 import { api, ApiError, connectLive, type LiveEvent, type LiveState, type RouteInfo, type Site } from './api';
 import type { App, AppState, BottomTab, EngineState, Mounts, OpenTab, Pane } from './app-api';
+import { reserveDock } from './dock-adapter';
 import { emit, type NoticeKind } from './events';
 import { locale, onLanguage } from './i18n';
 import { brandMark } from './ui/brand';
@@ -9,7 +10,7 @@ import { installHints } from './ui/hint-strip';
 import { icon } from './ui/icons';
 import { refuse } from './ui/notice-step';
 import { openPackageSheet, installPackaging } from './ui/package-sheet';
-import { installPanel } from './ui/panel';
+import { installPanel, panelPagesHtml } from './ui/panel';
 import { askPath } from './ui/path-dialog';
 import { Preview, routeKey } from './ui/preview';
 import { LayoutState } from './ui/resizers';
@@ -29,7 +30,8 @@ const SHELL = `<div class="fp-app">
 <div class="fp-title-tools">
 <button class="fp-tt-btn" type="button" data-act="palette" title="Find a Command" aria-label="Find a Command">${icon('commandPalette', 16)}</button>
 <button class="fp-tt-btn fp-theme-btn" type="button" data-act="theme" title="Switch theme" aria-label="Switch theme"><span class="fp-theme-to-light">${icon('sun', 16)}</span><span class="fp-theme-to-dark">${icon('moon', 16)}</span></button>
-<button class="fp-tt-btn" type="button" data-act="preferences" title="Preferences" aria-label="Preferences">${icon('settings', 16)}</button>
+<button class="fp-tt-btn fp-dock-btn" type="button" data-act="dock" title="Agent Dock" aria-label="Agent Dock" aria-pressed="false">${icon('terminal', 16)}</button>
+<button class="fp-tt-btn" type="button" data-act="preferences"title="Preferences" aria-label="Preferences">${icon('settings', 16)}</button>
 </div>
 </header>
 <div class="fp-tabs" role="tablist" aria-label="Open sites"></div>
@@ -63,9 +65,7 @@ const SHELL = `<div class="fp-app">
 <button class="fp-icon-btn is-sm" type="button" data-act="toggle-bottom" title="Hide the panel" aria-label="Hide the panel">${icon('chevronDown', 14)}</button>
 </div>
 <div class="fp-bottom-body">
-<div class="fp-bottom-page" data-page="problems" role="tabpanel">No problems found yet.</div>
-<div class="fp-bottom-page" data-page="console" role="tabpanel" hidden>Nothing in the console yet.</div>
-<div class="fp-bottom-page" data-page="network" role="tabpanel" hidden>No network requests yet.</div>
+${panelPagesHtml()}
 <div class="fp-bottom-page" data-page="revisions" role="tabpanel" hidden></div>
 </div>
 </section>
@@ -138,6 +138,7 @@ const routeCountText = (n: number): string => (n === 1 ? '1 route' : `${n} route
 
 export async function startApp(): Promise<App> {
   applyTheme();
+  reserveDock();
   const host = document.getElementById('app') as HTMLElement;
   mountOnce(host, SHELL);
   const root = q(host, '.fp-app');
@@ -449,13 +450,9 @@ export async function startApp(): Promise<App> {
 
   const importFromFormWeb = async (): Promise<Site | null> => {
     if (busy) return null;
-    let project: string | null = null;
-    const projects = await api.formwebProjects().catch(() => []);
-    if (projects.length > 1) {
-      const picked = await pickFormWebProject(projects);
-      if (picked === undefined) return null;
-      project = picked;
-    }
+    const picked = await pickFormWebProject(() => api.formwebProjects().catch(() => []));
+    if (picked === undefined) return null;
+    const project = picked;
     return flow(async () => (await api.formwebImportCurrent(project)).site, 'FormWeb import finished.');
   };
 

@@ -1,4 +1,5 @@
 import asyncio
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,7 @@ from mcp.types import ToolAnnotations
 
 from app import __version__
 from app.cli import Client, OpError
+from app.services import paths
 
 INSTRUCTIONS = (
     "FormPublisher turns a site built in FormWeb into something that can be checked, packaged and published. "
@@ -233,9 +235,20 @@ def build(client: Client | None = None) -> MCPServer:
 def main(argv: list[str] | None = None) -> int:
     args = list(argv or [])
     if args and args[0] in ("-h", "--help"):
-        print("formpublisher_engine.py mcp: serve the FormPublisher tools over MCP on stdio.")
+        print("formpublisher_engine.py mcp [--tab-key-file PATH]: serve the FormPublisher tools over MCP on stdio.")
         return 0
-    build().run("stdio")
+    client = None
+    if args and args[0].startswith("--tab-key-file"):
+        given = args[0].partition("=")[2] if "=" in args[0] else (args[1] if len(args) > 1 else "")
+        try:
+            key = Path(given).read_text(encoding="utf-8").strip() if given else ""
+        except OSError:
+            key = ""
+        if not key:
+            print("formpublisher mcp: --tab-key-file needs the path of a readable tab key file.", file=sys.stderr)
+            return 2
+        client = Client(url=os.environ.get("FORMPUBLISHER_URL") or f"http://127.0.0.1:{paths.port()}", key=key)
+    build(client).run("stdio")
     return 0
 
 

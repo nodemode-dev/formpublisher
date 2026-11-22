@@ -1,7 +1,8 @@
 import type { PreviewMotion, PreviewTheme, PreviewThrottle } from '../api-host';
 import { emit } from '../events';
-import { t } from '../i18n';
-import { q, setDisabled } from './dom';
+import { onLanguage, t } from '../i18n';
+import { el, q, setDisabled } from './dom';
+import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
 import { icon } from './icons';
 
 const KEY = 'formpublisher.preview';
@@ -62,8 +63,19 @@ export function loadPreviewState(): PreviewState {
 
 const rotateIcon = (size: number): string => `<span class="icon" style="width:${size}px;height:${size}px" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3.5" width="8" height="13" rx="1.5"/><path d="M4.5 14.5v2.5a2.5 2.5 0 0 0 2.5 2.5h5M10 17.5l2.5 2-2.5 2"/></svg></span>`;
 
-const select = (ctl: string, label: string, options: ReadonlyArray<readonly [string, string]>): string =>
-  `<select class="fp-tb-select" data-ctl="${ctl}" aria-label="${label}" title="${label}">${options.map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}</select>`;
+const opts = (list: ReadonlyArray<readonly [string, string]>): DropdownOption[] => list.map(([value, label]) => ({ value, label }));
+
+const CHOICES: Record<string, { label: string; options: DropdownOption[] }> = {
+  device: { label: 'Device', options: opts([['desktop', 'Desktop 1440 x 900'], ['laptop', 'Laptop 1280 x 800'], ['tablet', 'Tablet 834 x 1112'], ['phone', 'Phone 390 x 844'], ['custom', 'Custom']]) },
+  zoom: { label: 'Zoom', options: opts([['fit', 'Fit'], ['50', '50%'], ['75', '75%'], ['100', '100%']]) },
+  theme: { label: 'Preview theme', options: opts([['auto', 'Theme: Auto'], ['dark', 'Theme: Dark'], ['light', 'Theme: Light']]) },
+  motion: { label: 'Preview motion', options: opts([['auto', 'Motion: Auto'], ['reduce', 'Motion: Reduce']]) },
+  throttle: { label: 'Preview network', options: opts([['none', 'Network: None'], ['fast', 'Network: Fast'], ['slow', 'Network: Slow']]) },
+};
+
+const select = (ctl: string): string => dropdownHtml({ cls: 'fp-tb-select', label: CHOICES[ctl].label, title: CHOICES[ctl].label, data: { ctl }, options: CHOICES[ctl].options });
+
+const PROBE = `<span class="fp-dd fp-tb-select fp-tb-probe" translate="no" aria-hidden="true"><span class="fp-dd-face"><span class="fp-dd-cur"><span class="fp-dd-text"><span class="fp-dd-l"></span></span></span></span>${icon('chevronDown', 12)}</span>`;
 
 const FIT_BELOW = 1400;
 
@@ -77,16 +89,16 @@ const shortLabel = (ctl: string, text: string): string => {
 };
 
 const CONTROLS = `<span class="fp-sep"></span>
-${select('device', 'Device', [['desktop', 'Desktop 1440 x 900'], ['laptop', 'Laptop 1280 x 800'], ['tablet', 'Tablet 834 x 1112'], ['phone', 'Phone 390 x 844'], ['custom', 'Custom']])}
+${select('device')}
 <input class="fp-tb-num" data-ctl="width" type="number" inputmode="numeric" min="${MIN_SIZE}" max="${MAX_SIZE}" step="1" aria-label="Width" title="Width">
 <span class="fp-tb-x" aria-hidden="true">x</span>
 <input class="fp-tb-num" data-ctl="height" type="number" inputmode="numeric" min="${MIN_SIZE}" max="${MAX_SIZE}" step="1" aria-label="Height" title="Height">
 <button class="fp-icon-btn" type="button" data-ctl="rotate" title="Rotate" aria-label="Rotate">${rotateIcon(16)}</button>
-${select('zoom', 'Zoom', [['fit', 'Fit'], ['50', '50%'], ['75', '75%'], ['100', '100%']])}
+${select('zoom')}
 <span class="fp-sep"></span>
-${select('theme', 'Preview theme', [['auto', 'Theme: Auto'], ['dark', 'Theme: Dark'], ['light', 'Theme: Light']])}
-${select('motion', 'Preview motion', [['auto', 'Motion: Auto'], ['reduce', 'Motion: Reduce']])}
-${select('throttle', 'Preview network', [['none', 'Network: None'], ['fast', 'Network: Fast'], ['slow', 'Network: Slow']])}
+${select('theme')}
+${select('motion')}
+${select('throttle')}
 <span class="fp-sep"></span>
 <button class="fp-icon-btn" type="button" data-ctl="reload" title="Reload" aria-label="Reload">${icon('reload', 16)}</button>
 <button class="fp-icon-btn" type="button" data-ctl="browser" title="Open in browser" aria-label="Open in browser">${icon('globe', 16)}</button>
@@ -106,18 +118,20 @@ export class Toolbar {
   private state: PreviewState = loadPreviewState();
   private shown = '';
   private readonly field: HTMLInputElement;
-  private readonly device: HTMLSelectElement;
+  private readonly device: Dropdown;
   private readonly width: HTMLInputElement;
   private readonly height: HTMLInputElement;
-  private readonly zoom: HTMLSelectElement;
-  private readonly theme: HTMLSelectElement;
-  private readonly motion: HTMLSelectElement;
-  private readonly throttle: HTMLSelectElement;
-  private readonly gated: Array<HTMLButtonElement | HTMLInputElement | HTMLSelectElement>;
-  private readonly selects: HTMLSelectElement[];
-  private readonly probe: HTMLSelectElement;
+  private readonly zoom: Dropdown;
+  private readonly theme: Dropdown;
+  private readonly motion: Dropdown;
+  private readonly throttle: Dropdown;
+  private readonly gated: Array<HTMLButtonElement | HTMLInputElement>;
+  private readonly selects: Dropdown[];
+  private readonly probe: HTMLElement;
+  private readonly probeText: HTMLElement;
   private rowWidth = Infinity;
   private compact = false;
+  private titleShown = '';
 
   constructor(private readonly host: HTMLElement, private readonly hooks: ToolbarHooks) {
     host.insertAdjacentHTML('beforeend', CONTROLS);
@@ -125,25 +139,33 @@ export class Toolbar {
     this.field.readOnly = false;
     this.field.disabled = true;
     const ctl = <T extends HTMLElement>(name: string): T => q<T>(host, `[data-ctl="${name}"]`);
-    this.device = ctl('device');
+    const choice = (name: string, change: (value: string) => void): Dropdown =>
+      new Dropdown(ctl<HTMLButtonElement>(name), { label: CHOICES[name].label, options: CHOICES[name].options, value: this.state[name as 'device'], change });
+    this.device = choice('device', (v) => {
+      const d = v as Device;
+      if (d !== 'custom') {
+        const [w, h] = PRESETS[d];
+        this.state.width = w;
+        this.state.height = h;
+      }
+      this.state.device = d;
+      this.deviceTitle();
+      this.commit('view');
+    });
     this.width = ctl('width');
     this.height = ctl('height');
-    this.zoom = ctl('zoom');
-    this.theme = ctl('theme');
-    this.motion = ctl('motion');
-    this.throttle = ctl('throttle');
+    this.zoom = choice('zoom', (v) => { this.state.zoom = v as Zoom; this.commit('view'); });
+    this.theme = choice('theme', (v) => { this.state.theme = v as PreviewTheme; this.commit('mount'); });
+    this.motion = choice('motion', (v) => { this.state.motion = v as PreviewMotion; this.commit('mount'); });
+    this.throttle = choice('throttle', (v) => { this.state.throttle = v as PreviewThrottle; this.commit('mount'); });
     const reload = ctl<HTMLButtonElement>('reload');
     const browser = ctl<HTMLButtonElement>('browser');
     const pack = ctl<HTMLButtonElement>('package');
     const publish = ctl<HTMLButtonElement>('publish');
     this.gated = [this.field, reload, browser, publish, pack];
     this.selects = [this.device, this.zoom, this.theme, this.motion, this.throttle];
-    this.probe = document.createElement('select');
-    this.probe.className = 'fp-tb-select fp-tb-probe';
-    this.probe.setAttribute('translate', 'no');
-    this.probe.setAttribute('aria-hidden', 'true');
-    this.probe.tabIndex = -1;
-    this.probe.add(new Option(''));
+    this.probe = el(PROBE);
+    this.probeText = q(this.probe, '.fp-dd-l');
     host.append(this.probe);
     this.paintControls();
     this.fit();
@@ -162,17 +184,6 @@ export class Toolbar {
     });
     this.field.addEventListener('blur', () => { if (this.field.value !== this.shown) this.field.value = this.shown; });
 
-    this.device.addEventListener('change', () => {
-      const d = this.device.value as Device;
-      if (d !== 'custom') {
-        const [w, h] = PRESETS[d];
-        this.state.width = w;
-        this.state.height = h;
-      }
-      this.state.device = d;
-      this.deviceTitle();
-      this.commit('view');
-    });
     const size = (input: HTMLInputElement, key: 'width' | 'height'): void => {
       input.addEventListener('change', () => {
         this.state[key] = clampSize(Number(input.value), this.state[key]);
@@ -186,10 +197,6 @@ export class Toolbar {
       [this.state.width, this.state.height] = [this.state.height, this.state.width];
       this.commit('view');
     });
-    this.zoom.addEventListener('change', () => { this.state.zoom = this.zoom.value as Zoom; this.commit('view'); });
-    this.theme.addEventListener('change', () => { this.state.theme = this.theme.value as PreviewTheme; this.commit('mount'); });
-    this.motion.addEventListener('change', () => { this.state.motion = this.motion.value as PreviewMotion; this.commit('mount'); });
-    this.throttle.addEventListener('change', () => { this.state.throttle = this.throttle.value as PreviewThrottle; this.commit('mount'); });
     reload.addEventListener('click', () => hooks.reload());
     browser.addEventListener('click', () => hooks.openBrowser());
     pack.addEventListener('click', () => hooks.packageSite());
@@ -200,10 +207,7 @@ export class Toolbar {
       const w = box.contentBoxSize?.[0]?.inlineSize ?? box.contentRect.width;
       if (w > 0 && w !== this.rowWidth) { this.rowWidth = w; this.fit(); }
     }).observe(host);
-    const refit = new MutationObserver(() => this.fit());
-    for (const s of this.selects) {
-      refit.observe(s, { childList: true, characterData: true, subtree: true });
-    }
+    onLanguage(() => this.fit());
     document.fonts?.addEventListener('loadingdone', () => this.fit());
   }
 
@@ -221,44 +225,46 @@ export class Toolbar {
   }
 
   private measure(text: string): number {
-    this.probe.options[0].text = text;
+    if (this.probeText.textContent !== text) this.probeText.textContent = text;
     return this.probe.getBoundingClientRect().width;
   }
 
-  private customShort(s: HTMLSelectElement, full: string): string {
+  private customShort(s: Dropdown, full: string): string {
     const other = t('Other');
     if (other === 'Other') return '';
     let presets = 0;
-    for (const o of Array.from(s.options)) {
-      if (o.value !== 'custom') presets = Math.max(presets, this.measure(shortLabel('device', o.text)));
+    for (const o of s.options()) {
+      if (o.value !== 'custom') presets = Math.max(presets, this.measure(shortLabel('device', t(o.label))));
     }
     return this.measure(full) > presets + 0.5 ? other : '';
   }
 
   private deviceTitle(): void {
-    const base = this.device.getAttribute('aria-label') ?? '';
-    const o = this.device.selectedOptions[0];
-    const title = this.compact && o ? `${base}: ${o.text}` : base;
-    if (this.device.title !== title) this.device.title = title;
+    const base = t(CHOICES.device.label);
+    const o = this.device.selected();
+    const title = this.compact && o ? `${base}: ${t(o.label)}` : base;
+    if (title === this.titleShown && this.device.button.title === title) return;
+    this.titleShown = title;
+    this.device.button.title = title;
   }
 
   private paint(compact: boolean): void {
     this.compact = compact;
     for (const s of this.selects) {
-      const ctl = s.dataset.ctl ?? '';
-      for (const o of Array.from(s.options)) {
-        let short = compact ? shortLabel(ctl, o.text) : '';
-        if (compact && ctl === 'device' && o.value === 'custom') short = this.customShort(s, o.text);
-        if (short && short !== o.text) { if (o.label !== short) o.label = short; } else if (o.hasAttribute('label')) o.removeAttribute('label');
+      const ctl = s.button.dataset.ctl ?? '';
+      const shorts = new Map<string, string>();
+      let widest = 0;
+      for (const o of s.options()) {
+        const text = t(o.label);
+        let short = compact ? shortLabel(ctl, text) : '';
+        if (compact && ctl === 'device' && o.value === 'custom') short = this.customShort(s, text);
+        const shown = short && short !== text ? short : text;
+        if (shown !== text) shorts.set(o.value, shown);
+        widest = Math.max(widest, this.measure(shown));
       }
-      if (s.options.length) {
-        let widest = 0;
-        for (const o of Array.from(s.options)) widest = Math.max(widest, this.measure(o.label));
-        const px = `${Math.ceil(widest)}px`;
-        if (s.style.width !== px) s.style.width = px;
-      } else if (s.style.width) {
-        s.style.removeProperty('width');
-      }
+      s.setShorts(shorts.size ? shorts : null);
+      const px = `${Math.ceil(widest)}px`;
+      if (s.button.style.width !== px) s.button.style.width = px;
     }
     this.deviceTitle();
   }
@@ -284,13 +290,13 @@ export class Toolbar {
 
   private paintControls(): void {
     const s = this.state;
-    if (this.device.value !== s.device) this.device.value = s.device;
+    this.device.set(s.device);
     this.deviceTitle();
     if (this.width.value !== String(s.width)) this.width.value = String(s.width);
     if (this.height.value !== String(s.height)) this.height.value = String(s.height);
-    if (this.zoom.value !== s.zoom) this.zoom.value = s.zoom;
-    if (this.theme.value !== s.theme) this.theme.value = s.theme;
-    if (this.motion.value !== s.motion) this.motion.value = s.motion;
-    if (this.throttle.value !== s.throttle) this.throttle.value = s.throttle;
+    this.zoom.set(s.zoom);
+    this.theme.set(s.theme);
+    this.motion.set(s.motion);
+    this.throttle.set(s.throttle);
   }
 }

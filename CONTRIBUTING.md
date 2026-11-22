@@ -53,10 +53,11 @@ The code lives in:
 Run the same checks CI runs (the `frontend` and `engine` jobs):
 
 ```sh
-(cd frontend && npm ci --no-fund && npm audit --audit-level=low && npm run build)
+(cd frontend && npm ci --no-fund && npm audit --audit-level=low && npm run build && npm run typecheck:dock)
 python setup/lock_requirements.py --check
 pip install --require-hashes -r backend/requirements.lock
 python setup/i18n_check.py
+python setup/dock_check.py
 python backend/formpublisher_engine.py --selfcheck
 python -m compileall -q backend/app setup
 ./formpublisher agents sync --check
@@ -66,7 +67,11 @@ vendor/formweb-native/target/release/formweb-core --selfcheck
 ```
 
 The build type checks the interface and builds it; the self check imports every
-router. The lock check fails when a lock lacks a pin of a requirements file: after
+router. `npm run typecheck:dock` compiles `frontend/src/dock` with the seven strict
+flags its contract names, and `python setup/dock_check.py` fails, naming the file,
+when a file of that folder differs from `MANIFEST.json`, is missing or is extra.
+`./formpublisher agents sync --check` also fails when `agent_lookup.py` does not match
+the hash recorded for its version. The lock check fails when a lock lacks a pin of a requirements file: after
 changing one, run `python setup/lock_requirements.py` (it needs uv 0.11.32) and commit
 the locks. The language check fails when a key of `frontend/src/i18n/keys` is missing
 from any locale folder, a placeholder is lost or a string holds an em dash. CI also
@@ -90,6 +95,19 @@ test never touches your real files, your agents' setup or your password store.
 - Interface text goes through the translation tables: add each new string to every
   language.
 - Edits are surgical and made by hand: no codemods or scripted rewrites of source.
+- `frontend/src/dock/` (the agent dock, module 2.2.1) and
+  `backend/app/services/agent_lookup.py` (the finder for the agent programs) are
+  copied from FormVis and never edited here. A change to either is made in FormVis,
+  released there as a whole new version, and copied here whole (the dock with its
+  `MANIFEST.json`; the finder with its new hash added to `LOOKUP_HASHES` in
+  `setup/agents.py`). FormPublisher's own part of the
+  dock is `frontend/src/dock-adapter.ts`, `frontend/src/styles/dock-tokens.css` and the
+  engine's `services/terminal.py` and `services/agent_programs.py`. A check of the dock
+  uses stand-in programs and never starts a real agent program.
+- Every chooser is the family's dropdown (`frontend/src/ui/dropdown.ts`), never a
+  native `select`. Keys and settings are made and changed only in Preferences; a sheet
+  that needs one offers a chip that opens Preferences at that panel. Accent-coloured
+  text and icons use `--accent-ink`, which stays readable on the light themes.
 - The window never flashes or shifts: every container exists in its final layout before
   the first paint, colours, sizes and every `z-index` come from
   `frontend/src/styles/tokens.css`, and icons are inline `currentColor` SVG.

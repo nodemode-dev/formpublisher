@@ -1,12 +1,16 @@
 import '../styles/overlays.css';
+import '../styles/dock-tokens.css';
+import '../dock/dock.css';
 import { api } from '../api';
 import type { App } from '../app-api';
 import { emit, on } from '../events';
 import { CommandPalette } from './command-palette';
-import { Commands, installShortcuts } from './commands';
+import { comboOf, Commands, formatKeys, installShortcuts } from './commands';
 import { DEMOS, demoCommand, demoCommands } from './demos';
-import { confirmAction } from './dialogs';
-import { inTauri } from './dom';
+import { anyDialogOpen, confirmAction } from './dialogs';
+import { Dock } from '../dock/dock';
+import { formpublisherDock, type OwnKind } from '../dock-adapter';
+import { inTauri, q, setAttr, setClass } from './dom';
 import { setLibraryOpener } from './builds';
 import { Home } from './home';
 import './icons-extra';
@@ -15,7 +19,7 @@ import { stepFor, type StepHost } from './notice-step';
 import { isMacDesktop, MENUS_IN_WINDOW_KEY, menusInWindow, NativeMenus, wantsNativeMenus } from './native-menu';
 import { openPackageSheet } from './package-sheet';
 import { runChecks } from './panel';
-import { Preferences, type PrefsSection } from './preferences';
+import { bindPreferences, openPreferences } from './preferences';
 import { reserveMenubar } from './reserve';
 import { ShortcutsDialog } from './shortcuts-dialog';
 import { TemplatesSheet } from './templates-sheet';
@@ -54,7 +58,8 @@ export function installChrome(app: App): Chrome {
   const home = new Home(app, commands, app.state().activeId === null);
   setLibraryOpener((id) => { void home.revealBuild(id); });
   let palette: CommandPalette | null = null;
-  let prefs: Preferences | null = null;
+  let dock: Dock<OwnKind> | null = null;
+  bindPreferences(app);
   let shortcuts: ShortcutsDialog | null = null;
   let templates: TemplatesSheet | null = null;
 
@@ -145,6 +150,7 @@ export function installChrome(app: App): Chrome {
     pane('view.toggle-routes', 'Routes', 'panelLeft', ['Mod+['], 'is-strip-hidden', 'strip', 'Show or hide the routes list'),
     pane('view.toggle-inspector', 'Inspector', 'panelRight', ['Mod+]'], 'is-props-hidden', 'props', 'Show or hide the inspector'),
     pane('view.toggle-bottom', 'Bottom Panel', 'panelBottom', undefined, 'is-bottom-hidden', 'bottom', 'Show or hide the bottom panel'),
+    { id: 'view.agent-dock', label: 'Agent Dock', keys: ['Mod+J'], icon: 'terminal', group: 'View', menu: 'View', description: 'Show or hide the agent dock with its terminals and Claude Code', checked: () => dock?.isOpen() === true, run: () => dock?.toggle() },
     tab('view.problems', 'Problems', 'alert', 'problems'),
     tab('view.console', 'Console', 'terminal', 'console'),
     tab('view.network', 'Network', 'globe', 'network'),
@@ -212,7 +218,7 @@ export function installChrome(app: App): Chrome {
       },
     },
 
-    { id: 'app.preferences', label: 'Preferences...', keys: ['Mod+,'], icon: 'settings', group: 'App', menu: 'File', description: 'Open Preferences', run: (params) => { prefs ??= new Preferences(app); prefs.show(typeof params?.section === 'string' ? (params.section as PrefsSection) : undefined); } },
+    { id: 'app.preferences', label: 'Preferences...', keys: ['Mod+,'], icon: 'settings', group: 'App', menu: 'File', description: 'Open Preferences', run: (params) => { openPreferences(typeof params?.section === 'string' ? params.section : undefined); } },
 
     { id: 'help.shortcuts', label: 'Keyboard Shortcuts', keys: ['Mod+/'], icon: 'keyboard', group: 'Help', menu: 'Help', description: 'List every command with its keys', run: () => { shortcuts ??= new ShortcutsDialog(commands); shortcuts.show(); } },
     { id: 'help.about', label: 'About formpublisher', icon: 'info', group: 'Help', menu: 'Help', description: 'Version, license and copyright', run: () => commands.run('app.preferences', { section: 'about' }) },
@@ -227,7 +233,7 @@ export function installChrome(app: App): Chrome {
   const menus: MenuDef[] = [
     { label: 'File', items: ['view.home', 'file.templates', '-', 'file.open-zip', 'file.open-folder', 'file.import-formweb', '-', 'file.new-window', 'file.close-tab', '-', 'site.package', 'publish.open', '-', 'app.preferences'] },
     { label: 'Edit', items: ['edit.undo', 'edit.redo', '-', 'edit.cut', 'edit.copy', 'edit.paste', 'edit.select-all'] },
-    { label: 'View', items: ['view.builds', 'view.palette', '-', 'view.theme', { label: 'Density', items: ['view.density-compact', 'view.density-regular', 'view.density-comfortable'] }, ...(isMacDesktop() ? ['view.menus-in-window'] : []), '-', 'view.toggle-routes', 'view.toggle-inspector', 'view.toggle-bottom', '-', 'view.problems', 'view.console', 'view.network'] },
+    { label: 'View', items: ['view.builds', 'view.palette', '-', 'view.theme', { label: 'Density', items: ['view.density-compact', 'view.density-regular', 'view.density-comfortable'] }, ...(isMacDesktop() ? ['view.menus-in-window'] : []), '-', 'view.toggle-routes', 'view.toggle-inspector', 'view.toggle-bottom', 'view.agent-dock', '-', 'view.problems', 'view.console', 'view.network'] },
     { label: 'Site', items: ['site.check', 'site.check-deep', '-', 'site.reload-routes', 'site.reveal-folder', '-', 'site.remove'] },
     { label: 'Window', items: ['window.minimize', 'window.maximize', 'window.fullscreen'] },
     { label: 'Help', items: ['help.docs', 'help.hosting', 'help.shortcuts', { label: 'Demos', items: DEMOS.map(demoCommand) }, '-', 'help.about'] },
@@ -242,6 +248,29 @@ export function installChrome(app: App): Chrome {
   }
 
   installShortcuts(commands);
+
+  const keysOf = (id: string): string[] => commands.get(id)?.keys ?? [];
+  const passed = ['app.preferences', 'help.shortcuts', 'view.palette'];
+  const agentDock = new Dock(formpublisherDock({
+    isChord: (e) => !e.isComposing && !anyDialogOpen() && keysOf('view.agent-dock').includes(comboOf(e)),
+    chordLabel: () => { const k = keysOf('view.agent-dock')[0]; return k ? formatKeys(k) : ''; },
+    passKey: (e) => passed.some((id) => keysOf(id).includes(comboOf(e))),
+    openSettings: () => openPreferences(),
+    tabsChanged: () => agentDock.refresh(),
+  }));
+  dock = agentDock;
+  const dockBtn = q<HTMLButtonElement>(app.mounts.titleTools, '[data-act="dock"]');
+  const syncDock = (): void => {
+    const open = agentDock.isOpen();
+    setClass(dockBtn, 'is-on', open);
+    setAttr(dockBtn, 'aria-pressed', String(open));
+  };
+  dockBtn.addEventListener('click', () => agentDock.toggle());
+  agentDock.onTab = syncDock;
+  agentDock.onChange = syncDock;
+  agentDock.mount(app.mounts.root, q(app.mounts.root, '.fp-status'));
+  new MutationObserver(() => { if (agentDock.root.inert) agentDock.root.inert = false; }).observe(agentDock.root, { attributes: true, attributeFilter: ['inert'] });
+  syncDock();
 
   on('fp:palette', () => { commands.run('view.palette'); });
   on('fp:preferences', () => { commands.run('app.preferences'); });

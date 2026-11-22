@@ -5,20 +5,44 @@ import { LANGUAGES, language, setLanguage, storedLanguage } from '../i18n';
 import { VERSION } from '../version';
 import { Dialog } from './dialogs';
 import { el, escapeHtml, q, setAttr, setClass, setDisabled, setText, setValue } from './dom';
+import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
+import { raiseDialog } from './key-transfer';
+import { ChecksPanel, checksPanelHtml } from './prefs-checks';
+import { KeysPanel, keysPanelHtml } from './prefs-keys';
 import { PrefsShell } from './prefs-shell';
 import { reservePrefs } from './reserve';
-import { applyDensity, applyTheme, readChoice, readDensity, saveChoice, setAccent, setTheme, THEMES, type Density } from './themes';
+import { DEFAULT_ACCENT, PREVIOUS_DEFAULT_ACCENT, applyDensity, applyTheme, readChoice, readDensity, saveChoice, setAccent, setTheme, THEMES, type Density } from './themes';
 
-export type PrefsSection = 'general' | 'interface' | 'formweb' | 'about';
+export type PrefsSection = 'general' | 'interface' | 'formweb' | 'checks' | 'keys' | 'about';
 
 const SECTIONS: Array<[PrefsSection, string, string]> = [
   ['general', 'General', 'settings'],
   ['interface', 'Interface', 'sun'],
   ['formweb', 'FormWeb', 'link'],
+  ['checks', 'Checks', 'shield'],
+  ['keys', 'Signing keys', 'key'],
   ['about', 'About', 'info'],
 ];
 
-const ACCENTS = ['#f97316', '#ef4444', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
+let shared: Preferences | null = null;
+let boundApp: App | null = null;
+
+const isSection = (s: string | undefined): s is PrefsSection => SECTIONS.some(([id]) => id === s);
+
+export function bindPreferences(app: App): void {
+  boundApp ??= app;
+}
+
+export function openPreferences(section?: string): void {
+  const app = boundApp;
+  if (!shared && !app) return;
+  shared ??= new Preferences(app as App);
+  shared.show(isSection(section) ? section : undefined);
+}
+
+const ACCENTS = [DEFAULT_ACCENT, PREVIOUS_DEFAULT_ACCENT, '#ef4444', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
+const LANGUAGE_LABEL = 'Language';
+const LANGUAGE_OPTIONS: DropdownOption[] = LANGUAGES.map(([value, label]) => ({ value, label, literal: true }));
 const DENSITIES: Array<[Density, string]> = [['compact', 'Compact'], ['standard', 'Regular'], ['comfortable', 'Comfortable']];
 
 const swatch = (id: string): string => {
@@ -42,16 +66,20 @@ export class Preferences extends Dialog {
   private readonly engineValue: HTMLElement;
   private readonly autoCheck: HTMLInputElement;
   private readonly autoBuild: HTMLInputElement;
+  private readonly checks: ChecksPanel;
+  private readonly keys: KeysPanel;
   private saved = '';
 
   constructor(private readonly app: App) {
     super('Preferences', 760, 'fp-prefs-dlg');
-    const langs = LANGUAGES.map(([code, name]) => `<option value="${code}" translate="no">${escapeHtml(name)}</option>`).join('');
+    shared ??= this;
+    boundApp ??= app;
+    const langs = dropdownHtml({ cls: 'fp-select', label: LANGUAGE_LABEL, data: { ctl: 'language' }, options: LANGUAGE_OPTIONS, value: storedLanguage() });
     const root = el(`<div class="fp-prefs">
 <div class="fp-prefs-pages">
 <section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="general"><div class="fp-prefs-secbody">
 <section class="fp-prefs-group"><h3 class="fp-prefs-label">Language</h3>
-<div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Language</div><div class="fp-pref-hint">The window changes to the language you choose.</div></div><select class="fp-select" data-ctl="language" aria-label="Language">${langs}</select></div>
+<div class="fp-pref-row"><div class="fp-pref-text"><div class="fp-pref-name">Language</div><div class="fp-pref-hint">The window changes to the language you choose.</div></div>${langs}</div>
 </section>
 </div></section>
 <section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="interface"><div class="fp-prefs-secbody">
@@ -79,6 +107,8 @@ export class Preferences extends Dialog {
 <div class="fp-pref-row"><div class="fp-pref-text"><label class="fp-pref-name" for="fp-auto-build">Build a site when it arrives</label><div class="fp-pref-hint">Builds the package as soon as a site arrives, after the checks when both are on. Off by default.</div></div><input id="fp-auto-build" class="fp-pref-check" type="checkbox" data-ctl="auto-build"></div>
 </section>
 </div></section>
+<section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="checks"><div class="fp-prefs-secbody">${checksPanelHtml()}</div></section>
+<section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="keys"><div class="fp-prefs-secbody">${keysPanelHtml()}</div></section>
 <section class="fp-prefs-page fp-prefs-sec" role="tabpanel" data-section="about"><div class="fp-prefs-secbody">
 <section class="fp-prefs-group">
 <div class="fp-about-name" translate="no">formpublisher</div>
@@ -109,10 +139,16 @@ export class Preferences extends Dialog {
     this.engineValue = q(root, '[data-field="engine"]');
     this.autoCheck = q<HTMLInputElement>(root, '[data-ctl="auto-check"]');
     this.autoBuild = q<HTMLInputElement>(root, '[data-ctl="auto-build"]');
+    this.checks = new ChecksPanel(q(root, '.fp-prefs-sec[data-section="checks"]'));
+    this.keys = new KeysPanel(q(root, '.fp-prefs-sec[data-section="keys"]'), () => this.isOpen);
     this.autoCheck.addEventListener('change', () => { void this.saveFlag('receive.autoCheck', this.autoCheck); });
     this.autoBuild.addEventListener('change', () => { void this.saveFlag('receive.autoBuild', this.autoBuild); });
-    const lang = q<HTMLSelectElement>(root, '[data-ctl="language"]');
-    lang.value = storedLanguage();
+    const lang: Dropdown = new Dropdown(q<HTMLButtonElement>(root, '[data-ctl="language"]'), {
+      label: LANGUAGE_LABEL,
+      options: LANGUAGE_OPTIONS,
+      value: storedLanguage(),
+      change: (want) => { void setLanguage(want).then(() => { if (lang.value === want) lang.set(language()); }); },
+    });
 
     root.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
@@ -126,10 +162,6 @@ export class Preferences extends Dialog {
       if (act === 'fw-save') void this.saveFormWeb();
       else if (act === 'fw-test') void this.testFormWeb();
     });
-    lang.addEventListener('change', () => {
-      const want = lang.value;
-      void setLanguage(want).then(() => { if (lang.value === want) lang.value = language(); });
-    });
     this.accentInput.addEventListener('input', () => setAccent(this.accentInput.value));
     this.intensity.addEventListener('input', () => {
       const value = Number(this.intensity.value);
@@ -142,6 +174,12 @@ export class Preferences extends Dialog {
   }
 
   show(section?: PrefsSection): void {
+    if (shared && shared !== this) { shared.show(section); return; }
+    if (this.isOpen) {
+      if (section) this.shell.show(section, 'smooth');
+      return;
+    }
+    raiseDialog(this);
     if (section) this.shell.mark(section);
     this.sync();
     setText(this.engineValue, this.app.state().engineVersion || '-');
@@ -150,6 +188,7 @@ export class Preferences extends Dialog {
     if (section) this.shell.scrollTo(section, 'auto');
     this.shell.draw();
     void this.loadFormWeb();
+    this.keys.shown();
   }
 
   private sync(): void {
@@ -189,6 +228,7 @@ export class Preferences extends Dialog {
       setValue(this.fwInput, url);
       this.autoCheck.checked = s['receive.autoCheck'] === true;
       this.autoBuild.checked = s['receive.autoBuild'] === true;
+      this.checks.fill(s);
     } catch {
       this.result('The engine is not reachable', true);
     }

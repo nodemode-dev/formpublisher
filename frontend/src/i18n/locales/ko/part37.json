@@ -1,0 +1,23 @@
+{
+  "Signing keys": "서명 키",
+  "Your keys": "내 키",
+  "No keys yet. Create one below or import one.": "아직 키가 없습니다. 아래에서 만들거나 가져오세요.",
+  "Import...": "가져오기...",
+  "Export...": "내보내기...",
+  "Created on {0}": "만든 날짜 {0}",
+  "Removed key {0}.": "키 {0}을(를) 제거했습니다.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "{0}을(를) 제거할까요? 개인 키가 삭제되어 더 이상 서명할 수 없습니다. 휴지통에 공개 키가 남아 있어 서명은 계속 확인할 수 있습니다.",
+  "Remove key": "키 제거",
+  "Browser for the deep check": "심층 검사용 브라우저",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "심층 검사는 이 브라우저를 사용합니다. 필드가 비어 있으면 Google Chrome, 그다음 Microsoft Edge, 그다음 브라우저가 보통 설치되는 위치를 찾습니다.",
+  "Browse...": "찾아보기...",
+  "Type the full path of the browser program in the field.": "필드에 브라우저 프로그램의 전체 경로를 입력하세요.",
+  "Choose the browser": "브라우저 선택",
+  "Give the full path of the browser program, starting from the top folder.": "최상위 폴더부터 브라우저 프로그램의 전체 경로를 입력하세요.",
+  "Cleared. The deep check looks for a browser itself.": "지웠습니다. 심층 검사가 직접 브라우저를 찾습니다.",
+  "There is no file at that path.": "해당 경로에 파일이 없습니다.",
+  "No keys yet. Create one in Preferences.": "아직 키가 없습니다. 환경설정에서 만드세요.",
+  "Manage keys": "키 관리",
+  "Create a key in Preferences": "환경설정에서 키 만들기",
+  "Open Preferences": "환경설정 열기"
+}

@@ -1,0 +1,23 @@
+{
+  "Signing keys": "คีย์สำหรับลงนาม",
+  "Your keys": "คีย์ของคุณ",
+  "No keys yet. Create one below or import one.": "ยังไม่มีคีย์ สร้างคีย์ด้านล่างหรือนำเข้าคีย์",
+  "Import...": "นำเข้า...",
+  "Export...": "ส่งออก...",
+  "Created on {0}": "สร้างเมื่อ {0}",
+  "Removed key {0}.": "นำคีย์ {0} ออกแล้ว",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "นำ {0} ออกหรือไม่ คีย์ส่วนตัวจะถูกลบ จึงลงนามไม่ได้อีก ถังขยะจะเก็บคีย์สาธารณะไว้ จึงยังตรวจสอบลายเซ็นของคีย์นี้ได้",
+  "Remove key": "นำคีย์ออก",
+  "Browser for the deep check": "เบราว์เซอร์สำหรับการตรวจสอบเชิงลึก",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "การตรวจสอบเชิงลึกจะควบคุมเบราว์เซอร์นี้ เมื่อช่องว่างอยู่ จะค้นหา Google Chrome จากนั้น Microsoft Edge จากนั้นตำแหน่งที่มักติดตั้งเบราว์เซอร์",
+  "Browse...": "เรียกดู...",
+  "Type the full path of the browser program in the field.": "พิมพ์พาธเต็มของโปรแกรมเบราว์เซอร์ลงในช่อง",
+  "Choose the browser": "เลือกเบราว์เซอร์",
+  "Give the full path of the browser program, starting from the top folder.": "ระบุพาธเต็มของโปรแกรมเบราว์เซอร์ โดยเริ่มจากโฟลเดอร์บนสุด",
+  "Cleared. The deep check looks for a browser itself.": "ล้างแล้ว การตรวจสอบเชิงลึกจะค้นหาเบราว์เซอร์เอง",
+  "There is no file at that path.": "ไม่มีไฟล์ที่พาธนั้น",
+  "No keys yet. Create one in Preferences.": "ยังไม่มีคีย์ สร้างคีย์ในการตั้งค่า",
+  "Manage keys": "จัดการคีย์",
+  "Create a key in Preferences": "สร้างคีย์ในการตั้งค่า",
+  "Open Preferences": "เปิดการตั้งค่า"
+}

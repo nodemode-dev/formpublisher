@@ -1,0 +1,22 @@
+.fp-dd { display: inline-flex; align-items: center; gap: var(--space-1); min-width: 0; overflow: hidden; text-align: start; white-space: nowrap; cursor: pointer; }
+.fp-dd:disabled { cursor: default; opacity: 0.5; }
+.fp-dd > .icon { flex: none; color: var(--text-muted); transition: transform var(--transition-fast); }
+.fp-dd.is-open > .icon { transform: rotate(180deg); }
+.fp-dd-face { display: grid; grid-template-columns: minmax(0, 1fr); flex: 1 1 auto; min-width: 0; }
+.fp-dd-face > *, .fp-dd-sizer > * { grid-area: 1 / 1; min-width: 0; }
+.fp-dd-sizer { display: grid; grid-template-columns: minmax(0, 1fr); visibility: hidden; pointer-events: none; }
+.fp-dd-text { display: flex; align-items: baseline; gap: var(--space-2); min-width: 0; overflow: hidden; }
+.fp-dd-l { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.fp-dd-d { flex: none; color: var(--text-muted); font-size: var(--fs-11); }
+.fp-dd-d[hidden] { display: none; }
+
+.fp-dd-pop { position: fixed; inset: auto; z-index: var(--z-context); display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; max-width: min(480px, calc(100vw - var(--space-2))); max-height: min(360px, calc(100vh - var(--space-2))); margin: 0; padding: var(--space-1); overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; border-radius: var(--radius-xl); color: var(--text-primary); font-family: var(--font-ui); font-size: var(--fs-13); line-height: 1.35; outline: 0; }
+.fp-dd-pop[hidden] { display: none; }
+.fp-dd-pop[popover]:not(:popover-open) { display: none; }
+.fp-dd-opt { display: grid; grid-template-columns: 14px minmax(0, 1fr); align-items: center; column-gap: var(--space-2); height: var(--ctl-md); padding: 0 var(--space-3) 0 var(--space-2); border-radius: var(--radius); color: var(--text-secondary); white-space: nowrap; cursor: default; user-select: none; }
+.fp-dd-opt > .icon { visibility: hidden; color: var(--accent-ink); }
+.fp-dd-opt .fp-dd-text { justify-content: space-between; gap: var(--space-4); }
+.fp-dd-opt.is-chosen { color: var(--text-primary); }
+.fp-dd-opt.is-chosen > .icon { visibility: visible; }
+.fp-dd-opt.is-active:not(.is-disabled) { background: color-mix(in srgb, var(--text-primary) 10%, transparent); color: var(--text-primary); }
+.fp-dd-opt.is-disabled { color: var(--text-muted); opacity: 0.55; }

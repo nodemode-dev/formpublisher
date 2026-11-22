@@ -37,8 +37,10 @@ content, or something outside the machine, could get further than it should:
   development start claims it from `POST /api/window/key`, which answers only the
   window's own origins. The command line and the MCP server use a second key from
   `engine.key` in the data folder, which only the person can read, is new at every
-  engine start and is removed when the engine ends. Anything that lets a request
-  without a key change something, or hands a key to a page that is not the window.
+  engine start and is removed when the engine ends. An agent tab of the agent dock
+  has a third key of its own (see **The agent dock** below). Anything that lets a
+  request without a key change something, or hands a key to a page that is not the
+  window.
 - **The site host**, the second loopback listener that serves the mounted site for
   Preview and the deep checks (port 8281, or another free loopback port): anything
   that makes it reachable from another machine, serves files outside the mounted
@@ -80,8 +82,25 @@ content, or something outside the machine, could get further than it should:
   uploads. Anything that makes it send a site or a key anywhere, or run those commands,
   without the person.
 - **Local files**: the data folder (`~/FormPublisher`, or `FORMPUBLISHER_HOME`), with
-  `engine.key` in it, and the Trash that restores from it: anything that exposes it,
-  or reads or writes outside it other than where the person points.
+  `engine.key` and `agent-tabs/` in it, and the Trash that restores from it: anything
+  that exposes it, or reads or writes outside it other than where the person points.
+- **The agent dock** (terminal tabs for a shell, Claude Code, Codex, Cursor and
+  Antigravity, opened from the window): each agent tab works in its own folder,
+  `agent-tabs/[id]/` in the data folder (readable only by the person, mode 0700), and
+  gets its own key for FormPublisher's tools, a file `tab.key` there (mode 0600) that
+  the program's MCP entry reads with `--tab-key-file`. The key is never on a command
+  line or in the environment, the engine accepts it for the tools while the tab's
+  program runs, it is refused on the dock's own routes (a tab cannot open, change or
+  attach terminal tabs), and it ends when the program ends or the tab closes, when
+  the folder is removed too. A plain shell tab has no key and no entry. A tab's
+  output streams only to a socket opened with a one-use ticket, bought with the
+  window's key for that tab, good for 60 seconds and accepted only from the window's
+  own origin. A tab's environment drops the engine's own `FORMPUBLISHER_` variables.
+  The dock's folder (`frontend/src/dock/`) and the finder that looks for the programs
+  (`backend/app/services/agent_lookup.py`) are shared with other Form apps and checked
+  against recorded hashes. Anything that puts a tab key on a command line, in a log
+  or in a file others can read, lets one tab's key open or read another tab, lets a
+  key outlast its tab, opens a stream without a ticket, or gives a plain shell a key.
 - **Agents and the MCP server** (`./formpublisher mcp`, Claude Code, Codex and
   Cursor): a tool reaching beyond the data folder, or acting without the step you would
   take in the window.

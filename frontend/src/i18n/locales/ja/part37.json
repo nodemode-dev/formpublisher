@@ -1,0 +1,23 @@
+{
+  "Signing keys": "署名鍵",
+  "Your keys": "あなたの鍵",
+  "No keys yet. Create one below or import one.": "まだ鍵がありません。下で作成するか、読み込んでください。",
+  "Import...": "読み込む...",
+  "Export...": "書き出す...",
+  "Created on {0}": "作成日 {0}",
+  "Removed key {0}.": "鍵 {0} を削除しました。",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "{0} を削除しますか？秘密鍵が消去されるため、署名できなくなります。ゴミ箱には公開鍵が残るため、その署名は引き続き確認できます。",
+  "Remove key": "鍵を削除",
+  "Browser for the deep check": "詳細チェックに使うブラウザ",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "詳細チェックはこのブラウザを操作します。空欄のときは Google Chrome、次に Microsoft Edge、次にブラウザが通常インストールされる場所を探します。",
+  "Browse...": "参照...",
+  "Type the full path of the browser program in the field.": "ブラウザのプログラムのフルパスを欄に入力してください。",
+  "Choose the browser": "ブラウザを選択",
+  "Give the full path of the browser program, starting from the top folder.": "ブラウザのプログラムのフルパスを、最上位のフォルダから指定してください。",
+  "Cleared. The deep check looks for a browser itself.": "クリアしました。詳細チェックが自分でブラウザを探します。",
+  "There is no file at that path.": "そのパスにファイルがありません。",
+  "No keys yet. Create one in Preferences.": "まだ鍵がありません。環境設定で作成してください。",
+  "Manage keys": "鍵を管理",
+  "Create a key in Preferences": "環境設定で鍵を作成",
+  "Open Preferences": "環境設定を開く"
+}

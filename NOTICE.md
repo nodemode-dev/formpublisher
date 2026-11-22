@@ -16,6 +16,7 @@ FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, 
 | objc2, objc2-app-kit (macOS only) | the splash window's corner mask and clear background | MIT |
 | gtk (Linux only) | the desktop window on Linux | MIT |
 | windows-sys 0.61.2 (Windows only) | the job object that makes the engine end with the shell | MIT OR Apache-2.0 |
+| `@xterm/xterm` 6.0.0 and `@xterm/addon-fit` 0.11.0 | the terminal in the agent dock's tabs, built into the window | MIT |
 | FastAPI 0.141.1, Starlette | the engine service | MIT, BSD-3-Clause |
 | Uvicorn 0.53.0 with its `standard` extras (websockets, watchfiles, httptools, uvloop, h11, click, python-dotenv, PyYAML) | HTTP and WebSocket serving, the disk watcher | BSD-3-Clause (uvicorn, websockets, click, python-dotenv); MIT (watchfiles, httptools, h11, PyYAML, uvloop) |
 | python-multipart 0.0.32 | upload bodies (site exports) | Apache-2.0 |
@@ -26,7 +27,8 @@ FormPublisher is licensed under the GNU General Public License v3.0 (`LICENSE`, 
 | jaraco.classes 3.4.0, jaraco.context 6.1.2, jaraco.functools 4.6.0, more-itertools 11.2.1 | brought in by keyring | MIT |
 | SecretStorage 3.5.0 and jeepney 0.9.0 (Linux only) | keyring's way to the Secret Service over D-Bus | BSD-3-Clause (SecretStorage), MIT (jeepney) |
 | pywin32-ctypes 0.2.3 (Windows only) | keyring's way to Credential Manager | BSD-3-Clause |
-| Playwright for Python 1.65.0 (`backend/requirements-deep.txt`), frozen into the engine; no browser is downloaded | deep checks drive the person's installed Google Chrome or Microsoft Edge | Apache-2.0 |
+| ptyprocess 0.7.0 (macOS and Linux) | the terminal tabs of the agent dock | ISC |
+| pywinpty 3.0.5 (Windows only) | the terminal tabs of the agent dock; its wheel carries winpty.dll and winpty-agent.exe from winpty (Ryan Prichard), OpenConsole.exe and conpty.dll from Microsoft's microsoft/terminal, and the Rust crates its own bill of materials lists | MIT (pywinpty, winpty, microsoft/terminal); MIT OR Apache-2.0 (the windows crates) || Playwright for Python 1.65.0 (`backend/requirements-deep.txt`), frozen into the engine; no browser is downloaded | deep checks drive the person's installed Google Chrome or Microsoft Edge | Apache-2.0 |
 | Node.js runtime inside Playwright's driver (`playwright/driver/node`), frozen into the engine with the driver | runs Playwright's driver for the deep checks | MIT, with the third-party licences listed in the driver's own `LICENSE` and `ThirdPartyNotices` files, which ship in the engine folder under `_internal/playwright/driver/` |
 | greenlet 3.5.6 | the coroutine switching that Playwright's Python package needs | MIT AND PSF-2.0 |
 | FormWeb engine crates 0.27.0 (formweb-model, formweb-engine, formweb-export, formweb-core), vendored unedited in `vendor/formweb-native` with FormWeb's `LICENSE`, Copyright 2026 NodeAgentc, Inc. | `formweb-core`, built by `setup/install_compiler`, opens `.fweb` projects | Apache-2.0, compatible with GPL-3.0-only |

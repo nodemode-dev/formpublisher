@@ -74,7 +74,7 @@ def main() -> int:
         locked = {m.group(1).lower().replace("_", "-") for m in (PIN.match(line) for line in lock.splitlines()) if m}
         for source in sources:
             for raw in (BACKEND / source).read_text(encoding="utf-8").splitlines():
-                pin = re.sub(r"\[[^\]]*\]", "", raw.strip()).lower().replace("_", "-")
+                pin = re.sub(r"\[[^\]]*\]", "", raw.split("#", 1)[0].split(";", 1)[0].strip()).lower().replace("_", "-")
                 if pin and not pin.startswith("#") and pin not in locked:
                     problems.append(f"backend/{name} does not hold {raw.strip()} from backend/{source}")
         if "--hash=sha256:" not in lock:

@@ -1,8 +1,13 @@
-.fp-fw-list { display: grid; gap: var(--space-1); max-height: 320px; overflow-y: auto; overscroll-behavior: contain; }
-.fp-fw-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--space-2); min-height: 48px; padding: 6px var(--space-2); border: 1px solid var(--line-2); border-radius: var(--radius); cursor: pointer; }
+.fp-fw-list { display: grid; align-content: start; gap: var(--space-1); height: 212px; padding: 2px; overflow-y: auto; overscroll-behavior: contain; }
+.fp-fw-row { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--space-2); min-height: 48px; padding: 6px var(--space-2); border: 1px solid var(--line-1); border-radius: var(--radius-md); background: var(--surface-2); cursor: pointer; transition: border-color var(--transition-fast); }
 .fp-fw-row:hover { border-color: var(--line-3); }
-.fp-fw-row:has(input:checked) { border-color: var(--accent-color); }
+.fp-fw-row:has(input:checked) { border-color: var(--accent-line); background: linear-gradient(90deg, var(--surface-raised) 0%, var(--accent-glow) 55%, var(--accent-glow) 100%); }
+.fp-fw-row:has(input:focus-visible) { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+.fp-fw-list.is-stale > .fp-fw-row { opacity: 0.6; }
+.fp-fw-state { display: flex; align-items: center; gap: var(--space-2); height: 18px; margin-top: var(--space-2); color: var(--text-muted); font-size: var(--fs-12); }
+.fp-fw-state > * { visibility: hidden; }
+.fp-fw-state.is-on > * { visibility: visible; }
 .fp-fw-row input { margin: 0; accent-color: var(--accent-color); }
 .fp-fw-text { display: grid; min-width: 0; }
-.fp-fw-name { overflow: hidden; color: var(--text-primary); font-size: var(--fp-13); text-overflow: ellipsis; white-space: nowrap; }
-.fp-fw-meta { overflow: hidden; color: var(--text-muted); font-size: var(--fp-12); text-overflow: ellipsis; white-space: nowrap; }
+.fp-fw-name { overflow: hidden; color: var(--text-primary); font-size: var(--fs-13); text-overflow: ellipsis; white-space: nowrap; }
+.fp-fw-meta { overflow: hidden; color: var(--text-muted); font-size: var(--fs-12); text-overflow: ellipsis; white-space: nowrap; }

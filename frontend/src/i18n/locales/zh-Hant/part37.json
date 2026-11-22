@@ -1,0 +1,23 @@
+{
+  "Signing keys": "簽署金鑰",
+  "Your keys": "你的金鑰",
+  "No keys yet. Create one below or import one.": "尚無金鑰。請在下方建立一把，或匯入一把。",
+  "Import...": "匯入...",
+  "Export...": "匯出...",
+  "Created on {0}": "建立於 {0}",
+  "Removed key {0}.": "已移除金鑰 {0}。",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "要移除 {0} 嗎？其私密金鑰會被刪除，因此無法再簽署。垃圾桶會保留其公開金鑰，因此仍可檢查其簽章。",
+  "Remove key": "移除金鑰",
+  "Browser for the deep check": "深度檢查使用的瀏覽器",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "深度檢查會驅動此瀏覽器。欄位空白時，會依序尋找 Google Chrome、Microsoft Edge，以及瀏覽器通常的安裝位置。",
+  "Browse...": "瀏覽...",
+  "Type the full path of the browser program in the field.": "請在欄位中輸入瀏覽器程式的完整路徑。",
+  "Choose the browser": "選擇瀏覽器",
+  "Give the full path of the browser program, starting from the top folder.": "請填寫瀏覽器程式的完整路徑，從最上層資料夾開始。",
+  "Cleared. The deep check looks for a browser itself.": "已清除。深度檢查會自行尋找瀏覽器。",
+  "There is no file at that path.": "該路徑下沒有檔案。",
+  "No keys yet. Create one in Preferences.": "尚無金鑰。請在偏好設定中建立一把。",
+  "Manage keys": "管理金鑰",
+  "Create a key in Preferences": "在偏好設定中建立金鑰",
+  "Open Preferences": "開啟偏好設定"
+}

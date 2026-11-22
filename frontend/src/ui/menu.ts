@@ -1,4 +1,4 @@
-import type { Commands } from './commands';
+import { formatKeys, type Commands } from './commands';
 import { anyDialogOpen } from './dialogs';
 import { el, isMac, q, setClass, setDisabled, setText } from './dom';
 import { icon } from './icons';
@@ -10,6 +10,21 @@ export interface MenuDef { label: string; items: MenuItem[] | (() => MenuItem[])
 export const itemsOf = (def: MenuDef): MenuItem[] => (typeof def.items === 'function' ? def.items() : def.items);
 
 const isSub = (i: MenuItem): i is SubMenu => typeof i === 'object';
+
+const keyCaps =(combo: string): string[] => (combo ? combo.split(/\+(?=.)/).map((part) => formatKeys(part)) : []);
+
+function paintKeys(box: HTMLElement, combo: string): void {
+  if (box.dataset.combo === combo) return;
+  box.dataset.combo = combo;
+  const caps = keyCaps(combo);
+  const have = Array.from(box.children);
+  caps.forEach((cap, i) => {
+    let k = have[i];
+    if (!k) { k = el('<kbd class="fp-kbd"></kbd>'); box.appendChild(k); }
+    setText(k, cap);
+  });
+  for (let i = caps.length; i < have.length; i++) have[i].remove();
+}
 const MIN_DROP = 160;
 const TYPE_AHEAD_MS = 700;
 
@@ -156,7 +171,7 @@ export class PopupMenu {
       const cmd = this.commands.get(r.id);
       if (!cmd) continue;
       setText(q(r.node, '.fp-menu-label'), this.commands.label(cmd));
-      setText(q(r.node, '.fp-menu-keys'), this.commands.keyLabel(cmd));
+      paintKeys(q(r.node, '.fp-menu-keys'), cmd.keys?.[0] ?? '');
       setDisabled(r.node, !this.commands.enabled(cmd));
       setClass(r.node, 'is-checked', !!cmd.checked?.());
     }

@@ -2,7 +2,7 @@
 html, body { height: 100%; overflow: hidden; }
 body {
   font-family: var(--font-ui);
-  font-size: var(--fp-12);
+  font-size: var(--fs-12);
   line-height: 1.35;
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -27,8 +27,8 @@ body.animations-disabled * { transition: none !important; animation: none !impor
 
 #overlay-root { position: fixed; inset: 0; z-index: var(--z-overlay); pointer-events: none; }
 #overlay-root > * { pointer-events: auto; }
-#toast-root { position: fixed; left: 50%; bottom: calc(var(--fp-status-h) + var(--space-3)); width: 0; height: 0; z-index: var(--z-overlay-modal); pointer-events: none; }
-#toast-root > * { position: absolute; left: 0; bottom: 0; width: max-content; transform: translate(-50%, var(--toast-y, 0px)); transition: transform 160ms ease; }
+#toast-root { position: fixed; left: 50%; bottom: calc(var(--cv-status-h) + var(--space-3)); width: 0; height: 0; z-index: var(--z-overlay-modal); pointer-events: none; }
+#toast-root > * { --toast-y: 0px; position: absolute; left: 0; bottom: 0; width: max-content; transform: translate(-50%, var(--toast-y)); transition: transform 160ms ease; }
 
 .fp-mark { display: block; flex: none; }
 .fp-art-light { display: none; }

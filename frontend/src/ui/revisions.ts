@@ -31,7 +31,6 @@ function changeText(row: RevisionRow): string {
   return row.changes ? `+${row.changes.added} -${row.changes.removed} ~${row.changes.changed}` : '';
 }
 
-/** A revision list on the left and the diff of the chosen revision against the one before it on the right. Fixed regions, so nothing moves when data arrives. */
 export class RevisionsView {
   readonly root: HTMLElement;
   private readonly list: HTMLElement;

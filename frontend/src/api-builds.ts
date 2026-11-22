@@ -220,6 +220,7 @@ export const buildsApi = {
     const raw = await request<unknown>(`/api/keys/${enc(id)}/export`, body('POST', current ? { path, passphrase, current } : { path, passphrase }));
     return isObj(raw) ? str(raw.file) : '';
   },
+  removeKey: (id: string): Promise<unknown> => request<unknown>(`/api/keys/${enc(id)}`, { method: 'DELETE' }),
   async importKey(pem: string, passphrase: string, name: string): Promise<KeyInfo> {
     const data: Record<string, string> = { pem };
     if (passphrase) data.passphrase = passphrase;

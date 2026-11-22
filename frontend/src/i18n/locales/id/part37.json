@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Kunci penandatanganan",
+  "Your keys": "Kunci Anda",
+  "No keys yet. Create one below or import one.": "Belum ada kunci. Buat satu di bawah atau impor satu.",
+  "Import...": "Impor...",
+  "Export...": "Ekspor...",
+  "Created on {0}": "Dibuat pada {0}",
+  "Removed key {0}.": "Kunci {0} dihapus.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "Hapus {0}? Kunci privatnya dihapus, sehingga tidak bisa lagi menandatangani. Tempat sampah menyimpan kunci publiknya, sehingga tanda tangannya masih bisa diperiksa.",
+  "Remove key": "Hapus kunci",
+  "Browser for the deep check": "Browser untuk pemeriksaan mendalam",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "Pemeriksaan mendalam menjalankan browser ini. Jika kolom kosong, pemeriksaan mencari Google Chrome, lalu Microsoft Edge, lalu lokasi tempat browser biasanya dipasang.",
+  "Browse...": "Telusuri...",
+  "Type the full path of the browser program in the field.": "Ketik jalur lengkap program browser di kolom ini.",
+  "Choose the browser": "Pilih browser",
+  "Give the full path of the browser program, starting from the top folder.": "Berikan jalur lengkap program browser, dimulai dari folder teratas.",
+  "Cleared. The deep check looks for a browser itself.": "Dikosongkan. Pemeriksaan mendalam mencari browser sendiri.",
+  "There is no file at that path.": "Tidak ada file di jalur itu.",
+  "No keys yet. Create one in Preferences.": "Belum ada kunci. Buat satu di Preferensi.",
+  "Manage keys": "Kelola kunci",
+  "Create a key in Preferences": "Buat kunci di Preferensi",
+  "Open Preferences": "Buka Preferensi"
+}

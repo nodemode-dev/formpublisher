@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Signeringsnycklar",
+  "Your keys": "Dina nycklar",
+  "No keys yet. Create one below or import one.": "Inga nycklar ännu. Skapa en nedan eller importera en.",
+  "Import...": "Importera...",
+  "Export...": "Exportera...",
+  "Created on {0}": "Skapad {0}",
+  "Removed key {0}.": "Nyckeln {0} har tagits bort.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "Ta bort {0}? Dess privata nyckel raderas, så den kan inte längre signera. Papperskorgen behåller dess publika nyckel, så dess signaturer kan fortfarande kontrolleras.",
+  "Remove key": "Ta bort nyckel",
+  "Browser for the deep check": "Webbläsare för den djupa kontrollen",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "Den djupa kontrollen styr den här webbläsaren. När fältet är tomt letar den efter Google Chrome, sedan Microsoft Edge, sedan de platser där webbläsare brukar installeras.",
+  "Browse...": "Bläddra...",
+  "Type the full path of the browser program in the field.": "Skriv hela sökvägen till webbläsarprogrammet i fältet.",
+  "Choose the browser": "Välj webbläsaren",
+  "Give the full path of the browser program, starting from the top folder.": "Ange hela sökvägen till webbläsarprogrammet, från den översta mappen.",
+  "Cleared. The deep check looks for a browser itself.": "Rensat. Den djupa kontrollen letar själv efter en webbläsare.",
+  "There is no file at that path.": "Det finns ingen fil på den sökvägen.",
+  "No keys yet. Create one in Preferences.": "Inga nycklar ännu. Skapa en i Inställningar.",
+  "Manage keys": "Hantera nycklar",
+  "Create a key in Preferences": "Skapa en nyckel i Inställningar",
+  "Open Preferences": "Öppna Inställningar"
+}

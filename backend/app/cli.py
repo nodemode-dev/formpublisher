@@ -49,9 +49,10 @@ def _error_code(payload: bytes, status: int) -> str:
 
 
 class Client:
-    def __init__(self, url: str | None = None, in_process: bool = False) -> None:
+    def __init__(self, url: str | None = None, in_process: bool = False, key: str | None = None) -> None:
         self.explicit = (url or os.environ.get("FORMPUBLISHER_URL") or "").rstrip("/")
         self.in_process = in_process
+        self.key = key
         self.url = ""
         self.resolved = False
         self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
@@ -62,7 +63,7 @@ class Client:
         if data is not None:
             headers["Content-Type"] = "application/json"
         if method not in window_key.READS:
-            key = window_key.read_key_file()
+            key = self.key or window_key.read_key_file()
             if key:
                 headers[window_key.HEADER] = key
         req = urllib.request.Request(f"{self.url}{path}", data=data, method=method, headers=headers)

@@ -1,0 +1,23 @@
+{
+  "Signing keys": "Aláírókulcsok",
+  "Your keys": "Az Ön kulcsai",
+  "No keys yet. Create one below or import one.": "Még nincs kulcs. Hozzon létre egyet lent, vagy importáljon egyet.",
+  "Import...": "Importálás...",
+  "Export...": "Exportálás...",
+  "Created on {0}": "Létrehozva: {0}",
+  "Removed key {0}.": "A(z) {0} kulcs eltávolítva.",
+  "Remove {0}? Its private key is deleted, so it can no longer sign. The Trash keeps its public key, so its signatures can still be checked.": "Eltávolítja ezt: {0}? A privát kulcsa törlődik, így többé nem tud aláírni. A Kuka megőrzi a nyilvános kulcsát, így az aláírásai továbbra is ellenőrizhetők.",
+  "Remove key": "Kulcs eltávolítása",
+  "Browser for the deep check": "Böngésző a mély ellenőrzéshez",
+  "The deep check drives this browser. When the field is empty, it looks for Google Chrome, then Microsoft Edge, then the places browsers are usually installed.": "A mély ellenőrzés ezt a böngészőt vezérli. Ha a mező üres, a Google Chrome-ot keresi, majd a Microsoft Edge-et, majd azokat a helyeket, ahová a böngészőket általában telepítik.",
+  "Browse...": "Tallózás...",
+  "Type the full path of the browser program in the field.": "Írja be a mezőbe a böngészőprogram teljes elérési útját.",
+  "Choose the browser": "Válassza ki a böngészőt",
+  "Give the full path of the browser program, starting from the top folder.": "Adja meg a böngészőprogram teljes elérési útját a legfelső mappától kezdve.",
+  "Cleared. The deep check looks for a browser itself.": "Törölve. A mély ellenőrzés maga keres böngészőt.",
+  "There is no file at that path.": "Ezen az elérési úton nincs fájl.",
+  "No keys yet. Create one in Preferences.": "Még nincs kulcs. Hozzon létre egyet a Beállításokban.",
+  "Manage keys": "Kulcsok kezelése",
+  "Create a key in Preferences": "Kulcs létrehozása a Beállításokban",
+  "Open Preferences": "Beállítások megnyitása"
+}

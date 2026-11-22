@@ -2,10 +2,12 @@ import '../styles/panel.css';
 import type { App } from '../app-api';
 import { fetchResults, postLive, siteRevision, startRun, type Problem, type Severity, type Tier } from '../api-checks';
 import { emit, on, type ProbeMessage, type RouteStatus } from '../events';
-import { t } from '../i18n';
+import { onLanguage, t } from '../i18n';
 import { el, patchList, q, setAttr, setClass, setDisabled, setHidden, setText } from './dom';
+import { Dropdown, dropdownHtml, type DropdownOption } from './dropdown';
 import { icon } from './icons';
 import { refuse } from './notice-step';
+import { openPreferences } from './preferences';
 import { RevisionsView } from './revisions';
 
 interface ConEntry { seq: number; level: 'error' | 'warn'; text: string; where: string }
@@ -52,14 +54,34 @@ function bytesLabel(b: number): string {
   return `${(b / 1024 / 1024).toFixed(1)} MB`;
 }
 
+const SEV_LABEL = 'Filter by severity';
+const TIER_LABEL = 'Filter by tier';
+const SEV_OPTIONS: DropdownOption[] = [{ value: 'all', label: 'All severities' }, { value: 'error', label: 'Errors' }, { value: 'warning', label: 'Warnings' }, { value: 'info', label: 'Info' }];
+const TIER_OPTIONS: DropdownOption[] = [{ value: 'all', label: 'All tiers' }, { value: 'static', label: 'Static' }, { value: 'live', label: 'Live' }, { value: 'deep', label: 'Deep' }];
+
+const page = (name: string, bar: string, head: string, empty: string, hidden: boolean): string =>
+  `<div class="fp-bottom-page fp-pn-page" data-page="${name}" role="tabpanel"${hidden ? ' hidden' : ''}><div class="fp-pn-bar">${bar}</div>${head}<div class="fp-pn-body"><div class="fp-pn-list" role="rowgroup"></div><div class="fp-pn-empty">${empty}</div></div></div>`;
+
+const CLEAR = `<span class="fp-pn-spacer"></span><button class="fp-btn fp-btn-sm fp-btn-ghost" type="button" data-act="clear">Clear</button>`;
+
+export function panelPagesHtml(): string {
+  const filters = `${dropdownHtml({ cls: 'fp-pn-select', label: SEV_LABEL, data: { f: 'sev' }, options: SEV_OPTIONS })}${dropdownHtml({ cls: 'fp-pn-select', label: TIER_LABEL, data: { f: 'tier' }, options: TIER_OPTIONS })}`;
+  const problems = `${filters}<button class="fp-btn fp-btn-sm fp-pn-filter" type="button" aria-haspopup="menu" aria-expanded="false" title="Filter problems" aria-label="Filter problems" hidden>${icon('filter', 14)}<i class="fp-pn-dot" hidden></i></button><span class="fp-pn-progress" aria-live="polite"></span><span class="fp-pn-spacer"></span><button class="fp-btn fp-btn-sm" type="button" data-act="run" title="Run checks">${icon('check', 14)}<span>Run checks</span></button><button class="fp-btn fp-btn-sm" type="button" data-act="deep" title="Deep check">${icon('alert', 14)}<span>Deep check</span></button>`;
+  const note = '<p class="fp-pn-note" title="The deep check loads the site as a browser would, including what it loads from other hosts.">The deep check loads the site as a browser would, including what it loads from other hosts.</p>';
+  const nethead = '<div class="fp-pn-net fp-pn-nethead" aria-hidden="true"><span>URL</span><span>Kind</span><span>Status</span><span>Time</span><span>Size</span></div>';
+  return page('problems', problems, note, 'No problems found yet.', false)
+    + page('console', CLEAR, '', 'Nothing in the console yet.', true)
+    + page('network', CLEAR, nethead, 'No network requests yet.', true);
+}
+
 class Panel {
   private readonly data = new Map<string, SiteData>();
   private readonly pages: Record<'problems' | 'console' | 'network', HTMLElement>;
   private readonly lists: Record<'problems' | 'console' | 'network', HTMLElement>;
   private readonly empties: Record<'problems' | 'console' | 'network', HTMLElement>;
   private readonly counts: Record<'problems' | 'console' | 'network', HTMLElement>;
-  private readonly sevSel: HTMLSelectElement;
-  private readonly tierSel: HTMLSelectElement;
+  private readonly sevSel: Dropdown;
+  private readonly tierSel: Dropdown;
   private readonly filterBtn: HTMLButtonElement;
   private readonly filterDot: HTMLElement;
   private filterMenu: HTMLElement | null = null;
@@ -86,18 +108,10 @@ class Panel {
     const tab = (name: string): HTMLElement => q(root, `.fp-bottom-tab[data-tab="${name}"]`);
     const page = (name: string): HTMLElement => q(root, `.fp-bottom-page[data-page="${name}"]`);
     this.pages = { problems: page('problems'), console: page('console'), network: page('network') };
-    const shell = (p: HTMLElement, toolbar: string, head: string): void => {
-      p.replaceChildren();
-      p.classList.add('fp-pn-page');
-      p.insertAdjacentHTML('beforeend', `<div class="fp-pn-bar">${toolbar}</div>${head}<div class="fp-pn-body"><div class="fp-pn-list" role="rowgroup"></div><div class="fp-pn-empty"></div></div>`);
-    };
-    shell(this.pages.problems, `<select class="fp-pn-select" data-f="sev" aria-label="Filter by severity"><option value="all">All severities</option><option value="error">Errors</option><option value="warning">Warnings</option><option value="info">Info</option></select><select class="fp-pn-select" data-f="tier" aria-label="Filter by tier"><option value="all">All tiers</option><option value="static">Static</option><option value="live">Live</option><option value="deep">Deep</option></select><button class="fp-btn fp-btn-sm fp-pn-filter" type="button" aria-haspopup="menu" aria-expanded="false" title="Filter problems" aria-label="Filter problems" hidden>${icon('filter', 14)}<i class="fp-pn-dot" hidden></i></button><span class="fp-pn-progress" aria-live="polite"></span><span class="fp-pn-spacer"></span><button class="fp-btn fp-btn-sm" type="button" data-act="run" title="Run checks">${icon('check', 14)}<span>Run checks</span></button><button class="fp-btn fp-btn-sm" type="button" data-act="deep" title="Deep check">${icon('alert', 14)}<span>Deep check</span></button>`, '<p class="fp-pn-note" title="The deep check loads the site as a browser would, including what it loads from other hosts.">The deep check loads the site as a browser would, including what it loads from other hosts.</p>');
-    shell(this.pages.console, `<span class="fp-pn-spacer"></span><button class="fp-btn fp-btn-sm fp-btn-ghost" type="button" data-act="clear">Clear</button>`, '');
-    shell(this.pages.network, `<span class="fp-pn-spacer"></span><button class="fp-btn fp-btn-sm fp-btn-ghost" type="button" data-act="clear">Clear</button>`, '<div class="fp-pn-net fp-pn-nethead" aria-hidden="true"><span>URL</span><span>Kind</span><span>Status</span><span>Time</span><span>Size</span></div>');
     this.lists = { problems: q(this.pages.problems, '.fp-pn-list'), console: q(this.pages.console, '.fp-pn-list'), network: q(this.pages.network, '.fp-pn-list') };
     this.empties = { problems: q(this.pages.problems, '.fp-pn-empty'), console: q(this.pages.console, '.fp-pn-empty'), network: q(this.pages.network, '.fp-pn-empty') };
-    this.sevSel = q(this.pages.problems, '[data-f="sev"]');
-    this.tierSel = q(this.pages.problems, '[data-f="tier"]');
+    this.sevSel = new Dropdown(q<HTMLButtonElement>(this.pages.problems, '[data-f="sev"]'), { label: SEV_LABEL, options: SEV_OPTIONS, change: () => this.filterChanged() });
+    this.tierSel = new Dropdown(q<HTMLButtonElement>(this.pages.problems, '[data-f="tier"]'), { label: TIER_LABEL, options: TIER_OPTIONS, change: () => this.filterChanged() });
     this.filterBtn = q(this.pages.problems, '.fp-pn-filter');
     this.filterDot = q(this.filterBtn, '.fp-pn-dot');
     this.runBtn = q(this.pages.problems, '[data-act="run"]');
@@ -126,11 +140,7 @@ class Panel {
   private watchBar(): void {
     const refit = (): void => { this.syncFilter(); this.fitBar(); };
     new ResizeObserver(refit).observe(this.pages.problems);
-    const edits = new MutationObserver(refit);
-    for (const sel of [this.sevSel, this.tierSel]) {
-      sel.addEventListener('change', refit);
-      edits.observe(sel, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['aria-label'] });
-    }
+    onLanguage(refit);
     document.fonts?.addEventListener('loadingdone', refit);
     this.filterBtn.addEventListener('click', () => { if (this.filterMenu) this.closeMenu(false); else this.openMenu(); });
     this.filterBtn.addEventListener('keydown', (e) => {
@@ -145,8 +155,14 @@ class Panel {
     this.syncFilter();
   }
 
+  private filterChanged(): void {
+    this.syncFilter();
+    this.fitBar();
+    this.schedule();
+  }
+
   private syncFilter(): void {
-    const label = `${t('Filter problems')}: ${this.sevSel.selectedOptions[0]?.text ?? ''}, ${this.tierSel.selectedOptions[0]?.text ?? ''}`;
+    const label = `${t('Filter problems')}: ${t(this.sevSel.selected()?.label ?? '')}, ${t(this.tierSel.selected()?.label ?? '')}`;
     setAttr(this.filterBtn, 'title', label);
     setAttr(this.filterBtn, 'aria-label', label);
     setHidden(this.filterDot, this.sevSel.value === 'all' && this.tierSel.value === 'all');
@@ -158,17 +174,17 @@ class Panel {
     let focus: HTMLElement | null = null;
     [this.sevSel, this.tierSel].forEach((sel, g) => {
       if (g) menu.append(el('<div class="fp-menu-sep" role="separator"></div>'));
-      const name = sel.getAttribute('aria-label') ?? '';
+      const name = t(sel === this.sevSel ? SEV_LABEL : TIER_LABEL);
       const group = el('<div class="fp-pn-menu-group" role="group"></div>');
       setAttr(group, 'aria-label', name);
       const head = el('<div class="fp-pn-menu-head" aria-hidden="true"></div>');
       setText(head, name);
       group.append(head);
-      for (const o of Array.from(sel.options)) {
+      for (const o of sel.options()) {
         const item = el<HTMLButtonElement>(`<button class="fp-menu-item" role="menuitemradio" type="button" tabindex="-1"><span class="fp-menu-check">${icon('check', 14)}</span><span class="fp-menu-label"></span></button>`);
         item.dataset.f = sel === this.sevSel ? 'sev' : 'tier';
         item.dataset.v = o.value;
-        setText(q(item, '.fp-menu-label'), o.text);
+        setText(q(item, '.fp-menu-label'), t(o.label));
         const on = sel.value === o.value;
         setAttr(item, 'aria-checked', String(on));
         setClass(item, 'is-checked', on);
@@ -206,10 +222,10 @@ class Panel {
     if (restore && !this.filterBtn.hidden) this.filterBtn.focus();
   }
 
-  private pickFilter(sel: HTMLSelectElement, value: string): void {
+  private pickFilter(sel: Dropdown, value: string): void {
     if (sel.value !== value) {
-      sel.value = value;
-      sel.dispatchEvent(new Event('change', { bubbles: true }));
+      sel.set(value);
+      this.filterChanged();
     }
     const menu = this.filterMenu;
     if (!menu) return;
@@ -245,14 +261,16 @@ class Panel {
       const word = t('All');
       setHidden(this.filterBtn, mode !== 'compact');
       for (const sel of [this.sevSel, this.tierSel]) {
-        setHidden(sel, mode === 'compact');
-        const all = sel.options[0];
-        if (short) { if (all.label !== word) all.label = word; } else if (all.hasAttribute('label')) all.removeAttribute('label');
-        if (short && sel.selectedIndex === 0) { if (sel.title !== all.text) sel.title = all.text; } else if (sel.hasAttribute('title')) sel.removeAttribute('title');
+        if (mode === 'compact') sel.close(false);
+        setHidden(sel.button, mode === 'compact');
+        const all = sel.options()[0];
+        sel.setShorts(short ? new Map([[all.value, word]]) : null);
+        const title = short && sel.value === all.value ? t(all.label) : '';
+        if (title) setAttr(sel.button, 'title', title); else if (sel.button.hasAttribute('title')) sel.button.removeAttribute('title');
       }
     };
     const wrapped = (mode: 'full' | 'short' | 'compact'): boolean => {
-      const row = mode === 'compact' ? [this.filterBtn, this.runBtn, this.deepBtn] : [this.sevSel, this.tierSel, this.runBtn, this.deepBtn];
+      const row = mode === 'compact' ? [this.filterBtn, this.runBtn, this.deepBtn] : [this.sevSel.button, this.tierSel.button, this.runBtn, this.deepBtn];
       return row.some((c) => Math.abs(c.offsetTop - row[0].offsetTop) > 2);
     };
     const settle = (): void => {
@@ -268,8 +286,6 @@ class Panel {
 
   private wire(): void {
     const { console: con, network } = this.pages;
-    this.sevSel.addEventListener('change', () => this.schedule());
-    this.tierSel.addEventListener('change', () => this.schedule());
     this.runBtn.addEventListener('click', () => { void runChecks(this.app, false); });
     this.deepBtn.addEventListener('click', () => { void runChecks(this.app, true); });
     const openProblems = (): void => this.app.showBottomTab('problems');
@@ -547,6 +563,13 @@ class Panel {
       key: (p) => p.id,
       create: (p) => {
         const node = el(`<div class="fp-pn-row fp-pn-prob" role="row" tabindex="0"><span class="fp-pn-sev"></span><span class="fp-pn-code" translate="no"></span><span class="fp-pn-msg"></span><span class="fp-pn-route" translate="no"></span><span class="fp-pn-tier"></span></div>`);
+        if (p.code === 'deep.unavailable') {
+          const act = el<HTMLButtonElement>('<button class="fp-pn-act" type="button">Open Preferences</button>');
+          act.addEventListener('click', (e) => { e.stopPropagation(); openPreferences('checks'); });
+          act.addEventListener('keydown', (e) => e.stopPropagation());
+          q(node, '.fp-pn-msg').after(act);
+          node.classList.add('has-act');
+        }
         this.paintProblem(node, p);
         return node;
       },
