@@ -3,7 +3,7 @@
 Living log for the desktop shell (Tauri 2). Source files stay comment-free; what they would have said lives here.
 
 Current build version: v0.3.3
-Last updated: 2026-11-15 · v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
+Last updated: 2026-11-21 · v0.3.4 the desktop build runs a pinned Tauri command line from frontend/node_modules, and build_app.bat stops when the install fails; v0.3.0 the macOS overlay title bar: the traffic lights have their own inset, the title row drags the window, and extra windows share the style.
 
 ---
 
@@ -135,3 +135,16 @@ On macOS the main window has `TitleBarStyle::Overlay` with a hidden title, so th
 Windows opened by `open_window` now get the same overlay style; they had the system title bar while the page drew its row for the overlay. The capability gains `core:window:allow-start-dragging`, which `data-tauri-drag-region` needs when the page comes from a remote origin (the engine). `objc2-app-kit` gains the `NSButton` and `NSControl` features for `standardWindowButton` and the buttons' frames.
 
 Checked: `cargo check` for Linux and for the macOS target, both exit 0 (the frozen engine replaced by a placeholder file). The page's geometry was measured in Chrome with a faked macOS shell. Not run: any of this on a Mac; whether the 120 ms second pass is enough on a slow machine is not known.
+
+---
+
+## The desktop build runs a pinned Tauri command line {#cli-pin}
+- refers-to: ../build_app · ../build_app.bat · ../frontend/package.json :: devDependencies · Cargo.lock :: tauri
+- kind: decision
+- logged: v0.3.4 · 2026-11-21
+
+Until 0.3.3 `build_app` and `build_app.bat` ran `npx --yes @tauri-apps/cli@2`, which fetches whatever 2.x is newest on the day of the build, so two builds of one commit could differ and a new release of the tool could break the build. `@tauri-apps/cli` is now a devDependency of `frontend` at 2.12.5, the version of the `tauri` crate in `Cargo.lock` (2.12.6 is the newest on that line; the lock keeps the crate at 2.12.5, so the command line and the crate stay on one release). `@tauri-apps/api` stays at 2.12.1: Tauri stops a build when the crate and the api package differ in minor version, and both are 2.12. No `@tauri-apps/plugin-*` package is a dependency (the dialog call is `invoke` from the api package, see `frontend/HASHOUT_LOG.md`), so `tauri info` lists the three as not installed, which is expected. The lock file was refreshed with `npm install` and only gained the command line and its eleven platform packages (218 lines added, none removed).
+
+`build_app` runs `node frontend/node_modules/.bin/tauri` from the repository root, the way `./formpublisher desktop dev` already does; `build_app.bat` runs `frontend\node_modules\.bin\tauri.cmd`, as `formpublisher.bat desktop dev` does. Both install again when that file is missing (a `frontend/node_modules` from before the pin has no copy of the tool). `build_app.bat` also stops now, with exit code 1 and a message, when the install of the engine and the window fails; before, it went on to a build that could not succeed.
+
+Checked: `npm ci`, `npm audit --audit-level=low` (0 vulnerabilities) and `npm run build` in `frontend`; from the repository root `node frontend/node_modules/.bin/tauri --version` (2.12.5), `build --help` and `info` (it finds `src-tauri`; tauri 2.12.5, api 2.12.1, no version-mismatch warning); `bash -n build_app`. Not run: a desktop build (no WebKitGTK here), any line of `build_app.bat` (no Windows or Wine here; its install check is the idiom `formpublisher.bat boot` already has, `call ... & if errorlevel 1`, which Phase 45 ran under Wine), macOS.

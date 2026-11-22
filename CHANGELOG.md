@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4 · 2026-11-21
+
+- The desktop build runs the same Tauri command line every time. `@tauri-apps/cli` is pinned to 2.12.5 in `frontend/package.json` and its lock file, the release of the `tauri` crate in `src-tauri/Cargo.lock`, and `build_app` and `build_app.bat` run that copy from `frontend/node_modules` instead of fetching whatever `@tauri-apps/cli@2` is newest with `npx`. A checkout whose `frontend/node_modules` was installed before this installs it first. `@tauri-apps/api` stays at 2.12.1, on the same minor line as the crate.
+- `build_app.bat` stops with a plain message and exit code 1 when the install of the engine or of the window fails, instead of going on to a build that cannot succeed.
+- The FormWeb engine crates stay vendored at 0.21.2. FormWeb 0.27.0's engine crates are the same source, only the version number differs, so `.fweb` projects saved by FormWeb 0.27.0, in both file versions, open here with nothing lost and to the same files as FormWeb's own 0.27.0 engine makes. Export zips and publication folders are read as files and do not touch the crates. One label differs: a package built from a `.fweb` project records FormWeb 0.21.2 as its engine, the version of the vendored copy.
+
 ## 0.3.3 · 2026-11-15
 
 - The demos update in place. Opening a demo whose bundled site changed since you first opened it adds the new version as a revision of the same site, so the corrected credits in Lowlight and Looking Back reach a data folder written by 0.3.0 without removing anything. A demo you have built or prepared a host folder for is left as it is, and opening a demo that has not changed adds nothing.

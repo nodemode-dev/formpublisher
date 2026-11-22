@@ -3,7 +3,7 @@
 The living log of the FormPublisher frontend. Read it before editing `frontend/`. The code carries no comments; the reasons live here, one entry per file.
 
 Current build version: v0.3.3
-Last updated: 2026-11-15 · v0.3.3, Phase 67: a language switch holds Preferences, the hint strip and the menubar still (the toolbar still shifts once, by decision), Import from FormWeb lists saved projects, the Problems tooltip is translated; Phase 66: the strings of the forms.local-address check and the Import notice that says a revision was added
+Last updated: 2026-11-21 · v0.3.4, no window change: package.json pins the Tauri command line as a dev dependency; v0.3.3, Phase 67: a language switch holds Preferences, the hint strip and the menubar still (the toolbar still shifts once, by decision), Import from FormWeb lists saved projects, the Problems tooltip is translated; Phase 66: the strings of the forms.local-address check and the Import notice that says a revision was added
 
 ---
 
@@ -12,7 +12,7 @@ Last updated: 2026-11-15 · v0.3.3, Phase 67: a language switch holds Preference
 ```
 frontend/
 ├── index.html            pre-paint theme boot, font preloads, style links, #app, #overlay-root, #toast-root
-├── package.json          pinned dependencies, scripts dev, build, preview, typecheck
+├── package.json          pinned dependencies (the Tauri command line, @tauri-apps/cli 2.12.5, is a dev one; see src-tauri/HASHOUT_LOG.md), scripts dev, build, preview, typecheck
 ├── tsconfig.json         FormDeck's strict settings
 ├── vite.config.ts        port 5280, preview 5281, host false, /api proxy with ws to 8280
 ├── HASHOUT_LOG.md        this file
