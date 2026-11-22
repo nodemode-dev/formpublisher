@@ -1,8 +1,8 @@
 {
   "name": "formpublisher",
   "private": true,
-  "version": "0.3.4",
-  "description": "formpublisher · preview, check, package and publish FormWeb sites",
+  "version": "0.4.0",
+  "description": "formpublisher · start from a template, check, package, sign and host FormWeb sites yourself",
   "type": "module",
   "engines": {
     "node": ">=20.19"
