@@ -22,6 +22,7 @@ if /i "%CMD%"=="mcp" ( "%PYEXE%" backend\formpublisher_engine.py mcp %REST% & go
 if /i "%CMD%"=="agents" ( "%PYEXE%" setup\agents.py %REST% & goto :eof )
 if /i "%CMD%"=="vendor" ( "%PYEXE%" setup\vendor_check.py %REST% & goto :eof )
 if /i "%CMD%"=="doctor" goto doctor
+if /i "%CMD%"=="test" ( call setup\test.bat %REST% & goto :eof )
 if /i "%CMD%"=="version" ( "%PYEXE%" backend\formpublisher_engine.py --version & goto :eof )
 if /i "%CMD%"=="help" goto usage
 echo [formpublisher] unknown command: %CMD%

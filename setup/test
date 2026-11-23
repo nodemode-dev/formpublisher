@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/lib.sh"
+which="${1:-all}"
+[ $# -gt 0 ] && shift
+case "$which" in
+  all|unit|engine) ;;
+  *) fp_say "unknown test layer: $which (use unit, engine or nothing for all)"; exit 2 ;;
+esac
+fail=0
+run() { fp_say "$1"; shift; "$@" || fail=1; }
+wants() { [ "$which" = all ] || [ "$which" = "$1" ]; }
+if wants unit; then
+  [ -d "$FORMPUBLISHER_ROOT/frontend/node_modules/vitest" ] || fp_die "the interface packages are missing, run ./formpublisher install"
+  cd "$FORMPUBLISHER_ROOT/frontend"
+  run "interface logic (vitest)" npx vitest run "$@"
+fi
+if wants engine; then
+  py="$FORMPUBLISHER_ROOT/backend/venv/bin/python"
+  [ -x "$py" ] || py="$FORMPUBLISHER_ROOT/backend/venv/Scripts/python.exe"
+  [ -x "$py" ] || fp_die "the backend venv is missing, run ./formpublisher install"
+  "$py" -c "import pytest" >/dev/null 2>&1 || fp_die "pytest is missing from the backend venv, run backend/venv/bin/python -m pip install -r backend/requirements-test.txt"
+  cd "$FORMPUBLISHER_ROOT"
+  run "engine (pytest)" "$py" -m pytest -q backend/tests "$@"
+fi
+exit "$fail"
