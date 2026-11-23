@@ -143,3 +143,14 @@ jobs:
           FORMPUBLISHER_REQUIRE_CORE: "1"
           FORMPUBLISHER_FORMWEB_CORE: ${{ github.workspace }}/vendor/formweb-native/target/release/formweb-core
         run: python -m pytest -q backend/tests
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install the interface packages
+        working-directory: frontend
+        run: npm ci --no-fund
+      - name: Interface tests
+        working-directory: frontend
+        run: npx vitest run
