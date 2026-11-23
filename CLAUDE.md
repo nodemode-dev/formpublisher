@@ -27,7 +27,7 @@ FormPublisher only reads FormWeb. It imports exports and publication folders and
 - A check never starts a real agent program; use a stand-in.
 - No emoji; no em dash in Markdown; no icon libraries (inline `currentColor` SVG only); no commented-out code; near-zero comments.
 - Every dependency that ships gets a row in `NOTICE.md`. FormPublisher is GPL-3.0-only: permissive and GPL-3.0-compatible licences are fine, AGPL is used nowhere, and LGPL code only as a separate program. Code from FormVis and FormDeck (Apache-2.0, the same owner) may be taken; FormPortal and formcompiler (GPL-3.0-only, another product line) give the look and the data contracts, not code.
-- Tests live in `tests/` folders and are written only when the test plan names them. The engine's pytest suite is `backend/tests` (see `AGENTS.md`); keep it green and fast.
+- Tests live in `tests/` folders and are added when the owner asks; a change in behaviour updates its tests in the same pull request; every test follows the five rules in `docs/TESTING.md`. `./formpublisher test` runs them: the engine's pytest suite is `backend/tests` (see `AGENTS.md`) and the interface's vitest suite is `frontend/tests/unit`; keep them green and fast.
 
 ## Commits
 

@@ -87,6 +87,7 @@ Every test runs against stand-ins that the fixture in `backend/tests/conftest.py
 sets: its own home folder, a `PATH` of the system folders only (so no agent program
 can be found), its own agent configuration folders and keyring's fail backend, so a
 test never touches your real files, your agents' setup or your password store.
+`./formpublisher test` runs every layer; `docs/TESTING.md` says how and what a test must do to be accepted.
 
 - Keep each pull request to one change.
 - Write commit subjects in Conventional Commits: `feat(engine): ...`,
