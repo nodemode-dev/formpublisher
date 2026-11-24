@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.11.0 · 2026-11-23
+
+- FormPublisher has a full test suite and a runner. `./formpublisher test` runs two layers: interface logic (vitest with happy-dom, `frontend/tests/unit`) and the engine (pytest against the real FastAPI app, `backend/tests`). `./formpublisher test unit` or `./formpublisher test engine` runs one. `docs/TESTING.md` says how to run them and what a test must do to be accepted.
+- 1,008 new cases run the app and check what a user or a calling program would notice: every static check on hand-made sites, `.fpub` packages read back and tampered ones refused, what each host target writes judged by that host's own format, zip intake refusals, the trash and revisions byte for byte, keys never returned in full, every write route refused without the window key, the command line and the MCP server, and views mounted in a document. With the 30 cases that were already here, 1,038 pass; 8 older cases are skipped where `formweb-core` is not built.
+- No app code changed. Where a test showed the app to be wrong, the test stays as a strict expected failure whose reason starts with `DEFECT:`. There are 3 such cases: two redirects that differ only by a trailing slash write `location = /old` twice, which nginx rejects; a redirect whose target has its own query is skipped with a warning, although the manual says nginx keeps the query unless the target has its own; and the MCP server on stdio sends no answer to a line that is not JSON, where JSON-RPC 2.0 asks for a parse error (-32700). `git grep -n "DEFECT:" backend/tests frontend/tests` lists them.
+- CI's job `tests` runs the interface tests after the engine tests.
+- Not run for this version: the offline demo's data in `demo/data` was not generated again and still says 0.10.1; the deep check tier, which needs a browser; a real `nginx -t` (nginx was not installed, an independent reader and a stand-in program checked the syntax rules); compiling `.fweb` projects (`formweb-core` was not built); the Rust tests under `vendor/formweb-native`, which are FormWeb's and outside the runner; the desktop shell; macOS and Windows.
+
 ## 0.10.1 · 2026-11-22
 
 - The documents say what 0.10.0 does:

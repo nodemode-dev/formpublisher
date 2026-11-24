@@ -62,6 +62,8 @@ The rows above name the crates `src-tauri/Cargo.toml` asks for, at the versions 
 | PyInstaller 6.22.3 | freezes the engine folder (`setup/freeze_backend`) | GPL-2.0-or-later with the bootloader exception, which permits distributing the frozen program under its own licence |
 | pytest 9.2.0, pluggy 1.7.0, iniconfig 2.3.1, Pygments 2.21.0 (`backend/requirements-test.lock`) | the engine's tests; not frozen: `setup/freeze_backend` excludes keyring's test modules (`keyring.testing`, `keyring.devpi_client`), pytest and pluggy, so a venv that also holds the test tools freezes the same engine | MIT (pytest, pluggy, iniconfig); BSD-2-Clause (Pygments) |
 | pyinstaller-hooks-contrib 2026.10, altgraph 0.17.5, macholib 1.16.4 (macOS only), pefile 2024.8.26 (Windows only) | brought in by PyInstaller for the freeze; not frozen | Apache-2.0 for the run-time hooks and GPL-2.0-or-later for the rest (pyinstaller-hooks-contrib); MIT (altgraph, macholib, pefile) |
+| vitest 5.0.5 | runs the interface's tests (`frontend/tests/unit`); test only, not shipped | MIT |
+| happy-dom 21.0.4 | the stand-in document the interface's tests run in; test only, not shipped | MIT |
 | uv 0.11.32 | writes the requirement locks (`python setup/lock_requirements.py`); not shipped | Apache-2.0 OR MIT |
 | Rust toolchain 1.97.0 (cargo, rustc), pinned in `src-tauri/rust-toolchain.toml` | builds the desktop shell and `formweb-core` from the vendored crates | Apache-2.0 OR MIT |
 
